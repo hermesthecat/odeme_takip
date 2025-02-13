@@ -217,13 +217,7 @@ function createCalendarEvents(payments) {
 
 // Para birimine göre renk döndür
 function getPaymentColor(currency) {
-    const colors = {
-        'TRY': '#198754', // Yeşil
-        'USD': '#0d6efd', // Mavi
-        'EUR': '#6610f2', // Mor
-        'GBP': '#dc3545'  // Kırmızı
-    };
-    return colors[currency] || '#6c757d'; // Varsayılan gri
+    return '#dc3545'; // Bootstrap kırmızı renk kodu
 }
 
 // Takvimi güncelle
