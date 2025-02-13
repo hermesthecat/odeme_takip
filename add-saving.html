@@ -24,18 +24,18 @@
         <i class="bi bi-piggy-bank me-2"></i>
         Yeni Birikim Ekle
       </h1>
-      
+
       <form id="savingForm" class="needs-validation" novalidate>
         <div class="mb-4">
           <label for="savingName" class="form-label">
             <i class="bi bi-tag me-2"></i>Birikim İsmi
           </label>
-          <input 
-            type="text" 
-            class="form-control" 
-            id="savingName" 
+          <input
+            type="text"
+            class="form-control"
+            id="savingName"
             placeholder="Örn: Araba, Tatil, Ev"
-            required 
+            required
           />
           <div class="invalid-feedback">Birikim ismi gereklidir.</div>
         </div>
@@ -55,7 +55,7 @@
             />
             <div class="invalid-feedback">Geçerli bir hedef tutar giriniz.</div>
           </div>
-          
+
           <div class="col-md-6">
             <label for="currentAmount" class="form-label">
               <i class="bi bi-cash-stack me-2"></i>Mevcut Tutar
@@ -68,7 +68,9 @@
               placeholder="0.00"
               required
             />
-            <div class="invalid-feedback">Geçerli bir mevcut tutar giriniz.</div>
+            <div class="invalid-feedback">
+              Geçerli bir mevcut tutar giriniz.
+            </div>
           </div>
         </div>
 
@@ -89,25 +91,15 @@
             <label for="startDate" class="form-label">
               <i class="bi bi-calendar-check me-2"></i>Başlangıç Tarihi
             </label>
-            <input
-              type="date"
-              class="form-control"
-              id="startDate"
-              required
-            />
+            <input type="date" class="form-control" id="startDate" required />
             <div class="invalid-feedback">Başlangıç tarihi seçiniz.</div>
           </div>
-          
+
           <div class="col-md-6">
             <label for="targetDate" class="form-label">
               <i class="bi bi-calendar-event me-2"></i>Hedef Tarihi
             </label>
-            <input
-              type="date"
-              class="form-control"
-              id="targetDate"
-              required
-            />
+            <input type="date" class="form-control" id="targetDate" required />
             <div class="invalid-feedback">Hedef tarihi seçiniz.</div>
           </div>
         </div>

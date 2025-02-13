@@ -34,7 +34,7 @@ function toggleTheme() {
     const currentTheme = getCurrentTheme();
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    
+
     // Tema değişikliği bildirimini göster
     Swal.fire({
         icon: 'success',
@@ -93,7 +93,7 @@ function updateChartTheme(theme) {
 document.addEventListener('DOMContentLoaded', () => {
     const currentTheme = getCurrentTheme();
     setTheme(currentTheme);
-    
+
     // Tema değiştirme butonunu ekle
     const navButtons = document.querySelector('.d-flex.justify-content-between div');
     if (navButtons) {
@@ -248,9 +248,9 @@ function updatePayment(index) {
                 <label class="form-label">Kategori</label>
                 <select id="category" class="form-select" required>
                     <option value="">Kategori Seçin</option>
-                    ${goals.categories.map(category => 
-                        `<option value="${category.name}" ${payment.category === category.name ? 'selected' : ''}>${category.name}</option>`
-                    ).join('')}
+                    ${goals.categories.map(category =>
+            `<option value="${category.name}" ${payment.category === category.name ? 'selected' : ''}>${category.name}</option>`
+        ).join('')}
                 </select>
             </div>
             <div class="mb-3">
@@ -1313,7 +1313,7 @@ function updateCharts(period = 'month') {
     // Butonların aktif/pasif durumlarını güncelle
     const monthlyBtn = document.querySelector('button[onclick="updateCharts(\'month\')"]');
     const yearlyBtn = document.querySelector('button[onclick="updateCharts(\'year\')"]');
-    
+
     if (monthlyBtn && yearlyBtn) {
         if (period === 'month') {
             monthlyBtn.classList.add('active');
@@ -1963,16 +1963,16 @@ function updateBillRemindersDisplay() {
                 </button>
             </div>
             <div class="card-body">
-                ${reminders.length === 0 ? 
-                    '<p class="text-muted mb-0">Henüz fatura hatırlatıcısı eklenmemiş.</p>' :
-                    reminders.map((reminder, index) => {
-                        const daysUntilDue = reminder.dueDay - currentDay;
-                        const isOverdue = daysUntilDue < 0;
-                        const isDueSoon = daysUntilDue <= reminder.reminderDays && daysUntilDue >= 0;
-                        const statusClass = isOverdue ? 'bg-danger' : isDueSoon ? 'bg-warning' : 'bg-success';
-                        const statusText = isOverdue ? 'Gecikmiş!' : isDueSoon ? 'Yaklaşıyor!' : 'Normal';
-                        
-                        return `
+                ${reminders.length === 0 ?
+            '<p class="text-muted mb-0">Henüz fatura hatırlatıcısı eklenmemiş.</p>' :
+            reminders.map((reminder, index) => {
+                const daysUntilDue = reminder.dueDay - currentDay;
+                const isOverdue = daysUntilDue < 0;
+                const isDueSoon = daysUntilDue <= reminder.reminderDays && daysUntilDue >= 0;
+                const statusClass = isOverdue ? 'bg-danger' : isDueSoon ? 'bg-warning' : 'bg-success';
+                const statusText = isOverdue ? 'Gecikmiş!' : isDueSoon ? 'Yaklaşıyor!' : 'Normal';
+
+                return `
                             <div class="mb-3 p-3 border rounded ${isOverdue ? 'border-danger' : isDueSoon ? 'border-warning' : 'border-success'}">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
@@ -1991,7 +1991,7 @@ function updateBillRemindersDisplay() {
                                 </div>
                             </div>
                         `;
-                    }).join('')}
+            }).join('')}
             </div>
         </div>
     `;

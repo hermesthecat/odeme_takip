@@ -150,7 +150,8 @@ body {
     padding: 12px 8px;
 }
 
-.table td, .table th {
+.table td,
+.table th {
     border-color: var(--border-color);
     padding: 12px 8px;
     vertical-align: middle;
@@ -162,12 +163,12 @@ body {
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd) {
     background-color: #252525;
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(even) {
     background-color: #1e1e1e;
     color: #ffffff !important;
 }
@@ -187,7 +188,7 @@ body {
     color: #ffffff !important;
 }
 
-[data-theme="dark"] .table td, 
+[data-theme="dark"] .table td,
 [data-theme="dark"] .table th {
     border-color: #333333;
     color: #ffffff !important;
@@ -299,11 +300,11 @@ body {
 }
 
 /* Açık tema için tablo satır stilleri */
-[data-theme="light"] .table-striped > tbody > tr:nth-of-type(odd) {
+[data-theme="light"] .table-striped>tbody>tr:nth-of-type(odd) {
     background-color: rgba(0, 0, 0, 0.02);
 }
 
-[data-theme="light"] .table-striped > tbody > tr:nth-of-type(even) {
+[data-theme="light"] .table-striped>tbody>tr:nth-of-type(even) {
     background-color: var(--bg-secondary);
 }
 
@@ -373,7 +374,12 @@ body {
 }
 
 /* Başlık stilleri */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: var(--text-primary);
 }
 
@@ -555,7 +561,8 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 0.9rem;
     }
 
-    .table td, .table th {
+    .table td,
+    .table th {
         padding: 0.5rem;
     }
 
@@ -580,8 +587,10 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     /* Form düzenlemesi */
-    .form-control, .form-select {
-        font-size: 16px; /* iOS'ta zoom sorununu önler */
+    .form-control,
+    .form-select {
+        font-size: 16px;
+        /* iOS'ta zoom sorununu önler */
     }
 
     /* Bütçe hedefleri düzenlemesi */
@@ -641,8 +650,10 @@ h1, h2, h3, h4, h5, h6 {
         transform: scale(0.98);
     }
 
-    .table td, .table th {
-        min-height: 44px; /* Dokunmatik hedef boyutu */
+    .table td,
+    .table th {
+        min-height: 44px;
+        /* Dokunmatik hedef boyutu */
     }
 }
 
@@ -688,11 +699,11 @@ h1, h2, h3, h4, h5, h6 {
     color: #ffffff !important;
 }
 
-[data-theme="dark"] h1, 
-[data-theme="dark"] h2, 
-[data-theme="dark"] h3, 
-[data-theme="dark"] h4, 
-[data-theme="dark"] h5, 
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
 [data-theme="dark"] h6 {
     color: #ffffff !important;
 }
