@@ -1625,21 +1625,50 @@ function updateBudgetGoal() {
 // Kategori hedefi ekle
 function addCategoryGoal() {
     Swal.fire({
-        title: 'Kategori Hedefi Ekle',
+        title: '<i class="bi bi-graph-up-arrow text-primary me-2"></i>Kategori Hedefi Ekle',
         html: `
-            <div class="mb-3">
-                <label class="form-label">Kategori Adı</label>
-                <input type="text" id="categoryName" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Aylık Limit (TL)</label>
-                <input type="number" id="categoryLimit" class="form-control" min="0" step="100" required>
-            </div>
+            <form id="categoryGoalForm" class="needs-validation">
+                <div class="mb-3 position-relative">
+                    <label for="categoryName" class="form-label d-flex align-items-center">
+                        <i class="bi bi-wallet-fill me-2 text-success"></i>Kategori Adı
+                    </label>
+                    <input type="text" class="form-control form-control-lg shadow-sm" 
+                           id="categoryName" placeholder="Örn: Market, Faturalar, Eğlence" required>
+                </div>
+                <div class="mb-3 position-relative">
+                    <label for="categoryLimit" class="form-label d-flex align-items-center">
+                        <i class="bi bi-wallet-fill me-2 text-success"></i>Aylık Harcama Limiti
+                    </label>
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text">₺</span>
+                        <input type="number" class="form-control form-control-lg shadow-sm" 
+                               id="categoryLimit" min="0" step="100" placeholder="0.00" required>
+                    </div>
+                </div>
+            </form>
         `,
         showCancelButton: true,
-        confirmButtonText: 'Ekle',
-        cancelButtonText: 'İptal',
+        confirmButtonText: '<i class="bi bi-check-lg me-2"></i>Kaydet',
+        cancelButtonText: '<i class="bi bi-x-lg me-2"></i>İptal',
+        customClass: {
+            container: getCurrentTheme() === 'dark' ? 'swal2-dark' : '',
+            popup: 'shadow-lg border-0',
+            title: 'text-center fs-4 fw-bold',
+            htmlContainer: 'text-start',
+            confirmButton: 'btn btn-success px-3 me-3',
+            cancelButton: 'btn btn-outline-secondary px-3'
+        },
+        width: '32rem',
+        padding: '2rem',
+        buttonsStyling: false,
+        focusConfirm: false,
         preConfirm: () => {
+            const form = document.getElementById('categoryGoalForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return false;
+            }
+
             const name = document.getElementById('categoryName').value.trim();
             const limit = parseFloat(document.getElementById('categoryLimit').value);
 
