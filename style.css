@@ -11,7 +11,7 @@ body {
 /* Kart stilleri */
 .card {
     background-color: white;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     margin-bottom: 20px;
 }
@@ -32,13 +32,15 @@ body {
 }
 
 /* Form stilleri */
-.form-control:focus, .form-select:focus {
+.form-control:focus,
+.form-select:focus {
     border-color: #80bdff;
-    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
 }
 
 /* Başlık stilleri */
-h1, h2 {
+h1,
+h2 {
     color: #2c3e50;
 }
 
@@ -92,7 +94,7 @@ h1, h2 {
     .container {
         padding: 0 15px;
     }
-    
+
     .table-responsive {
         margin: 0 -15px;
     }
@@ -100,4 +102,4 @@ h1, h2 {
     #calendar {
         height: 400px;
     }
-} 
+}

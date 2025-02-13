@@ -6,24 +6,9 @@
 const STORAGE_KEY = 'payments';
 const INCOME_STORAGE_KEY = 'incomes';
 
-// Eski verileri kontrol et ve taşı
-function migrateOldData() {
-    try {
-        const oldData = localStorage.getItem('payment_tracking_data');
-        if (oldData) {
-            localStorage.setItem(STORAGE_KEY, oldData);
-            localStorage.removeItem('payment_tracking_data');
-            console.log('Eski veriler taşındı');
-        }
-    } catch (error) {
-        console.error('Veri taşıma hatası:', error);
-    }
-}
-
 // LocalStorage'dan ödemeleri yükleme
 function loadPayments() {
     try {
-        migrateOldData(); // Eski verileri kontrol et
         const payments = localStorage.getItem(STORAGE_KEY);
         console.log('Yüklenen ödemeler:', payments);
         return payments ? JSON.parse(payments) : [];
@@ -75,14 +60,14 @@ function saveIncomes(incomes) {
 function calculateNextPaymentDate(firstPaymentDate, frequency) {
     const firstDate = new Date(firstPaymentDate);
     const today = new Date();
-    
+
     if (frequency === '0') return firstDate;
-    
+
     let nextDate = new Date(firstDate);
     while (nextDate <= today) {
         nextDate.setMonth(nextDate.getMonth() + parseInt(frequency));
     }
-    
+
     return nextDate;
 }
 
@@ -94,7 +79,7 @@ function formatDate(date) {
 // Ödeme listesini güncelleme
 function updatePaymentList() {
     console.log('updatePaymentList fonksiyonu çağrıldı');
-    
+
     const tbody = document.getElementById('paymentList');
     if (!tbody) {
         console.error('paymentList elementi bulunamadı!');
@@ -105,7 +90,7 @@ function updatePaymentList() {
     console.log('Yüklenen ödeme sayısı:', payments.length);
 
     tbody.innerHTML = '';
-    
+
     if (!Array.isArray(payments) || payments.length === 0) {
         console.log('Ödeme listesi boş');
         const row = document.createElement('tr');
@@ -113,11 +98,11 @@ function updatePaymentList() {
         tbody.appendChild(row);
         return;
     }
-    
+
     payments.forEach((payment, index) => {
         try {
             const nextPaymentDate = calculateNextPaymentDate(payment.firstPaymentDate, payment.frequency);
-            
+
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${payment.name || '-'}</td>
@@ -140,7 +125,7 @@ function updatePaymentList() {
 // Gelir listesini güncelleme
 function updateIncomeList() {
     console.log('updateIncomeList fonksiyonu çağrıldı');
-    
+
     const tbody = document.getElementById('incomeList');
     if (!tbody) {
         console.error('incomeList elementi bulunamadı!');
@@ -151,7 +136,7 @@ function updateIncomeList() {
     console.log('Yüklenen gelir sayısı:', incomes.length);
 
     tbody.innerHTML = '';
-    
+
     if (!Array.isArray(incomes) || incomes.length === 0) {
         console.log('Gelir listesi boş');
         const row = document.createElement('tr');
@@ -159,11 +144,11 @@ function updateIncomeList() {
         tbody.appendChild(row);
         return;
     }
-    
+
     incomes.forEach((income, index) => {
         try {
             const nextIncomeDate = calculateNextPaymentDate(income.firstIncomeDate, income.frequency);
-            
+
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${income.name || '-'}</td>
@@ -224,11 +209,11 @@ function deleteIncome(index) {
 // Form işlemleri
 if (document.getElementById('paymentForm')) {
     const form = document.getElementById('paymentForm');
-    
+
     // Form gönderildiğinde
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
-        
+
         try {
             // Form verilerini al
             const payment = {
@@ -238,17 +223,17 @@ if (document.getElementById('paymentForm')) {
                 firstPaymentDate: document.getElementById('firstPaymentDate').value,
                 frequency: document.getElementById('frequency').value
             };
-            
+
             // Veri kontrolü
             if (!payment.name || isNaN(payment.amount) || !payment.firstPaymentDate) {
                 alert('Lütfen tüm alanları doğru şekilde doldurunuz.');
                 return;
             }
-            
+
             // Mevcut ödemeleri yükle ve yeni ödemeyi ekle
             const payments = loadPayments();
             payments.push(payment);
-            
+
             // Kaydet ve yönlendir
             if (savePayments(payments)) {
                 alert('Ödeme başarıyla kaydedildi!');
@@ -266,10 +251,10 @@ if (document.getElementById('paymentForm')) {
 // Gelir formu işlemleri
 if (document.getElementById('incomeForm')) {
     const form = document.getElementById('incomeForm');
-    
-    form.addEventListener('submit', function(e) {
+
+    form.addEventListener('submit', function (e) {
         e.preventDefault();
-        
+
         try {
             const income = {
                 name: document.getElementById('incomeName').value.trim(),
@@ -278,15 +263,15 @@ if (document.getElementById('incomeForm')) {
                 firstIncomeDate: document.getElementById('firstIncomeDate').value,
                 frequency: document.getElementById('frequency').value
             };
-            
+
             if (!income.name || isNaN(income.amount) || !income.firstIncomeDate) {
                 alert('Lütfen tüm alanları doğru şekilde doldurunuz.');
                 return;
             }
-            
+
             const incomes = loadIncomes();
             incomes.push(income);
-            
+
             if (saveIncomes(incomes)) {
                 alert('Gelir başarıyla kaydedildi!');
                 window.location.href = 'index.html';
@@ -310,10 +295,10 @@ function createCalendarEvents(payments) {
     // Ödemeleri ekle
     payments.forEach(payment => {
         let currentDate = new Date(payment.firstPaymentDate);
-        
+
         while (currentDate <= sixMonthsLater) {
             events.push({
-                title: `Ödeme: ${payment.name} - ${payment.amount} ${payment.currency}`,
+                title: `${payment.name} - ${payment.amount} ${payment.currency}`,
                 start: currentDate.toISOString().split('T')[0],
                 backgroundColor: '#dc3545', // Kırmızı
                 borderColor: '#dc3545',
@@ -326,7 +311,7 @@ function createCalendarEvents(payments) {
             });
 
             if (payment.frequency === '0') break;
-            
+
             const nextDate = new Date(currentDate);
             nextDate.setMonth(nextDate.getMonth() + parseInt(payment.frequency));
             currentDate = nextDate;
@@ -337,10 +322,10 @@ function createCalendarEvents(payments) {
     const incomes = loadIncomes();
     incomes.forEach(income => {
         let currentDate = new Date(income.firstIncomeDate);
-        
+
         while (currentDate <= sixMonthsLater) {
             events.push({
-                title: `Gelir: ${income.name} - ${income.amount} ${income.currency}`,
+                title: `${income.name} - ${income.amount} ${income.currency}`,
                 start: currentDate.toISOString().split('T')[0],
                 backgroundColor: '#198754', // Yeşil
                 borderColor: '#198754',
@@ -353,7 +338,7 @@ function createCalendarEvents(payments) {
             });
 
             if (income.frequency === '0') break;
-            
+
             const nextDate = new Date(currentDate);
             nextDate.setMonth(nextDate.getMonth() + parseInt(income.frequency));
             currentDate = nextDate;
@@ -382,7 +367,7 @@ function updateCalendar() {
                 right: 'dayGridMonth,dayGridWeek'
             },
             events: events,
-            eventClick: function(info) {
+            eventClick: function (info) {
                 alert(`Ödeme Detayları:
                     \nÖdeme: ${info.event.title}
                     \nTarih: ${formatDate(info.event.start)}
@@ -424,7 +409,7 @@ function formatMoney(amount) {
 function calculateMonthlyBalance(year, month) {
     const startDate = new Date(year, month, 1);
     const endDate = new Date(year, month + 1, 0);
-    
+
     let totalIncome = 0;
     let totalExpense = 0;
 
@@ -482,23 +467,23 @@ function updateSummaryCards() {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth();
-    
+
     const balance = calculateMonthlyBalance(year, month);
-    
+
     // Gelir kartını güncelle
     const incomeElement = document.getElementById('monthlyIncome');
     if (incomeElement) {
         incomeElement.textContent = formatMoney(balance.income);
         incomeElement.classList.toggle('text-success', balance.income > 0);
     }
-    
+
     // Gider kartını güncelle
     const expenseElement = document.getElementById('monthlyExpense');
     if (expenseElement) {
         expenseElement.textContent = formatMoney(balance.expense);
         expenseElement.classList.toggle('text-danger', balance.expense > 0);
     }
-    
+
     // Net durum kartını güncelle
     const balanceElement = document.getElementById('monthlyBalance');
     if (balanceElement) {
@@ -506,7 +491,7 @@ function updateSummaryCards() {
         balanceElement.classList.toggle('text-success', balance.balance > 0);
         balanceElement.classList.toggle('text-danger', balance.balance < 0);
     }
-    
+
     // Dönem kartını güncelle
     const periodElement = document.getElementById('currentPeriod');
     if (periodElement) {
@@ -519,19 +504,18 @@ function updateSummaryCards() {
 
 // Ana sayfa yüklendiğinde
 if (document.getElementById('paymentList')) {
-    window.addEventListener('load', function() {
+    window.addEventListener('load', function () {
         console.log('Ana sayfa yüklendi');
-        migrateOldData();
         updatePaymentList();
         updateIncomeList();
         updateCalendar();
         updateSummaryCards(); // Özet kartlarını güncelle
     });
-    
+
     // Test butonu için event listener
     const testButton = document.getElementById('testButton');
     if (testButton) {
-        testButton.addEventListener('click', function() {
+        testButton.addEventListener('click', function () {
             const payments = localStorage.getItem(STORAGE_KEY);
             console.log('LocalStorage içeriği:', payments);
             if (payments) {
