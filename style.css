@@ -63,6 +63,32 @@ body {
     border-color: var(--border-color);
 }
 
+/* Karanlık tema için tablo satır stilleri */
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Açık tema için tablo satır stilleri */
+[data-theme="light"] .table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .table-striped > tbody > tr:nth-of-type(even) {
+    background-color: var(--bg-secondary);
+}
+
+[data-theme="light"] .table-hover tbody tr:hover {
+    background-color: rgba(0, 0, 0, 0.075);
+}
+
 /* Form stilleri */
 .form-control,
 .form-select {
