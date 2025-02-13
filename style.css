@@ -57,28 +57,46 @@ body {
     background-color: var(--bg-primary);
     border-bottom: 2px solid var(--border-color);
     color: var(--text-primary);
+    font-weight: 600;
+    padding: 12px 8px;
 }
 
 .table td, .table th {
     border-color: var(--border-color);
+    padding: 12px 8px;
+    vertical-align: middle;
 }
 
 /* Karanlık tema için tablo satır stilleri */
 [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
-    background-color: var(--bg-secondary);
+    background-color: rgba(255, 255, 255, 0.01);
 }
 
 [data-theme="dark"] .table-hover tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .table {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .table td, 
+[data-theme="dark"] .table th {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Açık tema için tablo satır stilleri */
 [data-theme="light"] .table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.02);
 }
 
 [data-theme="light"] .table-striped > tbody > tr:nth-of-type(even) {
@@ -86,7 +104,32 @@ body {
 }
 
 [data-theme="light"] .table-hover tbody tr:hover {
-    background-color: rgba(0, 0, 0, 0.075);
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Tablo içindeki butonlar için stil */
+.table .btn {
+    padding: 4px 8px;
+    margin: 0 2px;
+}
+
+/* Progress bar stilleri */
+[data-theme="dark"] .progress {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .progress-bar {
+    color: #fff;
+}
+
+/* Döviz kurları kartı için özel stiller */
+[data-theme="dark"] #exchangeRates .card {
+    background-color: var(--bg-secondary);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] #exchangeRates .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
 }
 
 /* Form stilleri */
