@@ -4,8 +4,8 @@
   "description": "Kişisel bütçe kontrol ve takip sistemi",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#121212",
+  "theme_color": "#121212",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -26,15 +26,22 @@
       "name": "Ödeme Ekle",
       "short_name": "Ödeme",
       "description": "Yeni ödeme ekle",
-      "url": "/add-payment.html",
+      "url": "/?action=add-payment",
       "icons": [{ "src": "icons/payment-96.png", "sizes": "96x96" }]
     },
     {
       "name": "Gelir Ekle",
       "short_name": "Gelir",
       "description": "Yeni gelir ekle",
-      "url": "/add-income.html",
+      "url": "/?action=add-income",
       "icons": [{ "src": "icons/income-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Birikim Ekle",
+      "short_name": "Birikim",
+      "description": "Yeni birikim hedefi ekle",
+      "url": "/?action=add-saving",
+      "icons": [{ "src": "icons/saving-96.png", "sizes": "96x96" }]
     }
   ]
 }
