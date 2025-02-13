@@ -179,13 +179,97 @@ if (document.getElementById('paymentForm')) {
     });
 }
 
+// Takvim olaylarını oluştur
+function createCalendarEvents(payments) {
+    const events = [];
+    const today = new Date();
+    const sixMonthsLater = new Date();
+    sixMonthsLater.setMonth(today.getMonth() + 6);
+
+    payments.forEach(payment => {
+        let currentDate = new Date(payment.firstPaymentDate);
+        
+        // Gelecek 6 aylık ödemeleri hesapla
+        while (currentDate <= sixMonthsLater) {
+            events.push({
+                title: `${payment.name} - ${payment.amount} ${payment.currency}`,
+                start: currentDate.toISOString().split('T')[0],
+                backgroundColor: getPaymentColor(payment.currency),
+                borderColor: getPaymentColor(payment.currency),
+                extendedProps: {
+                    amount: payment.amount,
+                    currency: payment.currency,
+                    frequency: payment.frequency
+                }
+            });
+
+            // Bir sonraki ödeme tarihini hesapla
+            if (payment.frequency === '0') break; // Tek seferlik ödeme
+            
+            const nextDate = new Date(currentDate);
+            nextDate.setMonth(nextDate.getMonth() + parseInt(payment.frequency));
+            currentDate = nextDate;
+        }
+    });
+
+    return events;
+}
+
+// Para birimine göre renk döndür
+function getPaymentColor(currency) {
+    const colors = {
+        'TRY': '#198754', // Yeşil
+        'USD': '#0d6efd', // Mavi
+        'EUR': '#6610f2', // Mor
+        'GBP': '#dc3545'  // Kırmızı
+    };
+    return colors[currency] || '#6c757d'; // Varsayılan gri
+}
+
+// Takvimi güncelle
+function updateCalendar() {
+    const calendarEl = document.getElementById('calendar');
+    if (!calendarEl) return;
+
+    const payments = loadPayments();
+    const events = createCalendarEvents(payments);
+
+    if (!calendarEl.fullCalendar) {
+        // Takvimi ilk kez oluştur
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            locale: 'tr',
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,dayGridWeek'
+            },
+            events: events,
+            eventClick: function(info) {
+                alert(`Ödeme Detayları:
+                    \nÖdeme: ${info.event.title}
+                    \nTarih: ${formatDate(info.event.start)}
+                    \nTutar: ${info.event.extendedProps.amount} ${info.event.extendedProps.currency}
+                    \nTekrar: ${getFrequencyText(info.event.extendedProps.frequency)}`);
+            }
+        });
+        calendar.render();
+        calendarEl.fullCalendar = calendar;
+    } else {
+        // Mevcut takvimi güncelle
+        calendarEl.fullCalendar.removeAllEvents();
+        calendarEl.fullCalendar.addEventSource(events);
+    }
+}
+
 // Ana sayfa yüklendiğinde
 if (document.getElementById('paymentList')) {
-    // Sayfa yüklendiğinde listeyi güncelle
+    // Sayfa yüklendiğinde listeyi ve takvimi güncelle
     window.addEventListener('load', function() {
         console.log('Ana sayfa yüklendi');
-        migrateOldData(); // Eski verileri kontrol et
+        migrateOldData();
         updatePaymentList();
+        updateCalendar();
     });
     
     // Test butonu için event listener

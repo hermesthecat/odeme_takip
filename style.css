@@ -8,11 +8,22 @@ body {
     margin: 0 auto;
 }
 
-/* Tablo stilleri */
-.table {
+/* Kart stilleri */
+.card {
     background-color: white;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Tablo stilleri */
+.table {
+    margin-bottom: 0;
 }
 
 .table thead th {
@@ -52,6 +63,30 @@ h1, h2 {
     border-color: #545b62;
 }
 
+/* Takvim stilleri */
+#calendar {
+    height: 600px;
+    margin: 20px 0;
+}
+
+.fc-event {
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.fc-event-title {
+    font-weight: 500;
+    white-space: normal;
+}
+
+.fc-header-toolbar {
+    margin-bottom: 1.5em;
+}
+
+.fc-day-today {
+    background-color: #f8f9fa !important;
+}
+
 /* Responsive düzenlemeler */
 @media (max-width: 768px) {
     .container {
@@ -60,5 +95,9 @@ h1, h2 {
     
     .table-responsive {
         margin: 0 -15px;
+    }
+
+    #calendar {
+        height: 400px;
     }
 } 
