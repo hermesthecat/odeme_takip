@@ -33,7 +33,7 @@ git clone https://github.com/hermesthecat/odeme_takip.git
 2. Proje dizinine gidin / Go to project directory
 
 ```bash
-cd butce-kontrol
+cd odeme_takip
 ```
 
 3. Bir web sunucusu ile çalıştırın / Run with a web server
