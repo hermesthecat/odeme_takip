@@ -12,7 +12,11 @@ function loadPayments() {
         const payments = localStorage.getItem(STORAGE_KEY);
         return payments ? JSON.parse(payments) : [];
     } catch (error) {
-        alert('Ödemeler yüklenirken hata oluştu: ' + error.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Ödemeler yüklenirken hata oluştu: ' + error.message
+        });
         return [];
     }
 }
@@ -24,7 +28,11 @@ function savePayments(payments) {
         localStorage.setItem(STORAGE_KEY, data);
         return true;
     } catch (error) {
-        alert('Ödemeler kaydedilirken hata oluştu: ' + error.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Ödemeler kaydedilirken hata oluştu: ' + error.message
+        });
         return false;
     }
 }
@@ -35,7 +43,11 @@ function loadIncomes() {
         const incomes = localStorage.getItem(INCOME_STORAGE_KEY);
         return incomes ? JSON.parse(incomes) : [];
     } catch (error) {
-        alert('Gelirler yüklenirken hata oluştu: ' + error.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Gelirler yüklenirken hata oluştu: ' + error.message
+        });
         return [];
     }
 }
@@ -47,7 +59,11 @@ function saveIncomes(incomes) {
         localStorage.setItem(INCOME_STORAGE_KEY, data);
         return true;
     } catch (error) {
-        alert('Gelirler kaydedilirken hata oluştu: ' + error.message);
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Gelirler kaydedilirken hata oluştu: ' + error.message
+        });
         return false;
     }
 }
@@ -76,7 +92,11 @@ function formatDate(date) {
 function updatePaymentList() {
     const tbody = document.getElementById('paymentList');
     if (!tbody) {
-        alert('Ödeme listesi tablosu bulunamadı!');
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Ödeme listesi tablosu bulunamadı!'
+        });
         return;
     }
 
@@ -117,7 +137,11 @@ function updatePaymentList() {
 function updateIncomeList() {
     const tbody = document.getElementById('incomeList');
     if (!tbody) {
-        alert('Gelir listesi tablosu bulunamadı!');
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Gelir listesi tablosu bulunamadı!'
+        });
         return;
     }
 
@@ -171,37 +195,67 @@ function getFrequencyText(frequency) {
 
 // Ödeme silme
 function deletePayment(index) {
-    if (confirm('Bu ödemeyi silmek istediğinizden emin misiniz?')) {
-        const payments = loadPayments();
-        payments.splice(index, 1);
-        if (savePayments(payments)) {
-            updatePaymentList();
+    Swal.fire({
+        title: 'Emin misiniz?',
+        text: "Bu ödemeyi silmek istediğinizden emin misiniz?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Evet, sil!',
+        cancelButtonText: 'İptal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const payments = loadPayments();
+            payments.splice(index, 1);
+            if (savePayments(payments)) {
+                updatePaymentList();
+                Swal.fire(
+                    'Silindi!',
+                    'Ödeme başarıyla silindi.',
+                    'success'
+                );
+            }
         }
-    }
+    });
 }
 
 // Gelir silme
 function deleteIncome(index) {
-    if (confirm('Bu geliri silmek istediğinizden emin misiniz?')) {
-        const incomes = loadIncomes();
-        incomes.splice(index, 1);
-        if (saveIncomes(incomes)) {
-            updateIncomeList();
-            updateCalendar();
+    Swal.fire({
+        title: 'Emin misiniz?',
+        text: "Bu geliri silmek istediğinizden emin misiniz?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Evet, sil!',
+        cancelButtonText: 'İptal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const incomes = loadIncomes();
+            incomes.splice(index, 1);
+            if (saveIncomes(incomes)) {
+                updateIncomeList();
+                updateCalendar();
+                Swal.fire(
+                    'Silindi!',
+                    'Gelir başarıyla silindi.',
+                    'success'
+                );
+            }
         }
-    }
+    });
 }
 
 // Form işlemleri
 if (document.getElementById('paymentForm')) {
     const form = document.getElementById('paymentForm');
 
-    // Form gönderildiğinde
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
         try {
-            // Form verilerini al
             const payment = {
                 name: document.getElementById('paymentName').value.trim(),
                 amount: parseFloat(document.getElementById('amount').value),
@@ -210,26 +264,41 @@ if (document.getElementById('paymentForm')) {
                 frequency: document.getElementById('frequency').value
             };
 
-            // Veri kontrolü
             if (!payment.name || isNaN(payment.amount) || !payment.firstPaymentDate) {
-                alert('Lütfen tüm alanları doğru şekilde doldurunuz.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Lütfen tüm alanları doğru şekilde doldurunuz.'
+                });
                 return;
             }
 
-            // Mevcut ödemeleri yükle ve yeni ödemeyi ekle
             const payments = loadPayments();
             payments.push(payment);
 
-            // Kaydet ve yönlendir
             if (savePayments(payments)) {
-                alert('Ödeme başarıyla kaydedildi!');
-                window.location.href = 'index.html'; // URL düzeltildi
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Ödeme başarıyla kaydedildi!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = 'index.html';
+                });
             } else {
-                alert('Ödeme kaydedilirken bir hata oluştu!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Ödeme kaydedilirken bir hata oluştu!'
+                });
             }
         } catch (error) {
-            console.error('Kayıt sırasında hata:', error);
-            alert('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata!',
+                text: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz.'
+            });
         }
     });
 }
@@ -251,7 +320,11 @@ if (document.getElementById('incomeForm')) {
             };
 
             if (!income.name || isNaN(income.amount) || !income.firstIncomeDate) {
-                alert('Lütfen tüm alanları doğru şekilde doldurunuz.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Lütfen tüm alanları doğru şekilde doldurunuz.'
+                });
                 return;
             }
 
@@ -259,14 +332,28 @@ if (document.getElementById('incomeForm')) {
             incomes.push(income);
 
             if (saveIncomes(incomes)) {
-                alert('Gelir başarıyla kaydedildi!');
-                window.location.href = 'index.html';
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Gelir başarıyla kaydedildi!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = 'index.html';
+                });
             } else {
-                alert('Gelir kaydedilirken bir hata oluştu!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Gelir kaydedilirken bir hata oluştu!'
+                });
             }
         } catch (error) {
-            console.error('Kayıt sırasında hata:', error);
-            alert('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata!',
+                text: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz.'
+            });
         }
     });
 }
@@ -343,7 +430,6 @@ function updateCalendar() {
     const events = createCalendarEvents(payments);
 
     if (!calendarEl.fullCalendar) {
-        // Takvimi ilk kez oluştur
         const calendar = new FullCalendar.Calendar(calendarEl, {
             locale: 'tr',
             initialView: 'dayGridMonth',
@@ -354,17 +440,23 @@ function updateCalendar() {
             },
             events: events,
             eventClick: function (info) {
-                alert(`Ödeme Detayları:
-                    \nÖdeme: ${info.event.title}
-                    \nTarih: ${formatDate(info.event.start)}
-                    \nTutar: ${info.event.extendedProps.amount} ${info.event.extendedProps.currency}
-                    \nTekrar: ${getFrequencyText(info.event.extendedProps.frequency)}`);
+                Swal.fire({
+                    title: info.event.extendedProps.type === 'payment' ? 'Ödeme Detayları' : 'Gelir Detayları',
+                    html: `
+                        <div class="text-start">
+                            <p><strong>İsim:</strong> ${info.event.title}</p>
+                            <p><strong>Tarih:</strong> ${formatDate(info.event.start)}</p>
+                            <p><strong>Tutar:</strong> ${info.event.extendedProps.amount} ${info.event.extendedProps.currency}</p>
+                            <p><strong>Tekrar:</strong> ${getFrequencyText(info.event.extendedProps.frequency)}</p>
+                        </div>
+                    `,
+                    icon: info.event.extendedProps.type === 'payment' ? 'error' : 'success'
+                });
             }
         });
         calendar.render();
         calendarEl.fullCalendar = calendar;
     } else {
-        // Mevcut takvimi güncelle
         calendarEl.fullCalendar.removeAllEvents();
         calendarEl.fullCalendar.addEventSource(events);
     }
