@@ -2300,4 +2300,144 @@ function showAddSavingModal() {
     const targetDate = new Date();
     targetDate.setMonth(targetDate.getMonth() + 12); // Varsayılan olarak 1 yıl sonrası
     document.getElementById('targetDate').valueAsDate = targetDate;
-} 
+}
+
+// Ödeme ekleme modalını göster
+function showAddPaymentModal() {
+    // Kategorileri yükle
+    const goals = loadBudgetGoals();
+    const categoryOptions = goals.categories.map(category => 
+        `<option value="${category.name}">${category.name}</option>`
+    ).join('');
+
+    Swal.fire({
+        title: '<i class="bi bi-credit-card-fill text-danger me-2"></i>Ödeme Ekle',
+        html: `
+            <form id="paymentModalForm" class="needs-validation">
+                <div class="mb-3 position-relative">
+                    <label for="paymentName" class="form-label d-flex align-items-center">
+                        <i class="bi bi-tag-fill me-2 text-primary"></i>Ödeme İsmi
+                    </label>
+                    <input type="text" class="form-control form-control-lg shadow-sm" id="paymentName" 
+                           placeholder="Örn: Elektrik, Su, Doğalgaz" required>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label for="amount" class="form-label d-flex align-items-center">
+                            <i class="bi bi-cash-stack me-2 text-success"></i>Tutar
+                        </label>
+                        <input type="number" class="form-control form-control-lg shadow-sm" id="amount" 
+                               step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="currency" class="form-label d-flex align-items-center">
+                            <i class="bi bi-currency-exchange me-2 text-warning"></i>Para Birimi
+                        </label>
+                        <select class="form-select form-select-lg shadow-sm" id="currency" required>
+                            <option value="TRY">₺ TRY</option>
+                            <option value="USD">$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                            <option value="GBP">£ GBP</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label d-flex align-items-center">
+                        <i class="bi bi-folder-fill me-2 text-warning"></i>Kategori
+                    </label>
+                    <select class="form-select form-select-lg shadow-sm" id="category" required>
+                        <option value="">Kategori Seçin</option>
+                        ${categoryOptions}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="firstPaymentDate" class="form-label d-flex align-items-center">
+                        <i class="bi bi-calendar-check-fill me-2 text-info"></i>İlk Ödeme Tarihi
+                    </label>
+                    <input type="date" class="form-control form-control-lg shadow-sm" id="firstPaymentDate" required>
+                </div>
+                <div class="mb-3">
+                    <label for="frequency" class="form-label d-flex align-items-center">
+                        <i class="bi bi-arrow-repeat me-2 text-secondary"></i>Tekrarlama Sıklığı
+                    </label>
+                    <select class="form-select form-select-lg shadow-sm" id="frequency" required>
+                        <option value="0">🔄 Tekrar Yok</option>
+                        <option value="1">📅 Her Ay</option>
+                        <option value="2">📅 2 Ayda Bir</option>
+                        <option value="3">📅 3 Ayda Bir</option>
+                        <option value="4">📅 4 Ayda Bir</option>
+                        <option value="5">📅 5 Ayda Bir</option>
+                        <option value="6">📅 6 Ayda Bir</option>
+                        <option value="12">📅 Yıllık</option>
+                    </select>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '<i class="bi bi-check-lg me-2"></i>Kaydet',
+        cancelButtonText: '<i class="bi bi-x-lg me-2"></i>İptal',
+        customClass: {
+            container: getCurrentTheme() === 'dark' ? 'swal2-dark' : '',
+            popup: 'shadow-lg border-0',
+            title: 'text-start fs-4 fw-bold',
+            htmlContainer: 'text-start',
+            confirmButton: 'btn btn-success btn-lg px-4',
+            cancelButton: 'btn btn-outline-secondary btn-lg px-4'
+        },
+        width: '32rem',
+        padding: '2rem',
+        buttonsStyling: false,
+        showCloseButton: true,
+        focusConfirm: false,
+        preConfirm: () => {
+            const form = document.getElementById('paymentModalForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return false;
+            }
+
+            const payment = {
+                name: document.getElementById('paymentName').value.trim(),
+                amount: parseFloat(document.getElementById('amount').value),
+                currency: document.getElementById('currency').value,
+                category: document.getElementById('category').value,
+                firstPaymentDate: document.getElementById('firstPaymentDate').value,
+                frequency: document.getElementById('frequency').value
+            };
+
+            if (!payment.name || isNaN(payment.amount) || !payment.firstPaymentDate || !payment.category) {
+                Swal.showValidationMessage('Lütfen tüm alanları doğru şekilde doldurunuz.');
+                return false;
+            }
+
+            return payment;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const payments = loadPayments();
+            payments.push(result.value);
+            if (savePayments(payments)) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Ödeme başarıyla kaydedildi!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: {
+                        popup: 'shadow border-0'
+                    }
+                }).then(() => {
+                    updatePaymentList();
+                    updateSummaryCards();
+                    updateCharts();
+                    updateCalendar();
+                    updateBudgetGoalsDisplay();
+                });
+            }
+        }
+    });
+
+    // Bugünün tarihini varsayılan olarak ayarla
+    document.getElementById('firstPaymentDate').valueAsDate = new Date();
+}
+ 
