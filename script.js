@@ -399,15 +399,133 @@ function updateCalendar() {
     }
 }
 
+// Para birimlerinin TL karşılıkları (sabit kur için)
+const EXCHANGE_RATES = {
+    'TRY': 1,
+    'USD': 30.50,
+    'EUR': 33.20,
+    'GBP': 38.70
+};
+
+// Tutarı TL'ye çevir
+function convertToTRY(amount, currency) {
+    return amount * EXCHANGE_RATES[currency];
+}
+
+// Tutarı formatla
+function formatMoney(amount) {
+    return new Intl.NumberFormat('tr-TR', {
+        style: 'currency',
+        currency: 'TRY'
+    }).format(amount);
+}
+
+// Belirli bir ay için gelir ve giderleri hesapla
+function calculateMonthlyBalance(year, month) {
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
+    
+    let totalIncome = 0;
+    let totalExpense = 0;
+
+    // Gelirleri hesapla
+    const incomes = loadIncomes();
+    incomes.forEach(income => {
+        const incomeDate = new Date(income.firstIncomeDate);
+        if (income.frequency === '0') {
+            // Tek seferlik gelir
+            if (incomeDate.getFullYear() === year && incomeDate.getMonth() === month) {
+                totalIncome += convertToTRY(income.amount, income.currency);
+            }
+        } else {
+            // Tekrarlı gelir
+            let currentDate = new Date(income.firstIncomeDate);
+            while (currentDate <= endDate) {
+                if (currentDate >= startDate && currentDate <= endDate) {
+                    totalIncome += convertToTRY(income.amount, income.currency);
+                }
+                currentDate.setMonth(currentDate.getMonth() + parseInt(income.frequency));
+            }
+        }
+    });
+
+    // Giderleri hesapla
+    const payments = loadPayments();
+    payments.forEach(payment => {
+        const paymentDate = new Date(payment.firstPaymentDate);
+        if (payment.frequency === '0') {
+            // Tek seferlik ödeme
+            if (paymentDate.getFullYear() === year && paymentDate.getMonth() === month) {
+                totalExpense += convertToTRY(payment.amount, payment.currency);
+            }
+        } else {
+            // Tekrarlı ödeme
+            let currentDate = new Date(payment.firstPaymentDate);
+            while (currentDate <= endDate) {
+                if (currentDate >= startDate && currentDate <= endDate) {
+                    totalExpense += convertToTRY(payment.amount, payment.currency);
+                }
+                currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+            }
+        }
+    });
+
+    return {
+        income: totalIncome,
+        expense: totalExpense,
+        balance: totalIncome - totalExpense
+    };
+}
+
+// Özet kartlarını güncelle
+function updateSummaryCards() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    
+    const balance = calculateMonthlyBalance(year, month);
+    
+    // Gelir kartını güncelle
+    const incomeElement = document.getElementById('monthlyIncome');
+    if (incomeElement) {
+        incomeElement.textContent = formatMoney(balance.income);
+        incomeElement.classList.toggle('text-success', balance.income > 0);
+    }
+    
+    // Gider kartını güncelle
+    const expenseElement = document.getElementById('monthlyExpense');
+    if (expenseElement) {
+        expenseElement.textContent = formatMoney(balance.expense);
+        expenseElement.classList.toggle('text-danger', balance.expense > 0);
+    }
+    
+    // Net durum kartını güncelle
+    const balanceElement = document.getElementById('monthlyBalance');
+    if (balanceElement) {
+        balanceElement.textContent = formatMoney(balance.balance);
+        balanceElement.classList.toggle('text-success', balance.balance > 0);
+        balanceElement.classList.toggle('text-danger', balance.balance < 0);
+    }
+    
+    // Dönem kartını güncelle
+    const periodElement = document.getElementById('currentPeriod');
+    if (periodElement) {
+        periodElement.textContent = new Intl.DateTimeFormat('tr-TR', {
+            year: 'numeric',
+            month: 'long'
+        }).format(now);
+    }
+}
+
 // Ana sayfa yüklendiğinde
 if (document.getElementById('paymentList')) {
-    // Sayfa yüklendiğinde listeyi ve takvimi güncelle
     window.addEventListener('load', function() {
         console.log('Ana sayfa yüklendi');
         migrateOldData();
         updatePaymentList();
         updateIncomeList();
         updateCalendar();
+        updateSummaryCards(); // Özet kartlarını güncelle
     });
     
     // Test butonu için event listener
@@ -420,6 +538,9 @@ if (document.getElementById('paymentList')) {
                 console.log('Ayrıştırılmış veriler:', JSON.parse(payments));
             }
             updatePaymentList();
+            updateIncomeList();
+            updateCalendar();
+            updateSummaryCards(); // Özet kartlarını güncelle
         });
     }
 } 
