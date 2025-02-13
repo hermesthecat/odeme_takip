@@ -383,7 +383,7 @@ function updateIncomeList() {
                 <td>${getFrequencyText(income.frequency)}</td>
                 <td>${formatDate(nextIncomeDate)}</td>
                 <td>
-                    <button class="btn btn-success btn-sm me-1" onclick="updateIncome(${index})">
+                    <button class="btn btn-primary btn-sm me-1" onclick="updateIncome(${index})">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <button class="btn btn-danger btn-sm" onclick="deleteIncome(${index})">
@@ -1036,8 +1036,12 @@ function updateSavingList() {
                     </div>
                 </td>
                 <td>
-                    <button class="btn btn-primary btn-sm me-1" onclick="updateSaving(${index})">Güncelle</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteSaving(${index})">Sil</button>
+                    <button class="btn btn-primary btn-sm me-1" onclick="updateSaving(${index})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSaving(${index})">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             `;
             tbody.appendChild(row);
