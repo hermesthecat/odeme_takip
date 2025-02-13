@@ -2,10 +2,15 @@
  * @author A. Kerem Gök
  */
 
+// Döviz kuru API URL'i
+const TCMB_API_URL = 'https://api.exchangerate.host/live?source=TRY&access_key=4f467070688418cb9958422c637c880c';
+
 // LocalStorage anahtarları
 const STORAGE_KEY = 'payments';
 const INCOME_STORAGE_KEY = 'incomes';
 const SAVING_STORAGE_KEY = 'savings';
+const EXCHANGE_RATES_KEY = 'exchangeRates';
+const LAST_UPDATE_KEY = 'lastExchangeUpdate';
 
 // LocalStorage'dan ödemeleri yükleme
 function loadPayments() {
@@ -412,7 +417,7 @@ if (document.getElementById('savingForm')) {
                 targetDate: document.getElementById('targetDate').value
             };
 
-            if (!saving.name || isNaN(saving.targetAmount) || isNaN(saving.currentAmount) || 
+            if (!saving.name || isNaN(saving.targetAmount) || isNaN(saving.currentAmount) ||
                 !saving.startDate || !saving.targetDate) {
                 Swal.fire({
                     icon: 'error',
@@ -574,6 +579,83 @@ function updateCalendar() {
         calendarEl.fullCalendar.removeAllEvents();
         calendarEl.fullCalendar.addEventSource(events);
     }
+}
+
+// Döviz kurlarını güncelle
+async function updateExchangeRates() {
+    try {
+        const response = await fetch(TCMB_API_URL);
+        const data = await response.json();
+
+        if (data && data.rates) {
+            const exchangeRates = {
+                'TRY': 1,
+                'USD': 1 / data.rates.TRYUSD,
+                'EUR': 1 / data.rates.TRYEUR,
+                'GBP': 1 / data.rates.TRYGBP
+            };
+
+            localStorage.setItem(EXCHANGE_RATES_KEY, JSON.stringify(exchangeRates));
+            localStorage.setItem(LAST_UPDATE_KEY, new Date().toISOString());
+
+            return exchangeRates;
+        }
+    } catch (error) {
+        // Hata durumunda son kaydedilen kurları kullan
+        const savedRates = localStorage.getItem(EXCHANGE_RATES_KEY);
+        return savedRates ? JSON.parse(savedRates) : EXCHANGE_RATES;
+    }
+}
+
+// Döviz kurlarını göster
+function showExchangeRates() {
+    const ratesContainer = document.getElementById('exchangeRates');
+    if (!ratesContainer) return;
+
+    // Son güncelleme zamanını kontrol et
+    const lastUpdate = localStorage.getItem(LAST_UPDATE_KEY);
+    const lastUpdateDate = lastUpdate ? new Date(lastUpdate) : null;
+    const now = new Date();
+
+    // 24 saatten eski ise uyarı göster
+    const isOld = lastUpdateDate && (now - lastUpdateDate) > 24 * 60 * 60 * 1000;
+
+    // Kurları al
+    const rates = localStorage.getItem(EXCHANGE_RATES_KEY);
+    const exchangeRates = rates ? JSON.parse(rates) : EXCHANGE_RATES;
+
+    const html = `
+        <div class="card shadow-sm">
+            <div class="card-body p-2">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-3">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-currency-dollar me-1"></i>
+                            <span class="fw-bold">USD:</span>
+                            <span class="ms-1">${exchangeRates.USD.toFixed(2)}₺</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-currency-euro me-1"></i>
+                            <span class="fw-bold">EUR:</span>
+                            <span class="ms-1">${exchangeRates.EUR.toFixed(2)}₺</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-currency-pound me-1"></i>
+                            <span class="fw-bold">GBP:</span>
+                            <span class="ms-1">${exchangeRates.GBP.toFixed(2)}₺</span>
+                        </div>
+                    </div>
+                    <small class="text-muted ${isOld ? 'text-danger' : ''}">
+                        <i class="bi bi-clock-history me-1"></i>
+                        Son güncelleme: ${lastUpdateDate ? lastUpdateDate.toLocaleString('tr-TR') : 'Bilinmiyor'}
+                        ${isOld ? ' (Güncel değil!)' : ''}
+                    </small>
+                </div>
+            </div>
+        </div>
+    `;
+
+    ratesContainer.innerHTML = html;
 }
 
 // Para birimlerinin TL karşılıkları (sabit kur için)
@@ -853,13 +935,121 @@ function deleteSaving(index) {
     });
 }
 
+// Veri export/import fonksiyonları
+function exportData() {
+    try {
+        const data = {
+            payments: loadPayments(),
+            incomes: loadIncomes(),
+            savings: loadSavings(),
+            exchangeRates: localStorage.getItem(EXCHANGE_RATES_KEY),
+            lastUpdate: localStorage.getItem(LAST_UPDATE_KEY),
+            exportDate: new Date().toISOString()
+        };
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const date = new Date().toLocaleDateString('tr-TR').replace(/\./g, '-');
+        
+        a.href = url;
+        a.download = `butce-verilerim-${date}.json`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        Swal.fire({
+            icon: 'success',
+            title: 'Başarılı!',
+            text: 'Verileriniz başarıyla dışa aktarıldı.',
+            showConfirmButton: false,
+            timer: 1500
+        });
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Veriler dışa aktarılırken bir hata oluştu: ' + error.message
+        });
+    }
+}
+
+function importData() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                
+                // Veri doğrulama
+                if (!data.payments || !data.incomes || !data.savings) {
+                    throw new Error('Geçersiz veri formatı');
+                }
+
+                // Verileri kaydet
+                savePayments(data.payments);
+                saveIncomes(data.incomes);
+                saveSavings(data.savings);
+                
+                if (data.exchangeRates) {
+                    localStorage.setItem(EXCHANGE_RATES_KEY, data.exchangeRates);
+                }
+                if (data.lastUpdate) {
+                    localStorage.setItem(LAST_UPDATE_KEY, data.lastUpdate);
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Verileriniz başarıyla içe aktarıldı.',
+                    showConfirmButton: true,
+                    confirmButtonText: 'Tamam'
+                }).then(() => {
+                    window.location.reload();
+                });
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Veriler içe aktarılırken bir hata oluştu: ' + error.message
+                });
+            }
+        };
+        reader.readAsText(file);
+    };
+
+    input.click();
+}
+
 // Ana sayfa yüklendiğinde
 if (document.getElementById('paymentList')) {
-    window.addEventListener('load', function () {
+    console.log('Ana sayfa yükleniyor...');
+    window.addEventListener('load', async function () {
+        console.log('Load event tetiklendi');
+        // Döviz kurlarını güncelle ve göster
+        await updateExchangeRates();
+        showExchangeRates();
+
+        // Diğer güncellemeler
         updatePaymentList();
         updateIncomeList();
         updateSavingList();
         updateCalendar();
         updateSummaryCards();
+
+        // Her saat başı kurları güncelle
+        setInterval(async () => {
+            await updateExchangeRates();
+            showExchangeRates();
+            updateSummaryCards();
+        }, 60 * 60 * 1000); // 1 saat
     });
 } 
