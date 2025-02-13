@@ -1917,25 +1917,54 @@ function saveBillReminders(reminders) {
 // Fatura hatırlatıcısı ekle
 function addBillReminder() {
     Swal.fire({
-        title: 'Fatura Hatırlatıcısı Ekle',
+        title: '<i class="bi bi-bell-fill text-warning me-2"></i>Fatura Hatırlatıcısı Ekle',
         html: `
-            <div class="mb-3">
-                <label class="form-label">Fatura Adı</label>
-                <input type="text" id="billName" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Son Ödeme Günü (Ayın Kaçı)</label>
-                <input type="number" id="dueDay" class="form-control" min="1" max="31" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Hatırlatma Günü (Son Ödemeden Kaç Gün Önce)</label>
-                <input type="number" id="reminderDays" class="form-control" min="1" max="15" value="3" required>
-            </div>
+            <form id="billReminderForm" class="needs-validation">
+                <div class="mb-3 position-relative">
+                    <label for="billName" class="form-label d-flex align-items-center">
+                        <i class="bi bi-tag-fill me-2 text-primary"></i>Fatura Adı
+                    </label>
+                    <input type="text" class="form-control form-control-lg shadow-sm" id="billName" 
+                           placeholder="Örn: Elektrik, Su, Doğalgaz" required>
+                </div>
+                <div class="mb-3 position-relative">
+                    <label for="dueDay" class="form-label d-flex align-items-center">
+                        <i class="bi bi-calendar-event-fill me-2 text-danger"></i>Son Ödeme Günü
+                    </label>
+                    <input type="number" class="form-control form-control-lg shadow-sm" id="dueDay" 
+                           min="1" max="31" placeholder="Ayın kaçıncı günü? (1-31)" required>
+                </div>
+                <div class="mb-3 position-relative">
+                    <label for="reminderDays" class="form-label d-flex align-items-center">
+                        <i class="bi bi-alarm-fill me-2 text-info"></i>Hatırlatma Günü
+                    </label>
+                    <input type="number" class="form-control form-control-lg shadow-sm" id="reminderDays" 
+                           min="1" max="15" value="3" placeholder="Kaç gün önce hatırlatılsın? (1-15)" required>
+                </div>
+            </form>
         `,
         showCancelButton: true,
-        confirmButtonText: 'Ekle',
-        cancelButtonText: 'İptal',
+        confirmButtonText: '<i class="bi bi-check-lg me-2"></i>Kaydet',
+        cancelButtonText: '<i class="bi bi-x-lg me-2"></i>İptal',
+        customClass: {
+            container: getCurrentTheme() === 'dark' ? 'swal2-dark' : '',
+            popup: 'shadow-lg border-0',
+            title: 'text-center fs-4 fw-bold',
+            htmlContainer: 'text-start',
+            confirmButton: 'btn btn-success px-3 me-3',
+            cancelButton: 'btn btn-outline-secondary px-3'
+        },
+        width: '32rem',
+        padding: '2rem',
+        buttonsStyling: false,
+        focusConfirm: false,
         preConfirm: () => {
+            const form = document.getElementById('billReminderForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return false;
+            }
+
             const name = document.getElementById('billName').value.trim();
             const dueDay = parseInt(document.getElementById('dueDay').value);
             const reminderDays = parseInt(document.getElementById('reminderDays').value);
@@ -1965,8 +1994,11 @@ function addBillReminder() {
                     icon: 'success',
                     title: 'Başarılı!',
                     text: 'Fatura hatırlatıcısı eklendi.',
+                    showConfirmButton: false,
                     timer: 1500,
-                    showConfirmButton: false
+                    customClass: {
+                        popup: 'shadow border-0'
+                    }
                 });
             }
         }
