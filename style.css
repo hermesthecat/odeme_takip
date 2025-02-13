@@ -1030,3 +1030,109 @@ h1, h2, h3, h4, h5, h6 {
     border-color: #ff6b6b !important;
     color: #ffffff !important;
 }
+
+/* Gelir Ekleme Formu Stilleri */
+.needs-validation {
+    max-width: 600px;
+    margin: 0 auto;
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #4dabf7;
+    box-shadow: 0 0 0 0.25rem rgba(77, 171, 247, 0.1);
+}
+
+.form-control:hover,
+.form-select:hover {
+    border-color: #4dabf7;
+}
+
+.invalid-feedback {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Gelir Ekleme Sayfası Başlık */
+.container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+/* Gelir Ekleme Form Butonları */
+.form-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.form-buttons .btn {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #20c997, #0ca678) !important;
+    border: none !important;
+}
+
+.btn-success:hover {
+    background: linear-gradient(45deg, #0ca678, #099268) !important;
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, #6c757d, #495057) !important;
+    border: none !important;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(45deg, #495057, #343a40) !important;
+    transform: translateY(-2px);
+}
+
+[data-theme="dark"] .needs-validation {
+    background: var(--bg-secondary);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: #252525;
+    border-color: #404040;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    border-color: #4dabf7;
+    background-color: #2d2d2d;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+    color: #808080;
+}
