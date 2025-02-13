@@ -402,20 +402,30 @@ function calculateMonthlyBalance(year, month) {
     // Gelirleri hesapla
     const incomes = loadIncomes();
     incomes.forEach(income => {
-        const incomeDate = new Date(income.firstIncomeDate);
+        const firstDate = new Date(income.firstIncomeDate);
+
         if (income.frequency === '0') {
             // Tek seferlik gelir
-            if (incomeDate.getFullYear() === year && incomeDate.getMonth() === month) {
+            if (firstDate.getFullYear() === year && firstDate.getMonth() === month) {
                 totalIncome += convertToTRY(income.amount, income.currency);
             }
         } else {
             // Tekrarlı gelir
-            let currentDate = new Date(income.firstIncomeDate);
-            while (currentDate <= endDate) {
-                if (currentDate >= startDate && currentDate <= endDate) {
-                    totalIncome += convertToTRY(income.amount, income.currency);
-                }
+            let currentDate = new Date(firstDate);
+
+            // İlk tarihi ayın başına getir
+            while (currentDate > startDate) {
+                currentDate.setMonth(currentDate.getMonth() - parseInt(income.frequency));
+            }
+
+            // Sonraki ödeme tarihini bul
+            while (currentDate <= startDate) {
                 currentDate.setMonth(currentDate.getMonth() + parseInt(income.frequency));
+            }
+
+            // Eğer bu ay içindeyse ekle
+            if (currentDate <= endDate) {
+                totalIncome += convertToTRY(income.amount, income.currency);
             }
         }
     });
@@ -423,20 +433,30 @@ function calculateMonthlyBalance(year, month) {
     // Giderleri hesapla
     const payments = loadPayments();
     payments.forEach(payment => {
-        const paymentDate = new Date(payment.firstPaymentDate);
+        const firstDate = new Date(payment.firstPaymentDate);
+
         if (payment.frequency === '0') {
             // Tek seferlik ödeme
-            if (paymentDate.getFullYear() === year && paymentDate.getMonth() === month) {
+            if (firstDate.getFullYear() === year && firstDate.getMonth() === month) {
                 totalExpense += convertToTRY(payment.amount, payment.currency);
             }
         } else {
             // Tekrarlı ödeme
-            let currentDate = new Date(payment.firstPaymentDate);
-            while (currentDate <= endDate) {
-                if (currentDate >= startDate && currentDate <= endDate) {
-                    totalExpense += convertToTRY(payment.amount, payment.currency);
-                }
+            let currentDate = new Date(firstDate);
+
+            // İlk tarihi ayın başına getir
+            while (currentDate > startDate) {
+                currentDate.setMonth(currentDate.getMonth() - parseInt(payment.frequency));
+            }
+
+            // Sonraki ödeme tarihini bul
+            while (currentDate <= startDate) {
                 currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+            }
+
+            // Eğer bu ay içindeyse ekle
+            if (currentDate <= endDate) {
+                totalExpense += convertToTRY(payment.amount, payment.currency);
             }
         }
     });
