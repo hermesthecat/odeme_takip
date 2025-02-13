@@ -5,6 +5,7 @@
 // LocalStorage anahtarları
 const STORAGE_KEY = 'payments';
 const INCOME_STORAGE_KEY = 'incomes';
+const SAVING_STORAGE_KEY = 'savings';
 
 // LocalStorage'dan ödemeleri yükleme
 function loadPayments() {
@@ -63,6 +64,37 @@ function saveIncomes(incomes) {
             icon: 'error',
             title: 'Hata!',
             text: 'Gelirler kaydedilirken hata oluştu: ' + error.message
+        });
+        return false;
+    }
+}
+
+// Birikimleri yükleme
+function loadSavings() {
+    try {
+        const savings = localStorage.getItem(SAVING_STORAGE_KEY);
+        return savings ? JSON.parse(savings) : [];
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Birikimler yüklenirken hata oluştu: ' + error.message
+        });
+        return [];
+    }
+}
+
+// Birikimleri kaydetme
+function saveSavings(savings) {
+    try {
+        const data = JSON.stringify(savings);
+        localStorage.setItem(SAVING_STORAGE_KEY, data);
+        return true;
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Birikimler kaydedilirken hata oluştu: ' + error.message
         });
         return false;
     }
@@ -363,6 +395,83 @@ if (document.getElementById('incomeForm')) {
     });
 }
 
+// Birikim formu işlemleri
+if (document.getElementById('savingForm')) {
+    const form = document.getElementById('savingForm');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        try {
+            const saving = {
+                name: document.getElementById('savingName').value.trim(),
+                targetAmount: parseFloat(document.getElementById('targetAmount').value),
+                currentAmount: parseFloat(document.getElementById('currentAmount').value),
+                currency: document.getElementById('currency').value,
+                startDate: document.getElementById('startDate').value,
+                targetDate: document.getElementById('targetDate').value
+            };
+
+            if (!saving.name || isNaN(saving.targetAmount) || isNaN(saving.currentAmount) || 
+                !saving.startDate || !saving.targetDate) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Lütfen tüm alanları doğru şekilde doldurunuz.'
+                });
+                return;
+            }
+
+            if (saving.currentAmount > saving.targetAmount) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Mevcut tutar hedef tutardan büyük olamaz!'
+                });
+                return;
+            }
+
+            const startDateObj = new Date(saving.startDate);
+            const targetDateObj = new Date(saving.targetDate);
+            if (targetDateObj <= startDateObj) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Hedef tarihi başlangıç tarihinden sonra olmalıdır!'
+                });
+                return;
+            }
+
+            const savings = loadSavings();
+            savings.push(saving);
+
+            if (saveSavings(savings)) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Birikim başarıyla kaydedildi!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.href = 'index.html';
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Birikim kaydedilirken bir hata oluştu!'
+                });
+            }
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata!',
+                text: 'Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz.'
+            });
+        }
+    });
+}
+
 // Takvim olaylarını oluştur
 function createCalendarEvents(payments) {
     const events = [];
@@ -605,11 +714,151 @@ function updateSummaryCards() {
     }
 }
 
+// İlerleme yüzdesini hesapla
+function calculateProgress(targetAmount, currentAmount) {
+    return Math.min(100, Math.round((currentAmount / targetAmount) * 100));
+}
+
+// Birikim listesini güncelleme
+function updateSavingList() {
+    const tbody = document.getElementById('savingList');
+    if (!tbody) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Birikim listesi tablosu bulunamadı!'
+        });
+        return;
+    }
+
+    const savings = loadSavings();
+    tbody.innerHTML = '';
+
+    if (!Array.isArray(savings) || savings.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="8" class="text-center">Henüz birikim kaydı bulunmamaktadır.</td>';
+        tbody.appendChild(row);
+        return;
+    }
+
+    savings.forEach((saving, index) => {
+        try {
+            const progress = calculateProgress(saving.targetAmount, saving.currentAmount);
+            const progressClass = progress >= 100 ? 'bg-success' : 'bg-primary';
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${saving.name || '-'}</td>
+                <td>${saving.targetAmount ? saving.targetAmount.toFixed(2) : '0.00'}</td>
+                <td>${saving.currentAmount ? saving.currentAmount.toFixed(2) : '0.00'}</td>
+                <td>${saving.currency || '-'}</td>
+                <td>${formatDate(saving.startDate)}</td>
+                <td>${formatDate(saving.targetDate)}</td>
+                <td>
+                    <div class="progress">
+                        <div class="progress-bar ${progressClass}" role="progressbar" 
+                             style="width: ${progress}%" 
+                             aria-valuenow="${progress}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            ${progress}%
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <button class="btn btn-primary btn-sm me-1" onclick="updateSaving(${index})">Güncelle</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSaving(${index})">Sil</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        } catch (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata!',
+                text: `Birikim ${index + 1} gösterilirken hata oluştu: ${error.message}`
+            });
+        }
+    });
+}
+
+// Birikim güncelleme
+function updateSaving(index) {
+    const savings = loadSavings();
+    const saving = savings[index];
+
+    Swal.fire({
+        title: 'Birikim Güncelle',
+        html: `
+            <div class="mb-3">
+                <label class="form-label">Biriken Tutar</label>
+                <input type="number" id="currentAmount" class="form-control" value="${saving.currentAmount}" step="0.01">
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Güncelle',
+        cancelButtonText: 'İptal',
+        preConfirm: () => {
+            const currentAmount = parseFloat(document.getElementById('currentAmount').value);
+            if (isNaN(currentAmount)) {
+                Swal.showValidationMessage('Lütfen geçerli bir tutar giriniz');
+                return false;
+            }
+            return currentAmount;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            savings[index].currentAmount = result.value;
+            if (saveSavings(savings)) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Birikim başarıyla güncellendi!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        }
+    });
+}
+
+// Birikim silme
+function deleteSaving(index) {
+    Swal.fire({
+        title: 'Emin misiniz?',
+        text: "Bu birikimi silmek istediğinizden emin misiniz?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Evet, sil!',
+        cancelButtonText: 'İptal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const savings = loadSavings();
+            savings.splice(index, 1);
+            if (saveSavings(savings)) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Silindi!',
+                    text: 'Birikim başarıyla silindi.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        }
+    });
+}
+
 // Ana sayfa yüklendiğinde
 if (document.getElementById('paymentList')) {
     window.addEventListener('load', function () {
         updatePaymentList();
         updateIncomeList();
+        updateSavingList();
         updateCalendar();
         updateSummaryCards();
     });
