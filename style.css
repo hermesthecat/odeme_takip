@@ -1,6 +1,31 @@
+/* CSS Değişkenleri */
+:root {
+    /* Açık mod renkleri */
+    --bg-primary: #f8f9fa;
+    --bg-secondary: #ffffff;
+    --text-primary: #2c3e50;
+    --text-secondary: #6c757d;
+    --border-color: #dee2e6;
+    --card-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    --hover-bg: #f8f9fa;
+}
+
+[data-theme="dark"] {
+    /* Karanlık mod renkleri */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: #404040;
+    --card-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    --hover-bg: #363636;
+}
+
 /* Genel stiller */
 body {
-    background-color: #f8f9fa;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -10,38 +35,53 @@ body {
 
 /* Kart stilleri */
 .card {
-    background-color: white;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--bg-secondary);
+    box-shadow: var(--card-shadow);
     border-radius: 8px;
     margin-bottom: 20px;
+    border-color: var(--border-color);
 }
 
 .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
+    background-color: var(--bg-primary);
+    border-bottom: 2px solid var(--border-color);
 }
 
 /* Tablo stilleri */
 .table {
     margin-bottom: 0;
+    color: var(--text-primary);
 }
 
 .table thead th {
-    background-color: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
+    background-color: var(--bg-primary);
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-primary);
+}
+
+.table td, .table th {
+    border-color: var(--border-color);
 }
 
 /* Form stilleri */
+.form-control,
+.form-select {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
 .form-control:focus,
 .form-select:focus {
+    background-color: var(--bg-secondary);
     border-color: #80bdff;
+    color: var(--text-primary);
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
 }
 
 /* Başlık stilleri */
-h1,
-h2 {
-    color: #2c3e50;
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
 }
 
 /* Buton stilleri */

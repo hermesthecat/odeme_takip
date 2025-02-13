@@ -13,10 +13,97 @@ const EXCHANGE_RATES_KEY = 'exchangeRates';
 const LAST_UPDATE_KEY = 'lastExchangeUpdate';
 const BUDGET_GOALS_KEY = 'budgetGoals';
 const BILL_REMINDERS_KEY = 'billReminders';
+const THEME_KEY = 'theme'; // Tema ayarı için yeni anahtar
 
 // Grafik değişkenleri
 let incomeExpenseChart = null;
 let savingsChart = null;
+
+// Tema yönetimi fonksiyonları
+function getCurrentTheme() {
+    return localStorage.getItem(THEME_KEY) || 'light';
+}
+
+function setTheme(theme) {
+    localStorage.setItem(THEME_KEY, theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    updateChartTheme(theme);
+}
+
+function toggleTheme() {
+    const currentTheme = getCurrentTheme();
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    
+    // Tema değişikliği bildirimini göster
+    Swal.fire({
+        icon: 'success',
+        title: newTheme === 'dark' ? 'Karanlık Mod Aktif' : 'Aydınlık Mod Aktif',
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        background: newTheme === 'dark' ? '#2d2d2d' : '#ffffff',
+        color: newTheme === 'dark' ? '#ffffff' : '#2c3e50'
+    });
+}
+
+function updateChartTheme(theme) {
+    const chartOptions = {
+        plugins: {
+            legend: {
+                labels: {
+                    color: theme === 'dark' ? '#ffffff' : '#2c3e50'
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    color: theme === 'dark' ? '#404040' : '#dee2e6'
+                },
+                ticks: {
+                    color: theme === 'dark' ? '#ffffff' : '#2c3e50'
+                }
+            },
+            y: {
+                grid: {
+                    color: theme === 'dark' ? '#404040' : '#dee2e6'
+                },
+                ticks: {
+                    color: theme === 'dark' ? '#ffffff' : '#2c3e50'
+                }
+            }
+        }
+    };
+
+    // Mevcut grafikleri güncelle
+    if (incomeExpenseChart) {
+        incomeExpenseChart.options = { ...incomeExpenseChart.options, ...chartOptions };
+        incomeExpenseChart.update();
+    }
+    if (savingsChart) {
+        savingsChart.options = { ...savingsChart.options, ...chartOptions };
+        savingsChart.update();
+    }
+}
+
+// Sayfa yüklendiğinde tema ayarını uygula
+document.addEventListener('DOMContentLoaded', () => {
+    const currentTheme = getCurrentTheme();
+    setTheme(currentTheme);
+    
+    // Tema değiştirme butonunu ekle
+    const navButtons = document.querySelector('.d-flex.justify-content-between div');
+    if (navButtons) {
+        const themeButton = document.createElement('button');
+        themeButton.className = 'btn btn-outline-secondary ms-2';
+        themeButton.innerHTML = `<i class="bi bi-${currentTheme === 'dark' ? 'sun' : 'moon'}"></i>`;
+        themeButton.onclick = toggleTheme;
+        navButtons.appendChild(themeButton);
+    }
+});
 
 // LocalStorage'dan ödemeleri yükleme
 function loadPayments() {

@@ -6,7 +6,7 @@
     <title>Bütçe Kontrol Sistemi</title>
 
     <!-- PWA Meta Etiketleri -->
-    <meta name="theme-color" content="#ffffff"/>
+    <meta name="theme-color" content="#ffffff" data-dark-theme="#1a1a1a"/>
     <meta name="apple-mobile-web-app-capable" content="yes"/>
     <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
     <meta name="apple-mobile-web-app-title" content="Bütçe Kontrol"/>
@@ -36,6 +36,18 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+
+    <script>
+      // Sayfa yüklenirken mevcut temayı uygula
+      const theme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+      
+      // Meta theme-color'ı güncelle
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (metaThemeColor) {
+        metaThemeColor.content = theme === 'dark' ? '#1a1a1a' : '#ffffff';
+      }
+    </script>
   </head>
   <body>
     <div class="container mt-4">
