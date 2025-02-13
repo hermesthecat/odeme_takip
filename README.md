@@ -27,7 +27,7 @@ Bu proje, kişisel bütçe kontrolü ve takibi için geliştirilmiş bir web uyg
 1. Projeyi klonlayın / Clone the project
 
 ```bash
-git clone https://github.com/hermesthecat/butce-kontrol.git
+git clone https://github.com/hermesthecat/odeme_takip.git
 ```
 
 2. Proje dizinine gidin / Go to project directory
