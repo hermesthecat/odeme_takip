@@ -209,12 +209,15 @@ function deletePayment(index) {
             const payments = loadPayments();
             payments.splice(index, 1);
             if (savePayments(payments)) {
-                updatePaymentList();
-                Swal.fire(
-                    'Silindi!',
-                    'Ödeme başarıyla silindi.',
-                    'success'
-                );
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Silindi!',
+                    text: 'Ödeme başarıyla silindi.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
             }
         }
     });
@@ -236,13 +239,15 @@ function deleteIncome(index) {
             const incomes = loadIncomes();
             incomes.splice(index, 1);
             if (saveIncomes(incomes)) {
-                updateIncomeList();
-                updateCalendar();
-                Swal.fire(
-                    'Silindi!',
-                    'Gelir başarıyla silindi.',
-                    'success'
-                );
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Silindi!',
+                    text: 'Gelir başarıyla silindi.',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
             }
         }
     });
