@@ -11,6 +11,7 @@ const INCOME_STORAGE_KEY = 'incomes';
 const SAVING_STORAGE_KEY = 'savings';
 const EXCHANGE_RATES_KEY = 'exchangeRates';
 const LAST_UPDATE_KEY = 'lastExchangeUpdate';
+const BUDGET_GOALS_KEY = 'budgetGoals';
 
 // Grafik değişkenleri
 let incomeExpenseChart = null;
@@ -1238,7 +1239,244 @@ function updateSavingsChart() {
     }
 }
 
-// Ana sayfa yüklendiğinde
+// Bütçe hedeflerini yükle
+function loadBudgetGoals() {
+    try {
+        const goals = localStorage.getItem(BUDGET_GOALS_KEY);
+        return goals ? JSON.parse(goals) : {
+            monthlyExpenseLimit: 0,
+            categories: []
+        };
+    } catch (error) {
+        console.error('Bütçe hedefleri yüklenirken hata:', error);
+        return {
+            monthlyExpenseLimit: 0,
+            categories: []
+        };
+    }
+}
+
+// Bütçe hedeflerini kaydet
+function saveBudgetGoals(goals) {
+    try {
+        localStorage.setItem(BUDGET_GOALS_KEY, JSON.stringify(goals));
+        return true;
+    } catch (error) {
+        console.error('Bütçe hedefleri kaydedilirken hata:', error);
+        return false;
+    }
+}
+
+// Bütçe hedefi ekle/güncelle
+function updateBudgetGoal() {
+    Swal.fire({
+        title: 'Aylık Bütçe Hedefi',
+        html: `
+            <div class="mb-3">
+                <label class="form-label">Aylık Harcama Limiti (TL)</label>
+                <input type="number" id="monthlyLimit" class="form-control" value="${loadBudgetGoals().monthlyExpenseLimit}" min="0" step="100">
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Kaydet',
+        cancelButtonText: 'İptal',
+        preConfirm: () => {
+            const limit = parseFloat(document.getElementById('monthlyLimit').value);
+            if (isNaN(limit) || limit < 0) {
+                Swal.showValidationMessage('Geçerli bir limit giriniz');
+                return false;
+            }
+            return limit;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const goals = loadBudgetGoals();
+            goals.monthlyExpenseLimit = result.value;
+            if (saveBudgetGoals(goals)) {
+                updateBudgetGoalsDisplay();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Bütçe hedefi güncellendi.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+    });
+}
+
+// Kategori hedefi ekle
+function addCategoryGoal() {
+    Swal.fire({
+        title: 'Kategori Hedefi Ekle',
+        html: `
+            <div class="mb-3">
+                <label class="form-label">Kategori Adı</label>
+                <input type="text" id="categoryName" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Aylık Limit (TL)</label>
+                <input type="number" id="categoryLimit" class="form-control" min="0" step="100" required>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Ekle',
+        cancelButtonText: 'İptal',
+        preConfirm: () => {
+            const name = document.getElementById('categoryName').value.trim();
+            const limit = parseFloat(document.getElementById('categoryLimit').value);
+            
+            if (!name) {
+                Swal.showValidationMessage('Kategori adı gereklidir');
+                return false;
+            }
+            if (isNaN(limit) || limit < 0) {
+                Swal.showValidationMessage('Geçerli bir limit giriniz');
+                return false;
+            }
+            
+            return { name, limit };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const goals = loadBudgetGoals();
+            goals.categories.push(result.value);
+            if (saveBudgetGoals(goals)) {
+                updateBudgetGoalsDisplay();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Kategori hedefi eklendi.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+    });
+}
+
+// Kategori hedefini sil
+function deleteCategoryGoal(index) {
+    Swal.fire({
+        title: 'Emin misiniz?',
+        text: "Bu kategori hedefini silmek istediğinizden emin misiniz?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Evet, sil!',
+        cancelButtonText: 'İptal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const goals = loadBudgetGoals();
+            goals.categories.splice(index, 1);
+            if (saveBudgetGoals(goals)) {
+                updateBudgetGoalsDisplay();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Silindi!',
+                    text: 'Kategori hedefi başarıyla silindi.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+    });
+}
+
+// Bütçe hedeflerini görüntüle
+function updateBudgetGoalsDisplay() {
+    const container = document.getElementById('budgetGoals');
+    if (!container) return;
+
+    const goals = loadBudgetGoals();
+    const currentExpenses = calculateMonthlyBalance(new Date().getFullYear(), new Date().getMonth()).expense;
+    const monthlyLimitProgress = (currentExpenses / goals.monthlyExpenseLimit) * 100;
+    
+    let html = `
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Aylık Bütçe Durumu</h5>
+                <button onclick="updateBudgetGoal()" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Hedefi Güncelle
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Aylık Limit: ${formatMoney(goals.monthlyExpenseLimit)}</span>
+                        <span>Mevcut Harcama: ${formatMoney(currentExpenses)}</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar ${monthlyLimitProgress > 90 ? 'bg-danger' : monthlyLimitProgress > 75 ? 'bg-warning' : 'bg-success'}" 
+                             role="progressbar" 
+                             style="width: ${Math.min(100, monthlyLimitProgress)}%" 
+                             aria-valuenow="${Math.min(100, monthlyLimitProgress)}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            ${Math.round(monthlyLimitProgress)}%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Kategori Hedefleri</h5>
+                <button onclick="addCategoryGoal()" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-plus"></i> Kategori Ekle
+                </button>
+            </div>
+            <div class="card-body">
+                ${goals.categories.length === 0 ? 
+                    '<p class="text-muted mb-0">Henüz kategori hedefi eklenmemiş.</p>' : 
+                    goals.categories.map((category, index) => `
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span>${category.name}</span>
+                                <div>
+                                    <span class="me-2">Limit: ${formatMoney(category.limit)}</span>
+                                    <button onclick="deleteCategoryGoal(${index})" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-info" 
+                                     role="progressbar" 
+                                     style="width: 0%" 
+                                     aria-valuenow="0" 
+                                     aria-valuemin="0" 
+                                     aria-valuemax="100">
+                                    0%
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Uyarı kontrolü
+    if (monthlyLimitProgress > 90) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Bütçe Uyarısı!',
+            text: 'Aylık harcama limitinize çok yaklaştınız!',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+        });
+    }
+}
+
+// Ana sayfa yüklendiğinde bütçe hedeflerini de güncelle
 if (document.getElementById('paymentList')) {
     console.log('Ana sayfa yükleniyor...');
     window.addEventListener('load', async function () {
@@ -1254,6 +1492,7 @@ if (document.getElementById('paymentList')) {
         updateCalendar();
         updateSummaryCards();
         updateCharts(); // Grafikleri güncelle
+        updateBudgetGoalsDisplay();
 
         // Her saat başı kurları güncelle
         setInterval(async () => {
