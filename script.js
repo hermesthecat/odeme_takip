@@ -131,6 +131,95 @@ function formatDate(date) {
     return new Date(date).toLocaleDateString('tr-TR');
 }
 
+// Ödeme güncelleme
+function updatePayment(index) {
+    const payments = loadPayments();
+    const payment = payments[index];
+    const goals = loadBudgetGoals();
+
+    Swal.fire({
+        title: 'Ödeme Güncelle',
+        html: `
+            <div class="mb-3">
+                <label class="form-label">Ödeme İsmi</label>
+                <input type="text" id="paymentName" class="form-control" value="${payment.name}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tutar</label>
+                <input type="number" id="amount" class="form-control" value="${payment.amount}" step="0.01" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Para Birimi</label>
+                <select id="currency" class="form-select" required>
+                    <option value="TRY" ${payment.currency === 'TRY' ? 'selected' : ''}>TRY</option>
+                    <option value="USD" ${payment.currency === 'USD' ? 'selected' : ''}>USD</option>
+                    <option value="EUR" ${payment.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                    <option value="GBP" ${payment.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Kategori</label>
+                <select id="category" class="form-select" required>
+                    <option value="">Kategori Seçin</option>
+                    ${goals.categories.map(category => 
+                        `<option value="${category.name}" ${payment.category === category.name ? 'selected' : ''}>${category.name}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">İlk Ödeme Tarihi</label>
+                <input type="date" id="firstPaymentDate" class="form-control" value="${payment.firstPaymentDate}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tekrarlama Sıklığı</label>
+                <select id="frequency" class="form-select" required>
+                    <option value="0" ${payment.frequency === '0' ? 'selected' : ''}>Tekrar Yok</option>
+                    <option value="1" ${payment.frequency === '1' ? 'selected' : ''}>Her Ay</option>
+                    <option value="2" ${payment.frequency === '2' ? 'selected' : ''}>2 Ayda Bir</option>
+                    <option value="3" ${payment.frequency === '3' ? 'selected' : ''}>3 Ayda Bir</option>
+                    <option value="4" ${payment.frequency === '4' ? 'selected' : ''}>4 Ayda Bir</option>
+                    <option value="5" ${payment.frequency === '5' ? 'selected' : ''}>5 Ayda Bir</option>
+                    <option value="6" ${payment.frequency === '6' ? 'selected' : ''}>6 Ayda Bir</option>
+                    <option value="12" ${payment.frequency === '12' ? 'selected' : ''}>Yıllık</option>
+                </select>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Güncelle',
+        cancelButtonText: 'İptal',
+        preConfirm: () => {
+            const name = document.getElementById('paymentName').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const currency = document.getElementById('currency').value;
+            const category = document.getElementById('category').value;
+            const firstPaymentDate = document.getElementById('firstPaymentDate').value;
+            const frequency = document.getElementById('frequency').value;
+
+            if (!name || isNaN(amount) || !firstPaymentDate || !category) {
+                Swal.showValidationMessage('Lütfen tüm alanları doğru şekilde doldurunuz.');
+                return false;
+            }
+
+            return { name, amount, currency, category, firstPaymentDate, frequency };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            payments[index] = result.value;
+            if (savePayments(payments)) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Ödeme başarıyla güncellendi!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        }
+    });
+}
+
 // Ödeme listesini güncelleme
 function updatePaymentList() {
     const tbody = document.getElementById('paymentList');
@@ -166,7 +255,12 @@ function updatePaymentList() {
                 <td>${getFrequencyText(payment.frequency)}</td>
                 <td>${formatDate(nextPaymentDate)}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="deletePayment(${index})">Sil</button>
+                    <button class="btn btn-primary btn-sm me-1" onclick="updatePayment(${index})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deletePayment(${index})">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             `;
             tbody.appendChild(row);
