@@ -2104,15 +2104,14 @@ function showAddIncomeModal() {
         customClass: {
             container: getCurrentTheme() === 'dark' ? 'swal2-dark' : '',
             popup: 'shadow-lg border-0',
-            title: 'text-start fs-4 fw-bold',
+            title: 'text-center fs-4 fw-bold',
             htmlContainer: 'text-start',
-            confirmButton: 'btn btn-success btn-lg px-4',
-            cancelButton: 'btn btn-outline-secondary btn-lg px-4'
+            confirmButton: 'btn btn-success px-3 me-3',
+            cancelButton: 'btn btn-outline-secondary px-3'
         },
         width: '32rem',
         padding: '2rem',
         buttonsStyling: false,
-        showCloseButton: true,
         focusConfirm: false,
         preConfirm: () => {
             const form = document.getElementById('incomeModalForm');
@@ -2226,15 +2225,14 @@ function showAddSavingModal() {
         customClass: {
             container: getCurrentTheme() === 'dark' ? 'swal2-dark' : '',
             popup: 'shadow-lg border-0',
-            title: 'text-start fs-4 fw-bold',
+            title: 'text-center fs-4 fw-bold',
             htmlContainer: 'text-start',
-            confirmButton: 'btn btn-success btn-lg px-4',
-            cancelButton: 'btn btn-outline-secondary btn-lg px-4'
+            confirmButton: 'btn btn-success px-3 me-3',
+            cancelButton: 'btn btn-outline-secondary px-3'
         },
         width: '32rem',
         padding: '2rem',
         buttonsStyling: false,
-        showCloseButton: true,
         focusConfirm: false,
         preConfirm: () => {
             const form = document.getElementById('savingModalForm');
@@ -2306,7 +2304,7 @@ function showAddSavingModal() {
 function showAddPaymentModal() {
     // Kategorileri yükle
     const goals = loadBudgetGoals();
-    const categoryOptions = goals.categories.map(category => 
+    const categoryOptions = goals.categories.map(category =>
         `<option value="${category.name}">${category.name}</option>`
     ).join('');
 
@@ -2379,15 +2377,14 @@ function showAddPaymentModal() {
         customClass: {
             container: getCurrentTheme() === 'dark' ? 'swal2-dark' : '',
             popup: 'shadow-lg border-0',
-            title: 'text-start fs-4 fw-bold',
+            title: 'text-center fs-4 fw-bold',
             htmlContainer: 'text-start',
-            confirmButton: 'btn btn-success btn-lg px-4',
-            cancelButton: 'btn btn-outline-secondary btn-lg px-4'
+            confirmButton: 'btn btn-success px-3 me-3',
+            cancelButton: 'btn btn-outline-secondary px-3'
         },
         width: '32rem',
         padding: '2rem',
         buttonsStyling: false,
-        showCloseButton: true,
         focusConfirm: false,
         preConfirm: () => {
             const form = document.getElementById('paymentModalForm');
@@ -2440,4 +2437,3 @@ function showAddPaymentModal() {
     // Bugünün tarihini varsayılan olarak ayarla
     document.getElementById('firstPaymentDate').valueAsDate = new Date();
 }
- 
