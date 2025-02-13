@@ -12,13 +12,102 @@
 
 [data-theme="dark"] {
     /* Karanlık mod renkleri */
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #2d2d2d;
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
     --text-primary: #ffffff;
     --text-secondary: #cccccc;
-    --border-color: #404040;
-    --card-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-    --hover-bg: #363636;
+    --border-color: #333333;
+    --card-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    --hover-bg: #2d2d2d;
+}
+
+/* Karanlık tema metin renkleri */
+[data-theme="dark"] {
+    color-scheme: dark;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #a0a0a0 !important;
+}
+
+[data-theme="dark"] .text-dark {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .text-body {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .text-secondary {
+    color: #cccccc !important;
+}
+
+[data-theme="dark"] .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: #252525;
+    border-color: #333333;
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: #2d2d2d;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .form-text {
+    color: #cccccc;
+}
+
+[data-theme="dark"] .input-group-text {
+    background-color: #252525;
+    border-color: #333333;
+    color: #ffffff;
+}
+
+[data-theme="dark"] ::placeholder {
+    color: #888888 !important;
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .modal-header,
+[data-theme="dark"] .modal-footer {
+    border-color: #333333;
+}
+
+[data-theme="dark"] .list-group-item {
+    background-color: #252525;
+    border-color: #333333;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .card-text {
+    color: #ffffff;
+}
+
+[data-theme="dark"] small {
+    color: #cccccc;
+}
+
+[data-theme="dark"] label {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .nav-link {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .nav-link:hover {
+    color: #cccccc;
 }
 
 /* Genel stiller */
@@ -68,30 +157,94 @@ body {
 }
 
 /* Karanlık tema için tablo satır stilleri */
+[data-theme="dark"] .table tbody tr {
+    background-color: #1e1e1e;
+}
+
 [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: #252525;
 }
 
 [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
-    background-color: rgba(255, 255, 255, 0.01);
+    background-color: #1e1e1e;
+}
+
+[data-theme="dark"] .table tbody tr td {
+    background-color: inherit;
 }
 
 [data-theme="dark"] .table-hover tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: #2d2d2d;
 }
 
 [data-theme="dark"] .table {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: #333333;
 }
 
 [data-theme="dark"] .table td, 
 [data-theme="dark"] .table th {
-    border-color: rgba(255, 255, 255, 0.1);
+    border-color: #333333;
 }
 
 [data-theme="dark"] .table thead th {
-    background-color: rgba(0, 0, 0, 0.2);
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    background-color: #181818;
+    border-bottom: 2px solid #333333;
+}
+
+/* Kart başlıkları için özel stiller */
+[data-theme="dark"] .card-header {
+    background-color: #181818;
+    border-bottom: 1px solid #333333;
+}
+
+/* Karanlık tema için özel kart başlıkları */
+[data-theme="dark"] .card-header.bg-success {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+}
+
+[data-theme="dark"] .card-header.bg-primary {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+}
+
+[data-theme="dark"] .card-header.bg-danger {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+}
+
+[data-theme="dark"] .card-header.bg-warning {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+}
+
+[data-theme="dark"] .card-header.bg-info {
+    background-color: rgba(13, 202, 240, 0.2) !important;
+}
+
+[data-theme="dark"] .card-header.bg-success.bg-opacity-25 {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+}
+
+[data-theme="dark"] .card-header.bg-primary.bg-opacity-25 {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+}
+
+[data-theme="dark"] .card-header.bg-danger.bg-opacity-25 {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+}
+
+/* Karanlık tema için kart gövdeleri */
+[data-theme="dark"] .card.bg-success.bg-opacity-25 {
+    background-color: rgba(25, 135, 84, 0.1) !important;
+}
+
+[data-theme="dark"] .card.bg-danger.bg-opacity-25 {
+    background-color: rgba(220, 53, 69, 0.1) !important;
+}
+
+[data-theme="dark"] .card.bg-info.bg-opacity-25 {
+    background-color: rgba(13, 202, 240, 0.1) !important;
+}
+
+[data-theme="dark"] .card.bg-warning.bg-opacity-25 {
+    background-color: rgba(255, 193, 7, 0.1) !important;
 }
 
 /* Açık tema için tablo satır stilleri */
@@ -123,9 +276,13 @@ body {
 }
 
 /* Döviz kurları kartı için özel stiller */
+[data-theme="dark"] #exchangeRates {
+    background-color: #1e1e1e !important;
+}
+
 [data-theme="dark"] #exchangeRates .card {
-    background-color: var(--bg-secondary);
-    border-color: rgba(255, 255, 255, 0.1);
+    background-color: #252525;
+    border: 1px solid #333333;
 }
 
 [data-theme="dark"] #exchangeRates .text-muted {
