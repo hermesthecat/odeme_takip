@@ -438,14 +438,7 @@ function updateIncome(index) {
 // Gelir listesini güncelleme
 function updateIncomeList() {
     const tbody = document.getElementById('incomeList');
-    if (!tbody) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Hata!',
-            text: 'Gelir listesi tablosu bulunamadı!'
-        });
-        return;
-    }
+    if (!tbody) return;
 
     const incomes = loadIncomes();
     tbody.innerHTML = '';
@@ -470,17 +463,19 @@ function updateIncomeList() {
                 <td>${getFrequencyText(income.frequency)}</td>
                 <td>${formatDate(nextIncomeDate)}</td>
                 <td>
-                    <button class="btn btn-primary btn-sm me-1" onclick="updateIncome(${index})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteIncome(${index})">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="btn-group">
+                        <button class="btn btn-primary btn-sm" onclick="updateIncome(${index})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteIncome(${index})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(row);
         } catch (error) {
-            alert(`Gelir ${index + 1} gösterilirken hata oluştu: ${error.message}`);
+            console.error(`Gelir ${index + 1} gösterilirken hata oluştu:`, error);
         }
     });
 }
@@ -835,16 +830,46 @@ function updateCalendar() {
             events: events,
             eventClick: function (info) {
                 Swal.fire({
-                    title: info.event.extendedProps.type === 'payment' ? 'Ödeme Detayları' : 'Gelir Detayları',
+                    title: `<i class="bi bi-${info.event.extendedProps.type === 'payment' ? 'credit-card-fill text-danger' : 'wallet-fill text-success'} me-2"></i>${info.event.extendedProps.type === 'payment' ? 'Ödeme Detayları' : 'Gelir Detayları'}`,
                     html: `
-                        <div class="text-start">
-                            <p><strong>İsim:</strong> ${info.event.title}</p>
-                            <p><strong>Tarih:</strong> ${formatDate(info.event.start)}</p>
-                            <p><strong>Tutar:</strong> ${info.event.extendedProps.amount} ${info.event.extendedProps.currency}</p>
-                            <p><strong>Tekrar:</strong> ${getFrequencyText(info.event.extendedProps.frequency)}</p>
+                        <div class="income-details">
+                            <div class="detail-item">
+                                <i class="bi bi-tag-fill text-primary"></i>
+                                <div class="detail-content">
+                                    <span class="detail-label">İsim</span>
+                                    <span class="detail-value">${info.event.title.split(' - ')[0]}</span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-cash-stack text-success"></i>
+                                <div class="detail-content">
+                                    <span class="detail-label">Tutar</span>
+                                    <span class="detail-value">${info.event.extendedProps.amount} ${info.event.extendedProps.currency}</span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-calendar-event text-info"></i>
+                                <div class="detail-content">
+                                    <span class="detail-label">Tarih</span>
+                                    <span class="detail-value">${formatDate(info.event.start)}</span>
+                                </div>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-arrow-repeat text-warning"></i>
+                                <div class="detail-content">
+                                    <span class="detail-label">Tekrarlama Sıklığı</span>
+                                    <span class="detail-value">${getFrequencyText(info.event.extendedProps.frequency)}</span>
+                                </div>
+                            </div>
                         </div>
                     `,
-                    icon: info.event.extendedProps.type === 'payment' ? 'error' : 'success'
+                    customClass: {
+                        container: 'income-details-modal',
+                        popup: 'income-details-popup',
+                        content: 'income-details-content'
+                    },
+                    showConfirmButton: false,
+                    showCloseButton: true
                 });
             }
         });
@@ -2525,4 +2550,49 @@ function showAddPaymentModal() {
 
     // Bugünün tarihini varsayılan olarak ayarla
     document.getElementById('firstPaymentDate').valueAsDate = new Date();
+}
+
+function showIncomeDetails(income) {
+    Swal.fire({
+        title: 'Gelir Detayları',
+        html: `
+            <div class="income-details">
+                <div class="detail-item">
+                    <i class="bi bi-tag-fill text-primary"></i>
+                    <div class="detail-content">
+                        <span class="detail-label">İsim</span>
+                        <span class="detail-value">${income.name}</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="bi bi-cash-stack text-success"></i>
+                    <div class="detail-content">
+                        <span class="detail-label">Tutar</span>
+                        <span class="detail-value">${income.amount.toFixed(2)} ${income.currency}</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="bi bi-calendar-event text-info"></i>
+                    <div class="detail-content">
+                        <span class="detail-label">İlk Gelir Tarihi</span>
+                        <span class="detail-value">${formatDate(income.firstIncomeDate)}</span>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <i class="bi bi-arrow-repeat text-warning"></i>
+                    <div class="detail-content">
+                        <span class="detail-label">Tekrarlama Sıklığı</span>
+                        <span class="detail-value">${getFrequencyText(income.frequency)}</span>
+                    </div>
+                </div>
+            </div>
+        `,
+        customClass: {
+            container: 'income-details-modal',
+            popup: 'income-details-popup',
+            content: 'income-details-content'
+        },
+        showConfirmButton: false,
+        showCloseButton: true
+    });
 }

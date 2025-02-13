@@ -1156,3 +1156,121 @@ h6 {
 [data-theme="dark"] .form-control::placeholder {
     color: #808080;
 }
+
+/* Gelir Detayları Modal Stilleri */
+.income-details-modal .swal2-popup {
+    padding: 2rem;
+    border-radius: 20px;
+    background: var(--bg-secondary);
+}
+
+.income-details-modal .swal2-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.income-details {
+    padding: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background: var(--bg-primary);
+    border-radius: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.detail-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.detail-item i {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+}
+
+.detail-content {
+    flex: 1;
+}
+
+.detail-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .detail-item {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .detail-item i {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .income-details-modal .swal2-popup {
+    background: #1a1a1a;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .detail-item:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Gelir İsmi Linki */
+.income-name {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    display: inline-block;
+    position: relative;
+}
+
+.income-name:hover {
+    color: var(--primary);
+}
+
+.income-name::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--primary);
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.3s ease;
+}
+
+.income-name:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+[data-theme="dark"] .income-name {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .income-name:hover {
+    color: var(--primary);
+}
