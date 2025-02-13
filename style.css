@@ -859,3 +859,21 @@ h1, h2, h3, h4, h5, h6 {
 [data-theme="dark"] .swal2-timer-progress-bar {
     background-color: rgba(255, 255, 255, 0.2) !important;
 }
+
+[data-theme="dark"] .btn-group .btn-outline-primary {
+    color: #4dabf7 !important;
+    border-color: #4dabf7 !important;
+    background-color: transparent !important;
+}
+
+[data-theme="dark"] .btn-group .btn-outline-primary:hover {
+    color: #ffffff !important;
+    background-color: rgba(77, 171, 247, 0.2) !important;
+}
+
+[data-theme="dark"] .btn-group .btn-outline-primary.active {
+    color: #ffffff !important;
+    background-color: #4dabf7 !important;
+    border-color: #4dabf7 !important;
+    box-shadow: 0 0 0 0.25rem rgba(77, 171, 247, 0.5) !important;
+}
