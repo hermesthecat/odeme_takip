@@ -2018,9 +2018,7 @@ function updateBillRemindersDisplay() {
 
 // Ana sayfa yüklendiğinde bütçe hedeflerini de güncelle
 if (document.getElementById('paymentList')) {
-    console.log('Ana sayfa yükleniyor...');
     window.addEventListener('load', async function () {
-        console.log('Load event tetiklendi');
         // Döviz kurlarını güncelle ve göster
         await updateExchangeRates();
         showExchangeRates();
