@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeni Gelir Ekle - Ödeme Takip Sistemi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">Yeni Gelir Ekle</h1>
+        <form id="incomeForm" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="incomeName" class="form-label">Gelir İsmi</label>
+                <input type="text" class="form-control" id="incomeName" required>
+                <div class="invalid-feedback">Gelir ismi gereklidir.</div>
+            </div>
+            <div class="mb-3">
+                <label for="amount" class="form-label">Gelir Tutarı</label>
+                <input type="number" class="form-control" id="amount" step="0.01" required>
+                <div class="invalid-feedback">Geçerli bir tutar giriniz.</div>
+            </div>
+            <div class="mb-3">
+                <label for="currency" class="form-label">Para Birimi</label>
+                <select class="form-select" id="currency" required>
+                    <option value="TRY">TRY</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="GBP">GBP</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="firstIncomeDate" class="form-label">İlk Gelir Tarihi</label>
+                <input type="date" class="form-control" id="firstIncomeDate" required>
+                <div class="invalid-feedback">Tarih seçiniz.</div>
+            </div>
+            <div class="mb-3">
+                <label for="frequency" class="form-label">Tekrarlama Sıklığı</label>
+                <select class="form-select" id="frequency" required>
+                    <option value="0">Tekrar Yok</option>
+                    <option value="1">Her Ay</option>
+                    <option value="2">2 Ayda Bir</option>
+                    <option value="3">3 Ayda Bir</option>
+                    <option value="4">4 Ayda Bir</option>
+                    <option value="5">5 Ayda Bir</option>
+                    <option value="6">6 Ayda Bir</option>
+                    <option value="12">Yıllık</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-success">Kaydet</button>
+                <a href="index.html" class="btn btn-secondary" id="cancelButton">İptal</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 

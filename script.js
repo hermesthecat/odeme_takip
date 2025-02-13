@@ -2,8 +2,9 @@
  * @author A. Kerem Gök
  */
 
-// LocalStorage anahtarı
+// LocalStorage anahtarları
 const STORAGE_KEY = 'payments';
+const INCOME_STORAGE_KEY = 'incomes';
 
 // Eski verileri kontrol et ve taşı
 function migrateOldData() {
@@ -41,6 +42,31 @@ function savePayments(payments) {
         return true;
     } catch (error) {
         console.error('Ödemeler kaydedilirken hata:', error);
+        return false;
+    }
+}
+
+// Gelirleri yükleme
+function loadIncomes() {
+    try {
+        const incomes = localStorage.getItem(INCOME_STORAGE_KEY);
+        console.log('Yüklenen gelirler:', incomes);
+        return incomes ? JSON.parse(incomes) : [];
+    } catch (error) {
+        console.error('Gelirler yüklenirken hata:', error);
+        return [];
+    }
+}
+
+// Gelirleri kaydetme
+function saveIncomes(incomes) {
+    try {
+        const data = JSON.stringify(incomes);
+        localStorage.setItem(INCOME_STORAGE_KEY, data);
+        console.log('Kaydedilen gelirler:', incomes);
+        return true;
+    } catch (error) {
+        console.error('Gelirler kaydedilirken hata:', error);
         return false;
     }
 }
@@ -111,6 +137,52 @@ function updatePaymentList() {
     });
 }
 
+// Gelir listesini güncelleme
+function updateIncomeList() {
+    console.log('updateIncomeList fonksiyonu çağrıldı');
+    
+    const tbody = document.getElementById('incomeList');
+    if (!tbody) {
+        console.error('incomeList elementi bulunamadı!');
+        return;
+    }
+
+    const incomes = loadIncomes();
+    console.log('Yüklenen gelir sayısı:', incomes.length);
+
+    tbody.innerHTML = '';
+    
+    if (!Array.isArray(incomes) || incomes.length === 0) {
+        console.log('Gelir listesi boş');
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="7" class="text-center">Henüz gelir kaydı bulunmamaktadır.</td>';
+        tbody.appendChild(row);
+        return;
+    }
+    
+    incomes.forEach((income, index) => {
+        try {
+            const nextIncomeDate = calculateNextPaymentDate(income.firstIncomeDate, income.frequency);
+            
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${income.name || '-'}</td>
+                <td>${income.amount ? income.amount.toFixed(2) : '0.00'}</td>
+                <td>${income.currency || '-'}</td>
+                <td>${formatDate(income.firstIncomeDate)}</td>
+                <td>${getFrequencyText(income.frequency)}</td>
+                <td>${formatDate(nextIncomeDate)}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="deleteIncome(${index})">Sil</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        } catch (error) {
+            console.error(`Gelir ${index + 1} gösterilirken hata:`, error, income);
+        }
+    });
+}
+
 // Tekrarlama sıklığı metnini alma
 function getFrequencyText(frequency) {
     const frequencies = {
@@ -133,6 +205,18 @@ function deletePayment(index) {
         payments.splice(index, 1);
         if (savePayments(payments)) {
             updatePaymentList();
+        }
+    }
+}
+
+// Gelir silme
+function deleteIncome(index) {
+    if (confirm('Bu geliri silmek istediğinizden emin misiniz?')) {
+        const incomes = loadIncomes();
+        incomes.splice(index, 1);
+        if (saveIncomes(incomes)) {
+            updateIncomeList();
+            updateCalendar();
         }
     }
 }
@@ -179,6 +263,43 @@ if (document.getElementById('paymentForm')) {
     });
 }
 
+// Gelir formu işlemleri
+if (document.getElementById('incomeForm')) {
+    const form = document.getElementById('incomeForm');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        try {
+            const income = {
+                name: document.getElementById('incomeName').value.trim(),
+                amount: parseFloat(document.getElementById('amount').value),
+                currency: document.getElementById('currency').value,
+                firstIncomeDate: document.getElementById('firstIncomeDate').value,
+                frequency: document.getElementById('frequency').value
+            };
+            
+            if (!income.name || isNaN(income.amount) || !income.firstIncomeDate) {
+                alert('Lütfen tüm alanları doğru şekilde doldurunuz.');
+                return;
+            }
+            
+            const incomes = loadIncomes();
+            incomes.push(income);
+            
+            if (saveIncomes(incomes)) {
+                alert('Gelir başarıyla kaydedildi!');
+                window.location.href = 'index.html';
+            } else {
+                alert('Gelir kaydedilirken bir hata oluştu!');
+            }
+        } catch (error) {
+            console.error('Kayıt sırasında hata:', error);
+            alert('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz.');
+        }
+    });
+}
+
 // Takvim olaylarını oluştur
 function createCalendarEvents(payments) {
     const events = [];
@@ -186,25 +307,25 @@ function createCalendarEvents(payments) {
     const sixMonthsLater = new Date();
     sixMonthsLater.setMonth(today.getMonth() + 6);
 
+    // Ödemeleri ekle
     payments.forEach(payment => {
         let currentDate = new Date(payment.firstPaymentDate);
         
-        // Gelecek 6 aylık ödemeleri hesapla
         while (currentDate <= sixMonthsLater) {
             events.push({
-                title: `${payment.name} - ${payment.amount} ${payment.currency}`,
+                title: `Ödeme: ${payment.name} - ${payment.amount} ${payment.currency}`,
                 start: currentDate.toISOString().split('T')[0],
-                backgroundColor: getPaymentColor(payment.currency),
-                borderColor: getPaymentColor(payment.currency),
+                backgroundColor: '#dc3545', // Kırmızı
+                borderColor: '#dc3545',
                 extendedProps: {
+                    type: 'payment',
                     amount: payment.amount,
                     currency: payment.currency,
                     frequency: payment.frequency
                 }
             });
 
-            // Bir sonraki ödeme tarihini hesapla
-            if (payment.frequency === '0') break; // Tek seferlik ödeme
+            if (payment.frequency === '0') break;
             
             const nextDate = new Date(currentDate);
             nextDate.setMonth(nextDate.getMonth() + parseInt(payment.frequency));
@@ -212,12 +333,34 @@ function createCalendarEvents(payments) {
         }
     });
 
-    return events;
-}
+    // Gelirleri ekle
+    const incomes = loadIncomes();
+    incomes.forEach(income => {
+        let currentDate = new Date(income.firstIncomeDate);
+        
+        while (currentDate <= sixMonthsLater) {
+            events.push({
+                title: `Gelir: ${income.name} - ${income.amount} ${income.currency}`,
+                start: currentDate.toISOString().split('T')[0],
+                backgroundColor: '#198754', // Yeşil
+                borderColor: '#198754',
+                extendedProps: {
+                    type: 'income',
+                    amount: income.amount,
+                    currency: income.currency,
+                    frequency: income.frequency
+                }
+            });
 
-// Para birimine göre renk döndür
-function getPaymentColor(currency) {
-    return '#dc3545'; // Bootstrap kırmızı renk kodu
+            if (income.frequency === '0') break;
+            
+            const nextDate = new Date(currentDate);
+            nextDate.setMonth(nextDate.getMonth() + parseInt(income.frequency));
+            currentDate = nextDate;
+        }
+    });
+
+    return events;
 }
 
 // Takvimi güncelle
@@ -263,6 +406,7 @@ if (document.getElementById('paymentList')) {
         console.log('Ana sayfa yüklendi');
         migrateOldData();
         updatePaymentList();
+        updateIncomeList();
         updateCalendar();
     });
     
