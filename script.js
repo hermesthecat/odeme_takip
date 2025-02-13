@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const navButtons = document.querySelector('.d-flex.justify-content-between div');
     if (navButtons) {
         const themeButton = document.createElement('button');
-        themeButton.className = 'btn btn-outline-secondary ms-2';
+        themeButton.className = 'btn theme-toggle-btn ms-2';
         themeButton.innerHTML = `<i class="bi bi-${currentTheme === 'dark' ? 'sun' : 'moon'}"></i>`;
         themeButton.onclick = toggleTheme;
         navButtons.appendChild(themeButton);
