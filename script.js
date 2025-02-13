@@ -270,6 +270,84 @@ function updatePaymentList() {
     });
 }
 
+// Gelir güncelleme
+function updateIncome(index) {
+    const incomes = loadIncomes();
+    const income = incomes[index];
+
+    Swal.fire({
+        title: 'Gelir Güncelle',
+        html: `
+            <div class="mb-3">
+                <label class="form-label">Gelir İsmi</label>
+                <input type="text" id="incomeName" class="form-control" value="${income.name}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tutar</label>
+                <input type="number" id="amount" class="form-control" value="${income.amount}" step="0.01" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Para Birimi</label>
+                <select id="currency" class="form-select" required>
+                    <option value="TRY" ${income.currency === 'TRY' ? 'selected' : ''}>TRY</option>
+                    <option value="USD" ${income.currency === 'USD' ? 'selected' : ''}>USD</option>
+                    <option value="EUR" ${income.currency === 'EUR' ? 'selected' : ''}>EUR</option>
+                    <option value="GBP" ${income.currency === 'GBP' ? 'selected' : ''}>GBP</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">İlk Gelir Tarihi</label>
+                <input type="date" id="firstIncomeDate" class="form-control" value="${income.firstIncomeDate}" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Tekrarlama Sıklığı</label>
+                <select id="frequency" class="form-select" required>
+                    <option value="0" ${income.frequency === '0' ? 'selected' : ''}>Tekrar Yok</option>
+                    <option value="1" ${income.frequency === '1' ? 'selected' : ''}>Her Ay</option>
+                    <option value="2" ${income.frequency === '2' ? 'selected' : ''}>2 Ayda Bir</option>
+                    <option value="3" ${income.frequency === '3' ? 'selected' : ''}>3 Ayda Bir</option>
+                    <option value="4" ${income.frequency === '4' ? 'selected' : ''}>4 Ayda Bir</option>
+                    <option value="5" ${income.frequency === '5' ? 'selected' : ''}>5 Ayda Bir</option>
+                    <option value="6" ${income.frequency === '6' ? 'selected' : ''}>6 Ayda Bir</option>
+                    <option value="12" ${income.frequency === '12' ? 'selected' : ''}>Yıllık</option>
+                </select>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Güncelle',
+        cancelButtonText: 'İptal',
+        preConfirm: () => {
+            const name = document.getElementById('incomeName').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+            const currency = document.getElementById('currency').value;
+            const firstIncomeDate = document.getElementById('firstIncomeDate').value;
+            const frequency = document.getElementById('frequency').value;
+
+            if (!name || isNaN(amount) || !firstIncomeDate) {
+                Swal.showValidationMessage('Lütfen tüm alanları doğru şekilde doldurunuz.');
+                return false;
+            }
+
+            return { name, amount, currency, firstIncomeDate, frequency };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            incomes[index] = result.value;
+            if (saveIncomes(incomes)) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Gelir başarıyla güncellendi!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        }
+    });
+}
+
 // Gelir listesini güncelleme
 function updateIncomeList() {
     const tbody = document.getElementById('incomeList');
@@ -305,7 +383,12 @@ function updateIncomeList() {
                 <td>${getFrequencyText(income.frequency)}</td>
                 <td>${formatDate(nextIncomeDate)}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="deleteIncome(${index})">Sil</button>
+                    <button class="btn btn-success btn-sm me-1" onclick="updateIncome(${index})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteIncome(${index})">
+                        <i class="bi bi-trash"></i>
+                    </button>
                 </td>
             `;
             tbody.appendChild(row);
