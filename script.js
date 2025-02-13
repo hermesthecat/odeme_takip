@@ -1041,6 +1041,20 @@ function importData() {
 
 // Grafikleri güncelle
 function updateCharts(period = 'month') {
+    // Butonların aktif/pasif durumlarını güncelle
+    const monthlyBtn = document.querySelector('button[onclick="updateCharts(\'month\')"]');
+    const yearlyBtn = document.querySelector('button[onclick="updateCharts(\'year\')"]');
+    
+    if (monthlyBtn && yearlyBtn) {
+        if (period === 'month') {
+            monthlyBtn.classList.add('active');
+            yearlyBtn.classList.remove('active');
+        } else {
+            monthlyBtn.classList.remove('active');
+            yearlyBtn.classList.add('active');
+        }
+    }
+
     updateIncomeExpenseChart(period);
     updateSavingsChart();
 }
