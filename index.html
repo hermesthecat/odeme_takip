@@ -16,8 +16,11 @@
       href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
       rel="stylesheet"
     />
+    <link
+      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
   </head>
   <body>
     <div class="container mt-4">
@@ -191,8 +194,18 @@
           <div class="d-flex justify-content-between align-items-center">
             <h2 class="mb-0">Grafik Raporları</h2>
             <div class="btn-group">
-              <button onclick="updateCharts('month')" class="btn btn-outline-primary active">Aylık</button>
-              <button onclick="updateCharts('year')" class="btn btn-outline-primary">Yıllık</button>
+              <button
+                onclick="updateCharts('month')"
+                class="btn btn-outline-primary active"
+              >
+                Aylık
+              </button>
+              <button
+                onclick="updateCharts('year')"
+                class="btn btn-outline-primary"
+              >
+                Yıllık
+              </button>
             </div>
           </div>
         </div>

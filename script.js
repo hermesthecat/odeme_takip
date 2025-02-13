@@ -298,6 +298,16 @@ function deleteIncome(index) {
 // Form işlemleri
 if (document.getElementById('paymentForm')) {
     const form = document.getElementById('paymentForm');
+    const categorySelect = document.getElementById('category');
+
+    // Kategorileri yükle
+    const goals = loadBudgetGoals();
+    goals.categories.forEach(category => {
+        const option = document.createElement('option');
+        option.value = category.name;
+        option.textContent = category.name;
+        categorySelect.appendChild(option);
+    });
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -307,11 +317,12 @@ if (document.getElementById('paymentForm')) {
                 name: document.getElementById('paymentName').value.trim(),
                 amount: parseFloat(document.getElementById('amount').value),
                 currency: document.getElementById('currency').value,
+                category: document.getElementById('category').value,
                 firstPaymentDate: document.getElementById('firstPaymentDate').value,
                 frequency: document.getElementById('frequency').value
             };
 
-            if (!payment.name || isNaN(payment.amount) || !payment.firstPaymentDate) {
+            if (!payment.name || isNaN(payment.amount) || !payment.firstPaymentDate || !payment.category) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Hata!',
@@ -332,12 +343,6 @@ if (document.getElementById('paymentForm')) {
                     timer: 1500
                 }).then(() => {
                     window.location.href = 'index.html';
-                });
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Hata!',
-                    text: 'Ödeme kaydedilirken bir hata oluştu!'
                 });
             }
         } catch (error) {
@@ -956,7 +961,7 @@ function exportData() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         const date = new Date().toLocaleDateString('tr-TR').replace(/\./g, '-');
-        
+
         a.href = url;
         a.download = `butce-verilerim-${date}.json`;
         document.body.appendChild(a);
@@ -985,15 +990,15 @@ function importData() {
     input.type = 'file';
     input.accept = '.json';
 
-    input.onchange = function(e) {
+    input.onchange = function (e) {
         const file = e.target.files[0];
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             try {
                 const data = JSON.parse(e.target.result);
-                
+
                 // Veri doğrulama
                 if (!data.payments || !data.incomes || !data.savings) {
                     throw new Error('Geçersiz veri formatı');
@@ -1003,7 +1008,7 @@ function importData() {
                 savePayments(data.payments);
                 saveIncomes(data.incomes);
                 saveSavings(data.savings);
-                
+
                 if (data.exchangeRates) {
                     localStorage.setItem(EXCHANGE_RATES_KEY, data.exchangeRates);
                 }
@@ -1130,7 +1135,7 @@ function updateIncomeExpenseChart(period) {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: function(value) {
+                            callback: function (value) {
                                 return new Intl.NumberFormat('tr-TR', {
                                     style: 'currency',
                                     currency: 'TRY',
@@ -1144,8 +1149,8 @@ function updateIncomeExpenseChart(period) {
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + 
+                            label: function (context) {
+                                return context.dataset.label + ': ' +
                                     new Intl.NumberFormat('tr-TR', {
                                         style: 'currency',
                                         currency: 'TRY'
@@ -1210,7 +1215,7 @@ function updateSavingsChart() {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: function(value) {
+                            callback: function (value) {
                                 return new Intl.NumberFormat('tr-TR', {
                                     style: 'currency',
                                     currency: 'TRY',
@@ -1224,8 +1229,8 @@ function updateSavingsChart() {
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + 
+                            label: function (context) {
+                                return context.dataset.label + ': ' +
                                     new Intl.NumberFormat('tr-TR', {
                                         style: 'currency',
                                         currency: 'TRY'
@@ -1326,7 +1331,7 @@ function addCategoryGoal() {
         preConfirm: () => {
             const name = document.getElementById('categoryName').value.trim();
             const limit = parseFloat(document.getElementById('categoryLimit').value);
-            
+
             if (!name) {
                 Swal.showValidationMessage('Kategori adı gereklidir');
                 return false;
@@ -1335,7 +1340,7 @@ function addCategoryGoal() {
                 Swal.showValidationMessage('Geçerli bir limit giriniz');
                 return false;
             }
-            
+
             return { name, limit };
         }
     }).then((result) => {
@@ -1393,7 +1398,8 @@ function updateBudgetGoalsDisplay() {
     const goals = loadBudgetGoals();
     const currentExpenses = calculateMonthlyBalance(new Date().getFullYear(), new Date().getMonth()).expense;
     const monthlyLimitProgress = (currentExpenses / goals.monthlyExpenseLimit) * 100;
-    
+    const categoryExpenses = calculateCategoryExpenses(new Date().getFullYear(), new Date().getMonth());
+
     let html = `
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -1430,38 +1436,61 @@ function updateBudgetGoalsDisplay() {
                 </button>
             </div>
             <div class="card-body">
-                ${goals.categories.length === 0 ? 
-                    '<p class="text-muted mb-0">Henüz kategori hedefi eklenmemiş.</p>' : 
-                    goals.categories.map((category, index) => `
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <span>${category.name}</span>
-                                <div>
-                                    <span class="me-2">Limit: ${formatMoney(category.limit)}</span>
-                                    <button onclick="deleteCategoryGoal(${index})" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+                ${goals.categories.length === 0 ?
+            '<p class="text-muted mb-0">Henüz kategori hedefi eklenmemiş.</p>' :
+            goals.categories.map((category, index) => {
+                const expense = categoryExpenses[category.name] || 0;
+                const progress = (expense / category.limit) * 100;
+                return `
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span>${category.name}</span>
+                                    <div>
+                                        <span class="me-2">Harcama: ${formatMoney(expense)} / Limit: ${formatMoney(category.limit)}</span>
+                                        <button onclick="deleteCategoryGoal(${index})" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar ${progress > 90 ? 'bg-danger' : progress > 75 ? 'bg-warning' : 'bg-info'}" 
+                                         role="progressbar" 
+                                         style="width: ${Math.min(100, progress)}%" 
+                                         aria-valuenow="${Math.min(100, progress)}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                        ${Math.round(progress)}%
+                                    </div>
                                 </div>
                             </div>
-                            <div class="progress">
-                                <div class="progress-bar bg-info" 
-                                     role="progressbar" 
-                                     style="width: 0%" 
-                                     aria-valuenow="0" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100">
-                                    0%
-                                </div>
-                            </div>
-                        </div>
-                    `).join('')}
+                        `;
+            }).join('')}
             </div>
         </div>
     `;
 
     container.innerHTML = html;
 
-    // Uyarı kontrolü
+    // Kategori bazlı uyarıları kontrol et
+    goals.categories.forEach(category => {
+        const expense = categoryExpenses[category.name] || 0;
+        const progress = (expense / category.limit) * 100;
+
+        if (progress > 90) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Kategori Uyarısı!',
+                text: `${category.name} kategorisinde harcama limitinize çok yaklaştınız!`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true
+            });
+        }
+    });
+
+    // Genel bütçe uyarısı
     if (monthlyLimitProgress > 90) {
         Swal.fire({
             icon: 'warning',
@@ -1474,6 +1503,53 @@ function updateBudgetGoalsDisplay() {
             timerProgressBar: true
         });
     }
+}
+
+// Kategori bazlı harcamaları hesapla
+function calculateCategoryExpenses(year, month) {
+    const startDate = new Date(year, month, 1);
+    const endDate = new Date(year, month + 1, 0);
+    const expenses = {};
+
+    // Ödemeleri kategorilere göre topla
+    const payments = loadPayments();
+    payments.forEach(payment => {
+        if (!payment.category) return;
+
+        const firstDate = new Date(payment.firstPaymentDate);
+        let amount = 0;
+
+        if (payment.frequency === '0') {
+            // Tek seferlik ödeme
+            if (firstDate.getFullYear() === year && firstDate.getMonth() === month) {
+                amount = convertToTRY(payment.amount, payment.currency);
+            }
+        } else {
+            // Tekrarlı ödeme
+            let currentDate = new Date(firstDate);
+
+            // İlk tarihi ayın başına getir
+            while (currentDate > startDate) {
+                currentDate.setMonth(currentDate.getMonth() - parseInt(payment.frequency));
+            }
+
+            // Sonraki ödeme tarihini bul
+            while (currentDate <= startDate) {
+                currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+            }
+
+            // Eğer bu ay içindeyse ekle
+            if (currentDate <= endDate) {
+                amount = convertToTRY(payment.amount, payment.currency);
+            }
+        }
+
+        if (amount > 0) {
+            expenses[payment.category] = (expenses[payment.category] || 0) + amount;
+        }
+    });
+
+    return expenses;
 }
 
 // Ana sayfa yüklendiğinde bütçe hedeflerini de güncelle
