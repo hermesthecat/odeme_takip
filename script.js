@@ -10,10 +10,9 @@ const INCOME_STORAGE_KEY = 'incomes';
 function loadPayments() {
     try {
         const payments = localStorage.getItem(STORAGE_KEY);
-        console.log('Yüklenen ödemeler:', payments);
         return payments ? JSON.parse(payments) : [];
     } catch (error) {
-        console.error('Ödemeler yüklenirken hata:', error);
+        alert('Ödemeler yüklenirken hata oluştu: ' + error.message);
         return [];
     }
 }
@@ -23,10 +22,9 @@ function savePayments(payments) {
     try {
         const data = JSON.stringify(payments);
         localStorage.setItem(STORAGE_KEY, data);
-        console.log('Kaydedilen ödemeler:', payments);
         return true;
     } catch (error) {
-        console.error('Ödemeler kaydedilirken hata:', error);
+        alert('Ödemeler kaydedilirken hata oluştu: ' + error.message);
         return false;
     }
 }
@@ -35,10 +33,9 @@ function savePayments(payments) {
 function loadIncomes() {
     try {
         const incomes = localStorage.getItem(INCOME_STORAGE_KEY);
-        console.log('Yüklenen gelirler:', incomes);
         return incomes ? JSON.parse(incomes) : [];
     } catch (error) {
-        console.error('Gelirler yüklenirken hata:', error);
+        alert('Gelirler yüklenirken hata oluştu: ' + error.message);
         return [];
     }
 }
@@ -48,10 +45,9 @@ function saveIncomes(incomes) {
     try {
         const data = JSON.stringify(incomes);
         localStorage.setItem(INCOME_STORAGE_KEY, data);
-        console.log('Kaydedilen gelirler:', incomes);
         return true;
     } catch (error) {
-        console.error('Gelirler kaydedilirken hata:', error);
+        alert('Gelirler kaydedilirken hata oluştu: ' + error.message);
         return false;
     }
 }
@@ -78,21 +74,16 @@ function formatDate(date) {
 
 // Ödeme listesini güncelleme
 function updatePaymentList() {
-    console.log('updatePaymentList fonksiyonu çağrıldı');
-
     const tbody = document.getElementById('paymentList');
     if (!tbody) {
-        console.error('paymentList elementi bulunamadı!');
+        alert('Ödeme listesi tablosu bulunamadı!');
         return;
     }
 
     const payments = loadPayments();
-    console.log('Yüklenen ödeme sayısı:', payments.length);
-
     tbody.innerHTML = '';
 
     if (!Array.isArray(payments) || payments.length === 0) {
-        console.log('Ödeme listesi boş');
         const row = document.createElement('tr');
         row.innerHTML = '<td colspan="7" class="text-center">Henüz ödeme kaydı bulunmamaktadır.</td>';
         tbody.appendChild(row);
@@ -117,28 +108,23 @@ function updatePaymentList() {
             `;
             tbody.appendChild(row);
         } catch (error) {
-            console.error(`Ödeme ${index + 1} gösterilirken hata:`, error, payment);
+            alert(`Ödeme ${index + 1} gösterilirken hata oluştu: ${error.message}`);
         }
     });
 }
 
 // Gelir listesini güncelleme
 function updateIncomeList() {
-    console.log('updateIncomeList fonksiyonu çağrıldı');
-
     const tbody = document.getElementById('incomeList');
     if (!tbody) {
-        console.error('incomeList elementi bulunamadı!');
+        alert('Gelir listesi tablosu bulunamadı!');
         return;
     }
 
     const incomes = loadIncomes();
-    console.log('Yüklenen gelir sayısı:', incomes.length);
-
     tbody.innerHTML = '';
 
     if (!Array.isArray(incomes) || incomes.length === 0) {
-        console.log('Gelir listesi boş');
         const row = document.createElement('tr');
         row.innerHTML = '<td colspan="7" class="text-center">Henüz gelir kaydı bulunmamaktadır.</td>';
         tbody.appendChild(row);
@@ -163,7 +149,7 @@ function updateIncomeList() {
             `;
             tbody.appendChild(row);
         } catch (error) {
-            console.error(`Gelir ${index + 1} gösterilirken hata:`, error, income);
+            alert(`Gelir ${index + 1} gösterilirken hata oluştu: ${error.message}`);
         }
     });
 }
@@ -505,26 +491,9 @@ function updateSummaryCards() {
 // Ana sayfa yüklendiğinde
 if (document.getElementById('paymentList')) {
     window.addEventListener('load', function () {
-        console.log('Ana sayfa yüklendi');
         updatePaymentList();
         updateIncomeList();
         updateCalendar();
-        updateSummaryCards(); // Özet kartlarını güncelle
+        updateSummaryCards();
     });
-
-    // Test butonu için event listener
-    const testButton = document.getElementById('testButton');
-    if (testButton) {
-        testButton.addEventListener('click', function () {
-            const payments = localStorage.getItem(STORAGE_KEY);
-            console.log('LocalStorage içeriği:', payments);
-            if (payments) {
-                console.log('Ayrıştırılmış veriler:', JSON.parse(payments));
-            }
-            updatePaymentList();
-            updateIncomeList();
-            updateCalendar();
-            updateSummaryCards(); // Özet kartlarını güncelle
-        });
-    }
 } 
