@@ -171,12 +171,53 @@
       </div>
 
       <!-- Takvim -->
-      <div class="card">
+      <div class="card mb-4">
         <div class="card-header">
           <h2 class="mb-0">Takvim</h2>
         </div>
         <div class="card-body">
           <div id="calendar"></div>
+        </div>
+      </div>
+
+      <!-- Grafik Raporları -->
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">Grafik Raporları</h2>
+            <div class="btn-group">
+              <button onclick="updateCharts('month')" class="btn btn-outline-primary active">Aylık</button>
+              <button onclick="updateCharts('year')" class="btn btn-outline-primary">Yıllık</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="card chart-card">
+                <div class="card-header">
+                  <h5 class="card-title mb-0">Gelir-Gider Dağılımı</h5>
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="incomeExpenseChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="card chart-card">
+                <div class="card-header">
+                  <h5 class="card-title mb-0">Birikim Hedefleri</h5>
+                </div>
+                <div class="card-body">
+                  <div class="chart-container">
+                    <canvas id="savingsChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -186,6 +227,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/tr.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Sonra bizim script dosyamız -->
     <script src="script.js"></script>

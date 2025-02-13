@@ -12,6 +12,10 @@ const SAVING_STORAGE_KEY = 'savings';
 const EXCHANGE_RATES_KEY = 'exchangeRates';
 const LAST_UPDATE_KEY = 'lastExchangeUpdate';
 
+// Grafik değişkenleri
+let incomeExpenseChart = null;
+let savingsChart = null;
+
 // LocalStorage'dan ödemeleri yükleme
 function loadPayments() {
     try {
@@ -1029,6 +1033,211 @@ function importData() {
     input.click();
 }
 
+// Grafikleri güncelle
+function updateCharts(period = 'month') {
+    updateIncomeExpenseChart(period);
+    updateSavingsChart();
+}
+
+// Gelir-Gider grafiğini güncelle
+function updateIncomeExpenseChart(period) {
+    const ctx = document.getElementById('incomeExpenseChart');
+    if (!ctx) return;
+
+    let labels, incomeData, expenseData;
+
+    if (period === 'month') {
+        // Son 6 ayın verilerini al
+        const months = [];
+        const incomes = [];
+        const expenses = [];
+
+        for (let i = 5; i >= 0; i--) {
+            const date = new Date();
+            date.setMonth(date.getMonth() - i);
+            const monthYear = new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' }).format(date);
+            months.push(monthYear);
+
+            const balance = calculateMonthlyBalance(date.getFullYear(), date.getMonth());
+            incomes.push(balance.income);
+            expenses.push(balance.expense);
+        }
+
+        labels = months;
+        incomeData = incomes;
+        expenseData = expenses;
+    } else {
+        // Yıllık verileri al (son 3 yıl)
+        const years = [];
+        const incomes = [];
+        const expenses = [];
+
+        for (let i = 2; i >= 0; i--) {
+            const year = new Date().getFullYear() - i;
+            years.push(year.toString());
+
+            let yearlyIncome = 0;
+            let yearlyExpense = 0;
+
+            for (let month = 0; month < 12; month++) {
+                const balance = calculateMonthlyBalance(year, month);
+                yearlyIncome += balance.income;
+                yearlyExpense += balance.expense;
+            }
+
+            incomes.push(yearlyIncome);
+            expenses.push(yearlyExpense);
+        }
+
+        labels = years;
+        incomeData = incomes;
+        expenseData = expenses;
+    }
+
+    // Eğer grafik zaten varsa güncelle, yoksa oluştur
+    if (incomeExpenseChart) {
+        incomeExpenseChart.data.labels = labels;
+        incomeExpenseChart.data.datasets[0].data = incomeData;
+        incomeExpenseChart.data.datasets[1].data = expenseData;
+        incomeExpenseChart.update();
+    } else {
+        incomeExpenseChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Gelir',
+                        data: incomeData,
+                        backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                        borderColor: 'rgb(40, 167, 69)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Gider',
+                        data: expenseData,
+                        backgroundColor: 'rgba(220, 53, 69, 0.5)',
+                        borderColor: 'rgb(220, 53, 69)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('tr-TR', {
+                                    style: 'currency',
+                                    currency: 'TRY',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + 
+                                    new Intl.NumberFormat('tr-TR', {
+                                        style: 'currency',
+                                        currency: 'TRY'
+                                    }).format(context.raw);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Birikim grafiğini güncelle
+function updateSavingsChart() {
+    const ctx = document.getElementById('savingsChart');
+    if (!ctx) return;
+
+    const savings = loadSavings();
+    const labels = [];
+    const currentData = [];
+    const targetData = [];
+
+    savings.forEach(saving => {
+        labels.push(saving.name);
+        currentData.push(convertToTRY(saving.currentAmount, saving.currency));
+        targetData.push(convertToTRY(saving.targetAmount, saving.currency));
+    });
+
+    // Eğer grafik zaten varsa güncelle, yoksa oluştur
+    if (savingsChart) {
+        savingsChart.data.labels = labels;
+        savingsChart.data.datasets[0].data = currentData;
+        savingsChart.data.datasets[1].data = targetData;
+        savingsChart.update();
+    } else {
+        savingsChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Mevcut Tutar',
+                        data: currentData,
+                        backgroundColor: 'rgba(13, 110, 253, 0.5)',
+                        borderColor: 'rgb(13, 110, 253)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Hedef Tutar',
+                        data: targetData,
+                        backgroundColor: 'rgba(108, 117, 125, 0.5)',
+                        borderColor: 'rgb(108, 117, 125)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return new Intl.NumberFormat('tr-TR', {
+                                    style: 'currency',
+                                    currency: 'TRY',
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                }).format(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + 
+                                    new Intl.NumberFormat('tr-TR', {
+                                        style: 'currency',
+                                        currency: 'TRY'
+                                    }).format(context.raw);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
 // Ana sayfa yüklendiğinde
 if (document.getElementById('paymentList')) {
     console.log('Ana sayfa yükleniyor...');
@@ -1044,6 +1253,7 @@ if (document.getElementById('paymentList')) {
         updateSavingList();
         updateCalendar();
         updateSummaryCards();
+        updateCharts(); // Grafikleri güncelle
 
         // Her saat başı kurları güncelle
         setInterval(async () => {

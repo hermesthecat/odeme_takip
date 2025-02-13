@@ -127,3 +127,17 @@ h2 {
 #exchangeRates .text-muted {
     font-size: 0.85rem;
 }
+
+/* Grafik kartları stilleri */
+.chart-container {
+    height: 400px;
+    position: relative;
+}
+
+.chart-card {
+    height: 500px;
+}
+
+.chart-card .card-body {
+    padding: 1rem;
+}
