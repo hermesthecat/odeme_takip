@@ -328,33 +328,66 @@ body {
 }
 
 /* Döviz kurları kartı için özel stiller */
-[data-theme="dark"] #exchangeRates {
-    background-color: #1e1e1e !important;
+#exchangeRates {
+    background-color: var(--bg-primary) !important;
 }
 
-[data-theme="dark"] #exchangeRates .card {
-    background-color: #252525;
-    border: 1px solid #333333;
+#exchangeRates .card {
+    background-color: transparent !important;
+    border: none;
+    box-shadow: none;
 }
 
-[data-theme="dark"] #exchangeRates .text-muted {
-    color: #e0e0e0 !important;
+#exchangeRates .card-body {
+    padding: 0.3rem !important;
 }
 
-[data-theme="dark"] #exchangeRates .bi {
-    color: #ffffff !important;
+#exchangeRates .bi {
+    font-size: 0.8rem;
+    color: var(--text-primary) !important;
+    margin-right: 0.1rem;
 }
 
-[data-theme="dark"] #exchangeRates .fw-bold {
-    color: #ffffff !important;
+#exchangeRates .fw-bold {
+    color: var(--text-primary) !important;
+    font-size: 0.8rem;
+    margin-right: 0.1rem;
+    font-weight: 700 !important;
 }
 
-[data-theme="dark"] #exchangeRates span {
-    color: #ffffff !important;
+#exchangeRates span {
+    font-size: 0.8rem;
+    color: var(--text-primary) !important;
+    font-weight: 500 !important;
 }
 
-[data-theme="dark"] #exchangeRates small {
-    color: #e0e0e0 !important;
+#exchangeRates .text-muted {
+    font-size: 0.7rem;
+    color: var(--text-secondary) !important;
+    font-weight: 400 !important;
+}
+
+#exchangeRates .d-flex.gap-3 {
+    gap: 0.8rem !important;
+}
+
+/* Mobil için daha kompakt görünüm */
+@media (max-width: 768px) {
+    #exchangeRates .card-body {
+        padding: 0.2rem !important;
+    }
+
+    #exchangeRates .d-flex.gap-3 {
+        gap: 0.4rem !important;
+    }
+
+    #exchangeRates span {
+        font-size: 0.75rem;
+    }
+
+    #exchangeRates .text-muted {
+        font-size: 0.65rem;
+    }
 }
 
 /* Form stilleri */
@@ -655,30 +688,6 @@ h6 {
         min-height: 44px;
         /* Dokunmatik hedef boyutu */
     }
-}
-
-/* Döviz kurları kartı */
-#exchangeRates .card {
-    background-color: #fff;
-    border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#exchangeRates .card-body {
-    padding: 0.75rem 1rem;
-}
-
-#exchangeRates .bi {
-    font-size: 1.1rem;
-    color: #6c757d;
-}
-
-#exchangeRates .fw-bold {
-    color: #2c3e50;
-}
-
-#exchangeRates .text-muted {
-    font-size: 0.85rem;
 }
 
 /* Grafik kartları stilleri */
