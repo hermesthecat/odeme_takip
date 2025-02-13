@@ -2162,4 +2162,142 @@ function showAddIncomeModal() {
 
     // Bugünün tarihini varsayılan olarak ayarla
     document.getElementById('firstIncomeDate').valueAsDate = new Date();
+}
+
+// Birikim ekleme modalını göster
+function showAddSavingModal() {
+    Swal.fire({
+        title: '<i class="bi bi-piggy-bank-fill text-primary me-2"></i>Birikim Ekle',
+        html: `
+            <form id="savingModalForm" class="needs-validation">
+                <div class="mb-3 position-relative">
+                    <label for="savingName" class="form-label d-flex align-items-center">
+                        <i class="bi bi-tag-fill me-2 text-primary"></i>Birikim İsmi
+                    </label>
+                    <input type="text" class="form-control form-control-lg shadow-sm" id="savingName" 
+                           placeholder="Örn: Araba, Ev, Tatil" required>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-8">
+                        <label for="targetAmount" class="form-label d-flex align-items-center">
+                            <i class="bi bi-bullseye me-2 text-danger"></i>Hedef Tutar
+                        </label>
+                        <input type="number" class="form-control form-control-lg shadow-sm" id="targetAmount" 
+                               step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="currency" class="form-label d-flex align-items-center">
+                            <i class="bi bi-currency-exchange me-2 text-warning"></i>Para Birimi
+                        </label>
+                        <select class="form-select form-select-lg shadow-sm" id="currency" required>
+                            <option value="TRY">₺ TRY</option>
+                            <option value="USD">$ USD</option>
+                            <option value="EUR">€ EUR</option>
+                            <option value="GBP">£ GBP</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="currentAmount" class="form-label d-flex align-items-center">
+                        <i class="bi bi-wallet2 me-2 text-success"></i>Mevcut Tutar
+                    </label>
+                    <input type="number" class="form-control form-control-lg shadow-sm" id="currentAmount" 
+                           step="0.01" placeholder="0.00" required>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="startDate" class="form-label d-flex align-items-center">
+                            <i class="bi bi-calendar-check-fill me-2 text-info"></i>Başlangıç Tarihi
+                        </label>
+                        <input type="date" class="form-control form-control-lg shadow-sm" id="startDate" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="targetDate" class="form-label d-flex align-items-center">
+                            <i class="bi bi-calendar2-check-fill me-2 text-secondary"></i>Hedef Tarihi
+                        </label>
+                        <input type="date" class="form-control form-control-lg shadow-sm" id="targetDate" required>
+                    </div>
+                </div>
+            </form>
+        `,
+        showCancelButton: true,
+        confirmButtonText: '<i class="bi bi-check-lg me-2"></i>Kaydet',
+        cancelButtonText: '<i class="bi bi-x-lg me-2"></i>İptal',
+        customClass: {
+            container: getCurrentTheme() === 'dark' ? 'swal2-dark' : '',
+            popup: 'shadow-lg border-0',
+            title: 'text-start fs-4 fw-bold',
+            htmlContainer: 'text-start',
+            confirmButton: 'btn btn-success btn-lg px-4',
+            cancelButton: 'btn btn-outline-secondary btn-lg px-4'
+        },
+        width: '32rem',
+        padding: '2rem',
+        buttonsStyling: false,
+        showCloseButton: true,
+        focusConfirm: false,
+        preConfirm: () => {
+            const form = document.getElementById('savingModalForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return false;
+            }
+
+            const saving = {
+                name: document.getElementById('savingName').value.trim(),
+                targetAmount: parseFloat(document.getElementById('targetAmount').value),
+                currentAmount: parseFloat(document.getElementById('currentAmount').value),
+                currency: document.getElementById('currency').value,
+                startDate: document.getElementById('startDate').value,
+                targetDate: document.getElementById('targetDate').value
+            };
+
+            if (!saving.name || isNaN(saving.targetAmount) || isNaN(saving.currentAmount) ||
+                !saving.startDate || !saving.targetDate) {
+                Swal.showValidationMessage('Lütfen tüm alanları doğru şekilde doldurunuz.');
+                return false;
+            }
+
+            if (saving.currentAmount > saving.targetAmount) {
+                Swal.showValidationMessage('Mevcut tutar hedef tutardan büyük olamaz!');
+                return false;
+            }
+
+            const startDateObj = new Date(saving.startDate);
+            const targetDateObj = new Date(saving.targetDate);
+            if (targetDateObj <= startDateObj) {
+                Swal.showValidationMessage('Hedef tarihi başlangıç tarihinden sonra olmalıdır!');
+                return false;
+            }
+
+            return saving;
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const savings = loadSavings();
+            savings.push(result.value);
+            if (saveSavings(savings)) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Birikim başarıyla kaydedildi!',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    customClass: {
+                        popup: 'shadow border-0'
+                    }
+                }).then(() => {
+                    updateSavingList();
+                    updateSummaryCards();
+                    updateCharts();
+                });
+            }
+        }
+    });
+
+    // Bugünün tarihini varsayılan olarak ayarla
+    document.getElementById('startDate').valueAsDate = new Date();
+    const targetDate = new Date();
+    targetDate.setMonth(targetDate.getMonth() + 12); // Varsayılan olarak 1 yıl sonrası
+    document.getElementById('targetDate').valueAsDate = targetDate;
 } 
