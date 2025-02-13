@@ -14,10 +14,12 @@
             <div class="mb-3">
                 <label for="paymentName" class="form-label">Ödeme İsmi</label>
                 <input type="text" class="form-control" id="paymentName" required>
+                <div class="invalid-feedback">Ödeme ismi gereklidir.</div>
             </div>
             <div class="mb-3">
                 <label for="amount" class="form-label">Ödeme Tutarı</label>
                 <input type="number" class="form-control" id="amount" step="0.01" required>
+                <div class="invalid-feedback">Geçerli bir tutar giriniz.</div>
             </div>
             <div class="mb-3">
                 <label for="currency" class="form-label">Ödeme Kuru</label>
@@ -31,6 +33,7 @@
             <div class="mb-3">
                 <label for="firstPaymentDate" class="form-label">İlk Ödeme Tarihi</label>
                 <input type="date" class="form-control" id="firstPaymentDate" required>
+                <div class="invalid-feedback">Tarih seçiniz.</div>
             </div>
             <div class="mb-3">
                 <label for="frequency" class="form-label">Tekrarlama Sıklığı</label>
@@ -47,10 +50,11 @@
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-primary">Kaydet</button>
-                <a href="index.html" class="btn btn-secondary">İptal</a>
+                <a href="index.html" class="btn btn-secondary" id="cancelButton">İptal</a>
             </div>
         </form>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>

@@ -2,10 +2,28 @@
  * @author A. Kerem Gök
  */
 
+// LocalStorage anahtarı
+const STORAGE_KEY = 'payments';
+
+// Eski verileri kontrol et ve taşı
+function migrateOldData() {
+    try {
+        const oldData = localStorage.getItem('payment_tracking_data');
+        if (oldData) {
+            localStorage.setItem(STORAGE_KEY, oldData);
+            localStorage.removeItem('payment_tracking_data');
+            console.log('Eski veriler taşındı');
+        }
+    } catch (error) {
+        console.error('Veri taşıma hatası:', error);
+    }
+}
+
 // LocalStorage'dan ödemeleri yükleme
 function loadPayments() {
     try {
-        const payments = localStorage.getItem('payments');
+        migrateOldData(); // Eski verileri kontrol et
+        const payments = localStorage.getItem(STORAGE_KEY);
         console.log('Yüklenen ödemeler:', payments);
         return payments ? JSON.parse(payments) : [];
     } catch (error) {
@@ -17,7 +35,8 @@ function loadPayments() {
 // LocalStorage'a ödemeleri kaydetme
 function savePayments(payments) {
     try {
-        localStorage.setItem('payments', JSON.stringify(payments));
+        const data = JSON.stringify(payments);
+        localStorage.setItem(STORAGE_KEY, data);
         console.log('Kaydedilen ödemeler:', payments);
         return true;
     } catch (error) {
@@ -31,7 +50,7 @@ function calculateNextPaymentDate(firstPaymentDate, frequency) {
     const firstDate = new Date(firstPaymentDate);
     const today = new Date();
     
-    if (frequency === 0) return firstDate;
+    if (frequency === '0') return firstDate;
     
     let nextDate = new Date(firstDate);
     while (nextDate <= today) {
@@ -48,18 +67,21 @@ function formatDate(date) {
 
 // Ödeme listesini güncelleme
 function updatePaymentList() {
-    const payments = loadPayments();
-    const tbody = document.getElementById('paymentList');
-    console.log('Liste güncellenirken mevcut ödemeler:', payments);
+    console.log('updatePaymentList fonksiyonu çağrıldı');
     
+    const tbody = document.getElementById('paymentList');
     if (!tbody) {
-        console.error('paymentList elementi bulunamadı');
+        console.error('paymentList elementi bulunamadı!');
         return;
     }
 
+    const payments = loadPayments();
+    console.log('Yüklenen ödeme sayısı:', payments.length);
+
     tbody.innerHTML = '';
     
-    if (payments.length === 0) {
+    if (!Array.isArray(payments) || payments.length === 0) {
+        console.log('Ödeme listesi boş');
         const row = document.createElement('tr');
         row.innerHTML = '<td colspan="7" class="text-center">Henüz ödeme kaydı bulunmamaktadır.</td>';
         tbody.appendChild(row);
@@ -84,7 +106,7 @@ function updatePaymentList() {
             `;
             tbody.appendChild(row);
         } catch (error) {
-            console.error(`Ödeme gösterilirken hata (index: ${index}):`, error);
+            console.error(`Ödeme ${index + 1} gösterilirken hata:`, error, payment);
         }
     });
 }
@@ -109,17 +131,22 @@ function deletePayment(index) {
     if (confirm('Bu ödemeyi silmek istediğinizden emin misiniz?')) {
         const payments = loadPayments();
         payments.splice(index, 1);
-        savePayments(payments);
-        updatePaymentList();
+        if (savePayments(payments)) {
+            updatePaymentList();
+        }
     }
 }
 
-// Form gönderildiğinde
+// Form işlemleri
 if (document.getElementById('paymentForm')) {
-    document.getElementById('paymentForm').addEventListener('submit', function(e) {
+    const form = document.getElementById('paymentForm');
+    
+    // Form gönderildiğinde
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
         
         try {
+            // Form verilerini al
             const payment = {
                 name: document.getElementById('paymentName').value.trim(),
                 amount: parseFloat(document.getElementById('amount').value),
@@ -134,24 +161,43 @@ if (document.getElementById('paymentForm')) {
                 return;
             }
             
+            // Mevcut ödemeleri yükle ve yeni ödemeyi ekle
             const payments = loadPayments();
             payments.push(payment);
             
+            // Kaydet ve yönlendir
             if (savePayments(payments)) {
                 alert('Ödeme başarıyla kaydedildi!');
-                window.location.href = 'index.html';
+                window.location.href = 'index.html'; // URL düzeltildi
             } else {
                 alert('Ödeme kaydedilirken bir hata oluştu!');
             }
         } catch (error) {
-            console.error('Kayıt sırasında hata oluştu:', error);
+            console.error('Kayıt sırasında hata:', error);
             alert('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyiniz.');
         }
     });
 }
 
-// Sayfa yüklendiğinde ödeme listesini güncelle
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Sayfa yüklendi, liste güncelleniyor...');
-    updatePaymentList();
-}); 
+// Ana sayfa yüklendiğinde
+if (document.getElementById('paymentList')) {
+    // Sayfa yüklendiğinde listeyi güncelle
+    window.addEventListener('load', function() {
+        console.log('Ana sayfa yüklendi');
+        migrateOldData(); // Eski verileri kontrol et
+        updatePaymentList();
+    });
+    
+    // Test butonu için event listener
+    const testButton = document.getElementById('testButton');
+    if (testButton) {
+        testButton.addEventListener('click', function() {
+            const payments = localStorage.getItem(STORAGE_KEY);
+            console.log('LocalStorage içeriği:', payments);
+            if (payments) {
+                console.log('Ayrıştırılmış veriler:', JSON.parse(payments));
+            }
+            updatePaymentList();
+        });
+    }
+} 

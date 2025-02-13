@@ -12,7 +12,10 @@
         <h1 class="mb-4">Ödeme Takip Sistemi</h1>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Ödemeler</h2>
-            <a href="add-payment.html" class="btn btn-primary">Yeni Ödeme Ekle</a>
+            <div>
+                <button id="testButton" class="btn btn-info me-2">Test Et</button>
+                <a href="add-payment.html" class="btn btn-primary">Yeni Ödeme Ekle</a>
+            </div>
         </div>
         <div class="table-responsive">
             <table class="table table-striped">
@@ -33,7 +36,26 @@
             </table>
         </div>
     </div>
+
+    <!-- Önce Bootstrap ve diğer bağımlılıklar -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Sonra bizim script dosyamız -->
     <script src="script.js"></script>
+    
+    <!-- En son sayfa özel scriptleri -->
+    <script>
+        document.getElementById('testButton').addEventListener('click', function() {
+            const payments = localStorage.getItem('payments');
+            console.log('LocalStorage içeriği:', payments);
+            alert('LocalStorage içeriği konsola yazdırıldı. F12 tuşuna basarak kontrol ediniz.');
+            
+            if (typeof updatePaymentList === 'function') {
+                updatePaymentList();
+            } else {
+                console.error('updatePaymentList fonksiyonu bulunamadı!');
+            }
+        });
+    </script>
 </body>
 </html> 
