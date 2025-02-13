@@ -12,6 +12,7 @@ const SAVING_STORAGE_KEY = 'savings';
 const EXCHANGE_RATES_KEY = 'exchangeRates';
 const LAST_UPDATE_KEY = 'lastExchangeUpdate';
 const BUDGET_GOALS_KEY = 'budgetGoals';
+const BILL_REMINDERS_KEY = 'billReminders';
 
 // Grafik değişkenleri
 let incomeExpenseChart = null;
@@ -1566,6 +1567,187 @@ function calculateCategoryExpenses(year, month) {
     return expenses;
 }
 
+// Fatura hatırlatıcılarını yükle
+function loadBillReminders() {
+    try {
+        const reminders = localStorage.getItem(BILL_REMINDERS_KEY);
+        return reminders ? JSON.parse(reminders) : [];
+    } catch (error) {
+        console.error('Fatura hatırlatıcıları yüklenirken hata:', error);
+        return [];
+    }
+}
+
+// Fatura hatırlatıcılarını kaydet
+function saveBillReminders(reminders) {
+    try {
+        localStorage.setItem(BILL_REMINDERS_KEY, JSON.stringify(reminders));
+        return true;
+    } catch (error) {
+        console.error('Fatura hatırlatıcıları kaydedilirken hata:', error);
+        return false;
+    }
+}
+
+// Fatura hatırlatıcısı ekle
+function addBillReminder() {
+    Swal.fire({
+        title: 'Fatura Hatırlatıcısı Ekle',
+        html: `
+            <div class="mb-3">
+                <label class="form-label">Fatura Adı</label>
+                <input type="text" id="billName" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Son Ödeme Günü (Ayın Kaçı)</label>
+                <input type="number" id="dueDay" class="form-control" min="1" max="31" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Hatırlatma Günü (Son Ödemeden Kaç Gün Önce)</label>
+                <input type="number" id="reminderDays" class="form-control" min="1" max="15" value="3" required>
+            </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'Ekle',
+        cancelButtonText: 'İptal',
+        preConfirm: () => {
+            const name = document.getElementById('billName').value.trim();
+            const dueDay = parseInt(document.getElementById('dueDay').value);
+            const reminderDays = parseInt(document.getElementById('reminderDays').value);
+
+            if (!name) {
+                Swal.showValidationMessage('Fatura adı gereklidir');
+                return false;
+            }
+            if (isNaN(dueDay) || dueDay < 1 || dueDay > 31) {
+                Swal.showValidationMessage('Geçerli bir son ödeme günü giriniz (1-31)');
+                return false;
+            }
+            if (isNaN(reminderDays) || reminderDays < 1 || reminderDays > 15) {
+                Swal.showValidationMessage('Geçerli bir hatırlatma günü giriniz (1-15)');
+                return false;
+            }
+
+            return { name, dueDay, reminderDays };
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const reminders = loadBillReminders();
+            reminders.push(result.value);
+            if (saveBillReminders(reminders)) {
+                updateBillRemindersDisplay();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Fatura hatırlatıcısı eklendi.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+    });
+}
+
+// Fatura hatırlatıcısını sil
+function deleteBillReminder(index) {
+    Swal.fire({
+        title: 'Emin misiniz?',
+        text: "Bu fatura hatırlatıcısını silmek istediğinizden emin misiniz?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Evet, sil!',
+        cancelButtonText: 'İptal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const reminders = loadBillReminders();
+            reminders.splice(index, 1);
+            if (saveBillReminders(reminders)) {
+                updateBillRemindersDisplay();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Silindi!',
+                    text: 'Fatura hatırlatıcısı başarıyla silindi.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+            }
+        }
+    });
+}
+
+// Fatura hatırlatıcılarını görüntüle
+function updateBillRemindersDisplay() {
+    const container = document.getElementById('billReminders');
+    if (!container) return;
+
+    const reminders = loadBillReminders();
+    const today = new Date();
+    const currentDay = today.getDate();
+
+    let html = `
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Fatura Hatırlatıcıları</h5>
+                <button onclick="addBillReminder()" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-plus"></i> Hatırlatıcı Ekle
+                </button>
+            </div>
+            <div class="card-body">
+                ${reminders.length === 0 ? 
+                    '<p class="text-muted mb-0">Henüz fatura hatırlatıcısı eklenmemiş.</p>' :
+                    reminders.map((reminder, index) => {
+                        const daysUntilDue = reminder.dueDay - currentDay;
+                        const isOverdue = daysUntilDue < 0;
+                        const isDueSoon = daysUntilDue <= reminder.reminderDays && daysUntilDue >= 0;
+                        const statusClass = isOverdue ? 'bg-danger' : isDueSoon ? 'bg-warning' : 'bg-success';
+                        const statusText = isOverdue ? 'Gecikmiş!' : isDueSoon ? 'Yaklaşıyor!' : 'Normal';
+                        
+                        return `
+                            <div class="mb-3 p-3 border rounded ${isOverdue ? 'border-danger' : isDueSoon ? 'border-warning' : 'border-success'}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">${reminder.name}</h6>
+                                        <small class="text-muted">
+                                            Son Ödeme: Her ayın ${reminder.dueDay}. günü
+                                        </small>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge ${statusClass} mb-2">${statusText}</span>
+                                        <br>
+                                        <button onclick="deleteBillReminder(${index})" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+            </div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+
+    // Yaklaşan faturalar için uyarı göster
+    reminders.forEach(reminder => {
+        const daysUntilDue = reminder.dueDay - currentDay;
+        if (daysUntilDue <= reminder.reminderDays && daysUntilDue >= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Fatura Hatırlatması!',
+                text: `${reminder.name} faturanızın son ödeme tarihine ${daysUntilDue} gün kaldı!`,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true
+            });
+        }
+    });
+}
+
 // Ana sayfa yüklendiğinde bütçe hedeflerini de güncelle
 if (document.getElementById('paymentList')) {
     console.log('Ana sayfa yükleniyor...');
@@ -1583,6 +1765,7 @@ if (document.getElementById('paymentList')) {
         updateSummaryCards();
         updateCharts(); // Grafikleri güncelle
         updateBudgetGoalsDisplay();
+        updateBillRemindersDisplay();
 
         // Her saat başı kurları güncelle
         setInterval(async () => {
