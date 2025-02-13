@@ -1558,22 +1558,50 @@ function saveBudgetGoals(goals) {
 // Bütçe hedefi ekle/güncelle
 function updateBudgetGoal() {
     Swal.fire({
-        title: 'Aylık Bütçe Hedefi',
+        title: '<i class="bi bi-graph-up-arrow text-primary me-2"></i>Aylık Bütçe Hedefi',
         html: `
-            <div class="mb-3">
-                <label class="form-label">Aylık Harcama Limiti (TL)</label>
-                <input type="number" id="monthlyLimit" class="form-control" value="${loadBudgetGoals().monthlyExpenseLimit}" min="0" step="100">
-            </div>
+            <form id="budgetGoalForm" class="needs-validation">
+                <div class="mb-3 position-relative">
+                    <label for="monthlyLimit" class="form-label d-flex align-items-center">
+                        <i class="bi bi-wallet-fill me-2 text-success"></i>Aylık Harcama Limiti
+                    </label>
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text">₺</span>
+                        <input type="number" class="form-control form-control-lg shadow-sm" 
+                               id="monthlyLimit" value="${loadBudgetGoals().monthlyExpenseLimit}" 
+                               min="0" step="100" placeholder="0.00" required>
+                    </div>
+                </div>
+            </form>
         `,
         showCancelButton: true,
-        confirmButtonText: 'Kaydet',
-        cancelButtonText: 'İptal',
+        confirmButtonText: '<i class="bi bi-check-lg me-2"></i>Kaydet',
+        cancelButtonText: '<i class="bi bi-x-lg me-2"></i>İptal',
+        customClass: {
+            container: getCurrentTheme() === 'dark' ? 'swal2-dark' : '',
+            popup: 'shadow-lg border-0',
+            title: 'text-center fs-4 fw-bold',
+            htmlContainer: 'text-start',
+            confirmButton: 'btn btn-success px-3 me-3',
+            cancelButton: 'btn btn-outline-secondary px-3'
+        },
+        width: '32rem',
+        padding: '2rem',
+        buttonsStyling: false,
+        focusConfirm: false,
         preConfirm: () => {
+            const form = document.getElementById('budgetGoalForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return false;
+            }
+
             const limit = parseFloat(document.getElementById('monthlyLimit').value);
             if (isNaN(limit) || limit < 0) {
                 Swal.showValidationMessage('Geçerli bir limit giriniz');
                 return false;
             }
+
             return limit;
         }
     }).then((result) => {
