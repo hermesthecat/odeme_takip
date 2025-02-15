@@ -1,0 +1,94 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Composer dependencies
+/vendor/
+composer.lock
+
+# Generated files
+/logs/*
+!/logs/.gitkeep
+/data/*
+!/data/.gitkeep
+
+# Cache and temp files
+.cache/
+*.cache
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Node modules (if needed for frontend)
+/node_modules/
+package-lock.json
+
+# Test coverage reports
+/coverage/
+.phpunit.result.cache
+
+# Build files
+/build/
+/dist/
+*.zip
+*.tar.gz
+
+# Local configuration
+/config/local.php
+
+# Email templates (excluding dist)
+/templates/email/*
+!/templates/email.dist/
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+
+# Database dumps
+*.sql
+*.sqlite
+*.db
+
+# Session files
+/sessions/
+
+# Backup files
+*.bak
+*.backup
+*.[0-9]
+*.[0-9][0-9]
+*.[0-9][0-9][0-9]
+
+# User uploaded content
+/uploads/
+/media/
+
+# Error logs
+php_errors.log
+error_log
+debug.log
+
+# Runtime files
+/*.pid
+/*.socket
+
+# Project specific
+/config/custom.php
+/config/development.php
+/config/production.php
+/config/staging.php
+
+# Keep empty directories
+!.gitkeep
