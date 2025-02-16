@@ -2,6 +2,12 @@
 
 ## Technology Stack
 
+### Backend Technologies
+1.  **PHP**
+    -   Server-side scripting language
+2.  **MySQL**
+    -   Relational database management system
+
 ### Frontend Technologies
 1. **Core Web Technologies**
    - HTML5
@@ -18,44 +24,30 @@
    - Chart.js (Data visualization)
    - SweetAlert2 (Modal dialogs and notifications)
 
-### Data Management
-1. **Local Storage**
-   ```javascript
-   const STORAGE_KEYS = {
-     PAYMENTS: 'payments',
-     INCOMES: 'incomes',
-     SAVINGS: 'savings',
-     EXCHANGE_RATES: 'exchangeRates',
-     LAST_UPDATE: 'lastExchangeUpdate',
-     BUDGET_GOALS: 'budgetGoals',
-     THEME: 'theme'
-   }
-   ```
-
-2. **External APIs**
-   - Exchange Rate API (api.exchangerate.host)
-   - Supabase Client (Future implementation)
+### External APIs
+1.  **Exchange Rate API**
+    -   Real-time currency conversion
 
 ## Development Setup
 
 ### Environment Requirements
-- Modern web browser with IndexedDB support
-- Local web server for development
-- Internet connection for initial load and API calls
+- PHP 7.4 or higher
+- MySQL 5.7 or higher
+- Apache or Nginx web server
+- Composer for dependency management
 
 ### Development Tools
 - Visual Studio Code
 - Git for version control
-- Python's SimpleHTTPServer for local testing
+- MySQL Workbench or similar database management tool
 - Browser DevTools for debugging
 
 ## Technical Constraints
 
-### Browser Support
-- Modern browsers with ES6+ support
-- IndexedDB availability
-- Service Workers support for PWA
-- Local Storage support
+### Server Requirements
+- PHP version compatibility
+- MySQL database configuration
+- Web server configuration
 
 ### API Limitations
 - Exchange Rate API:
@@ -64,12 +56,21 @@
   - Response caching requirements
 
 ### Performance Requirements
-- Initial load < 3s
-- Offline functionality
+- Fast loading times
 - Smooth animations (60fps)
 - Responsive interface
 
 ## Dependencies
+
+### PHP Packages (Composer)
+```json
+{
+    "require": {
+        "ext-pdo": "*",
+        "guzzlehttp/guzzle": "^7.0"
+    }
+}
+```
 
 ### CDN Resources
 ```html
@@ -85,73 +86,75 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/tr.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 ```
 
 ## Data Models
 
 ### Income Model
-```typescript
-interface Income {
-  name: string;
-  amount: number;
-  currency: string;
-  firstIncomeDate: string;
-  frequency: string;
+```php
+class Income {
+    public $income_id;
+    public $user_id;
+    public $name;
+    public $amount;
+    public $currency;
+    public $first_income_date;
+    public $frequency;
 }
 ```
 
 ### Payment Model
-```typescript
-interface Payment {
-  name: string;
-  amount: number;
-  currency: string;
-  category: string;
-  firstPaymentDate: string;
-  frequency: string;
+```php
+class Payment {
+    public $payment_id;
+    public $user_id;
+    public $name;
+    public $amount;
+    public $currency;
+    public $category;
+    public $first_payment_date;
+    public $frequency;
 }
 ```
 
 ### Saving Model
-```typescript
-interface Saving {
-  name: string;
-  targetAmount: number;
-  currentAmount: number;
-  currency: string;
-  startDate: string;
-  targetDate: string;
+```php
+class Saving {
+    public $saving_id;
+    public $user_id;
+    public $name;
+    public $target_amount;
+    public $current_amount;
+    public $currency;
+    public $start_date;
+    public $target_date;
 }
 ```
 
 ### Budget Goals Model
-```typescript
-interface BudgetGoals {
-  monthlyExpenseLimit: number;
-  categories: {
-    name: string;
-    limit: number;
-  }[];
+```php
+class BudgetGoals {
+    public $goal_id;
+    public $user_id;
+    public $monthly_expense_limit;
+    public $category_name;
+    public $category_limit;
 }
 ```
 
 ## Implementation Notes
 
-### LocalStorage Usage
-- Theme preferences
-- Exchange rates cache
-- Last update timestamps
-- Budget goals configuration
+### Database Interaction
+- PDO for database connections
+- Prepared statements for security
+- Transactions for data integrity
 
-### IndexedDB Usage
-- Transaction records
-- Income records
-- Payment records
-- Savings records
+### Session Management
+- PHP sessions for user authentication
+- Secure session handling
+- Session timeout management
 
-### PWA Features
-- Offline functionality
-- App installation
-- Background sync
-- Push notifications (future)
+### API Integration
+- Guzzle HTTP client for API requests
+- Error handling for API responses
+- Caching for API data

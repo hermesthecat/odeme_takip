@@ -27,34 +27,29 @@ The Bütçe Kontrol Sistemi (Budget Control System) addresses the growing need f
 
 ### Core Functionality
 1. **Data Management**
-   - LocalStorage for user preferences
-   - IndexedDB for transaction data
+   - MySQL database for storing user data, income, expenses, savings, and budget goals.
    - Real-time currency exchange rates via API
-   - Import/Export functionality for data backup
 
-2. **Transaction Tracking**
+2. **User Authentication**
+   - Secure user registration and login
+   - Session management
+
+3. **Transaction Tracking**
    - Income recording with recurring options
    - Expense tracking with categorization
    - Multi-currency support
    - Payment scheduling
 
-3. **Financial Planning**
+4. **Financial Planning**
    - Budget goal setting and tracking
    - Savings targets with progress monitoring
    - Monthly spending limits
    - Category-based budget allocation
 
-4. **Reporting & Analysis**
-   - Monthly financial summaries
-   - Income vs. Expense visualization
-   - Savings progress tracking
-   - Category-based expense analysis
-
 ### User Experience Goals
 
 1. **Accessibility**
    - Mobile-first design
-   - Offline functionality
    - Cross-platform support
    - Dark/Light theme options
 
@@ -71,8 +66,6 @@ The Bütçe Kontrol Sistemi (Budget Control System) addresses the growing need f
    - Responsive interface
 
 4. **Reliability**
-   - Automatic data backup
-   - Offline operation
    - Data integrity
    - Error prevention
 
@@ -103,9 +96,8 @@ The Bütçe Kontrol Sistemi (Budget Control System) addresses the growing need f
    - Settings adjustments
 
 ## Key Differentiators
-- Offline-first PWA approach
 - Multi-currency support with real-time rates
 - Comprehensive financial tracking
 - User-friendly interface
-- Privacy-focused local data storage
+- Secure data storage in MySQL database
 - Cross-platform accessibility

@@ -1,7 +1,7 @@
 # Bütçe Kontrol Sistemi - Project Brief
 
 ## Project Overview
-A Progressive Web App (PWA) for personal budget control and tracking that provides offline functionality and comprehensive financial management features.
+A single-user PHP/MySQL web application for personal budget control and tracking, providing comprehensive financial management features.
 
 ## Core Requirements
 
@@ -9,19 +9,16 @@ A Progressive Web App (PWA) for personal budget control and tracking that provid
 - 💰 Income and expense tracking
 - 💳 Payment planning and scheduling
 - 📊 Detailed financial reporting and visualization
-- 💾 Offline functionality through PWA
 - 📱 Mobile-responsive design
 - 🎯 Savings goals tracking
-- 🔄 Automatic data backup
+- 🔄 Data backup via database
 - 🌙 Dark/Light theme support
 
 ### Technical Requirements
-- PWA implementation with offline support using Service Workers
-- Local data storage using IndexedDB
+- PHP backend with MySQL database for data storage
+- User authentication and session management
 - Real-time currency exchange rates via API
-- Cross-platform compatibility
 - Responsive UI for all device sizes
-- Data import/export functionality
 
 ## Project Goals
 
@@ -34,20 +31,17 @@ A Progressive Web App (PWA) for personal budget control and tracking that provid
 
 ### Technical Goals
 1. Fast and responsive performance
-2. Reliable offline functionality
-3. Seamless data synchronization
-4. Clean and maintainable code structure
-5. Scalable architecture
+2. Clean and maintainable code structure
+3. Scalable architecture
 
 ## Success Criteria
 - Successful tracking of income and expenses
 - Accurate financial reporting and forecasting
 - Effective savings goal management
 - User-friendly interface and navigation
-- Reliable offline functionality
 - Secure data handling and backup
 
 ## Target Platform
-- Web-based PWA accessible on any device
-- Primary focus on mobile users
+- Web-based application accessible on any device
+- Primary focus on web users
 - Cross-browser compatibility

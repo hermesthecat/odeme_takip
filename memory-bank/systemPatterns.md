@@ -2,27 +2,25 @@
 
 ## Architecture Overview
 
-### Client-Side Architecture
-The application follows a client-side architecture with complete offline capabilities:
+### PHP/MySQL Architecture
+The application follows a server-side architecture using PHP and MySQL:
 
 ```mermaid
 graph TD
-    UI[User Interface] --> SC[State Controller]
-    SC --> LS[Local Storage]
-    SC --> IDB[IndexedDB]
-    SC --> API[External APIs]
+    UI[User Interface] --> C[Controller]
+    C --> M[Model]
+    M --> DB[(MySQL Database)]
+    API[External APIs]
+    C --> API
     
-    subgraph Data Layer
-        LS
-        IDB
+    subgraph Backend
+        C
+        M
+        DB
         API
     end
     
-    subgraph Business Logic
-        SC
-    end
-    
-    subgraph Presentation Layer
+    subgraph Frontend
         UI
     end
 ```
@@ -30,41 +28,29 @@ graph TD
 ## Design Patterns
 
 ### Data Management
-1. **Repository Pattern**
-   - Separate data access logic
-   - LocalStorage for preferences
-   - IndexedDB for transaction data
-   - API integration for exchange rates
+1. **Model-View-Controller (MVC)**
+   - Separation of concerns
+   - Database interaction through models
+   - Request handling through controllers
+   - Presentation through views
 
-2. **Observer Pattern**
-   - Real-time UI updates
-   - Exchange rate monitoring
-   - Budget goal tracking
-   - Category expense monitoring
+2. **Data Access Objects (DAO)**
+   - Abstract database access
+   - Encapsulate queries
+   - Improve maintainability
 
 ### UI Patterns
-1. **Component-Based Architecture**
-   - Modular UI components
-   - Reusable elements
+1. **Template Engine**
+   - Dynamic content rendering
+   - Reusable templates
    - Consistent styling
    - Responsive design
-
-2. **Progressive Enhancement**
-   - Basic functionality without JavaScript
-   - Enhanced features with JS
-   - PWA capabilities
-   - Offline support
 
 ## Key Technical Decisions
 
 ### Storage Strategy
-1. **LocalStorage**
-   - User preferences
-   - Theme settings
-   - Currency preferences
-   - Last update timestamps
-
-2. **IndexedDB**
+1. **MySQL Database**
+   - User data
    - Transaction records
    - Budget goals
    - Savings targets
@@ -73,108 +59,116 @@ graph TD
 ### API Integration
 1. **Exchange Rates**
    - Real-time currency conversion
-   - Cached rates for offline use
    - Automatic updates
    - Fallback mechanisms
-
-### PWA Implementation
-1. **Service Workers**
-   - Offline functionality
-   - Cache management
-   - Background sync
-   - Push notifications
-
-2. **App Shell Model**
-   - Fast initial load
-   - Cached core assets
-   - Dynamic content loading
-   - Optimized performance
 
 ## Component Relationships
 
 ### Data Flow
 ```mermaid
 graph LR
-    UI[User Interface] --> AC[Action Creator]
-    AC --> ST[State]
-    ST --> UP[Update Processor]
-    UP --> DS[Data Store]
-    DS --> UI
+    UI[User Interface] --> C[Controller]
+    C --> M[Model]
+    M --> DB[(MySQL Database)]
+    C --> UI
 ```
 
-### Event Handling
+### Request Handling
 ```mermaid
 graph TD
-    UE[User Event] --> VL[Validation]
-    VL --> SP[State Processing]
-    SP --> DS[Data Storage]
-    DS --> UI[UI Update]
+    UR[User Request] --> C[Controller]
+    C --> VL[Validation]
+    VL --> M[Model]
+    M --> DB[Data Storage]
+    DB --> M
+    M --> V[View]
+    V --> UI[UI Update]
 ```
 
 ## Code Organization
 
 ### Directory Structure
 ```
-src/
-├── components/
-│   ├── common/
-│   ├── forms/
-│   └── views/
-├── services/
-│   ├── storage/
-│   ├── api/
-│   └── utils/
-├── styles/
-│   ├── themes/
-│   └── components/
-└── assets/
-    ├── icons/
-    └── images/
+/
+├── config/
+│   └── database.php
+├── controllers/
+│   ├── IncomeController.php
+│   ├── ExpenseController.php
+│   └── ...
+├── models/
+│   ├── Income.php
+│   ├── Expense.php
+│   └── ...
+├── views/
+│   ├── income/
+│   ├── expense/
+│   └── ...
+├── public/
+│   ├── css/
+│   ├── js/
+│   └── index.php
+└── index.php
 ```
 
 ### Module Dependencies
 ```mermaid
 graph TD
-    UI[UI Components] --> SV[Services]
-    SV --> ST[Storage]
-    SV --> AP[API]
-    ST --> DB[(IndexedDB)]
-    AP --> ER[Exchange Rates]
+    C[Controllers] --> M[Models]
+    M --> DB[(MySQL Database)]
+    C --> API[External APIs]
+    UI[User Interface] --> C
 ```
 
 ## Security Patterns
 
 ### Data Protection
-1. **Client-Side Encryption**
-   - Sensitive data encryption
-   - Secure storage practices
-   - Data integrity checks
+1. **Input Validation**
+   - Sanitize user inputs
+   - Prevent SQL injection
+   - Validate data types
 
-2. **API Security**
-   - Rate limiting
-   - Request validation
-   - Error handling
+2.  **Authentication and Authorization**
+    - Secure user registration
+    - Password hashing
+    - Session management
+
+### API Security
+1. **Rate Limiting**
+   - Limit API requests
+   - Prevent abuse
+   - Ensure availability
+
+2. **Request Validation**
+   - Validate API requests
+   - Prevent unauthorized access
+   - Ensure data integrity
 
 ## Performance Patterns
 
 ### Optimization Strategies
-1. **Caching**
-   - Service worker cache
-   - API response cache
-   - Static asset cache
+1. **Database Optimization**
+   - Indexing
+   - Query optimization
+   - Connection pooling
 
-2. **Lazy Loading**
-   - Dynamic imports
-   - Image optimization
-   - On-demand data fetching
+2. **Caching**
+   - API response cache
+   - Database query cache
+   - Output caching
 
 ### Error Handling
-1. **Graceful Degradation**
-   - Offline fallbacks
-   - API error recovery
-   - Data validation
+1. **Exception Handling**
+   - Centralized error handling
+   - Logging
+   - User-friendly messages
 
-2. **User Feedback**
+2. **Data Validation**
+   - Server-side validation
+   - Data integrity checks
+   - Error reporting
+
+3. **User Feedback**
    - Loading states
    - Error messages
    - Success notifications
