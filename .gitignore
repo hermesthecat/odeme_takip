@@ -29,6 +29,7 @@ Thumbs.db
 *.swp
 *.swo
 *~
+.specstory
 
 # Node modules (if needed for frontend)
 /node_modules/
