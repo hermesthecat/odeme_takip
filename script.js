@@ -13,7 +13,7 @@ const EXCHANGE_RATES_KEY = 'exchangeRates';
 const LAST_UPDATE_KEY = 'lastExchangeUpdate';
 const BUDGET_GOALS_KEY = 'budgetGoals';
 const BILL_REMINDERS_KEY = 'billReminders';
-const THEME_KEY = 'theme'; // Tema ayarı için yeni anahtar
+const THEME_KEY = 'theme';
 
 // Grafik değişkenleri
 let incomeExpenseChart = null;
