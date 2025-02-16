@@ -1,256 +1,237 @@
 <!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    />
-    <title>Bütçe Kontrol Sistemi</title>
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Bütçe Kontrol Sistemi</title>
 
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 
-    <script>
-      // Sayfa yüklenirken mevcut temayı uygula
-      const theme = localStorage.getItem("theme") || "light";
-      document.documentElement.setAttribute("data-theme", theme);
-    </script>
-  </head>
-  <body>
-    <div class="container mt-4">
-      <!-- Döviz Kurları -->
-      <div id="exchangeRates" class="mb-3 bg-light rounded p-2"></div>
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-      <!-- Başlık ve Veri Yönetimi -->
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Bütçe Kontrol Sistemi</h1>
-        <div>
-          <button onclick="exportData()" class="btn btn-outline-primary me-2">
-            <i class="bi bi-download me-1"></i>Verileri Dışa Aktar
-          </button>
-          <button onclick="importData()" class="btn btn-outline-secondary">
-            <i class="bi bi-upload me-1"></i>Verileri İçe Aktar
-          </button>
-        </div>
+  <script>
+    // Sayfa yüklenirken mevcut temayı uygula
+    const theme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", theme);
+  </script>
+</head>
+
+<body>
+  <div class="container mt-4">
+    <!-- Döviz Kurları -->
+    <div id="exchangeRates" class="mb-3 bg-light rounded p-2"></div>
+
+    <!-- Başlık ve Veri Yönetimi -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="mb-0">Bütçe Kontrol Sistemi</h1>
+      <div>
+        <button onclick="exportData()" class="btn btn-outline-primary me-2">
+          <i class="bi bi-download me-1"></i>Verileri Dışa Aktar
+        </button>
+        <button onclick="importData()" class="btn btn-outline-secondary">
+          <i class="bi bi-upload me-1"></i>Verileri İçe Aktar
+        </button>
       </div>
+    </div>
 
-      <!-- Aylık Özet -->
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="card bg-success bg-opacity-25 h-100">
-            <div class="card-body">
-              <h5 class="card-title">Aylık Gelir</h5>
-              <h3 class="card-text" id="monthlyIncome">0.00 TL</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card bg-danger bg-opacity-25 h-100">
-            <div class="card-body">
-              <h5 class="card-title">Aylık Gider</h5>
-              <h3 class="card-text" id="monthlyExpense">0.00 TL</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card bg-info bg-opacity-25 h-100">
-            <div class="card-body">
-              <h5 class="card-title">Net Durum</h5>
-              <h3 class="card-text" id="monthlyBalance">0.00 TL</h3>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3">
-          <div class="card bg-warning bg-opacity-25 h-100">
-            <div class="card-body">
-              <h5 class="card-title">Dönem</h5>
-              <h3 class="card-text" id="currentPeriod">Ocak 2024</h3>
-            </div>
+    <!-- Aylık Özet -->
+    <div class="row mb-4">
+      <div class="col-md-3">
+        <div class="card bg-success bg-opacity-25 h-100">
+          <div class="card-body">
+            <h5 class="card-title">Aylık Gelir</h5>
+            <h3 class="card-text" id="monthlyIncome">0.00 TL</h3>
           </div>
         </div>
       </div>
-
-      <!-- Gelirler Tablosu -->
-      <div class="card mb-4">
-        <div class="card-header bg-success bg-opacity-25">
-          <div class="d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">Gelirler</h2>
-            <div>
-              <button onclick="showAddIncomeModal()" class="btn btn-success">
-                Gelir Ekle
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Gelir İsmi</th>
-                  <th>Tutar</th>
-                  <th>Kur</th>
-                  <th>İlk Gelir Tarihi</th>
-                  <th>Tekrarlama Sıklığı</th>
-                  <th>Sonraki Gelir</th>
-                  <th>İşlemler</th>
-                </tr>
-              </thead>
-              <tbody id="incomeList">
-                <!-- Gelirler JavaScript ile buraya eklenecek -->
-              </tbody>
-            </table>
+      <div class="col-md-3">
+        <div class="card bg-danger bg-opacity-25 h-100">
+          <div class="card-body">
+            <h5 class="card-title">Aylık Gider</h5>
+            <h3 class="card-text" id="monthlyExpense">0.00 TL</h3>
           </div>
         </div>
       </div>
-
-      <!-- Birikimler Tablosu -->
-      <div class="card mb-4">
-        <div class="card-header bg-primary bg-opacity-25">
-          <div class="d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">Birikimler</h2>
-            <div>
-              <button onclick="showAddSavingModal()" class="btn btn-primary">
-                Birikim Ekle
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Birikim İsmi</th>
-                  <th>Hedef Tutar</th>
-                  <th>Biriken Tutar</th>
-                  <th>Kur</th>
-                  <th>Başlangıç Tarihi</th>
-                  <th>Hedef Tarihi</th>
-                  <th>İlerleme</th>
-                  <th>İşlemler</th>
-                </tr>
-              </thead>
-              <tbody id="savingList">
-                <!-- Birikimler JavaScript ile buraya eklenecek -->
-              </tbody>
-            </table>
+      <div class="col-md-3">
+        <div class="card bg-info bg-opacity-25 h-100">
+          <div class="card-body">
+            <h5 class="card-title">Net Durum</h5>
+            <h3 class="card-text" id="monthlyBalance">0.00 TL</h3>
           </div>
         </div>
       </div>
-
-      <!-- Ödemeler Tablosu -->
-      <div class="card mb-4">
-        <div class="card-header bg-danger bg-opacity-25">
-          <div class="d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">Ödemeler</h2>
-            <div>
-              <button onclick="showAddPaymentModal()" class="btn btn-danger">
-                Ödeme Ekle
-              </button>
-            </div>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th>Ödeme İsmi</th>
-                  <th>Tutar</th>
-                  <th>Kur</th>
-                  <th>İlk Ödeme Tarihi</th>
-                  <th>Tekrarlama Sıklığı</th>
-                  <th>Sonraki Ödeme</th>
-                  <th>İşlemler</th>
-                </tr>
-              </thead>
-              <tbody id="paymentList">
-                <!-- Ödemeler JavaScript ile buraya eklenecek -->
-              </tbody>
-            </table>
+      <div class="col-md-3">
+        <div class="card bg-warning bg-opacity-25 h-100">
+          <div class="card-body">
+            <h5 class="card-title">Dönem</h5>
+            <h3 class="card-text" id="currentPeriod">Ocak 2024</h3>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Bütçe Hedefleri -->
-      <div id="budgetGoals" class="mb-4">
-        <!-- Bütçe hedefleri JavaScript ile buraya eklenecek -->
-      </div>
-
-      <!-- Takvim -->
-      <div class="card mb-4">
-        <div class="card-header">
-          <h2 class="mb-0">Takvim</h2>
-        </div>
-        <div class="card-body">
-          <div id="calendar"></div>
-        </div>
-      </div>
-
-      <!-- Grafik Raporları -->
-      <div class="card">
-        <div class="card-header">
-          <div class="d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">Grafik Raporları</h2>
-            <div class="btn-group">
-              <button
-                onclick="updateCharts('month')"
-                class="btn btn-outline-primary active"
-              >
-                Aylık
-              </button>
-              <button
-                onclick="updateCharts('year')"
-                class="btn btn-outline-primary"
-              >
-                Yıllık
-              </button>
-            </div>
+    <!-- Gelirler Tablosu -->
+    <div class="card mb-4">
+      <div class="card-header bg-success bg-opacity-25">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0">Gelirler</h2>
+          <div>
+            <button onclick="showAddIncomeModal()" class="btn btn-success">
+              Gelir Ekle
+            </button>
           </div>
         </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6 mb-4">
-              <div class="card chart-card">
-                <div class="card-header">
-                  <h5 class="card-title mb-0">Gelir-Gider Dağılımı</h5>
-                </div>
-                <div class="card-body">
-                  <div class="chart-container">
-                    <canvas id="incomeExpenseChart"></canvas>
-                  </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Gelir İsmi</th>
+                <th>Tutar</th>
+                <th>Kur</th>
+                <th>İlk Gelir Tarihi</th>
+                <th>Tekrarlama Sıklığı</th>
+                <th>Sonraki Gelir</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody id="incomeList">
+              <!-- Gelirler JavaScript ile buraya eklenecek -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Birikimler Tablosu -->
+    <div class="card mb-4">
+      <div class="card-header bg-primary bg-opacity-25">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0">Birikimler</h2>
+          <div>
+            <button onclick="showAddSavingModal()" class="btn btn-primary">
+              Birikim Ekle
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Birikim İsmi</th>
+                <th>Hedef Tutar</th>
+                <th>Biriken Tutar</th>
+                <th>Kur</th>
+                <th>Başlangıç Tarihi</th>
+                <th>Hedef Tarihi</th>
+                <th>İlerleme</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody id="savingList">
+              <!-- Birikimler JavaScript ile buraya eklenecek -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ödemeler Tablosu -->
+    <div class="card mb-4">
+      <div class="card-header bg-danger bg-opacity-25">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0">Ödemeler</h2>
+          <div>
+            <button onclick="showAddPaymentModal()" class="btn btn-danger">
+              Ödeme Ekle
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Ödeme İsmi</th>
+                <th>Tutar</th>
+                <th>Kur</th>
+                <th>İlk Ödeme Tarihi</th>
+                <th>Tekrarlama Sıklığı</th>
+                <th>Sonraki Ödeme</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody id="paymentList">
+              <!-- Ödemeler JavaScript ile buraya eklenecek -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bütçe Hedefleri -->
+    <div id="budgetGoals" class="mb-4">
+      <!-- Bütçe hedefleri JavaScript ile buraya eklenecek -->
+    </div>
+
+    <!-- Takvim -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="mb-0">Takvim</h2>
+      </div>
+      <div class="card-body">
+        <div id="calendar"></div>
+      </div>
+    </div>
+
+    <!-- Grafik Raporları -->
+    <div class="card">
+      <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+          <h2 class="mb-0">Grafik Raporları</h2>
+          <div class="btn-group">
+            <button onclick="updateCharts('month')" class="btn btn-outline-primary active">
+              Aylık
+            </button>
+            <button onclick="updateCharts('year')" class="btn btn-outline-primary">
+              Yıllık
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h5 class="card-title mb-0">Gelir-Gider Dağılımı</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="incomeExpenseChart"></canvas>
                 </div>
               </div>
             </div>
-            <div class="col-md-6 mb-4">
-              <div class="card chart-card">
-                <div class="card-header">
-                  <h5 class="card-title mb-0">Birikim Hedefleri</h5>
-                </div>
-                <div class="card-body">
-                  <div class="chart-container">
-                    <canvas id="savingsChart"></canvas>
-                  </div>
+          </div>
+          <div class="col-md-6 mb-4">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h5 class="card-title mb-0">Birikim Hedefleri</h5>
+              </div>
+              <div class="card-body">
+                <div class="chart-container">
+                  <canvas id="savingsChart"></canvas>
                 </div>
               </div>
             </div>
@@ -258,15 +239,17 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Önce Bootstrap ve diğer bağımlılıklar -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/tr.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Önce Bootstrap ve diğer bağımlılıklar -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/tr.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Sonra bizim script dosyamız -->
-    <script src="script.js"></script>
-  </body>
+  <!-- Sonra bizim script dosyamız -->
+  <script src="script.js"></script>
+</body>
+
 </html>
