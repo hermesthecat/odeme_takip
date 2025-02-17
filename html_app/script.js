@@ -11,7 +11,7 @@ import * as charts from './modules/charts.js';
 import * as calculations from './modules/calculations.js';
 import * as modals from './modules/modals/index.js';
 import * as calendar from './modules/calendar.js';
-import * as lists from './modules/lists.js';
+import * as lists from './modules/lists/index.js';
 
 // Ana sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', () => {

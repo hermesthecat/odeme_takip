@@ -1,7 +1,7 @@
 // Birikim modalları modülü
 import { getCurrentTheme } from '../theme.js';
 import { loadSavings, saveSavings } from '../storage.js';
-import { updateSavingList } from '../lists.js';
+import { updateSavingList } from '../lists/index.js';
 import { updateSummaryCards } from '../calculations.js';
 import { updateCharts } from '../charts.js';
 

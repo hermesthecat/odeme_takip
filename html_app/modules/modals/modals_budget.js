@@ -1,7 +1,7 @@
 // Bütçe hedefleri modalları modülü
 import { getCurrentTheme } from '../theme.js';
 import { loadBudgetGoals, saveBudgetGoals } from '../storage.js';
-import { updateBudgetGoalsDisplay } from '../lists.js';
+import { updateBudgetGoalsDisplay } from '../lists/index.js';
 import { updateSummaryCards } from '../calculations.js';
 
 // Bütçe hedefi güncelleme modalını göster

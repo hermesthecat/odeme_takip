@@ -1,7 +1,7 @@
 // Gelir modalları modülü
 import { getCurrentTheme } from '../theme.js';
 import { loadIncomes, saveIncomes } from '../storage.js';
-import { updateIncomeList } from '../lists.js';
+import { updateIncomeList } from '../lists/index.js';
 import { updateSummaryCards } from '../calculations.js';
 import { updateCharts } from '../charts.js';
 import { updateCalendar } from '../calendar.js';

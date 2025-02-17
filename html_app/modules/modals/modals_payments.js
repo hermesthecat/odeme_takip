@@ -1,7 +1,7 @@
 // Ödeme modalları modülü
 import { getCurrentTheme } from '../theme.js';
 import { loadPayments, savePayments, loadBudgetGoals } from '../storage.js';
-import { updatePaymentList, updateBudgetGoalsDisplay } from '../lists.js';
+import { updatePaymentList, updateBudgetGoalsDisplay } from '../lists/index.js';
 import { updateSummaryCards } from '../calculations.js';
 import { updateCharts } from '../charts.js';
 import { updateCalendar } from '../calendar.js';
