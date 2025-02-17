@@ -1,28 +1,20 @@
 // Döviz işlemleri modülü
 import { EXCHANGE_RATES_KEY, LAST_UPDATE_KEY } from './storage.js';
 
-export const TCMB_API_URL = 'https://api.exchangerate.host/live?source=TRY&access_key=4f467070688418cb9958422c637c880c';
-
-// Para birimlerinin TL karşılıkları (sabit kur için)
-export const EXCHANGE_RATES = {
-    'TRY': 1,
-    'USD': 30.50,
-    'EUR': 33.20,
-    'GBP': 38.70
-};
+export const CURRENCY_API_URL = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/try.json';
 
 // Döviz kurlarını güncelle
 export async function updateExchangeRates() {
     try {
-        const response = await fetch(TCMB_API_URL);
+        const response = await fetch(CURRENCY_API_URL);
         const data = await response.json();
 
-        if (data && data.rates) {
+        if (data && data.try) {
             const exchangeRates = {
                 'TRY': 1,
-                'USD': 1 / data.rates.TRYUSD,
-                'EUR': 1 / data.rates.TRYEUR,
-                'GBP': 1 / data.rates.TRYGBP
+                'USD': 1 / data.try.usd,
+                'EUR': 1 / data.try.eur,
+                'GBP': 1 / data.try.gbp
             };
 
             localStorage.setItem(EXCHANGE_RATES_KEY, JSON.stringify(exchangeRates));
@@ -30,10 +22,21 @@ export async function updateExchangeRates() {
 
             return exchangeRates;
         }
+        throw new Error('API yanıtı geçerli değil');
     } catch (error) {
+        console.error('Döviz kurları güncellenirken hata:', error);
         // Hata durumunda son kaydedilen kurları kullan
         const savedRates = localStorage.getItem(EXCHANGE_RATES_KEY);
-        return savedRates ? JSON.parse(savedRates) : EXCHANGE_RATES;
+        if (!savedRates) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Döviz Kuru Hatası',
+                text: 'Döviz kurları alınamadı ve kayıtlı kur verisi bulunamadı. Lütfen internet bağlantınızı kontrol edin.',
+                showConfirmButton: true
+            });
+            return null;
+        }
+        return JSON.parse(savedRates);
     }
 }
 
@@ -52,8 +55,17 @@ export function showExchangeRates() {
 
     // Kurları al
     const rates = localStorage.getItem(EXCHANGE_RATES_KEY);
-    const exchangeRates = rates ? JSON.parse(rates) : EXCHANGE_RATES;
+    if (!rates) {
+        ratesContainer.innerHTML = `
+            <div class="alert alert-warning mb-0">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                Döviz kurları yüklenemedi. Lütfen internet bağlantınızı kontrol edin.
+            </div>
+        `;
+        return;
+    }
 
+    const exchangeRates = JSON.parse(rates);
     const html = `
         <div class="card shadow-sm">
             <div class="card-body p-2">
@@ -90,7 +102,18 @@ export function showExchangeRates() {
 
 // Tutarı TL'ye çevir
 export function convertToTRY(amount, currency) {
-    return amount * EXCHANGE_RATES[currency];
+    const rates = localStorage.getItem(EXCHANGE_RATES_KEY);
+    if (!rates) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Döviz Kuru Hatası',
+            text: 'Döviz kurları bulunamadı. Lütfen internet bağlantınızı kontrol edin.',
+            showConfirmButton: true
+        });
+        return 0;
+    }
+    const exchangeRates = JSON.parse(rates);
+    return amount * exchangeRates[currency];
 }
 
 // Tutarı formatla
