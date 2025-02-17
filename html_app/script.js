@@ -9,7 +9,7 @@ import * as currency from './modules/currency.js';
 import * as utils from './modules/utils.js';
 import * as charts from './modules/charts.js';
 import * as calculations from './modules/calculations.js';
-import * as modals from './modules/modals.js';
+import * as modals from './modules/modals/index.js';
 import * as calendar from './modules/calendar.js';
 import * as lists from './modules/lists.js';
 

@@ -3,7 +3,15 @@ import { loadPayments, loadIncomes, loadSavings, savePayments, saveIncomes, save
 import { formatDate, calculateProgress, getFrequencyText } from './utils.js';
 import { formatMoney } from './currency.js';
 import { calculateMonthlyBalance, calculateCategoryExpenses } from './calculations.js';
-import { showAddIncomeModal, showAddPaymentModal, showAddSavingModal, showUpdateBudgetGoalModal, showAddCategoryGoalModal, showDeleteCategoryGoalModal, showUpdateCategoryGoalModal } from './modals.js';
+import { 
+    showAddIncomeModal, 
+    showAddPaymentModal, 
+    showAddSavingModal, 
+    showUpdateBudgetGoalModal, 
+    showAddCategoryGoalModal, 
+    showDeleteCategoryGoalModal, 
+    showUpdateCategoryGoalModal 
+} from './modals/index.js';
 
 // Ödeme listesini güncelleme
 export function updatePaymentList() {
