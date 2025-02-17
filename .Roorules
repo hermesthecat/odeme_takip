@@ -1,0 +1,37 @@
+# .Roorules
+
+## Project Intelligence
+
+### Key Implementation Paths
+
+- The core functionality is implemented using PHP and MySQL.
+- The frontend is implemented using HTML, CSS, and JavaScript.
+- The application follows the MVC architecture.
+
+### User Preferences and Workflow
+
+- The user prefers a dark theme.
+- The user prefers a simple and intuitive interface.
+
+### Project-Specific Patterns
+
+- The application uses Bootstrap for styling.
+- The application uses Chart.js for data visualization.
+- The application uses SweetAlert2 for modal dialogs and notifications.
+
+### Known Challenges
+
+- Database optimization is a challenge.
+- API security is a challenge.
+- Data migration is a challenge.
+
+### Evolution of Project Decisions
+
+- The application was initially implemented using local storage, but it was later migrated to MySQL.
+- The application was initially implemented without a framework, but it was later migrated to a PHP framework.
+
+### Tool Usage Patterns
+
+- The application uses Visual Studio Code for development.
+- The application uses Git for version control.
+- The application uses MySQL Workbench for database management.
