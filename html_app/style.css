@@ -163,12 +163,12 @@ body {
   color: #ffffff !important;
 }
 
-[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd) {
   background-color: #252525;
   color: #ffffff !important;
 }
 
-[data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(even) {
   background-color: #1e1e1e;
   color: #ffffff !important;
 }
@@ -300,11 +300,11 @@ body {
 }
 
 /* Açık tema için tablo satır stilleri */
-[data-theme="light"] .table-striped > tbody > tr:nth-of-type(odd) {
+[data-theme="light"] .table-striped>tbody>tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, 0.02);
 }
 
-[data-theme="light"] .table-striped > tbody > tr:nth-of-type(even) {
+[data-theme="light"] .table-striped>tbody>tr:nth-of-type(even) {
   background-color: var(--bg-secondary);
 }
 
