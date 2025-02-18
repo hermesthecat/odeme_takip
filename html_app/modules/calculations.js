@@ -132,12 +132,8 @@ export function calculateCategoryExpenses(year, month) {
 }
 
 // Özet kartlarını güncelle
-export function updateSummaryCards() {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
-
-    const balance = calculateMonthlyBalance(year, month);
+export function updateSummaryCards(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
+    const balance = calculateMonthlyBalance(selectedYear, selectedMonth);
 
     // Gelir kartını güncelle
     const incomeElement = document.getElementById('monthlyIncome');
@@ -164,9 +160,10 @@ export function updateSummaryCards() {
     // Dönem kartını güncelle
     const periodElement = document.getElementById('currentPeriod');
     if (periodElement) {
+        const date = new Date(selectedYear, selectedMonth);
         periodElement.textContent = new Intl.DateTimeFormat('tr-TR', {
             year: 'numeric',
             month: 'long'
-        }).format(now);
+        }).format(date);
     }
 } 

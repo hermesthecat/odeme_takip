@@ -5,9 +5,16 @@ import { showAddIncomeModal } from '../modals/index.js';
 import { calculateNextPaymentDate } from './utils.js';
 
 // Gelir listesini güncelleme
-export function updateIncomeList() {
+export function updateIncomeList(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     const tbody = document.getElementById('incomeList');
-    if (!tbody) return;
+    if (!tbody) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Gelir listesi tablosu bulunamadı!'
+        });
+        return;
+    }
 
     const incomes = loadIncomes();
     tbody.innerHTML = '';
@@ -19,32 +26,75 @@ export function updateIncomeList() {
         return;
     }
 
+    const startDate = new Date(selectedYear, selectedMonth, 1);
+    const endDate = new Date(selectedYear, selectedMonth + 1, 0);
+
     incomes.forEach((income, index) => {
         try {
-            const nextIncomeDate = calculateNextPaymentDate(income.firstIncomeDate, income.frequency);
+            const firstDate = new Date(income.firstIncomeDate);
+            let shouldShow = false;
 
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${income.name || '-'}</td>
-                <td>${income.amount ? income.amount.toFixed(2) : '0.00'}</td>
-                <td>${income.currency || '-'}</td>
-                <td>${formatDate(income.firstIncomeDate)}</td>
-                <td>${getFrequencyText(income.frequency)}</td>
-                <td>${formatDate(nextIncomeDate)}</td>
-                <td>
-                    <div class="btn-group">
-                        <button class="btn btn-primary btn-sm" data-action="update-income" data-index="${index}">
+            if (income.frequency === '0') {
+                // Tek seferlik gelir
+                shouldShow = firstDate >= startDate && firstDate <= endDate;
+            } else {
+                // Tekrarlı gelir
+                let currentDate = new Date(firstDate);
+                let repeatCounter = 0;
+
+                while (currentDate <= endDate) {
+                    if (currentDate >= startDate && currentDate <= endDate) {
+                        shouldShow = true;
+                        break;
+                    }
+                    if (income.repeatCount && repeatCounter >= income.repeatCount) break;
+                    currentDate.setMonth(currentDate.getMonth() + parseInt(income.frequency));
+                    repeatCounter++;
+                }
+            }
+
+            if (shouldShow) {
+                const nextIncomeDate = calculateNextPaymentDate(income.firstIncomeDate, income.frequency, income.repeatCount);
+                const frequencyText = getFrequencyText(income.frequency);
+                const repeatText = income.frequency !== '0' ? 
+                                 (income.repeatCount ? ` (${income.repeatCount} tekrar)` : ' (Sonsuz)') : '';
+
+                // Mevcut tekrar sayısını hesapla
+                let currentRepeat = 0;
+                if (income.frequency !== '0') {
+                    const today = new Date();
+                    let currentDate = new Date(income.firstIncomeDate);
+                    while (currentDate <= today) {
+                        currentRepeat++;
+                        currentDate.setMonth(currentDate.getMonth() + parseInt(income.frequency));
+                    }
+                }
+
+                // Tekrar bilgisi metni
+                const repeatCountText = income.repeatCount && currentRepeat > 0 ? 
+                                      ` <span class="badge bg-info">${currentRepeat}/${income.repeatCount}</span>` : '';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${income.name || '-'}${repeatCountText}</td>
+                    <td>${income.amount ? income.amount.toFixed(2) : '0.00'}</td>
+                    <td>${income.currency || '-'}</td>
+                    <td>${formatDate(income.firstIncomeDate)}</td>
+                    <td>${frequencyText}${repeatText}</td>
+                    <td>${formatDate(nextIncomeDate)}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm me-1" data-action="update-income" data-index="${index}">
                             <i class="bi bi-pencil"></i>
                         </button>
                         <button class="btn btn-danger btn-sm" data-action="delete-income" data-index="${index}">
                             <i class="bi bi-trash"></i>
                         </button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(row);
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
         } catch (error) {
-            console.error(`Gelir ${index + 1} gösterilirken hata oluştu:`, error);
+            alert(`Gelir ${index + 1} gösterilirken hata oluştu: ${error.message}`);
         }
     });
 

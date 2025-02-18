@@ -19,6 +19,66 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentTheme = theme.getCurrentTheme();
     theme.setTheme(currentTheme);
 
+    // Yıl seçeneklerini oluştur
+    const yearSelect = document.getElementById('yearSelect');
+    const currentYear = new Date().getFullYear();
+    for (let year = currentYear - 5; year <= currentYear + 5; year++) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        if (year === currentYear) option.selected = true;
+        yearSelect.appendChild(option);
+    }
+
+    // Mevcut ayı seç
+    const monthSelect = document.getElementById('monthSelect');
+    monthSelect.value = new Date().getMonth();
+
+    // Ay değişikliği için event listener'lar
+    monthSelect.addEventListener('change', updateDisplayedMonth);
+    yearSelect.addEventListener('change', updateDisplayedMonth);
+    
+    document.getElementById('prevMonth').addEventListener('click', () => {
+        let currentMonth = parseInt(monthSelect.value);
+        let currentYear = parseInt(yearSelect.value);
+        
+        if (currentMonth === 0) {
+            monthSelect.value = "11";
+            yearSelect.value = (currentYear - 1).toString();
+        } else {
+            monthSelect.value = (currentMonth - 1).toString();
+        }
+        
+        updateDisplayedMonth();
+    });
+    
+    document.getElementById('nextMonth').addEventListener('click', () => {
+        let currentMonth = parseInt(monthSelect.value);
+        let currentYear = parseInt(yearSelect.value);
+        
+        if (currentMonth === 11) {
+            monthSelect.value = "0";
+            yearSelect.value = (currentYear + 1).toString();
+        } else {
+            monthSelect.value = (currentMonth + 1).toString();
+        }
+        
+        updateDisplayedMonth();
+    });
+
+    function updateDisplayedMonth() {
+        const selectedMonth = parseInt(monthSelect.value);
+        const selectedYear = parseInt(yearSelect.value);
+        
+        // Tüm gerekli güncellemeleri yap
+        lists.updatePaymentList(selectedYear, selectedMonth);
+        lists.updateIncomeList(selectedYear, selectedMonth);
+        lists.updateSavingList(selectedYear, selectedMonth);
+        calculations.updateSummaryCards(selectedYear, selectedMonth);
+        charts.updateCharts(undefined, selectedYear, selectedMonth);
+        lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
+    }
+
     // Tooltip'leri aktif et
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
@@ -75,20 +135,24 @@ document.addEventListener('DOMContentLoaded', () => {
         await currency.updateExchangeRates();
         currency.showExchangeRates();
 
+        // İlk yükleme için seçili ay/yıl değerlerini al
+        const selectedYear = parseInt(yearSelect.value);
+        const selectedMonth = parseInt(monthSelect.value);
+
         // Diğer güncellemeler
-        lists.updatePaymentList();
-        lists.updateIncomeList();
-        lists.updateSavingList();
+        lists.updatePaymentList(selectedYear, selectedMonth);
+        lists.updateIncomeList(selectedYear, selectedMonth);
+        lists.updateSavingList(selectedYear, selectedMonth);
         calendar.updateCalendar();
-        calculations.updateSummaryCards();
-        charts.updateCharts();
-        lists.updateBudgetGoalsDisplay();
+        calculations.updateSummaryCards(selectedYear, selectedMonth);
+        charts.updateCharts(undefined, selectedYear, selectedMonth);
+        lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
 
         // Her saat başı kurları güncelle
         setInterval(async () => {
             await currency.updateExchangeRates();
             currency.showExchangeRates();
-            calculations.updateSummaryCards();
+            calculations.updateSummaryCards(selectedYear, selectedMonth);
         }, 60 * 60 * 1000); // 1 saat
     });
 });

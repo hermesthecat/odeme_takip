@@ -1354,3 +1354,48 @@ h6 {
 [data-theme="light"] .table-striped tfoot td {
   background-color: inherit !important;
 }
+
+/* Ay Seçimi Stilleri */
+[data-theme="dark"] .bg-light {
+    background-color: #1e1e1e !important;
+}
+
+[data-theme="dark"] #monthSelect,
+[data-theme="dark"] #yearSelect {
+    color: #4dabf7 !important;
+    background-color: transparent !important;
+}
+
+[data-theme="dark"] #monthSelect option,
+[data-theme="dark"] #yearSelect option {
+    background-color: #1e1e1e;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .border {
+    border-color: #333333 !important;
+}
+
+/* Ay Seçimi Hover Efektleri */
+#monthSelect:hover,
+#yearSelect:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+#prevMonth,
+#nextMonth {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+#prevMonth:hover,
+#nextMonth:hover {
+    transform: scale(1.1);
+}

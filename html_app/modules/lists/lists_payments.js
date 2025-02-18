@@ -5,7 +5,7 @@ import { showAddPaymentModal } from '../modals/index.js';
 import { calculateNextPaymentDate } from './utils.js';
 
 // Ödeme listesini güncelleme
-export function updatePaymentList() {
+export function updatePaymentList(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     const tbody = document.getElementById('paymentList');
     if (!tbody) {
         Swal.fire({
@@ -26,46 +26,73 @@ export function updatePaymentList() {
         return;
     }
 
+    const startDate = new Date(selectedYear, selectedMonth, 1);
+    const endDate = new Date(selectedYear, selectedMonth + 1, 0);
+
     payments.forEach((payment, index) => {
         try {
-            const nextPaymentDate = calculateNextPaymentDate(payment.firstPaymentDate, payment.frequency, payment.repeatCount);
-            const frequencyText = getFrequencyText(payment.frequency);
-            const repeatText = payment.frequency !== '0' ? 
-                             (payment.repeatCount ? ` (${payment.repeatCount} tekrar)` : ' (Sonsuz)') : '';
+            const firstDate = new Date(payment.firstPaymentDate);
+            let shouldShow = false;
 
-            // Mevcut tekrar sayısını hesapla
-            let currentRepeat = 0;
-            if (payment.frequency !== '0') {
-                const today = new Date();
-                let currentDate = new Date(payment.firstPaymentDate);
-                while (currentDate <= today) {
-                    currentRepeat++;
+            if (payment.frequency === '0') {
+                // Tek seferlik ödeme
+                shouldShow = firstDate >= startDate && firstDate <= endDate;
+            } else {
+                // Tekrarlı ödeme
+                let currentDate = new Date(firstDate);
+                let repeatCounter = 0;
+
+                while (currentDate <= endDate) {
+                    if (currentDate >= startDate && currentDate <= endDate) {
+                        shouldShow = true;
+                        break;
+                    }
+                    if (payment.repeatCount && repeatCounter >= payment.repeatCount) break;
                     currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+                    repeatCounter++;
                 }
             }
 
-            // Tekrar bilgisi metni
-            const repeatCountText = payment.repeatCount && currentRepeat > 0 ? 
-                                  ` <span class="badge bg-info">${currentRepeat}/${payment.repeatCount}</span>` : '';
+            if (shouldShow) {
+                const nextPaymentDate = calculateNextPaymentDate(payment.firstPaymentDate, payment.frequency, payment.repeatCount);
+                const frequencyText = getFrequencyText(payment.frequency);
+                const repeatText = payment.frequency !== '0' ? 
+                                 (payment.repeatCount ? ` (${payment.repeatCount} tekrar)` : ' (Sonsuz)') : '';
 
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${payment.name || '-'}${repeatCountText}</td>
-                <td>${payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
-                <td>${payment.currency || '-'}</td>
-                <td>${formatDate(payment.firstPaymentDate)}</td>
-                <td>${frequencyText}${repeatText}</td>
-                <td>${formatDate(nextPaymentDate)}</td>
-                <td>
-                    <button class="btn btn-primary btn-sm me-1" data-action="update-payment" data-index="${index}">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" data-action="delete-payment" data-index="${index}">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </td>
-            `;
-            tbody.appendChild(row);
+                // Mevcut tekrar sayısını hesapla
+                let currentRepeat = 0;
+                if (payment.frequency !== '0') {
+                    const today = new Date();
+                    let currentDate = new Date(payment.firstPaymentDate);
+                    while (currentDate <= today) {
+                        currentRepeat++;
+                        currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+                    }
+                }
+
+                // Tekrar bilgisi metni
+                const repeatCountText = payment.repeatCount && currentRepeat > 0 ? 
+                                      ` <span class="badge bg-info">${currentRepeat}/${payment.repeatCount}</span>` : '';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${payment.name || '-'}${repeatCountText}</td>
+                    <td>${payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
+                    <td>${payment.currency || '-'}</td>
+                    <td>${formatDate(payment.firstPaymentDate)}</td>
+                    <td>${frequencyText}${repeatText}</td>
+                    <td>${formatDate(nextPaymentDate)}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm me-1" data-action="update-payment" data-index="${index}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" data-action="delete-payment" data-index="${index}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
         } catch (error) {
             alert(`Ödeme ${index + 1} gösterilirken hata oluştu: ${error.message}`);
         }
