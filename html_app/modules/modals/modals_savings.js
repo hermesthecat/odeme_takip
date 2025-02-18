@@ -125,7 +125,7 @@ export function showAddSavingModal(existingSaving = null, editIndex = -1) {
             } else {
                 savings.push(result.value);
             }
-            
+
             if (saveSavings(savings)) {
                 Swal.fire({
                     icon: 'success',

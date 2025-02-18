@@ -20,7 +20,7 @@ window.nextMonth = navigation.nextMonth;
 window.updateDisplays = () => {
     const selectedYear = parseInt(document.getElementById('yearSelect').value);
     const selectedMonth = parseInt(document.getElementById('monthSelect').value);
-    
+
     lists.updatePaymentList(selectedYear, selectedMonth);
     lists.updateIncomeList(selectedYear, selectedMonth);
     lists.updateSavingList(selectedYear, selectedMonth);

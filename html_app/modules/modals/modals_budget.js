@@ -7,19 +7,19 @@ import { updateSummaryCards } from '../calculations.js';
 // Bütçe hedefi güncelleme modalını göster
 export function showUpdateBudgetGoalModal() {
     const goals = loadBudgetGoals();
-    
+
     // Seçili ay ve yılı al
     const monthSelect = document.getElementById('monthSelect');
     const yearSelect = document.getElementById('yearSelect');
     const selectedMonth = parseInt(monthSelect.value) + 1;
     const selectedYear = parseInt(yearSelect.value);
-    
+
     // Ay-yıl anahtarını oluştur
     const monthKey = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}`;
-    
+
     // Seçili ayın limitini al
     const currentLimit = goals.monthlyLimits[monthKey] || 0;
-    
+
     // Seçili ayın adını al
     const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleString('tr-TR', { month: 'long', year: 'numeric' });
 
@@ -77,7 +77,7 @@ export function showUpdateBudgetGoalModal() {
         if (result.isConfirmed) {
             // Seçili ay için limiti güncelle
             goals.monthlyLimits[monthKey] = result.value;
-            
+
             if (saveBudgetGoals(goals)) {
                 Swal.fire({
                     icon: 'success',

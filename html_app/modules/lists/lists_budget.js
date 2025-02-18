@@ -38,7 +38,7 @@ export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), 
             const selectedDate = new Date(selectedYear, selectedMonth, 1);
             let currentDate = new Date(payment.firstPaymentDate);
             let pastRepeats = 0;
-            
+
             while (currentDate <= selectedDate) {
                 pastRepeats++;
                 currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
@@ -77,13 +77,13 @@ export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), 
     // Toplamları güncelle
     const table = tbody.closest('table');
     let tfoot = table.querySelector('tfoot');
-    
+
     // Eğer tfoot yoksa oluştur
     if (!tfoot) {
         tfoot = document.createElement('tfoot');
         table.appendChild(tfoot);
     }
-    
+
     // Toplam satırını güncelle
     tfoot.innerHTML = `
         <tr>
@@ -98,11 +98,11 @@ export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), 
 export function updateBudgetGoalsDisplay(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     const goals = loadBudgetGoals();
     const currentExpenses = calculateMonthlyBalance(selectedYear, selectedMonth).expense;
-    
+
     // Seçili ayın limitini al
     const monthKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
     const monthlyLimit = goals.monthlyLimits[monthKey] || 0;
-    
+
     const monthlyLimitProgress = monthlyLimit > 0 ? (currentExpenses / monthlyLimit) * 100 : 0;
     const categoryExpenses = calculateCategoryExpenses(selectedYear, selectedMonth);
 

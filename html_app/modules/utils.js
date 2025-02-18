@@ -15,7 +15,7 @@ export function calculateNextPaymentDate(firstPaymentDate, frequency, repeatCoun
     while (nextDate <= today) {
         nextDate.setMonth(nextDate.getMonth() + parseInt(frequency));
         repeatCounter++;
-        
+
         // Tekrar sayısı dolmuşsa son tarihi döndür
         if (repeatCount !== null && repeatCounter >= repeatCount) {
             return nextDate;
@@ -27,7 +27,7 @@ export function calculateNextPaymentDate(firstPaymentDate, frequency, repeatCoun
         const futureDate = new Date(firstDate);
         const totalMonths = (repeatCount - 1) * parseInt(frequency);
         futureDate.setMonth(futureDate.getMonth() + totalMonths);
-        
+
         // Eğer sonraki tarih, son tekrar tarihinden sonraysa
         if (nextDate > futureDate) {
             return futureDate;

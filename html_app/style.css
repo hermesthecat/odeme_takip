@@ -10,7 +10,7 @@
   --hover-bg: #f8f9fa;
   --month-selector-bg: #f8f9fa;
   --month-selector-border: #e9ecef;
-  --month-selector-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  --month-selector-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   --month-selector-hover: #e9ecef;
 }
 
@@ -25,7 +25,7 @@
   --hover-bg: #2d2d2d;
   --month-selector-bg: #2d2d2d;
   --month-selector-border: #404040;
-  --month-selector-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  --month-selector-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   --month-selector-hover: #404040;
 }
 
@@ -1305,135 +1305,135 @@ h6 {
 
 /* Ay Seçimi Stilleri */
 [data-theme="dark"] .bg-light {
-    background-color: #1e1e1e !important;
+  background-color: #1e1e1e !important;
 }
 
 [data-theme="dark"] #monthSelect,
 [data-theme="dark"] #yearSelect {
-    color: #4dabf7 !important;
-    background-color: transparent !important;
+  color: #4dabf7 !important;
+  background-color: transparent !important;
 }
 
 [data-theme="dark"] #monthSelect option,
 [data-theme="dark"] #yearSelect option {
-    background-color: #1e1e1e;
-    color: #ffffff;
+  background-color: #1e1e1e;
+  color: #ffffff;
 }
 
 [data-theme="dark"] .border {
-    border-color: #333333 !important;
+  border-color: #333333 !important;
 }
 
 /* Ay Seçimi Hover Efektleri */
 #monthSelect:hover,
 #yearSelect:hover {
-    cursor: pointer;
-    opacity: 0.8;
+  cursor: pointer;
+  opacity: 0.8;
 }
 
 #prevMonth,
 #nextMonth {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
 }
 
 #prevMonth:hover,
 #nextMonth:hover {
-    transform: scale(1.1);
+  transform: scale(1.1);
 }
 
 /* Tablo footer stilleri */
 .table tfoot tr {
-    background-color: inherit !important;
+  background-color: inherit !important;
 }
 
 .table-striped tfoot tr {
-    background-color: inherit !important;
+  background-color: inherit !important;
 }
 
 [data-theme="dark"] .table tfoot tr,
 [data-theme="dark"] .table-striped tfoot tr,
 [data-theme="dark"] .table tbody tr:nth-of-type(odd) tfoot tr,
 [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) tfoot tr {
-    background-color: #1e1e1e !important;
+  background-color: #1e1e1e !important;
 }
 
 [data-theme="dark"] .table tfoot td,
 [data-theme="dark"] .table-striped tfoot td {
-    color: #ffffff !important;
-    border-color: #333333 !important;
-    background-color: #1e1e1e !important;
+  color: #ffffff !important;
+  border-color: #333333 !important;
+  background-color: #1e1e1e !important;
 }
 
 [data-theme="light"] .table tfoot tr,
 [data-theme="light"] .table-striped tfoot tr {
-    background-color: inherit !important;
+  background-color: inherit !important;
 }
 
 [data-theme="light"] .table tfoot td,
 [data-theme="light"] .table-striped tfoot td {
-    background-color: inherit !important;
+  background-color: inherit !important;
 }
 
 /* Ay Seçici Stilleri */
 .month-selector {
-    background: var(--month-selector-bg);
-    border: 1px solid var(--month-selector-border);
-    border-radius: 15px;
-    padding: 0.75rem 1.5rem;
-    box-shadow: var(--month-selector-shadow);
-    transition: all 0.3s ease;
+  background: var(--month-selector-bg);
+  border: 1px solid var(--month-selector-border);
+  border-radius: 15px;
+  padding: 0.75rem 1.5rem;
+  box-shadow: var(--month-selector-shadow);
+  transition: all 0.3s ease;
 }
 
 .month-selector:hover {
-    box-shadow: var(--month-selector-shadow), 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: var(--month-selector-shadow), 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .month-selector select {
-    font-size: 1.25rem;
-    font-weight: 600;
-    padding: 0.5rem 1rem;
-    border-radius: 10px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .month-selector select:hover {
-    background: var(--month-selector-hover);
+  background: var(--month-selector-hover);
 }
 
 .month-selector .btn {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
 }
 
 .month-selector .btn:hover {
-    transform: scale(1.1);
-    background-color: var(--month-selector-hover);
+  transform: scale(1.1);
+  background-color: var(--month-selector-hover);
 }
 
 .month-selector .btn i {
-    font-size: 1.25rem;
+  font-size: 1.25rem;
 }
 
 .month-selector .current-period {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0 1rem;
-    white-space: nowrap;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 1rem;
+  white-space: nowrap;
 }

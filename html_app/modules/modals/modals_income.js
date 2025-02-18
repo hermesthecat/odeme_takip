@@ -111,7 +111,7 @@ export function showAddIncomeModal(existingIncome = null, editIndex = -1) {
             } else {
                 incomes.push(result.value);
             }
-            
+
             if (saveIncomes(incomes)) {
                 Swal.fire({
                     icon: 'success',

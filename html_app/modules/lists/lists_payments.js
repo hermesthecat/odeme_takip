@@ -65,8 +65,8 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
                 visiblePayments.push({ ...payment, index, isPaid }); // Görünür ödemeyi kaydet
                 const nextPaymentDate = calculateNextPaymentDate(payment.firstPaymentDate, payment.frequency, payment.repeatCount);
                 const frequencyText = getFrequencyText(payment.frequency);
-                const repeatText = payment.frequency !== '0' ? 
-                                 (payment.repeatCount ? ` (${payment.repeatCount} tekrar)` : ' (Sonsuz)') : '';
+                const repeatText = payment.frequency !== '0' ?
+                    (payment.repeatCount ? ` (${payment.repeatCount} tekrar)` : ' (Sonsuz)') : '';
 
                 // Mevcut tekrar sayısını hesapla
                 let currentRepeat = 0;
@@ -163,14 +163,14 @@ export function updatePayment(index) {
         // Seçili ay ve yılı al
         const monthSelect = document.getElementById('monthSelect');
         const yearSelect = document.getElementById('yearSelect');
-        
+
         if (monthSelect && yearSelect) {
             const selectedMonth = parseInt(monthSelect.value);
             const selectedYear = parseInt(yearSelect.value);
-            
+
             // Tüm listeleri güncelle
             updatePaymentList(selectedYear, selectedMonth);
-            
+
             // Diğer ilgili güncellemeleri de yap
             const event = new Event('change');
             monthSelect.dispatchEvent(event);
@@ -212,16 +212,16 @@ export function deletePayment(index) {
 function togglePaymentStatus(index) {
     const payments = loadPayments();
     const payment = payments[index];
-    
+
     // paidMonths dizisi yoksa oluştur
     if (!payment.paidMonths) {
         payment.paidMonths = [];
     }
-    
+
     // Seçili ayın string temsilini oluştur (YYYY-MM formatında)
     const currentDate = new Date();
     const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
-    
+
     // Eğer bu ay ödendiyse ödemedi yap, ödenmediyse ödendi yap
     const monthIndex = payment.paidMonths.indexOf(monthKey);
     if (monthIndex === -1) {
@@ -229,13 +229,13 @@ function togglePaymentStatus(index) {
     } else {
         payment.paidMonths.splice(monthIndex, 1);
     }
-    
+
     if (savePayments(payments)) {
         // Başarılı mesajı göster
         const isPaid = monthIndex === -1;
         const message = isPaid ? 'Ödeme yapıldı olarak işaretlendi!' : 'Ödeme yapılmadı olarak işaretlendi!';
         const icon = isPaid ? 'success' : 'info';
-        
+
         Swal.fire({
             icon: icon,
             title: 'Başarılı!',
@@ -249,7 +249,7 @@ function togglePaymentStatus(index) {
             if (existingTfoot) {
                 existingTfoot.remove();
             }
-            
+
             // Ödeme listesini güncelle
             updatePaymentList();
         });
@@ -279,7 +279,7 @@ function moveUnpaidToNextMonth(currentYear, currentMonth, unpaidPayments) {
     const payments = loadPayments();
     let nextMonth = currentMonth + 1;
     let nextYear = currentYear;
-    
+
     if (nextMonth > 11) {
         nextMonth = 0;
         nextYear++;
@@ -310,13 +310,13 @@ function moveUnpaidToNextMonth(currentYear, currentMonth, unpaidPayments) {
                     // Aktarım bilgisini oluştur
                     const fromDate = new Date(currentYear, currentMonth);
                     const transferInfo = `(${fromDate.toLocaleString('tr-TR', { month: 'long', year: 'numeric' })}'den aktarıldı)`;
-                    
+
                     // Eğer ödemede daha önce aktarım bilgisi varsa, onu kaldır
                     const cleanName = originalPayment.name.replace(/\s*\([^)]*'[^)]*\)\s*$/, '').trim();
-                    
+
                     // Yeni adı oluştur
                     originalPayment.name = `${cleanName} ${transferInfo}`;
-                    
+
                     // Tarihi güncelle
                     const originalDate = new Date(originalPayment.firstPaymentDate);
                     originalDate.setFullYear(nextYear);
@@ -336,11 +336,11 @@ function moveUnpaidToNextMonth(currentYear, currentMonth, unpaidPayments) {
                     // Seçili ayı güncelle ve listeyi yenile
                     const monthSelect = document.getElementById('monthSelect');
                     const yearSelect = document.getElementById('yearSelect');
-                    
+
                     if (monthSelect && yearSelect) {
                         monthSelect.value = nextMonth;
                         yearSelect.value = nextYear;
-                        
+
                         // Değişikliği tetikle
                         monthSelect.dispatchEvent(new Event('change'));
                     }

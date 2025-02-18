@@ -132,13 +132,12 @@ export function updateCalendar(selectedYear = new Date().getFullYear(), selected
                                 <i class="bi bi-arrow-repeat text-warning"></i>
                                 <div class="detail-content">
                                     <span class="detail-label">Tekrarlama Sıklığı</span>
-                                    <span class="detail-value">${getFrequencyText(info.event.extendedProps.frequency)}${
-                                        info.event.extendedProps.frequency !== '0' ? 
-                                        (info.event.extendedProps.repeatCount ? 
-                                            ` (${info.event.extendedProps.currentRepeat}/${info.event.extendedProps.repeatCount} tekrar)` : 
-                                            ' (Sonsuz)') : 
-                                        ''
-                                    }</span>
+                                    <span class="detail-value">${getFrequencyText(info.event.extendedProps.frequency)}${info.event.extendedProps.frequency !== '0' ?
+                            (info.event.extendedProps.repeatCount ?
+                                ` (${info.event.extendedProps.currentRepeat}/${info.event.extendedProps.repeatCount} tekrar)` :
+                                ' (Sonsuz)') :
+                            ''
+                        }</span>
                                 </div>
                             </div>
                         </div>

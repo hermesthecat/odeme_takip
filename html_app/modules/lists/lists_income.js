@@ -74,8 +74,8 @@ export function updateIncomeList(selectedYear = new Date().getFullYear(), select
                 }
 
                 const frequencyText = getFrequencyText(income.frequency);
-                const repeatText = income.frequency !== '0' ? 
-                                 (income.repeatCount ? ` (${income.repeatCount} tekrar)` : ' (Sonsuz)') : '';
+                const repeatText = income.frequency !== '0' ?
+                    (income.repeatCount ? ` (${income.repeatCount} tekrar)` : ' (Sonsuz)') : '';
 
                 // Mevcut tekrar sayısını hesapla
                 let currentRepeat = 0;
@@ -88,8 +88,8 @@ export function updateIncomeList(selectedYear = new Date().getFullYear(), select
                 }
 
                 // Tekrar bilgisi metni
-                const repeatCountText = income.repeatCount && currentRepeat > 0 ? 
-                                      ` <span class="badge bg-info">${currentRepeat}/${income.repeatCount}</span>` : '';
+                const repeatCountText = income.repeatCount && currentRepeat > 0 ?
+                    ` <span class="badge bg-info">${currentRepeat}/${income.repeatCount}</span>` : '';
 
                 const row = document.createElement('tr');
                 row.innerHTML = `

@@ -136,7 +136,7 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
             } else {
                 payments.push(result.value);
             }
-            
+
             if (savePayments(payments)) {
                 return Swal.fire({
                     icon: 'success',

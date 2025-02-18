@@ -107,31 +107,31 @@ export function loadBudgetGoals() {
             monthlyLimits: {},  // Her ay için ayrı limit
             categories: []
         };
-        
+
         if (!goals) return defaultGoals;
-        
+
         const parsedGoals = JSON.parse(goals);
-        
+
         // Eski yapıdan yeni yapıya geçiş için kontrol
         if (parsedGoals.monthlyExpenseLimit !== undefined) {
             // Eski yapıdaki limiti tüm aylar için varsayılan olarak ata
             const oldLimit = parsedGoals.monthlyExpenseLimit;
             parsedGoals.monthlyLimits = {};
-            
+
             // Şu anki yıl için tüm aylara eski limiti ata
             const currentYear = new Date().getFullYear();
             for (let month = 0; month < 12; month++) {
                 const monthKey = `${currentYear}-${String(month + 1).padStart(2, '0')}`;
                 parsedGoals.monthlyLimits[monthKey] = oldLimit;
             }
-            
+
             // Eski alanı sil
             delete parsedGoals.monthlyExpenseLimit;
-            
+
             // Yeni yapıyı kaydet
             localStorage.setItem(BUDGET_GOALS_KEY, JSON.stringify(parsedGoals));
         }
-        
+
         return {
             ...defaultGoals,
             ...parsedGoals
