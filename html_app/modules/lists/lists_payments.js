@@ -284,12 +284,16 @@ function moveUnpaidToNextMonth(currentYear, currentMonth, unpaidPayments) {
         if (result.isConfirmed) {
             // Her ödenmemiş ödeme için yeni bir kopya oluştur
             unpaidPayments.forEach(payment => {
-                const newPayment = { ...payment };
-                newPayment.firstPaymentDate = new Date(nextYear, nextMonth, 1).toISOString().split('T')[0];
-                newPayment.frequency = '0'; // Tek seferlik ödeme olarak ayarla
-                newPayment.repeatCount = null;
-                newPayment.isPaid = false;
-                newPayment.name = `${payment.name} (${new Date(currentYear, currentMonth).toLocaleString('tr-TR', { month: 'long' })} Aktarımı)`;
+                const newPayment = {
+                    name: `${payment.name} (${new Date(currentYear, currentMonth).toLocaleString('tr-TR', { month: 'long' })} Aktarımı)`,
+                    amount: payment.amount,
+                    currency: payment.currency,
+                    category: payment.category,
+                    firstPaymentDate: new Date(nextYear, nextMonth, 1).toISOString().split('T')[0],
+                    frequency: '0', // Tek seferlik ödeme olarak ayarla
+                    repeatCount: null,
+                    paidMonths: [] // Boş paidMonths dizisi ile başlat
+                };
                 
                 payments.push(newPayment);
             });
@@ -302,7 +306,17 @@ function moveUnpaidToNextMonth(currentYear, currentMonth, unpaidPayments) {
                     showConfirmButton: false,
                     timer: 1500
                 }).then(() => {
-                    updatePaymentList();
+                    // Seçili ayı güncelle ve listeyi yenile
+                    const monthSelect = document.getElementById('monthSelect');
+                    const yearSelect = document.getElementById('yearSelect');
+                    
+                    if (monthSelect && yearSelect) {
+                        monthSelect.value = nextMonth;
+                        yearSelect.value = nextYear;
+                        
+                        // Değişikliği tetikle
+                        monthSelect.dispatchEvent(new Event('change'));
+                    }
                 });
             }
         }
