@@ -116,7 +116,8 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
     const unpaidPayments = visiblePayments.filter(payment => !payment.isPaid);
 
     // Mevcut tfoot'u temizle
-    const existingTfoot = document.querySelector('tfoot');
+    const paymentTable = tbody.closest('table');
+    const existingTfoot = paymentTable.querySelector('tfoot');
     if (existingTfoot) {
         existingTfoot.remove();
     }
@@ -226,8 +227,9 @@ function togglePaymentStatus(index) {
             showConfirmButton: false,
             timer: 1500
         }).then(() => {
-            // Mevcut tfoot'u temizle
-            const existingTfoot = document.querySelector('tfoot');
+            // Sadece ödeme listesinin tfoot'unu temizle
+            const paymentTable = document.getElementById('paymentList').closest('table');
+            const existingTfoot = paymentTable.querySelector('tfoot');
             if (existingTfoot) {
                 existingTfoot.remove();
             }
