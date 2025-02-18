@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal açma butonları için event listener ekle
     document.querySelectorAll('.add-modal-btn').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const type = this.getAttribute('data-type');
             switch (type) {
                 case 'income':
