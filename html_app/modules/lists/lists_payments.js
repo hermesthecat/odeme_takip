@@ -37,8 +37,10 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
             let shouldShow = false;
 
             if (payment.frequency === '0') {
-                // Tek seferlik ödeme
-                shouldShow = firstDate >= startDate && firstDate <= endDate;
+                // Tek seferlik ödeme - sadece ay ve yıl kontrolü yap
+                const paymentYear = firstDate.getFullYear();
+                const paymentMonth = firstDate.getMonth();
+                shouldShow = paymentYear === selectedYear && paymentMonth === selectedMonth;
             } else {
                 // Tekrarlı ödeme
                 let currentDate = new Date(firstDate);
@@ -282,20 +284,17 @@ function moveUnpaidToNextMonth(currentYear, currentMonth, unpaidPayments) {
         cancelButtonText: 'İptal'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Her ödenmemiş ödeme için yeni bir kopya oluştur
+            // Her ödenmemiş ödeme için işlem yap
             unpaidPayments.forEach(payment => {
-                const newPayment = {
-                    name: `${payment.name} (${new Date(currentYear, currentMonth).toLocaleString('tr-TR', { month: 'long' })} Aktarımı)`,
-                    amount: payment.amount,
-                    currency: payment.currency,
-                    category: payment.category,
-                    firstPaymentDate: new Date(nextYear, nextMonth, 1).toISOString().split('T')[0],
-                    frequency: '0', // Tek seferlik ödeme olarak ayarla
-                    repeatCount: null,
-                    paidMonths: [] // Boş paidMonths dizisi ile başlat
-                };
-                
-                payments.push(newPayment);
+                // Orijinal ödemenin indeksini bul
+                const originalPayment = payments.find((p, idx) => idx === payment.index);
+                if (originalPayment) {
+                    // Orijinal ödemenin tarihini güncelle
+                    const originalDate = new Date(originalPayment.firstPaymentDate);
+                    originalDate.setFullYear(nextYear);
+                    originalDate.setMonth(nextMonth);
+                    originalPayment.firstPaymentDate = originalDate.toISOString().split('T')[0];
+                }
             });
 
             if (savePayments(payments)) {
