@@ -104,7 +104,7 @@ export function calculateCategoryExpenses(year, month) {
 
         if (payment.frequency === '0') {
             // Tek seferlik ödeme
-            if (firstDate.getFullYear() === year && firstDate.getMonth() === month && !isPaid) {
+            if (firstDate.getFullYear() === year && firstDate.getMonth() === month && isPaid) {
                 amount = convertToTRY(payment.amount, payment.currency);
             }
         } else {
@@ -121,8 +121,8 @@ export function calculateCategoryExpenses(year, month) {
                 currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
             }
 
-            // Eğer bu ay içindeyse ve ödenmemişse ekle
-            if (currentDate <= endDate && !isPaid) {
+            // Eğer bu ay içindeyse ve ödenmişse ekle
+            if (currentDate <= endDate && isPaid) {
                 amount = convertToTRY(payment.amount, payment.currency);
             }
         }

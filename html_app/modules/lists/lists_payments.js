@@ -3,6 +3,9 @@ import { loadPayments, savePayments } from '../storage.js';
 import { formatDate, getFrequencyText } from '../utils.js';
 import { showAddPaymentModal } from '../modals/index.js';
 import { calculateNextPaymentDate } from './utils.js';
+import { updateBudgetGoalsDisplay } from './lists_budget.js';
+import { updateSummaryCards } from '../calculations.js';
+import { updateCharts } from '../charts.js';
 
 // Ödeme listesini güncelleme
 export function updatePaymentList(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
@@ -219,8 +222,11 @@ function togglePaymentStatus(index) {
     }
 
     // Seçili ayın string temsilini oluştur (YYYY-MM formatında)
-    const currentDate = new Date();
-    const monthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+    const monthSelect = document.getElementById('monthSelect');
+    const yearSelect = document.getElementById('yearSelect');
+    const selectedMonth = parseInt(monthSelect.value);
+    const selectedYear = parseInt(yearSelect.value);
+    const monthKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
 
     // Eğer bu ay ödendiyse ödemedi yap, ödenmediyse ödendi yap
     const monthIndex = payment.paidMonths.indexOf(monthKey);
@@ -251,7 +257,16 @@ function togglePaymentStatus(index) {
             }
 
             // Ödeme listesini güncelle
-            updatePaymentList();
+            updatePaymentList(selectedYear, selectedMonth);
+
+            // Bütçe hedeflerini güncelle
+            updateBudgetGoalsDisplay(selectedYear, selectedMonth);
+
+            // Özet kartlarını güncelle
+            updateSummaryCards(selectedYear, selectedMonth);
+
+            // Grafikleri güncelle
+            updateCharts(undefined, selectedYear, selectedMonth);
         });
     }
 }
