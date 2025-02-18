@@ -84,7 +84,6 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
                                 <i class="bi bi-check-circle${payment.isPaid ? '-fill' : ''}"></i>
                             </button>
                             <span class="${payment.isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.name || '-'}</span>
-                            ${repeatCountText}
                         </div>
                     </td>
                     <td class="${payment.isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
