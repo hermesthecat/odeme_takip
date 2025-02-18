@@ -1,13 +1,89 @@
 // Bütçe hedefleri listesi işlemleri
-import { loadBudgetGoals } from '../storage.js';
-import { formatMoney } from '../currency.js';
+import { loadBudgetGoals, loadPayments } from '../storage.js';
+import { formatMoney, convertToTRY } from '../currency.js';
 import { calculateMonthlyBalance, calculateCategoryExpenses } from '../calculations.js';
-import { 
-    showUpdateBudgetGoalModal, 
-    showAddCategoryGoalModal, 
-    showDeleteCategoryGoalModal, 
-    showUpdateCategoryGoalModal 
+import { getFrequencyText } from '../utils.js';
+import {
+    showUpdateBudgetGoalModal,
+    showAddCategoryGoalModal,
+    showDeleteCategoryGoalModal,
+    showUpdateCategoryGoalModal
 } from '../modals/index.js';
+
+// Ödeme gücü tablosunu güncelle
+function updatePaymentPowerList() {
+    const tbody = document.getElementById('paymentPowerList');
+    if (!tbody) return;
+
+    const payments = loadPayments();
+    tbody.innerHTML = '';
+
+    // Sadece tekrarlayan ödemeleri filtrele
+    const recurringPayments = payments.filter(payment => payment.frequency !== '0');
+
+    if (recurringPayments.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = '<td colspan="7" class="text-center">Tekrarlayan ödeme bulunmamaktadır.</td>';
+        tbody.appendChild(row);
+        return;
+    }
+
+    let totalBurden = 0;
+    let totalMonths = 0;
+
+    recurringPayments.forEach(payment => {
+        // Kalan tekrar sayısını hesapla
+        let remainingRepeats = payment.repeatCount;
+        if (payment.repeatCount) {
+            const today = new Date();
+            let currentDate = new Date(payment.firstPaymentDate);
+            let pastRepeats = 0;
+            while (currentDate <= today) {
+                pastRepeats++;
+                currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+            }
+            remainingRepeats = Math.max(0, payment.repeatCount - pastRepeats);
+        }
+
+        // Toplam yükü hesapla
+        const repeats = payment.repeatCount || 120; // Sonsuz tekrar için 10 yıl varsayalım
+        const actualRepeats = payment.repeatCount ? Math.min(repeats, remainingRepeats) : repeats;
+        const totalAmount = convertToTRY(payment.amount * actualRepeats, payment.currency);
+        const monthlyAverage = totalAmount / (actualRepeats * parseInt(payment.frequency));
+
+        totalBurden += totalAmount;
+        totalMonths = Math.max(totalMonths, actualRepeats * parseInt(payment.frequency));
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>
+                <i class="bi bi-credit-card-fill text-danger me-2"></i>${payment.name}
+            </td>
+            <td>${payment.amount.toFixed(2)}</td>
+            <td>${payment.currency}</td>
+            <td>${getFrequencyText(payment.frequency)}</td>
+            <td>
+                ${payment.repeatCount ?
+                `<span class="badge bg-info">${remainingRepeats}/${payment.repeatCount}</span>` :
+                '<span class="badge bg-secondary">Sonsuz</span>'}
+            </td>
+            <td>${formatMoney(totalAmount)}</td>
+            <td>${formatMoney(monthlyAverage)}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    // Toplamları güncelle
+    const totalBurdenElement = document.getElementById('totalPaymentBurden');
+    if (totalBurdenElement) {
+        totalBurdenElement.textContent = formatMoney(totalBurden);
+    }
+
+    const averageMonthlyBurdenElement = document.getElementById('averageMonthlyBurden');
+    if (averageMonthlyBurdenElement) {
+        averageMonthlyBurdenElement.textContent = formatMoney(totalBurden / totalMonths);
+    }
+}
 
 // Bütçe hedeflerini görüntüle
 export function updateBudgetGoalsDisplay() {
@@ -106,6 +182,9 @@ export function updateBudgetGoalsDisplay() {
             }
         });
     });
+
+    // Ödeme gücü tablosunu güncelle
+    updatePaymentPowerList();
 }
 
 // Bütçe işlemlerini yönet
