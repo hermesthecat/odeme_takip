@@ -54,7 +54,25 @@ export function updateIncomeList(selectedYear = new Date().getFullYear(), select
             }
 
             if (shouldShow) {
-                const nextIncomeDate = calculateNextPaymentDate(income.firstIncomeDate, income.frequency, income.repeatCount);
+                // Seçili aydaki gelir tarihini hesapla
+                let currentIncomeDate = new Date(firstDate);
+                if (income.frequency !== '0') {
+                    // Seçili aya kadar ilerlet
+                    while (currentIncomeDate < startDate) {
+                        currentIncomeDate.setMonth(currentIncomeDate.getMonth() + parseInt(income.frequency));
+                    }
+                    // Eğer seçili ayı geçtiyse bir önceki tarihe geri dön
+                    if (currentIncomeDate > endDate) {
+                        currentIncomeDate.setMonth(currentIncomeDate.getMonth() - parseInt(income.frequency));
+                    }
+                }
+
+                // Sonraki gelir tarihini hesapla (seçili aydan sonraki ilk gelir)
+                let nextIncomeDate = new Date(currentIncomeDate);
+                if (income.frequency !== '0') {
+                    nextIncomeDate.setMonth(nextIncomeDate.getMonth() + parseInt(income.frequency));
+                }
+
                 const frequencyText = getFrequencyText(income.frequency);
                 const repeatText = income.frequency !== '0' ? 
                                  (income.repeatCount ? ` (${income.repeatCount} tekrar)` : ' (Sonsuz)') : '';
@@ -62,11 +80,10 @@ export function updateIncomeList(selectedYear = new Date().getFullYear(), select
                 // Mevcut tekrar sayısını hesapla
                 let currentRepeat = 0;
                 if (income.frequency !== '0') {
-                    const today = new Date();
-                    let currentDate = new Date(income.firstIncomeDate);
-                    while (currentDate <= today) {
+                    let tempDate = new Date(income.firstIncomeDate);
+                    while (tempDate <= currentIncomeDate) {
                         currentRepeat++;
-                        currentDate.setMonth(currentDate.getMonth() + parseInt(income.frequency));
+                        tempDate.setMonth(tempDate.getMonth() + parseInt(income.frequency));
                     }
                 }
 
@@ -79,7 +96,7 @@ export function updateIncomeList(selectedYear = new Date().getFullYear(), select
                     <td>${income.name || '-'}${repeatCountText}</td>
                     <td>${income.amount ? income.amount.toFixed(2) : '0.00'}</td>
                     <td>${income.currency || '-'}</td>
-                    <td>${formatDate(income.firstIncomeDate)}</td>
+                    <td>${formatDate(currentIncomeDate)}</td>
                     <td>${frequencyText}${repeatText}</td>
                     <td>${formatDate(nextIncomeDate)}</td>
                     <td>
