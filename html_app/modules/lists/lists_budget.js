@@ -11,7 +11,7 @@ import {
 } from '../modals/index.js';
 
 // Ödeme gücü tablosunu güncelle
-function updatePaymentPowerList() {
+export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     const tbody = document.getElementById('paymentPowerList');
     if (!tbody) return;
 
@@ -35,10 +35,11 @@ function updatePaymentPowerList() {
         // Kalan tekrar sayısını hesapla
         let remainingRepeats = payment.repeatCount;
         if (payment.repeatCount) {
-            const today = new Date();
+            const selectedDate = new Date(selectedYear, selectedMonth, 1);
             let currentDate = new Date(payment.firstPaymentDate);
             let pastRepeats = 0;
-            while (currentDate <= today) {
+            
+            while (currentDate <= selectedDate) {
                 pastRepeats++;
                 currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
             }
@@ -200,7 +201,7 @@ export function updateBudgetGoalsDisplay(selectedYear = new Date().getFullYear()
     });
 
     // Ödeme gücü tablosunu güncelle
-    updatePaymentPowerList();
+    updatePaymentPowerList(selectedYear, selectedMonth);
 }
 
 // Bütçe işlemlerini yönet

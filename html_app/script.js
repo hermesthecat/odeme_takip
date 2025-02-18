@@ -67,13 +67,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function updateDisplayedMonth() {
-        const selectedMonth = parseInt(monthSelect.value);
         const selectedYear = parseInt(yearSelect.value);
+        const selectedMonth = parseInt(monthSelect.value);
         
         // Tüm gerekli güncellemeleri yap
         lists.updatePaymentList(selectedYear, selectedMonth);
         lists.updateIncomeList(selectedYear, selectedMonth);
         lists.updateSavingList(selectedYear, selectedMonth);
+        lists.updatePaymentPowerList(selectedYear, selectedMonth);
         calculations.updateSummaryCards(selectedYear, selectedMonth);
         charts.updateCharts(undefined, selectedYear, selectedMonth);
         lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
