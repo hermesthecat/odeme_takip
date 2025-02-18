@@ -86,11 +86,11 @@ function updatePaymentPowerList() {
 }
 
 // Bütçe hedeflerini görüntüle
-export function updateBudgetGoalsDisplay() {
+export function updateBudgetGoalsDisplay(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     const goals = loadBudgetGoals();
-    const currentExpenses = calculateMonthlyBalance(new Date().getFullYear(), new Date().getMonth()).expense;
+    const currentExpenses = calculateMonthlyBalance(selectedYear, selectedMonth).expense;
     const monthlyLimitProgress = (currentExpenses / goals.monthlyExpenseLimit) * 100;
-    const categoryExpenses = calculateCategoryExpenses(new Date().getFullYear(), new Date().getMonth());
+    const categoryExpenses = calculateCategoryExpenses(selectedYear, selectedMonth);
 
     // Aylık limit progress barını güncelle
     const progressBar = document.getElementById('monthlyLimitProgress');
@@ -124,6 +124,22 @@ export function updateBudgetGoalsDisplay() {
         row.innerHTML = '<td colspan="6" class="text-center">Henüz kategori hedefi bulunmamaktadır.</td>';
         tbody.appendChild(row);
         return;
+    }
+
+    // Seçilen ayın adını al
+    const monthName = new Date(selectedYear, selectedMonth).toLocaleString('tr-TR', { month: 'long' });
+
+    // Başlık satırını güncelle
+    const headerRow = document.querySelector('#categoryGoalsList').closest('.table').querySelector('thead tr');
+    if (headerRow) {
+        headerRow.innerHTML = `
+            <th>Kategori</th>
+            <th>Aylık Hedef</th>
+            <th>${monthName} Harcaması</th>
+            <th>Kalan</th>
+            <th>İlerleme</th>
+            <th>İşlemler</th>
+        `;
     }
 
     goals.categories.forEach((category, index) => {
