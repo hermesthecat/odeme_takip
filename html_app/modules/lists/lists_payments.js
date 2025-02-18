@@ -289,7 +289,17 @@ function moveUnpaidToNextMonth(currentYear, currentMonth, unpaidPayments) {
                 // Orijinal ödemenin indeksini bul
                 const originalPayment = payments.find((p, idx) => idx === payment.index);
                 if (originalPayment) {
-                    // Orijinal ödemenin tarihini güncelle
+                    // Aktarım bilgisini oluştur
+                    const fromDate = new Date(currentYear, currentMonth);
+                    const transferInfo = `(${fromDate.toLocaleString('tr-TR', { month: 'long', year: 'numeric' })}'den aktarıldı)`;
+                    
+                    // Eğer ödemede daha önce aktarım bilgisi varsa, onu kaldır
+                    const cleanName = originalPayment.name.replace(/\s*\([^)]*'[^)]*\)\s*$/, '').trim();
+                    
+                    // Yeni adı oluştur
+                    originalPayment.name = `${cleanName} ${transferInfo}`;
+                    
+                    // Tarihi güncelle
                     const originalDate = new Date(originalPayment.firstPaymentDate);
                     originalDate.setFullYear(nextYear);
                     originalDate.setMonth(nextMonth);
