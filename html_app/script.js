@@ -19,6 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentTheme = theme.getCurrentTheme();
     theme.setTheme(currentTheme);
 
+    // Tooltip'leri aktif et
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
     // Tema değiştirme butonunu ekle
     const navButtons = document.querySelector('.d-flex.justify-content-between div');
     if (navButtons) {
@@ -45,8 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal açma butonları için event listener ekle
     document.querySelectorAll('.add-modal-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const type = e.target.dataset.type;
+        button.addEventListener('click', function() {
+            const type = this.getAttribute('data-type');
             switch (type) {
                 case 'income':
                     modals.showAddIncomeModal();
@@ -62,8 +66,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Veri import/export butonları için event listener ekle
-    document.querySelector('button[onclick="exportData()"]')?.addEventListener('click', utils.exportData);
-    document.querySelector('button[onclick="importData()"]')?.addEventListener('click', utils.importData);
+    document.querySelector('button[data-action="export-data"]')?.addEventListener('click', utils.exportData);
+    document.querySelector('button[data-action="import-data"]')?.addEventListener('click', utils.importData);
 
     // Sayfa yüklendiğinde gerekli güncellemeleri yap
     window.addEventListener('load', async function () {
