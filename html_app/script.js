@@ -12,6 +12,24 @@ import * as calculations from './modules/calculations.js';
 import * as modals from './modules/modals/index.js';
 import * as calendar from './modules/calendar.js';
 import * as lists from './modules/lists/index.js';
+import * as navigation from './modules/navigation.js';
+
+// Global fonksiyonları tanımla
+window.previousMonth = navigation.previousMonth;
+window.nextMonth = navigation.nextMonth;
+window.updateDisplays = () => {
+    const selectedYear = parseInt(document.getElementById('yearSelect').value);
+    const selectedMonth = parseInt(document.getElementById('monthSelect').value);
+    
+    lists.updatePaymentList(selectedYear, selectedMonth);
+    lists.updateIncomeList(selectedYear, selectedMonth);
+    lists.updateSavingList(selectedYear, selectedMonth);
+    lists.updatePaymentPowerList(selectedYear, selectedMonth);
+    calculations.updateSummaryCards(selectedYear, selectedMonth);
+    charts.updateCharts(undefined, selectedYear, selectedMonth);
+    lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
+    calendar.updateCalendar(selectedYear, selectedMonth);
+};
 
 // Ana sayfa yüklendiğinde
 document.addEventListener('DOMContentLoaded', () => {
@@ -19,67 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const currentTheme = theme.getCurrentTheme();
     theme.setTheme(currentTheme);
 
-    // Yıl seçeneklerini oluştur
-    const yearSelect = document.getElementById('yearSelect');
-    const currentYear = new Date().getFullYear();
-    for (let year = currentYear - 5; year <= currentYear + 5; year++) {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
-        if (year === currentYear) option.selected = true;
-        yearSelect.appendChild(option);
-    }
-
-    // Mevcut ayı seç
-    const monthSelect = document.getElementById('monthSelect');
-    monthSelect.value = new Date().getMonth();
-
-    // Ay değişikliği için event listener'lar
-    monthSelect.addEventListener('change', updateDisplayedMonth);
-    yearSelect.addEventListener('change', updateDisplayedMonth);
-    
-    document.getElementById('prevMonth').addEventListener('click', () => {
-        let currentMonth = parseInt(monthSelect.value);
-        let currentYear = parseInt(yearSelect.value);
-        
-        if (currentMonth === 0) {
-            monthSelect.value = "11";
-            yearSelect.value = (currentYear - 1).toString();
-        } else {
-            monthSelect.value = (currentMonth - 1).toString();
-        }
-        
-        updateDisplayedMonth();
-    });
-    
-    document.getElementById('nextMonth').addEventListener('click', () => {
-        let currentMonth = parseInt(monthSelect.value);
-        let currentYear = parseInt(yearSelect.value);
-        
-        if (currentMonth === 11) {
-            monthSelect.value = "0";
-            yearSelect.value = (currentYear + 1).toString();
-        } else {
-            monthSelect.value = (currentMonth + 1).toString();
-        }
-        
-        updateDisplayedMonth();
-    });
-
-    function updateDisplayedMonth() {
-        const selectedYear = parseInt(yearSelect.value);
-        const selectedMonth = parseInt(monthSelect.value);
-        
-        // Tüm gerekli güncellemeleri yap
-        lists.updatePaymentList(selectedYear, selectedMonth);
-        lists.updateIncomeList(selectedYear, selectedMonth);
-        lists.updateSavingList(selectedYear, selectedMonth);
-        lists.updatePaymentPowerList(selectedYear, selectedMonth);
-        calculations.updateSummaryCards(selectedYear, selectedMonth);
-        charts.updateCharts(undefined, selectedYear, selectedMonth);
-        lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
-        calendar.updateCalendar(selectedYear, selectedMonth);
-    }
+    // Ay seçiciyi başlat
+    navigation.initializeMonthSelector();
 
     // Tooltip'leri aktif et
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -138,17 +97,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currency.showExchangeRates();
 
         // İlk yükleme için seçili ay/yıl değerlerini al
-        const selectedYear = parseInt(yearSelect.value);
-        const selectedMonth = parseInt(monthSelect.value);
+        const selectedYear = parseInt(document.getElementById('yearSelect').value);
+        const selectedMonth = parseInt(document.getElementById('monthSelect').value);
 
         // Diğer güncellemeler
-        lists.updatePaymentList(selectedYear, selectedMonth);
-        lists.updateIncomeList(selectedYear, selectedMonth);
-        lists.updateSavingList(selectedYear, selectedMonth);
-        calendar.updateCalendar();
-        calculations.updateSummaryCards(selectedYear, selectedMonth);
-        charts.updateCharts(undefined, selectedYear, selectedMonth);
-        lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
+        updateDisplays();
 
         // Her saat başı kurları güncelle
         setInterval(async () => {

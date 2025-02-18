@@ -8,6 +8,10 @@
   --border-color: #dee2e6;
   --card-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   --hover-bg: #f8f9fa;
+  --month-selector-bg: #f8f9fa;
+  --month-selector-border: #e9ecef;
+  --month-selector-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  --month-selector-hover: #e9ecef;
 }
 
 [data-theme="dark"] {
@@ -19,6 +23,10 @@
   --border-color: #333333;
   --card-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   --hover-bg: #2d2d2d;
+  --month-selector-bg: #2d2d2d;
+  --month-selector-border: #404040;
+  --month-selector-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  --month-selector-hover: #404040;
 }
 
 /* Karanlık tema metin renkleri */
@@ -1371,4 +1379,61 @@ h6 {
 [data-theme="light"] .table tfoot td,
 [data-theme="light"] .table-striped tfoot td {
     background-color: inherit !important;
+}
+
+/* Ay Seçici Stilleri */
+.month-selector {
+    background: var(--month-selector-bg);
+    border: 1px solid var(--month-selector-border);
+    border-radius: 15px;
+    padding: 0.75rem 1.5rem;
+    box-shadow: var(--month-selector-shadow);
+    transition: all 0.3s ease;
+}
+
+.month-selector:hover {
+    box-shadow: var(--month-selector-shadow), 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.month-selector select {
+    font-size: 1.25rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.month-selector select:hover {
+    background: var(--month-selector-hover);
+}
+
+.month-selector .btn {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.month-selector .btn:hover {
+    transform: scale(1.1);
+    background-color: var(--month-selector-hover);
+}
+
+.month-selector .btn i {
+    font-size: 1.25rem;
+}
+
+.month-selector .current-period {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 1rem;
+    white-space: nowrap;
 }
