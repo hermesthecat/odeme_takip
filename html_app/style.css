@@ -1295,66 +1295,6 @@ h6 {
   font-size: 1.2rem;
 }
 
-/* Aylık Limit Butonu Stilleri */
-[data-action="update-monthly-limit"] {
-  background: linear-gradient(45deg, #4dabf7, #3b8fd8) !important;
-  border: none !important;
-  color: #ffffff !important;
-  padding: 8px 16px !important;
-  font-weight: 500 !important;
-  box-shadow: 0 2px 8px rgba(77, 171, 247, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-[data-action="update-monthly-limit"]:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(77, 171, 247, 0.4) !important;
-  background: linear-gradient(45deg, #3b8fd8, #2d7ab8) !important;
-}
-
-[data-theme="dark"] [data-action="update-monthly-limit"] {
-  background: linear-gradient(45deg, #4dabf7, #3b8fd8) !important;
-  color: #ffffff !important;
-  border: none !important;
-}
-
-[data-theme="dark"] [data-action="update-monthly-limit"]:hover {
-  background: linear-gradient(45deg, #3b8fd8, #2d7ab8) !important;
-}
-
-/* Tablo footer stilleri */
-.table tfoot tr {
-  background-color: inherit !important;
-}
-
-.table-striped tfoot tr {
-  background-color: inherit !important;
-}
-
-[data-theme="dark"] .table tfoot tr,
-[data-theme="dark"] .table-striped tfoot tr,
-[data-theme="dark"] .table tbody tr:nth-of-type(odd) tfoot tr,
-[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) tfoot tr {
-  background-color: #1e1e1e !important;
-}
-
-[data-theme="dark"] .table tfoot td,
-[data-theme="dark"] .table-striped tfoot td {
-  color: #ffffff !important;
-  border-color: #333333 !important;
-  background-color: #1e1e1e !important;
-}
-
-[data-theme="light"] .table tfoot tr,
-[data-theme="light"] .table-striped tfoot tr {
-  background-color: inherit !important;
-}
-
-[data-theme="light"] .table tfoot td,
-[data-theme="light"] .table-striped tfoot td {
-  background-color: inherit !important;
-}
-
 /* Ay Seçimi Stilleri */
 [data-theme="dark"] .bg-light {
     background-color: #1e1e1e !important;
@@ -1398,4 +1338,37 @@ h6 {
 #prevMonth:hover,
 #nextMonth:hover {
     transform: scale(1.1);
+}
+
+/* Tablo footer stilleri */
+.table tfoot tr {
+    background-color: inherit !important;
+}
+
+.table-striped tfoot tr {
+    background-color: inherit !important;
+}
+
+[data-theme="dark"] .table tfoot tr,
+[data-theme="dark"] .table-striped tfoot tr,
+[data-theme="dark"] .table tbody tr:nth-of-type(odd) tfoot tr,
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) tfoot tr {
+    background-color: #1e1e1e !important;
+}
+
+[data-theme="dark"] .table tfoot td,
+[data-theme="dark"] .table-striped tfoot td {
+    color: #ffffff !important;
+    border-color: #333333 !important;
+    background-color: #1e1e1e !important;
+}
+
+[data-theme="light"] .table tfoot tr,
+[data-theme="light"] .table-striped tfoot tr {
+    background-color: inherit !important;
+}
+
+[data-theme="light"] .table tfoot td,
+[data-theme="light"] .table-striped tfoot td {
+    background-color: inherit !important;
 }
