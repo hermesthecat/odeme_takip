@@ -79,7 +79,7 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
                         <option value="12" ${existingPayment?.frequency === '12' ? 'selected' : ''}>📅 Yıllık</option>
                     </select>
                 </div>
-                <div class="mb-3" style="display: ${existingPayment?.frequency === '0' ? 'none' : 'block'}">
+                <div class="mb-3" style="display: ${existingPayment?.frequency !== '0' && existingPayment ? 'block' : 'none'}">
                     <label for="repeatCount" class="form-label d-flex align-items-center">
                         <i class="bi bi-123 me-2 text-primary"></i>Tekrar Sayısı
                     </label>
