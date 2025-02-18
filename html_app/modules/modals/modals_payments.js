@@ -68,7 +68,7 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
                     <label for="frequency" class="form-label d-flex align-items-center">
                         <i class="bi bi-arrow-repeat me-2 text-secondary"></i>Tekrarlama Sıklığı
                     </label>
-                    <select class="form-select form-select-lg shadow-sm" id="frequency" required>
+                    <select class="form-select form-select-lg shadow-sm" id="frequency" required onchange="document.getElementById('repeatCount').parentElement.style.display = this.value === '0' ? 'none' : 'block'">
                         <option value="0" ${existingPayment?.frequency === '0' ? 'selected' : ''}>🔄 Tekrar Yok</option>
                         <option value="1" ${existingPayment?.frequency === '1' ? 'selected' : ''}>📅 Her Ay</option>
                         <option value="2" ${existingPayment?.frequency === '2' ? 'selected' : ''}>📅 2 Ayda Bir</option>
@@ -78,6 +78,14 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
                         <option value="6" ${existingPayment?.frequency === '6' ? 'selected' : ''}>📅 6 Ayda Bir</option>
                         <option value="12" ${existingPayment?.frequency === '12' ? 'selected' : ''}>📅 Yıllık</option>
                     </select>
+                </div>
+                <div class="mb-3" style="display: ${existingPayment?.frequency === '0' ? 'none' : 'block'}">
+                    <label for="repeatCount" class="form-label d-flex align-items-center">
+                        <i class="bi bi-123 me-2 text-primary"></i>Tekrar Sayısı
+                    </label>
+                    <input type="number" class="form-control form-control-lg shadow-sm" id="repeatCount" 
+                           value="${existingPayment?.repeatCount || ''}" min="1" max="120"
+                           placeholder="Boş bırakılırsa sonsuz tekrar eder">
                 </div>
             </form>
         `,
@@ -109,7 +117,8 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
                 currency: document.getElementById('currency').value,
                 category: document.getElementById('category').value,
                 firstPaymentDate: document.getElementById('firstPaymentDate').value,
-                frequency: document.getElementById('frequency').value
+                frequency: document.getElementById('frequency').value,
+                repeatCount: document.getElementById('repeatCount').value ? parseInt(document.getElementById('repeatCount').value) : null
             };
 
             if (!payment.name || isNaN(payment.amount) || !payment.firstPaymentDate || !payment.category) {

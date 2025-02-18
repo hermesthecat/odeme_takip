@@ -54,6 +54,7 @@ export function calculateMonthlyBalance(year, month) {
         } else {
             // Tekrarlı ödeme
             let currentDate = new Date(firstDate);
+            let repeatCounter = 0;
 
             // İlk tarihi ayın başına getir
             while (currentDate > startDate) {
@@ -63,11 +64,15 @@ export function calculateMonthlyBalance(year, month) {
             // Sonraki ödeme tarihini bul
             while (currentDate <= startDate) {
                 currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+                repeatCounter++;
             }
 
-            // Eğer bu ay içindeyse ekle
-            if (currentDate <= endDate) {
-                totalExpense += convertToTRY(payment.amount, payment.currency);
+            // Tekrar sayısı kontrolü
+            if (payment.repeatCount === null || repeatCounter <= payment.repeatCount) {
+                // Eğer bu ay içindeyse ekle
+                if (currentDate <= endDate) {
+                    totalExpense += convertToTRY(payment.amount, payment.currency);
+                }
             }
         }
     });

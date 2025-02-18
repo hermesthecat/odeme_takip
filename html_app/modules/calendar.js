@@ -12,8 +12,14 @@ function createCalendarEvents(payments) {
     // Ödemeleri ekle
     payments.forEach(payment => {
         let currentDate = new Date(payment.firstPaymentDate);
+        let repeatCounter = 0;
 
         while (currentDate <= sixMonthsLater) {
+            // Tekrar sayısı kontrolü
+            if (payment.repeatCount !== null && repeatCounter >= payment.repeatCount) {
+                break;
+            }
+
             events.push({
                 title: `${payment.name} - ${payment.amount} ${payment.currency}`,
                 start: currentDate.toISOString().split('T')[0],
@@ -23,7 +29,9 @@ function createCalendarEvents(payments) {
                     type: 'payment',
                     amount: payment.amount,
                     currency: payment.currency,
-                    frequency: payment.frequency
+                    frequency: payment.frequency,
+                    repeatCount: payment.repeatCount,
+                    currentRepeat: repeatCounter + 1
                 }
             });
 
@@ -32,6 +40,7 @@ function createCalendarEvents(payments) {
             const nextDate = new Date(currentDate);
             nextDate.setMonth(nextDate.getMonth() + parseInt(payment.frequency));
             currentDate = nextDate;
+            repeatCounter++;
         }
     });
 
@@ -39,8 +48,14 @@ function createCalendarEvents(payments) {
     const incomes = loadIncomes();
     incomes.forEach(income => {
         let currentDate = new Date(income.firstIncomeDate);
+        let repeatCounter = 0;
 
         while (currentDate <= sixMonthsLater) {
+            // Tekrar sayısı kontrolü
+            if (income.repeatCount !== null && repeatCounter >= income.repeatCount) {
+                break;
+            }
+
             events.push({
                 title: `${income.name} - ${income.amount} ${income.currency}`,
                 start: currentDate.toISOString().split('T')[0],
@@ -50,7 +65,9 @@ function createCalendarEvents(payments) {
                     type: 'income',
                     amount: income.amount,
                     currency: income.currency,
-                    frequency: income.frequency
+                    frequency: income.frequency,
+                    repeatCount: income.repeatCount,
+                    currentRepeat: repeatCounter + 1
                 }
             });
 
@@ -59,6 +76,7 @@ function createCalendarEvents(payments) {
             const nextDate = new Date(currentDate);
             nextDate.setMonth(nextDate.getMonth() + parseInt(income.frequency));
             currentDate = nextDate;
+            repeatCounter++;
         }
     });
 
@@ -113,7 +131,13 @@ export function updateCalendar() {
                                 <i class="bi bi-arrow-repeat text-warning"></i>
                                 <div class="detail-content">
                                     <span class="detail-label">Tekrarlama Sıklığı</span>
-                                    <span class="detail-value">${getFrequencyText(info.event.extendedProps.frequency)}</span>
+                                    <span class="detail-value">${getFrequencyText(info.event.extendedProps.frequency)}${
+                                        info.event.extendedProps.frequency !== '0' ? 
+                                        (info.event.extendedProps.repeatCount ? 
+                                            ` (${info.event.extendedProps.currentRepeat}/${info.event.extendedProps.repeatCount} tekrar)` : 
+                                            ' (Sonsuz)') : 
+                                        ''
+                                    }</span>
                                 </div>
                             </div>
                         </div>

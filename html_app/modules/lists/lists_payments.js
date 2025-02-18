@@ -28,15 +28,33 @@ export function updatePaymentList() {
 
     payments.forEach((payment, index) => {
         try {
-            const nextPaymentDate = calculateNextPaymentDate(payment.firstPaymentDate, payment.frequency);
+            const nextPaymentDate = calculateNextPaymentDate(payment.firstPaymentDate, payment.frequency, payment.repeatCount);
+            const frequencyText = getFrequencyText(payment.frequency);
+            const repeatText = payment.frequency !== '0' ? 
+                             (payment.repeatCount ? ` (${payment.repeatCount} tekrar)` : ' (Sonsuz)') : '';
+
+            // Mevcut tekrar sayısını hesapla
+            let currentRepeat = 0;
+            if (payment.frequency !== '0') {
+                const today = new Date();
+                let currentDate = new Date(payment.firstPaymentDate);
+                while (currentDate <= today) {
+                    currentRepeat++;
+                    currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+                }
+            }
+
+            // Tekrar bilgisi metni
+            const repeatCountText = payment.repeatCount && currentRepeat > 0 ? 
+                                  ` <span class="badge bg-info">${currentRepeat}/${payment.repeatCount}</span>` : '';
 
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${payment.name || '-'}</td>
+                <td>${payment.name || '-'}${repeatCountText}</td>
                 <td>${payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
                 <td>${payment.currency || '-'}</td>
                 <td>${formatDate(payment.firstPaymentDate)}</td>
-                <td>${getFrequencyText(payment.frequency)}</td>
+                <td>${frequencyText}${repeatText}</td>
                 <td>${formatDate(nextPaymentDate)}</td>
                 <td>
                     <button class="btn btn-primary btn-sm me-1" data-action="update-payment" data-index="${index}">

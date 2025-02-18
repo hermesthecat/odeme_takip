@@ -3,15 +3,35 @@ import { loadIncomes, loadPayments, loadSavings, loadBudgetGoals, saveIncomes, s
 import { THEME_KEY } from './theme.js';
 
 // Sonraki ödeme tarihini hesaplama
-export function calculateNextPaymentDate(firstPaymentDate, frequency) {
+export function calculateNextPaymentDate(firstPaymentDate, frequency, repeatCount = null) {
     const firstDate = new Date(firstPaymentDate);
     const today = new Date();
 
     if (frequency === '0') return firstDate;
 
     let nextDate = new Date(firstDate);
+    let repeatCounter = 0;
+
     while (nextDate <= today) {
         nextDate.setMonth(nextDate.getMonth() + parseInt(frequency));
+        repeatCounter++;
+        
+        // Tekrar sayısı dolmuşsa son tarihi döndür
+        if (repeatCount !== null && repeatCounter >= repeatCount) {
+            return nextDate;
+        }
+    }
+
+    // Tekrar sayısı kontrolü
+    if (repeatCount !== null) {
+        const futureDate = new Date(firstDate);
+        const totalMonths = (repeatCount - 1) * parseInt(frequency);
+        futureDate.setMonth(futureDate.getMonth() + totalMonths);
+        
+        // Eğer sonraki tarih, son tekrar tarihinden sonraysa
+        if (nextDate > futureDate) {
+            return futureDate;
+        }
     }
 
     return nextDate;
