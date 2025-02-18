@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
         calculations.updateSummaryCards(selectedYear, selectedMonth);
         charts.updateCharts(undefined, selectedYear, selectedMonth);
         lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
+        calendar.updateCalendar(selectedYear, selectedMonth);
     }
 
     // Tooltip'leri aktif et

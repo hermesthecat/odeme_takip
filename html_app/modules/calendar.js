@@ -84,7 +84,7 @@ function createCalendarEvents(payments) {
 }
 
 // Takvimi güncelle
-export function updateCalendar() {
+export function updateCalendar(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     const calendarEl = document.getElementById('calendar');
     if (!calendarEl) return;
 
@@ -95,6 +95,7 @@ export function updateCalendar() {
         const calendar = new FullCalendar.Calendar(calendarEl, {
             locale: 'tr',
             initialView: 'dayGridMonth',
+            initialDate: new Date(selectedYear, selectedMonth, 1),
             headerToolbar: {
                 left: 'prev,next today',
                 center: 'title',
@@ -157,5 +158,6 @@ export function updateCalendar() {
     } else {
         calendarEl.fullCalendar.removeAllEvents();
         calendarEl.fullCalendar.addEventSource(events);
+        calendarEl.fullCalendar.gotoDate(new Date(selectedYear, selectedMonth, 1));
     }
 } 
