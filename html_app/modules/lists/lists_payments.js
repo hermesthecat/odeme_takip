@@ -159,7 +159,23 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
 export function updatePayment(index) {
     const payments = loadPayments();
     const payment = payments[index];
-    showAddPaymentModal(payment, index);
+    showAddPaymentModal(payment, index).then(() => {
+        // Seçili ay ve yılı al
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        
+        if (monthSelect && yearSelect) {
+            const selectedMonth = parseInt(monthSelect.value);
+            const selectedYear = parseInt(yearSelect.value);
+            
+            // Tüm listeleri güncelle
+            updatePaymentList(selectedYear, selectedMonth);
+            
+            // Diğer ilgili güncellemeleri de yap
+            const event = new Event('change');
+            monthSelect.dispatchEvent(event);
+        }
+    });
 }
 
 // Ödeme silme

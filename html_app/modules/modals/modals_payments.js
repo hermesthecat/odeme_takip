@@ -17,7 +17,7 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
         `<option value="${category.name}" ${existingPayment?.category === category.name ? 'selected' : ''}>${category.name}</option>`
     ).join('');
 
-    Swal.fire({
+    return Swal.fire({
         title: `<i class="bi bi-credit-card-fill text-danger me-2"></i>${modalTitle}`,
         html: `
             <form id="paymentModalForm" class="needs-validation">
@@ -138,7 +138,7 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
             }
             
             if (savePayments(payments)) {
-                Swal.fire({
+                return Swal.fire({
                     icon: 'success',
                     title: 'Başarılı!',
                     text: `Ödeme başarıyla ${editIndex >= 0 ? 'güncellendi' : 'kaydedildi'}!`,
@@ -147,16 +147,10 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
                     customClass: {
                         popup: 'shadow border-0'
                     }
-                }).then(() => {
-                    // Tüm gerekli güncellemeleri yap
-                    updatePaymentList();
-                    updateSummaryCards();
-                    updateCharts();
-                    updateCalendar();
-                    updateBudgetGoalsDisplay();
                 });
             }
         }
+        return Promise.reject();
     });
 
     // Yeni ödeme eklerken bugünün tarihini varsayılan olarak ayarla
