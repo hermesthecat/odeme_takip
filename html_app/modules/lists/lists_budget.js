@@ -98,7 +98,12 @@ export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), 
 export function updateBudgetGoalsDisplay(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     const goals = loadBudgetGoals();
     const currentExpenses = calculateMonthlyBalance(selectedYear, selectedMonth).expense;
-    const monthlyLimitProgress = (currentExpenses / goals.monthlyExpenseLimit) * 100;
+    
+    // Seçili ayın limitini al
+    const monthKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
+    const monthlyLimit = goals.monthlyLimits[monthKey] || 0;
+    
+    const monthlyLimitProgress = monthlyLimit > 0 ? (currentExpenses / monthlyLimit) * 100 : 0;
     const categoryExpenses = calculateCategoryExpenses(selectedYear, selectedMonth);
 
     // Aylık limit progress barını güncelle
@@ -119,7 +124,7 @@ export function updateBudgetGoalsDisplay(selectedYear = new Date().getFullYear()
 
     const monthlyLimitText = document.getElementById('monthlyLimitText');
     if (monthlyLimitText) {
-        monthlyLimitText.textContent = `Limit: ${formatMoney(goals.monthlyExpenseLimit)}`;
+        monthlyLimitText.textContent = `Limit: ${formatMoney(monthlyLimit)}`;
     }
 
     // Kategori hedeflerini listele

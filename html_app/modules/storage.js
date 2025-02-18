@@ -103,14 +103,43 @@ export function saveSavings(savings) {
 export function loadBudgetGoals() {
     try {
         const goals = localStorage.getItem(BUDGET_GOALS_KEY);
-        return goals ? JSON.parse(goals) : {
-            monthlyExpenseLimit: 0,
+        const defaultGoals = {
+            monthlyLimits: {},  // Her ay için ayrı limit
             categories: []
+        };
+        
+        if (!goals) return defaultGoals;
+        
+        const parsedGoals = JSON.parse(goals);
+        
+        // Eski yapıdan yeni yapıya geçiş için kontrol
+        if (parsedGoals.monthlyExpenseLimit !== undefined) {
+            // Eski yapıdaki limiti tüm aylar için varsayılan olarak ata
+            const oldLimit = parsedGoals.monthlyExpenseLimit;
+            parsedGoals.monthlyLimits = {};
+            
+            // Şu anki yıl için tüm aylara eski limiti ata
+            const currentYear = new Date().getFullYear();
+            for (let month = 0; month < 12; month++) {
+                const monthKey = `${currentYear}-${String(month + 1).padStart(2, '0')}`;
+                parsedGoals.monthlyLimits[monthKey] = oldLimit;
+            }
+            
+            // Eski alanı sil
+            delete parsedGoals.monthlyExpenseLimit;
+            
+            // Yeni yapıyı kaydet
+            localStorage.setItem(BUDGET_GOALS_KEY, JSON.stringify(parsedGoals));
+        }
+        
+        return {
+            ...defaultGoals,
+            ...parsedGoals
         };
     } catch (error) {
         console.error('Bütçe hedefleri yüklenirken hata:', error);
         return {
-            monthlyExpenseLimit: 0,
+            monthlyLimits: {},
             categories: []
         };
     }

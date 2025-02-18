@@ -7,11 +7,29 @@ import { updateSummaryCards } from '../calculations.js';
 // Bütçe hedefi güncelleme modalını göster
 export function showUpdateBudgetGoalModal() {
     const goals = loadBudgetGoals();
+    
+    // Seçili ay ve yılı al
+    const monthSelect = document.getElementById('monthSelect');
+    const yearSelect = document.getElementById('yearSelect');
+    const selectedMonth = parseInt(monthSelect.value) + 1;
+    const selectedYear = parseInt(yearSelect.value);
+    
+    // Ay-yıl anahtarını oluştur
+    const monthKey = `${selectedYear}-${String(selectedMonth).padStart(2, '0')}`;
+    
+    // Seçili ayın limitini al
+    const currentLimit = goals.monthlyLimits[monthKey] || 0;
+    
+    // Seçili ayın adını al
+    const monthName = new Date(selectedYear, selectedMonth - 1).toLocaleString('tr-TR', { month: 'long', year: 'numeric' });
 
     Swal.fire({
         title: '<i class="bi bi-graph-up-arrow text-primary me-2"></i>Aylık Bütçe Hedefi',
         html: `
             <form id="budgetGoalForm" class="needs-validation">
+                <div class="mb-3">
+                    <h5 class="text-center text-primary mb-3">${monthName}</h5>
+                </div>
                 <div class="mb-3 position-relative">
                     <label for="monthlyLimit" class="form-label d-flex align-items-center">
                         <i class="bi bi-wallet-fill me-2 text-success"></i>Aylık Harcama Limiti
@@ -19,7 +37,7 @@ export function showUpdateBudgetGoalModal() {
                     <div class="input-group input-group-lg">
                         <span class="input-group-text">₺</span>
                         <input type="number" class="form-control form-control-lg shadow-sm" 
-                               id="monthlyLimit" value="${goals.monthlyExpenseLimit}" 
+                               id="monthlyLimit" value="${currentLimit}" 
                                min="0" step="100" placeholder="0.00" required>
                     </div>
                 </div>
@@ -57,7 +75,9 @@ export function showUpdateBudgetGoalModal() {
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            goals.monthlyExpenseLimit = result.value;
+            // Seçili ay için limiti güncelle
+            goals.monthlyLimits[monthKey] = result.value;
+            
             if (saveBudgetGoals(goals)) {
                 Swal.fire({
                     icon: 'success',
@@ -66,8 +86,8 @@ export function showUpdateBudgetGoalModal() {
                     timer: 1500,
                     showConfirmButton: false
                 }).then(() => {
-                    updateBudgetGoalsDisplay();
-                    updateSummaryCards();
+                    updateBudgetGoalsDisplay(selectedYear, selectedMonth - 1);
+                    updateSummaryCards(selectedYear, selectedMonth - 1);
                 });
             }
         }
