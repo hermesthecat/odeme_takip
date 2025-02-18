@@ -8,190 +8,172 @@ window.incomeExpenseChart = null;
 window.savingsChart = null;
 
 // Grafikleri güncelle
-export function updateCharts(period = 'month') {
-    updateIncomeExpenseChart(period);
+export function updateCharts(period = 'month', selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
+    updateIncomeExpenseChart(period, selectedYear, selectedMonth);
     updateSavingsChart();
 }
 
-// Gelir-Gider grafiğini güncelle
-function updateIncomeExpenseChart(period) {
+// Gelir-Gider dağılımı grafiğini güncelle
+function updateIncomeExpenseChart(period, selectedYear, selectedMonth) {
     const ctx = document.getElementById('incomeExpenseChart');
     if (!ctx) return;
 
-    let labels, incomeData, expenseData;
-
-    if (period === 'month') {
-        // Son 6 ayın verilerini al
-        const months = [];
-        const incomes = [];
-        const expenses = [];
-
-        for (let i = 5; i >= 0; i--) {
-            const date = new Date();
-            date.setMonth(date.getMonth() - i);
-            const monthYear = new Intl.DateTimeFormat('tr-TR', { month: 'long', year: 'numeric' }).format(date);
-            months.push(monthYear);
-
-            const balance = calculateMonthlyBalance(date.getFullYear(), date.getMonth());
-            incomes.push(balance.income);
-            expenses.push(balance.expense);
-        }
-
-        labels = months;
-        incomeData = incomes;
-        expenseData = expenses;
-    } else {
-        // Yıllık verileri al (son 3 yıl)
-        const years = [];
-        const incomes = [];
-        const expenses = [];
-
-        for (let i = 2; i >= 0; i--) {
-            const year = new Date().getFullYear() - i;
-            years.push(year.toString());
-
-            let yearlyIncome = 0;
-            let yearlyExpense = 0;
-
-            for (let month = 0; month < 12; month++) {
-                const balance = calculateMonthlyBalance(year, month);
-                yearlyIncome += balance.income;
-                yearlyExpense += balance.expense;
-            }
-
-            incomes.push(yearlyIncome);
-            expenses.push(yearlyExpense);
-        }
-
-        labels = years;
-        incomeData = incomes;
-        expenseData = expenses;
+    // Mevcut grafiği temizle
+    if (window.incomeExpenseChart) {
+        window.incomeExpenseChart.destroy();
     }
 
-    // Eğer grafik zaten varsa güncelle, yoksa oluştur
-    if (window.incomeExpenseChart) {
-        window.incomeExpenseChart.data.labels = labels;
-        window.incomeExpenseChart.data.datasets[0].data = incomeData;
-        window.incomeExpenseChart.data.datasets[1].data = expenseData;
-        window.incomeExpenseChart.update();
+    let labels, incomeData, expenseData;
+
+    if (period === 'year') {
+        // Yıllık görünüm için tüm ayların verilerini al
+        labels = Array.from({ length: 12 }, (_, i) =>
+            new Date(selectedYear, i).toLocaleString('tr-TR', { month: 'long' })
+        );
+
+        incomeData = Array.from({ length: 12 }, (_, i) => {
+            const balance = calculateMonthlyBalance(selectedYear, i);
+            return balance.income;
+        });
+
+        expenseData = Array.from({ length: 12 }, (_, i) => {
+            const balance = calculateMonthlyBalance(selectedYear, i);
+            return balance.expense;
+        });
     } else {
-        window.incomeExpenseChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Gelir',
-                        data: incomeData,
-                        backgroundColor: 'rgba(40, 167, 69, 0.5)',
-                        borderColor: 'rgb(40, 167, 69)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Gider',
-                        data: expenseData,
-                        backgroundColor: 'rgba(220, 53, 69, 0.5)',
-                        borderColor: 'rgb(220, 53, 69)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function (value) {
-                                return formatMoney(value);
-                            }
+        // Aylık görünüm için seçili ayın verilerini al
+        const balance = calculateMonthlyBalance(selectedYear, selectedMonth);
+        const monthName = new Date(selectedYear, selectedMonth).toLocaleString('tr-TR', { month: 'long', year: 'numeric' });
+
+        labels = [monthName];
+        incomeData = [balance.income];
+        expenseData = [balance.expense];
+    }
+
+    // Yeni grafiği oluştur
+    window.incomeExpenseChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Gelir',
+                    data: incomeData,
+                    backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                    borderColor: 'rgb(40, 167, 69)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Gider',
+                    data: expenseData,
+                    backgroundColor: 'rgba(220, 53, 69, 0.5)',
+                    borderColor: 'rgb(220, 53, 69)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: period === 'year' ? `${selectedYear} Yılı Gelir-Gider Dağılımı` : `${labels[0]} Gelir-Gider Dağılımı`
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.dataset.label}: ${formatMoney(context.raw)}`;
                         }
                     }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return context.dataset.label + ': ' + formatMoney(context.raw);
-                            }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return formatMoney(value);
                         }
                     }
                 }
             }
-        });
+        }
+    });
+
+    // Grafik başlığını güncelle
+    const chartTitle = document.querySelector('.chart-card .card-title');
+    if (chartTitle) {
+        chartTitle.textContent = period === 'year' ?
+            `${selectedYear} Yılı Gelir-Gider Dağılımı` :
+            `${labels[0]} Gelir-Gider Dağılımı`;
     }
 }
 
-// Birikim grafiğini güncelle
+// Birikim hedefleri grafiğini güncelle
 function updateSavingsChart() {
     const ctx = document.getElementById('savingsChart');
     if (!ctx) return;
 
-    const savings = loadSavings();
-    const labels = [];
-    const currentData = [];
-    const targetData = [];
-
-    savings.forEach(saving => {
-        labels.push(saving.name);
-        currentData.push(convertToTRY(saving.currentAmount, saving.currency));
-        targetData.push(convertToTRY(saving.targetAmount, saving.currency));
-    });
-
-    // Eğer grafik zaten varsa güncelle, yoksa oluştur
+    // Mevcut grafiği temizle
     if (window.savingsChart) {
-        window.savingsChart.data.labels = labels;
-        window.savingsChart.data.datasets[0].data = currentData;
-        window.savingsChart.data.datasets[1].data = targetData;
-        window.savingsChart.update();
-    } else {
-        window.savingsChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Mevcut Tutar',
-                        data: currentData,
-                        backgroundColor: 'rgba(13, 110, 253, 0.5)',
-                        borderColor: 'rgb(13, 110, 253)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Hedef Tutar',
-                        data: targetData,
-                        backgroundColor: 'rgba(108, 117, 125, 0.5)',
-                        borderColor: 'rgb(108, 117, 125)',
-                        borderWidth: 1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function (value) {
-                                return formatMoney(value);
-                            }
+        window.savingsChart.destroy();
+    }
+
+    const savings = loadSavings();
+    const labels = savings.map(saving => saving.name);
+    const targetData = savings.map(saving => saving.targetAmount);
+    const currentData = savings.map(saving => saving.currentAmount);
+
+    window.savingsChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Hedef',
+                    data: targetData,
+                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                    borderColor: 'rgb(0, 123, 255)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Mevcut',
+                    data: currentData,
+                    backgroundColor: 'rgba(40, 167, 69, 0.5)',
+                    borderColor: 'rgb(40, 167, 69)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Birikim Hedefleri'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.dataset.label}: ${formatMoney(context.raw)}`;
                         }
                     }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function (context) {
-                                return context.dataset.label + ': ' + formatMoney(context.raw);
-                            }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return formatMoney(value);
                         }
                     }
                 }
             }
-        });
-    }
+        }
+    });
 }
 
 // Grafik değişkenlerini dışa aktar
