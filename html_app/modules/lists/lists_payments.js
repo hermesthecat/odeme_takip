@@ -76,12 +76,22 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${payment.name || '-'}${repeatCountText}</td>
-                    <td>${payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
-                    <td>${payment.currency || '-'}</td>
-                    <td>${formatDate(payment.firstPaymentDate)}</td>
-                    <td>${frequencyText}${repeatText}</td>
-                    <td>${formatDate(nextPaymentDate)}</td>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <button class="btn ${payment.isPaid ? 'btn-success' : 'btn-outline-success'} btn-sm me-2" 
+                                    data-action="toggle-payment" data-index="${index}" 
+                                    title="${payment.isPaid ? 'Ödendi' : 'Ödenmedi'}">
+                                <i class="bi bi-check-circle${payment.isPaid ? '-fill' : ''}"></i>
+                            </button>
+                            <span class="${payment.isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.name || '-'}</span>
+                            ${repeatCountText}
+                        </div>
+                    </td>
+                    <td class="${payment.isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
+                    <td class="${payment.isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.currency || '-'}</td>
+                    <td class="${payment.isPaid ? 'text-decoration-line-through text-muted' : ''}">${formatDate(payment.firstPaymentDate)}</td>
+                    <td class="${payment.isPaid ? 'text-decoration-line-through text-muted' : ''}">${frequencyText}${repeatText}</td>
+                    <td class="${payment.isPaid ? 'text-decoration-line-through text-muted' : ''}">${formatDate(nextPaymentDate)}</td>
                     <td>
                         <button class="btn btn-primary btn-sm me-1" data-action="update-payment" data-index="${index}">
                             <i class="bi bi-pencil"></i>
@@ -141,6 +151,32 @@ export function deletePayment(index) {
     });
 }
 
+// Ödeme durumunu değiştir
+function togglePaymentStatus(index) {
+    const payments = loadPayments();
+    const payment = payments[index];
+    
+    // isPaid özelliğini tersine çevir (toggle)
+    payment.isPaid = !payment.isPaid;
+    
+    if (savePayments(payments)) {
+        // Başarılı mesajı göster
+        const message = payment.isPaid ? 'Ödeme yapıldı olarak işaretlendi!' : 'Ödeme yapılmadı olarak işaretlendi!';
+        const icon = payment.isPaid ? 'success' : 'info';
+        
+        Swal.fire({
+            icon: icon,
+            title: 'Başarılı!',
+            text: message,
+            showConfirmButton: false,
+            timer: 1500
+        }).then(() => {
+            // Sadece ödeme listesini güncelle
+            updatePaymentList();
+        });
+    }
+}
+
 // Ödeme işlemlerini yönet
 function handlePaymentAction(e) {
     const action = e.target.closest('button').dataset.action;
@@ -152,6 +188,9 @@ function handlePaymentAction(e) {
             break;
         case 'delete-payment':
             deletePayment(index);
+            break;
+        case 'toggle-payment':
+            togglePaymentStatus(index);
             break;
     }
 } 
