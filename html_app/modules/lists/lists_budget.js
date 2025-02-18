@@ -75,15 +75,23 @@ export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), 
     });
 
     // Toplamları güncelle
-    const totalBurdenElement = document.getElementById('totalPaymentBurden');
-    if (totalBurdenElement) {
-        totalBurdenElement.textContent = formatMoney(totalBurden);
+    const table = tbody.closest('table');
+    let tfoot = table.querySelector('tfoot');
+    
+    // Eğer tfoot yoksa oluştur
+    if (!tfoot) {
+        tfoot = document.createElement('tfoot');
+        table.appendChild(tfoot);
     }
-
-    const averageMonthlyBurdenElement = document.getElementById('averageMonthlyBurden');
-    if (averageMonthlyBurdenElement) {
-        averageMonthlyBurdenElement.textContent = formatMoney(totalBurden / totalMonths);
-    }
+    
+    // Toplam satırını güncelle
+    tfoot.innerHTML = `
+        <tr>
+            <td colspan="5"><strong>Toplam Ödeme Yükü</strong></td>
+            <td><strong>${formatMoney(totalBurden)}</strong></td>
+            <td><strong>${formatMoney(totalBurden / totalMonths)}</strong></td>
+        </tr>
+    `;
 }
 
 // Bütçe hedeflerini görüntüle
