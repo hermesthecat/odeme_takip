@@ -44,6 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
+    // Bütçe hedefleri butonları için event listener'ları ekle
+    document.querySelector('button[data-action="update-monthly-limit"]')?.addEventListener('click', () => {
+        modals.showUpdateBudgetGoalModal();
+    });
+
+    document.querySelector('button[data-action="add-category-goal"]')?.addEventListener('click', () => {
+        modals.showAddCategoryGoalModal();
+    });
+
     // Tema değiştirme butonunu ekle
     const navButtons = document.querySelector('.d-flex.justify-content-between div');
     if (navButtons) {
