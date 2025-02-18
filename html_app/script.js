@@ -80,7 +80,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     modals.showAddSavingModal();
                     break;
                 case 'payment':
-                    modals.showAddPaymentModal();
+                    // Kategorileri kontrol et
+                    const goals = storage.loadBudgetGoals();
+                    if (!goals.categories || goals.categories.length === 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Kategori Gerekli!',
+                            text: 'Ödeme ekleyebilmek için önce en az bir kategori eklemelisiniz.',
+                            confirmButtonText: 'Kategori Ekle',
+                            showCancelButton: true,
+                            cancelButtonText: 'İptal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                modals.showAddCategoryGoalModal();
+                            }
+                        });
+                    } else {
+                        modals.showAddPaymentModal();
+                    }
                     break;
             }
         });
