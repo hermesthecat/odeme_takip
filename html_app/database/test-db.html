@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,15 +12,18 @@
             padding: 20px;
             line-height: 1.6;
         }
+
         .container {
             max-width: 800px;
             margin: 0 auto;
         }
+
         .header {
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid #eee;
         }
+
         .test-group {
             margin-bottom: 30px;
             padding: 20px;
@@ -27,23 +31,28 @@
             border: 1px solid #dee2e6;
             border-radius: 4px;
         }
+
         .test-item {
             margin-bottom: 10px;
             padding: 10px;
             border-left: 3px solid transparent;
         }
+
         .test-item.running {
             border-left-color: #007bff;
             background: #f8f9ff;
         }
+
         .test-item.success {
             border-left-color: #28a745;
             background: #f8fff8;
         }
+
         .test-item.error {
             border-left-color: #dc3545;
             background: #fff8f8;
         }
+
         .button {
             background: #007bff;
             color: white;
@@ -52,13 +61,16 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         .button:hover {
             background: #0056b3;
         }
+
         .button:disabled {
             background: #ccc;
             cursor: not-allowed;
         }
+
         .log {
             background: #272822;
             color: #f8f8f2;
@@ -70,6 +82,7 @@
             overflow-y: auto;
             white-space: pre;
         }
+
         .help {
             margin-top: 20px;
             padding: 15px;
@@ -78,6 +91,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -123,10 +137,10 @@
 
         function addLogMessage(message, type = 'info') {
             const timestamp = new Date().toLocaleTimeString();
-            const color = type === 'error' ? '#ff6b6b' : 
-                         type === 'success' ? '#51cf66' : 
-                         '#339af0';
-            
+            const color = type === 'error' ? '#ff6b6b' :
+                type === 'success' ? '#51cf66' :
+                    '#339af0';
+
             log.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
             log.scrollTop = log.scrollHeight;
         }
@@ -134,7 +148,7 @@
         function updateTestItem(groupId, testName, status, message = '') {
             const group = document.getElementById(groupId);
             let item = group.querySelector(`[data-test="${testName}"]`);
-            
+
             if (!item) {
                 item = document.createElement('div');
                 item.className = 'test-item';
@@ -152,7 +166,7 @@
 
         async function runBasicTests() {
             const basicTests = document.getElementById('basicTests');
-            
+
             addLogMessage('Temel testler başlatılıyor...');
 
             try {
@@ -164,7 +178,7 @@
                     addLogMessage(`${test.name}: ${test.message}`, test.status);
                 });
 
-                addLogMessage(`data.success: ${data.success}`);
+                addLogMessage(`data: ${JSON.stringify(data)}`);
 
                 if (data.success) {
                     addLogMessage('Temel testler başarıyla tamamlandı!', 'success');
@@ -184,7 +198,7 @@
 
         async function runBudgetTests() {
             const transactionButton = document.querySelector('button[onclick="runTransactionTests"]');
-            
+
             addLogMessage('Bütçe testleri başlatılıyor...');
 
             try {
@@ -240,17 +254,7 @@
                 updateTestItem('transactionTests', 'system', 'error', error.message);
             }
         }
-
-        // Add initial log message and run tests after DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            addLogMessage('Test sistemi hazır. Lütfen temel testleri başlatın.');
-            const budgetButton = document.querySelector('button[onclick="runBudgetTests"]');
-            runBasicTests().then(() => {
-                if (budgetButton) {
-                    budgetButton.disabled = false;
-                }
-            });
-        });
     </script>
 </body>
+
 </html>
