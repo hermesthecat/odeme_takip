@@ -209,7 +209,12 @@ function transferUnpaidPayments() {
             loadData();
             nextMonth();
         } else {
-            alert('Hata: ' + response.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata',
+                text: response.message,
+                timer: 1500
+            });
         }
     });
 }

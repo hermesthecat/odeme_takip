@@ -20,7 +20,7 @@ function loadData() {
         if (response.status === 'success') {
             // Global data değişkenini set et
             window.data = response.data;
-            
+
             // Özet bilgileri güncelle
             updateSummary(response.data);
             $('#summaryLoadingSpinner').hide();
@@ -36,6 +36,13 @@ function loadData() {
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.error('AJAX hatası:', textStatus, errorThrown);
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata',
+            text: 'Veri yükleme hatası',
+            showConfirmButton: false,
+            timer: 1500
+        });
         hideAllLoadingSpinners();
     });
 }
