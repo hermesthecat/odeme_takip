@@ -325,7 +325,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         CONCAT(
                             (SELECT COUNT(*) FROM payments p2 
                              WHERE p2.parent_id = p1.id 
-                             AND p2.status = 'pending'
+                             AND p2.status = 'paid'
                              AND p2.user_id = p1.user_id),
                             '/',
                             (SELECT COUNT(*) FROM payments p3 

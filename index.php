@@ -203,7 +203,7 @@ checkLogin();
             <div class="card-header bg-info bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">Ödeme Gücü</h2>
-                    <small class="text-muted">Tekrarlayan ödemelerin yıllık toplamı</small>
+                    <small class="text-muted"></small>
                 </div>
             </div>
             <div class="card-body">
@@ -214,15 +214,14 @@ checkLogin();
                                 <th>Ödeme İsmi</th>
                                 <th>Tutar</th>
                                 <th>Kur</th>
-                                <th>Tekrarlama Sıklığı</th>
-                                <th>Yıllık Tekrar</th>
-                                <th>Yıllık Toplam</th>
+                                <th>Taksit Bilgisi</th>
+                                <th>Toplam</th>
                             </tr>
                         </thead>
                         <tbody id="recurringPaymentsList"></tbody>
                         <tfoot>
                             <tr class="table-info">
-                                <td colspan="5" class="text-end fw-bold">Toplam Yıllık Ödeme:</td>
+                                <td colspan="5" class="text-end fw-bold">Toplam Ödeme:</td>
                                 <td id="totalYearlyPayment" class="fw-bold"></td>
                             </tr>
                         </tfoot>
