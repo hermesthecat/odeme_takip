@@ -242,6 +242,60 @@
     </div>
 </div>
 
+<!-- Gelir Güncelleme Modal -->
+<div class="modal fade" id="updateIncomeModal" tabindex="-1" aria-labelledby="updateIncomeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updateIncomeModalLabel">Gelir Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updateIncomeForm" onsubmit="return false;">
+                    <input type="hidden" id="update_income_id" name="id">
+                    <div class="mb-3">
+                        <label for="update_income_name" class="form-label">Gelir Adı</label>
+                        <input type="text" class="form-control" id="update_income_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update_income_amount" class="form-label">Tutar</label>
+                        <input type="number" step="0.01" class="form-control" id="update_income_amount" name="amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update_income_currency" class="form-label">Para Birimi</label>
+                        <select class="form-select" id="update_income_currency" name="currency" required>
+                            <option value="TRY">TRY</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update_income_first_date" class="form-label">Tarih</label>
+                        <input type="date" class="form-control" id="update_income_first_date" name="first_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update_income_frequency" class="form-label">Tekrarlama Sıklığı</label>
+                        <select class="form-select" id="update_income_frequency" name="frequency" required>
+                            <option value="none">Tekrarlama Yok</option>
+                            <option value="monthly">Aylık</option>
+                            <option value="yearly">Yıllık</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="updateIncomeEndDateGroup" style="display: none;">
+                        <label for="update_income_end_date" class="form-label">Bitiş Tarihi</label>
+                        <input type="date" class="form-control" id="update_income_end_date" name="end_date">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="updateIncome()">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle (Gelirler için)
     document.getElementById('incomeFrequency').addEventListener('change', function() {

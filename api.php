@@ -266,6 +266,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ];
             }
             break;
+
+        case 'update_income':
+            try {
+                if (updateIncome()) {
+                    $response = ['status' => 'success', 'message' => 'Gelir başarıyla güncellendi'];
+                } else {
+                    $response = ['status' => 'error', 'message' => 'Gelir güncellenemedi'];
+                }
+            } catch (Exception $e) {
+                if (isset($pdo) && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
+            }
+            break;
     }
 
     // Response'u güvenli hale getir
