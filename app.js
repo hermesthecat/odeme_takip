@@ -136,7 +136,6 @@ function updateSavingsList(savings) {
                     <div class="progress">
                         <div class="progress-bar" role="progressbar" style="width: ${progress}%" 
                              aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
-                            ${progress.toFixed(1)}%
                         </div>
                     </div>
                 </td>
@@ -223,7 +222,7 @@ function updatePaymentsList(payments) {
             <td colspan="8" class="text-end">
                 <button class="btn btn-warning" onclick="transferUnpaidPayments()">
                     <i class="bi bi-arrow-right-circle me-1"></i>
-                    Ödenmemiş Ödemeleri Sonraki Aya Aktar
+                    Sonraki Aya Aktar
                 </button>
             </td>
         </tr>
