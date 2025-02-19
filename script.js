@@ -22,7 +22,7 @@ window.updateDisplays = async () => {
     const selectedMonth = parseInt(document.getElementById('monthSelect').value);
 
     lists.updatePaymentList(selectedYear, selectedMonth);
-    lists.updateIncomeList(selectedYear, selectedMonth);
+    await lists.updateIncomeList(selectedYear, selectedMonth);
     lists.updateSavingList(selectedYear, selectedMonth);
     lists.updatePaymentPowerList(selectedYear, selectedMonth);
     calculations.updateSummaryCards(selectedYear, selectedMonth);
