@@ -248,7 +248,6 @@ function updateRecurringPaymentsList(recurring_payments) {
                 <td>${payment.amount}</td>
                 <td>${payment.currency}</td>
                 <td>${payment.payment_status}</td>
-                <td>${payment.yearly_repeat_count}x</td>
                 <td>${parseFloat(payment.yearly_total).toFixed(2)} ${payment.currency}</td>
             </tr>
         `);
