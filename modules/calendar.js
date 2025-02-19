@@ -62,21 +62,44 @@ async function createCalendarEvents(payments) {
                     console.log(`Ödeme #${index + 1} için etkinlik oluşturuldu:`, event);
                     events.push(event);
 
-                    if (payment.frequency === '0') {
-                        console.log(`Ödeme #${index + 1} tek seferlik, döngüden çıkılıyor`);
+                    // Tek seferlik ödeme kontrolünü başa al
+                    if (payment.frequency === '0' || !payment.frequency) {
+                        console.log(`Ödeme #${index + 1} tek seferlik veya frekans belirtilmemiş, döngüden çıkılıyor`);
+                        break;
+                    }
+
+                    const frequency = parseInt(payment.frequency);
+                    if (isNaN(frequency) || frequency <= 0) {
+                        console.error(`Ödeme #${index + 1} için geçersiz frekans değeri:`, payment.frequency);
                         break;
                     }
 
                     const nextDate = new Date(currentDate);
-                    nextDate.setMonth(nextDate.getMonth() + parseInt(payment.frequency || '0'));
-                    
-                    if (nextDate <= currentDate) {
-                        console.error(`Ödeme #${index + 1} için geçersiz sonraki tarih:`, nextDate);
+                    nextDate.setMonth(nextDate.getMonth() + frequency);
+
+                    // Geçersiz tarih kontrolü
+                    if (nextDate <= currentDate || isNaN(nextDate.getTime())) {
+                        console.error(`Ödeme #${index + 1} için geçersiz sonraki tarih hesaplandı:`, {
+                            mevcut: currentDate,
+                            sonraki: nextDate,
+                            frekans: frequency
+                        });
                         break;
                     }
 
-                    console.log(`Ödeme #${index + 1} için sonraki tarih:`, nextDate);
-                    currentDate = nextDate;
+                    // Sonsuz döngü kontrolü
+                    if (repeatCounter > 100) {
+                        console.error(`Ödeme #${index + 1} için maksimum tekrar sayısı aşıldı`);
+                        break;
+                    }
+
+                    console.log(`Ödeme #${index + 1} için sonraki tarih:`, {
+                        mevcut: currentDate,
+                        sonraki: nextDate,
+                        tekrarSayısı: repeatCounter,
+                        frekans: frequency
+                    });
+                    currentDate = new Date(nextDate);
                     repeatCounter++;
                 }
             } catch (error) {
@@ -132,15 +155,44 @@ async function createCalendarEvents(payments) {
                 console.log(`Gelir #${index + 1} için etkinlik oluşturuldu:`, event);
                 events.push(event);
 
-                if (income.frequency === '0') {
-                    console.log(`Gelir #${index + 1} tek seferlik, döngüden çıkılıyor`);
+                // Tek seferlik gelir kontrolü
+                if (income.frequency === '0' || !income.frequency) {
+                    console.log(`Gelir #${index + 1} tek seferlik veya frekans belirtilmemiş, döngüden çıkılıyor`);
+                    break;
+                }
+
+                const frequency = parseInt(income.frequency);
+                if (isNaN(frequency) || frequency <= 0) {
+                    console.error(`Gelir #${index + 1} için geçersiz frekans değeri:`, income.frequency);
                     break;
                 }
 
                 const nextDate = new Date(currentDate);
-                nextDate.setMonth(nextDate.getMonth() + parseInt(income.frequency || '0'));
-                console.log(`Gelir #${index + 1} için sonraki tarih:`, nextDate);
-                currentDate = nextDate;
+                nextDate.setMonth(nextDate.getMonth() + frequency);
+
+                // Geçersiz tarih kontrolü
+                if (nextDate <= currentDate || isNaN(nextDate.getTime())) {
+                    console.error(`Gelir #${index + 1} için geçersiz sonraki tarih hesaplandı:`, {
+                        mevcut: currentDate,
+                        sonraki: nextDate,
+                        frekans: frequency
+                    });
+                    break;
+                }
+
+                // Sonsuz döngü kontrolü
+                if (repeatCounter > 100) {
+                    console.error(`Gelir #${index + 1} için maksimum tekrar sayısı aşıldı`);
+                    break;
+                }
+
+                console.log(`Gelir #${index + 1} için sonraki tarih:`, {
+                    mevcut: currentDate,
+                    sonraki: nextDate,
+                    tekrarSayısı: repeatCounter,
+                    frekans: frequency
+                });
+                currentDate = new Date(nextDate);
                 repeatCounter++;
             }
         });
