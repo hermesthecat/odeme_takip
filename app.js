@@ -246,12 +246,27 @@ function updateRecurringPaymentsList(recurring_payments) {
             totalYearlyPayment += parseFloat(payment.yearly_total);
         }
 
+        // Taksit bilgisini parçala (örn: "2/5" -> [2, 5])
+        const [paid, total] = payment.payment_status.split('/').map(Number);
+        const progress = (paid / total) * 100;
+        const progressClass = progress < 25 ? 'bg-danger' :
+            progress < 50 ? 'bg-warning' :
+                progress < 75 ? 'bg-info' :
+                    'bg-success';
+
         tbody.append(`
             <tr>
                 <td>${payment.name}</td>
                 <td>${parseFloat(payment.amount).toFixed(2)}</td>
                 <td>${payment.currency}</td>
-                <td>${payment.payment_status}</td>
+                <td>
+                    <div class="progress mb-1">
+                        <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${progress}%" 
+                             aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <small class="text-muted text-center d-block">${payment.payment_status}</small>
+                </td>
                 <td>${parseFloat(payment.yearly_total).toFixed(2)}</td>
             </tr>
         `);
