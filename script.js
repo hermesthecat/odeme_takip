@@ -17,7 +17,7 @@ import * as navigation from './modules/navigation.js';
 // Global fonksiyonları tanımla
 window.previousMonth = navigation.previousMonth;
 window.nextMonth = navigation.nextMonth;
-window.updateDisplays = () => {
+window.updateDisplays = async () => {
     const selectedYear = parseInt(document.getElementById('yearSelect').value);
     const selectedMonth = parseInt(document.getElementById('monthSelect').value);
 
@@ -28,7 +28,7 @@ window.updateDisplays = () => {
     calculations.updateSummaryCards(selectedYear, selectedMonth);
     charts.updateCharts(undefined, selectedYear, selectedMonth);
     lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
-    calendar.updateCalendar(selectedYear, selectedMonth);
+    await calendar.updateCalendar(selectedYear, selectedMonth);
 };
 
 // Ana sayfa yüklendiğinde

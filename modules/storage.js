@@ -10,7 +10,11 @@ const budgetGoalAdapter = new BudgetGoalDataAdapter();
 export async function loadPayments() {
     try {
         const response = await paymentAdapter.get();
-        return response?.data || [];
+        if (response?.success && Array.isArray(response.data)) {
+            return response.data;
+        }
+        console.error('API yanıtı geçersiz format:', response);
+        return [];
     } catch (error) {
         Swal.fire({
             icon: 'error',
@@ -39,9 +43,19 @@ export async function savePayments(payments) {
 // Gelirleri yükleme
 export async function loadIncomes() {
     try {
-        const data = await incomeAdapter.get();
-        return data.data;
+        console.log('Gelirler yükleniyor...');
+        const response = await incomeAdapter.get();
+        console.log('API yanıtı:', response);
+
+        if (response?.success && Array.isArray(response.data)) {
+            console.log(`${response.data.length} adet gelir yüklendi`);
+            return response.data;
+        }
+        
+        console.error('Gelirler API yanıtı geçersiz format:', response);
+        return [];
     } catch (error) {
+        console.error('Gelirler yüklenirken hata:', error);
         Swal.fire({
             icon: 'error',
             title: 'Hata!',
@@ -69,8 +83,12 @@ export async function saveIncomes(incomes) {
 // Birikimleri yükleme
 export async function loadSavings() {
     try {
-        const data = await savingAdapter.get();
-        return data.data;
+        const response = await savingAdapter.get();
+        if (response?.success && Array.isArray(response.data)) {
+            return response.data;
+        }
+        console.error('Birikimler API yanıtı geçersiz format:', response);
+        return [];
     } catch (error) {
         Swal.fire({
             icon: 'error',
@@ -100,14 +118,21 @@ export async function saveSavings(savings) {
 export async function loadBudgetGoals() {
     try {
         const response = await budgetGoalAdapter.get();
-        const data = response.data;
+        if (response?.success && response.data) {
+            const data = response.data;
+            return {
+                monthlyLimits: data.monthlyLimits || {},
+                categories: data.categories || [],
+                total_months: data.total_months,
+                months_with_budget: data.months_with_budget,
+                average_budget: data.average_budget,
+                months_within_budget: data.months_within_budget
+            };
+        }
+        console.error('Bütçe hedefleri API yanıtı geçersiz format:', response);
         return {
             monthlyLimits: {},
-            categories: [],
-            total_months: data.total_months,
-            months_with_budget: data.months_with_budget,
-            average_budget: data.average_budget,
-            months_within_budget: data.months_within_budget
+            categories: []
         };
     } catch (error) {
         console.error('Bütçe hedefleri yüklenirken hata:', error);
