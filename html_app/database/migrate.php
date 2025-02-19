@@ -1,4 +1,5 @@
 <?php
+require_once 'y:/UltraWebServer/vhosts/butce.local/html_app/database/Database.php';
 require_once __DIR__ . '/api/common.php';
 require_once __DIR__ . '/models/Payment.php';
 require_once __DIR__ . '/models/Income.php';
@@ -255,15 +256,13 @@ class DatabaseMigration {
     }
 
     private function migrateExchangeRates(array $rates): void {
-        foreach ($rates as $baseCurrency => $targetRates) {
-            foreach ($targetRates as $targetCurrency => $rate) {
-                $this->db->insertOrUpdate('exchange_rates', [
-                    'base_currency' => $baseCurrency,
-                    'target_currency' => $targetCurrency,
-                    'rate' => (float)$rate,
-                    'fetched_at' => date('Y-m-d H:i:s')
-                ], ['rate', 'fetched_at']);
-            }
+        foreach ($rates as $targetCurrency => $rate) {
+            $this->db->insertOrUpdate('exchange_rates', [
+                'base_currency' => 'TRY',
+                'target_currency' => $targetCurrency,
+                'rate' => (float)$rate,
+                'fetched_at' => date('Y-m-d H:i:s')
+            ], ['rate', 'fetched_at']);
         }
     }
 
