@@ -17,6 +17,36 @@ function calculateRepeatCount($frequency) {
     }
 }
 
+// İki tarih arasındaki ay sayısını hesaplama
+function getMonthDifference($start_date, $end_date) {
+    $start = new DateTime($start_date);
+    $end = new DateTime($end_date);
+    
+    $interval = $start->diff($end);
+    return $interval->y * 12 + $interval->m;
+}
+
+// Tekrarlama sıklığına göre ay aralığını hesapla
+function getMonthInterval($frequency) {
+    switch($frequency) {
+        case 'monthly': return 1;
+        case 'bimonthly': return 2;
+        case 'quarterly': return 3;
+        case 'fourmonthly': return 4;
+        case 'fivemonthly': return 5;
+        case 'sixmonthly': return 6;
+        case 'yearly': return 12;
+        default: return 0;
+    }
+}
+
+// Sonraki ödeme tarihini hesapla
+function calculateNextPaymentDate($date, $months) {
+    $next_date = new DateTime($date);
+    $next_date->modify('+' . $months . ' months');
+    return $next_date->format('Y-m-d');
+}
+
 // Sonraki tarihi hesaplama fonksiyonu
 function calculateNextDate($date, $frequency, $count = 1) {
     $nextDate = new DateTime($date);
@@ -60,10 +90,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     switch ($action) {
         case 'add_income':
-            $next_date = calculateNextDate($_POST['first_date'], $_POST['frequency']);
-            $stmt = $pdo->prepare("INSERT INTO income (user_id, name, amount, currency, first_date, frequency, next_date) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            if ($stmt->execute([$user_id, $_POST['name'], $_POST['amount'], $_POST['currency'], $_POST['first_date'], $_POST['frequency'], $next_date])) {
+            try {
+                $pdo->beginTransaction();
+
+                $frequency = $_POST['frequency'];
+                $first_date = $_POST['first_date'];
+                $end_date = $_POST['end_date'] ?? $first_date;
+                
+                // Ana kaydı ekle
+                $stmt = $pdo->prepare("INSERT INTO income (user_id, parent_id, name, amount, currency, first_date, frequency, next_date) VALUES (?, NULL, ?, ?, ?, ?, ?, ?)");
+                
+                if (!$stmt->execute([
+                    $user_id,
+                    $_POST['name'],
+                    $_POST['amount'],
+                    $_POST['currency'],
+                    $first_date,
+                    $frequency,
+                    $first_date
+                ])) {
+                    throw new Exception("Ana kayıt eklenemedi");
+                }
+
+                $parent_id = $pdo->lastInsertId();
+
+                // Tekrarlı kayıtlar için
+                if ($frequency !== 'none' && $end_date > $first_date) {
+                    $month_interval = getMonthInterval($frequency);
+                    $total_months = getMonthDifference($first_date, $end_date);
+                    $repeat_count = floor($total_months / $month_interval);
+
+                    // Child kayıtları ekle
+                    if ($repeat_count > 0) {
+                        $stmt = $pdo->prepare("INSERT INTO income (user_id, parent_id, name, amount, currency, first_date, frequency, next_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                        
+                        for ($i = 1; $i <= $repeat_count; $i++) {
+                            $income_date = calculateNextPaymentDate($first_date, $i * $month_interval);
+                            
+                            // Bitiş tarihini geçmemesi için kontrol
+                            if ($income_date <= $end_date) {
+                                if (!$stmt->execute([
+                                    $user_id,
+                                    $parent_id,
+                                    $_POST['name'],
+                                    $_POST['amount'],
+                                    $_POST['currency'],
+                                    $income_date,
+                                    $frequency,
+                                    $income_date
+                                ])) {
+                                    throw new Exception("Child kayıt eklenemedi");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                $pdo->commit();
                 $response = ['status' => 'success', 'message' => 'Gelir başarıyla eklendi'];
+            } catch (Exception $e) {
+                $pdo->rollBack();
+                $response = ['status' => 'error', 'message' => 'Gelir eklenirken hata: ' . $e->getMessage()];
             }
             break;
 
@@ -78,34 +165,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo->beginTransaction();
 
+                $frequency = $_POST['frequency'];
+                $first_date = $_POST['first_date'];
+                $end_date = $_POST['end_date'] ?? $first_date;
+                
                 // Ana kaydı ekle
                 $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, next_date) VALUES (?, NULL, ?, ?, ?, ?, ?, ?)");
-                $next_date = calculateNextDate($_POST['first_date'], $_POST['frequency']);
                 
-                if (!$stmt->execute([$user_id, $_POST['name'], $_POST['amount'], $_POST['currency'], $_POST['first_date'], $_POST['frequency'], $next_date])) {
+                if (!$stmt->execute([
+                    $user_id,
+                    $_POST['name'],
+                    $_POST['amount'],
+                    $_POST['currency'],
+                    $first_date,
+                    $frequency,
+                    $first_date
+                ])) {
                     throw new Exception("Ana kayıt eklenemedi");
                 }
 
                 $parent_id = $pdo->lastInsertId();
-                $repeat_count = calculateRepeatCount($_POST['frequency']);
 
-                // Child kayıtları ekle
-                if ($repeat_count > 1) {
-                    $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, next_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                    
-                    for ($i = 1; $i < $repeat_count; $i++) {
-                        $payment_date = calculateNextDate($_POST['first_date'], $_POST['frequency'], $i);
-                        if (!$stmt->execute([
-                            $user_id,
-                            $parent_id,
-                            $_POST['name'],
-                            $_POST['amount'],
-                            $_POST['currency'],
-                            $payment_date,
-                            $_POST['frequency'],
-                            $payment_date
-                        ])) {
-                            throw new Exception("Child kayıt eklenemedi");
+                // Tekrarlı kayıtlar için
+                if ($frequency !== 'none' && $end_date > $first_date) {
+                    $month_interval = getMonthInterval($frequency);
+                    $total_months = getMonthDifference($first_date, $end_date);
+                    $repeat_count = floor($total_months / $month_interval);
+
+                    // Child kayıtları ekle
+                    if ($repeat_count > 0) {
+                        $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, next_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                        
+                        for ($i = 1; $i <= $repeat_count; $i++) {
+                            $payment_date = calculateNextPaymentDate($first_date, $i * $month_interval);
+                            
+                            // Bitiş tarihini geçmemesi için kontrol
+                            if ($payment_date <= $end_date) {
+                                if (!$stmt->execute([
+                                    $user_id,
+                                    $parent_id,
+                                    $_POST['name'],
+                                    $_POST['amount'],
+                                    $_POST['currency'],
+                                    $payment_date,
+                                    $frequency,
+                                    $payment_date
+                                ])) {
+                                    throw new Exception("Child kayıt eklenemedi");
+                                }
+                            }
                         }
                     }
                 }
@@ -183,6 +291,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("UPDATE payments SET status = 'paid' WHERE id = ? AND user_id = ?");
             if ($stmt->execute([$_POST['id'], $user_id])) {
                 $response = ['status' => 'success', 'message' => 'Ödeme durumu güncellendi'];
+            }
+            break;
+
+        case 'mark_income_received':
+            $id = $_POST['id'];
+            $userId = $_SESSION['user_id'];
+            
+            $stmt = $pdo->prepare("UPDATE income SET status = 'received' WHERE id = :id AND user_id = :user_id");
+            $stmt->bindParam(':id', $id);
+            $stmt->bindParam(':user_id', $userId);
+            
+            if ($stmt->execute()) {
+                $response = array('status' => 'success');
+            } else {
+                $response = array('status' => 'error', 'message' => 'Gelir durumu güncellenirken bir hata oluştu.');
             }
             break;
     }

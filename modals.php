@@ -30,7 +30,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Tekrarlama Sıklığı</label>
-                        <select class="form-select" name="frequency" required>
+                        <select class="form-select" name="frequency" id="incomeFrequency" required>
                             <option value="none">Tekrar Yok</option>
                             <option value="monthly">Aylık</option>
                             <option value="bimonthly">2 Ayda Bir</option>
@@ -40,6 +40,10 @@
                             <option value="sixmonthly">6 Ayda Bir</option>
                             <option value="yearly">Yıllık</option>
                         </select>
+                    </div>
+                    <div class="mb-3" id="incomeEndDateGroup" style="display: none;">
+                        <label class="form-label">Bitiş Tarihi</label>
+                        <input type="date" class="form-control" name="end_date">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -153,10 +157,24 @@
 </div>
 
 <script>
-// Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle
+// Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle (Gelirler için)
+document.getElementById('incomeFrequency').addEventListener('change', function() {
+    const endDateGroup = document.getElementById('incomeEndDateGroup');
+    const endDateInput = endDateGroup.querySelector('input[name="end_date"]');
+    
+    if (this.value === 'none') {
+        endDateGroup.style.display = 'none';
+        endDateInput.removeAttribute('required');
+    } else {
+        endDateGroup.style.display = 'block';
+        endDateInput.setAttribute('required', 'required');
+    }
+});
+
+// Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle (Ödemeler için)
 document.getElementById('paymentFrequency').addEventListener('change', function() {
     const endDateGroup = document.getElementById('endDateGroup');
-    const endDateInput = document.querySelector('input[name="end_date"]');
+    const endDateInput = endDateGroup.querySelector('input[name="end_date"]');
     
     if (this.value === 'none') {
         endDateGroup.style.display = 'none';

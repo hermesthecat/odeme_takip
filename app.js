@@ -74,21 +74,43 @@ function updateIncomeList(incomes) {
     tbody.empty();
 
     incomes.forEach(function(income) {
+        const isChild = income.parent_id !== null;
+        const rowClass = isChild ? 'table-light' : '';
+        const incomeName = isChild ? `└─ ${income.name}` : income.name;
+        
         tbody.append(`
-            <tr>
-                <td>${income.name}</td>
+            <tr class="${rowClass}">
+                <td>${incomeName}</td>
                 <td>${income.amount} ${income.currency}</td>
                 <td>${income.currency}</td>
                 <td>${income.first_date}</td>
                 <td>${getFrequencyText(income.frequency)}</td>
-                <td>${income.next_date}</td>
+                <td>${income.status === 'received' ? '<span class="badge bg-success">Alındı</span>' : '<span class="badge bg-warning">Bekliyor</span>'}</td>
                 <td>
-                    <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    ${isChild ? `
+                        <button class="btn btn-sm btn-success" onclick="markAsReceived(${income.id})">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    ` : `
+                        <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    `}
                 </td>
             </tr>
         `);
+    });
+}
+
+// Gelir durumunu güncelle
+function markAsReceived(id) {
+    ajaxRequest({
+        action: 'mark_income_received',
+        id: id
+    }).done(function(response) {
+        if (response.status === 'success') {
+            loadData();
+        }
     });
 }
 
