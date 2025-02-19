@@ -394,8 +394,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $new_date = date('Y-m-d', mktime(0, 0, 0, $next_month, date('d', strtotime($payment['first_date'])), $next_year));
 
                     // Yeni ödemeyi ekle
-                    $stmt = $pdo->prepare("INSERT INTO payments (user_id, name, amount, currency, first_date, frequency, next_date) 
-                                         VALUES (?, ?, ?, ?, ?, 'none', ?)");
+                    $stmt = $pdo->prepare("INSERT INTO payments (user_id, name, amount, currency, first_date, frequency) 
+                                         VALUES (?, ?, ?, ?, ?, 'none')");
                     $new_name = $payment['name'] . ' (' . $current_month_name . ' Ayından Aktarıldı)';
 
                     if (!$stmt->execute([
@@ -403,7 +403,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $new_name,
                         $payment['amount'],
                         $payment['currency'],
-                        $new_date,
                         $new_date
                     ])) {
                         throw new Exception("Yeni ödeme eklenemedi");
