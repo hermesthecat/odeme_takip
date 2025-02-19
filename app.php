@@ -39,7 +39,7 @@ checkLogin();
                         <button class="btn btn-link text-primary me-3 fs-4" onclick="previousMonth()" title="Önceki Ay">
                             <i class="bi bi-chevron-left"></i>
                         </button>
-                        
+
                         <div class="date-selector bg-light rounded-pill px-4 py-2 shadow-sm d-flex align-items-center">
                             <select id="monthSelect" class="form-select form-select-lg border-0 bg-transparent me-2" style="width: auto;">
                                 <option value="0">Ocak</option>
@@ -254,7 +254,13 @@ checkLogin();
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="app.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/income.js"></script>
+    <script src="js/savings.js"></script>
+    <script src="js/payments.js"></script>
+    <script src="js/summary.js"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/app.js"></script>
 </body>
 
 </html>
