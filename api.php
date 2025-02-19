@@ -653,6 +653,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ];
             }
             break;
+
+        case 'get_payment_details':
+            try {
+                $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ? AND user_id = ?");
+                $stmt->execute([$_POST['id'], $user_id]);
+                $payment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($payment) {
+                    $response = [
+                        'status' => 'success',
+                        'data' => $payment
+                    ];
+                } else {
+                    $response = [
+                        'status' => 'error',
+                        'message' => 'Ödeme bulunamadı'
+                    ];
+                }
+            } catch (Exception $e) {
+                $response = [
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ];
+            }
+            break;
     }
 }
 

@@ -70,8 +70,110 @@ function markAsPaid(id) {
         id: id
     }).done(function (response) {
         if (response.status === 'success') {
-            loadData();
+            // Önce ödemenin detaylarını al
+            ajaxRequest({
+                action: 'get_payment_details',
+                id: id
+            }).done(function (detailsResponse) {
+                if (detailsResponse.status === 'success' && detailsResponse.data) {
+                    const payment = detailsResponse.data;
+                    const parentId = payment.parent_id || payment.id;
+
+                    // Sadece ilgili child kayıtları güncelle
+                    ajaxRequest({
+                        action: 'get_child_payments',
+                        parent_id: parentId
+                    }).done(function (childResponse) {
+                        if (childResponse.status === 'success') {
+                            const { parent, children } = childResponse.data;
+                            updateChildPayments(parentId, parent, children);
+
+                            // Ödeme gücü tablosundaki ilerleme çubuğunu güncelle
+                            const paidCount = [parent, ...children].filter(p => p.status === 'paid').length;
+                            const totalCount = children.length + 1;
+                            const progress = (paidCount / totalCount) * 100;
+                            const progressClass = progress < 25 ? 'bg-danger' :
+                                progress < 50 ? 'bg-warning' :
+                                    progress < 75 ? 'bg-info' :
+                                        'bg-success';
+
+                            const parentRow = $(`.payment-parent[data-payment-id="${parentId}"]`);
+                            const progressBar = parentRow.find('.progress-bar');
+                            const statusText = parentRow.find('.text-muted');
+
+                            progressBar.removeClass('bg-danger bg-warning bg-info bg-success')
+                                .addClass(progressClass)
+                                .css('width', progress + '%')
+                                .attr('aria-valuenow', progress);
+
+                            statusText.text(`${paidCount}/${totalCount}`);
+                        }
+                    });
+                } else {
+                    // Ödeme detayları alınamazsa sayfayı yenile
+                    loadData();
+                }
+            }).fail(function () {
+                // Hata durumunda sayfayı yenile
+                loadData();
+            });
         }
+    });
+}
+
+// Child ödemeleri güncelle (yeni fonksiyon)
+function updateChildPayments(parentId, parent, children) {
+    const tbody = $(`.child-payments[data-parent-id="${parentId}"]`);
+    tbody.empty();
+
+    // Ana kaydı ekle
+    let parentAmountText = `${parseFloat(parent.amount).toFixed(2)} ${parent.currency}`;
+    if (parent.currency !== data.user.base_currency && parent.exchange_rate) {
+        const convertedAmount = parseFloat(parent.amount) * parseFloat(parent.exchange_rate);
+        parentAmountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
+    }
+
+    tbody.append(`
+        <tr class="table-primary" style="cursor: default;">
+            <td>
+                <button
+                    class="btn btn-sm ${parent.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
+                    onclick="event.stopPropagation(); markAsPaid(${parent.id}); return false;"
+                    title="${parent.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
+                >
+                    <i class="bi ${parent.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
+                </button>
+            </td>
+            <td>${parent.first_date}</td>
+            <td>${parentAmountText}</td>
+            <td>${parent.currency}</td>
+        </tr>
+    `);
+
+    // Child kayıtları ekle
+    children.forEach(function (payment) {
+        let amountText = `${parseFloat(payment.amount).toFixed(2)} ${payment.currency}`;
+        if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
+            const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
+            amountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
+        }
+
+        tbody.append(`
+            <tr style="cursor: default;">
+                <td>
+                    <button
+                        class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
+                        onclick="event.stopPropagation(); markAsPaid(${payment.id}); return false;"
+                        title="${payment.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
+                    >
+                        <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
+                    </button>
+                </td>
+                <td>${payment.first_date}</td>
+                <td>${amountText}</td>
+                <td>${payment.currency}</td>
+            </tr>
+        `);
     });
 }
 
@@ -217,7 +319,7 @@ function loadChildPayments(parentId) {
                     <td>
                         <button
                             class="btn btn-sm ${parent.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
-                            onclick="markAsPaid(${parent.id}); return false;"
+                            onclick="event.stopPropagation(); markAsPaid(${parent.id}); return false;"
                             title="${parent.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
                         >
                             <i class="bi ${parent.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
@@ -242,7 +344,7 @@ function loadChildPayments(parentId) {
                         <td>
                             <button
                                 class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
-                                onclick="markAsPaid(${payment.id}); return false;"
+                                onclick="event.stopPropagation(); markAsPaid(${payment.id}); return false;"
                                 title="${payment.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
                             >
                                 <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>

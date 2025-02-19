@@ -127,7 +127,7 @@ checkLogin();
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">Gelirler</h2>
                     <button class="btn btn-success" data-action="add" data-type="income">
-                        <i class="bi bi-plus-lg me-1"></i>Gelir Ekle
+                        <i class="bi bi-plus-lg me-1"></i>Ekle
                     </button>
                 </div>
             </div>
@@ -158,7 +158,7 @@ checkLogin();
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">Birikimler</h2>
                     <button class="btn btn-primary" data-action="add" data-type="saving">
-                        <i class="bi bi-plus-lg me-1"></i>Birikim Ekle
+                        <i class="bi bi-plus-lg me-1"></i>Ekle
                     </button>
                 </div>
             </div>
@@ -189,7 +189,7 @@ checkLogin();
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="mb-0">Ödemeler</h2>
                     <button class="btn btn-danger" data-action="add" data-type="payment">
-                        <i class="bi bi-plus-lg me-1"></i>Ödeme Ekle
+                        <i class="bi bi-plus-lg me-1"></i>Ekle
                     </button>
                 </div>
             </div>
