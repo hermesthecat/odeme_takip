@@ -1,0 +1,11 @@
+---
+description: api
+globs: *
+---
+api url'i api_url.txt dosyasından okunacak.
+
+api istekleri için curl komutu kullanılacak.
+
+api istekleri için api_url.txt dosyasından url alınacak.
+
+api istekleri için proxy kullanılacak.
