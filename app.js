@@ -44,6 +44,7 @@ function loadData() {
             updateIncomeList(response.data.incomes);
             updateSavingsList(response.data.savings);
             updatePaymentsList(response.data.payments);
+            updateRecurringPaymentsList(response.data.recurring_payments);
             updateSummary(response.data);
         } else {
             console.error('Veri yükleme hatası:', response.message);
@@ -227,6 +228,33 @@ function updatePaymentsList(payments) {
             </td>
         </tr>
     `);
+}
+
+// Tekrarlayan ödemeleri güncelle
+function updateRecurringPaymentsList(recurring_payments) {
+    const tbody = $('#recurringPaymentsList');
+    tbody.empty();
+
+    let totalYearlyPayment = 0;
+
+    recurring_payments.forEach(function (payment) {
+        if (payment.currency === 'TRY') {
+            totalYearlyPayment += parseFloat(payment.yearly_total);
+        }
+
+        tbody.append(`
+            <tr>
+                <td>${payment.name}</td>
+                <td>${payment.amount}</td>
+                <td>${payment.currency}</td>
+                <td>${payment.payment_status}</td>
+                <td>${payment.yearly_repeat_count}x</td>
+                <td>${parseFloat(payment.yearly_total).toFixed(2)} ${payment.currency}</td>
+            </tr>
+        `);
+    });
+
+    $('#totalYearlyPayment').text(totalYearlyPayment.toFixed(2) + ' TL');
 }
 
 // Ödeme durumunu güncelle

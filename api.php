@@ -270,7 +270,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $year = intval($_POST['year']);
 
             // Ödemeleri al
-            $sql = "SELECT p.*, 
+            $sql_payments = "SELECT p.*, 
                     CASE 
                         WHEN p.parent_id IS NULL THEN (
                             SELECT MIN(p2.first_date)
@@ -292,12 +292,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     AND YEAR(p.first_date) = ?
                     ORDER BY p.parent_id, p.first_date ASC";
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$user_id, $month, $year]);
-            $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_payments = $pdo->prepare($sql_payments);
+            $stmt_payments->execute([$user_id, $month, $year]);
+            $payments = $stmt_payments->fetchAll(PDO::FETCH_ASSOC);
+
+            // Tekrarlayan ödemeleri al
+            $sql_recurring_payments = "SELECT 
+                        p1.name,
+                        p1.amount,
+                        p1.currency,
+                        p1.frequency,
+                        CASE 
+                            WHEN p1.frequency = 'monthly' THEN 12
+                            WHEN p1.frequency = 'bimonthly' THEN 6
+                            WHEN p1.frequency = 'quarterly' THEN 4
+                            WHEN p1.frequency = 'fourmonthly' THEN 3
+                            WHEN p1.frequency = 'fivemonthly' THEN 2.4
+                            WHEN p1.frequency = 'sixmonthly' THEN 2
+                            WHEN p1.frequency = 'yearly' THEN 1
+                            ELSE 1
+                        END as yearly_repeat_count,
+                        CASE 
+                            WHEN p1.frequency = 'monthly' THEN p1.amount * 12
+                            WHEN p1.frequency = 'bimonthly' THEN p1.amount * 6
+                            WHEN p1.frequency = 'quarterly' THEN p1.amount * 4
+                            WHEN p1.frequency = 'fourmonthly' THEN p1.amount * 3
+                            WHEN p1.frequency = 'fivemonthly' THEN p1.amount * 2.4
+                            WHEN p1.frequency = 'sixmonthly' THEN p1.amount * 2
+                            WHEN p1.frequency = 'yearly' THEN p1.amount
+                            ELSE p1.amount
+                        END as yearly_total,
+                        CONCAT(
+                            (SELECT COUNT(*) FROM payments p2 
+                             WHERE p2.parent_id = p1.id 
+                             AND p2.status = 'pending'
+                             AND p2.user_id = p1.user_id),
+                            '/',
+                            (SELECT COUNT(*) FROM payments p3 
+                             WHERE p3.parent_id = p1.id 
+                             AND p3.user_id = p1.user_id)
+                        ) as payment_status
+                    FROM payments p1 
+                    WHERE p1.user_id = ? 
+                    AND p1.frequency != 'none'
+                    AND p1.parent_id IS NULL
+                    ORDER BY yearly_total DESC";
+
+            $stmt_recurring_payments = $pdo->prepare($sql_recurring_payments);
+            $stmt_recurring_payments->execute([$user_id]);
+            $recurring_payments = $stmt_recurring_payments->fetchAll(PDO::FETCH_ASSOC);
 
             // Gelirleri al
-            $sql = "SELECT i.*, 
+            $sql_incomes = "SELECT i.*, 
                     CASE 
                         WHEN i.parent_id IS NULL THEN (
                             SELECT MIN(i2.first_date)
@@ -319,9 +365,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     AND YEAR(i.first_date) = ?
                     ORDER BY i.parent_id, i.first_date ASC";
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$user_id, $month, $year]);
-            $incomes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt_incomes = $pdo->prepare($sql_incomes);
+            $stmt_incomes->execute([$user_id, $month, $year]);
+            $incomes = $stmt_incomes->fetchAll(PDO::FETCH_ASSOC);
 
             // Birikimleri al
             $stmt = $pdo->prepare("SELECT * FROM savings WHERE user_id = ?");
@@ -333,7 +379,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'data' => [
                     'incomes' => $incomes,
                     'savings' => $savings,
-                    'payments' => $payments
+                    'payments' => $payments,
+                    'recurring_payments' => $recurring_payments
                 ]
             ];
             break;

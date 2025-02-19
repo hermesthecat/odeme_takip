@@ -197,6 +197,39 @@ checkLogin();
                 </div>
             </div>
         </div>
+
+        <!-- Ödeme Gücü Tablosu -->
+        <div class="card mb-4">
+            <div class="card-header bg-info bg-opacity-25">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Ödeme Gücü</h2>
+                    <small class="text-muted">Tekrarlayan ödemelerin yıllık toplamı</small>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Ödeme İsmi</th>
+                                <th>Tutar</th>
+                                <th>Kur</th>
+                                <th>Tekrarlama Sıklığı</th>
+                                <th>Yıllık Tekrar</th>
+                                <th>Yıllık Toplam</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recurringPaymentsList"></tbody>
+                        <tfoot>
+                            <tr class="table-info">
+                                <td colspan="5" class="text-end fw-bold">Toplam Yıllık Ödeme:</td>
+                                <td id="totalYearlyPayment" class="fw-bold"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Modals -->
