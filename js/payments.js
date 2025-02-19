@@ -75,7 +75,23 @@ function markAsPaid(id) {
         id: id
     }).done(function (response) {
         if (response.status === 'success') {
-            // Önce ödemenin detaylarını al
+            // İlgili buton ve ikonu bul
+            const button = $(`button[onclick="markAsPaid(${id})"]`);
+            const icon = button.find('i');
+            const currentStatus = button.hasClass('btn-success');
+
+            // Buton ve ikon sınıflarını güncelle
+            if (currentStatus) {
+                button.removeClass('btn-success').addClass('btn-outline-success');
+                icon.removeClass('bi-check-circle-fill').addClass('bi-check-circle');
+                button.attr('title', 'Ödendi olarak işaretle');
+            } else {
+                button.removeClass('btn-outline-success').addClass('btn-success');
+                icon.removeClass('bi-check-circle').addClass('bi-check-circle-fill');
+                button.attr('title', 'Ödenmedi olarak işaretle');
+            }
+
+            // Eğer bu bir child ödeme ise parent'ın progress bar'ını güncelle
             ajaxRequest({
                 action: 'get_payment_details',
                 id: id
@@ -114,13 +130,7 @@ function markAsPaid(id) {
                             statusText.text(`${paidCount}/${totalCount}`);
                         }
                     });
-                } else {
-                    // Ödeme detayları alınamazsa sayfayı yenile
-                    loadData();
                 }
-            }).fail(function () {
-                // Hata durumunda sayfayı yenile
-                loadData();
             });
         }
     });
