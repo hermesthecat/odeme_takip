@@ -185,8 +185,8 @@ function loadRecurringPayments()
         p1.frequency,
         (
             SELECT SUM(CASE 
-                WHEN p2.currency = p1.currency THEN p2.amount 
-                ELSE p2.amount * p2.exchange_rate 
+                WHEN p2.currency = (SELECT base_currency FROM users WHERE id = p1.user_id) THEN p2.amount 
+                ELSE p2.amount * COALESCE(p2.exchange_rate, 1) 
             END)
             FROM payments p2 
             WHERE (p2.parent_id = p1.id OR p2.id = p1.id)
