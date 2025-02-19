@@ -210,7 +210,7 @@
     document.getElementById('incomeFrequency').addEventListener('change', function() {
         const endDateGroup = document.getElementById('incomeEndDateGroup');
         const endDateInput = endDateGroup.querySelector('input[name="end_date"]');
-        
+
         if (this.value === 'none') {
             endDateGroup.style.display = 'none';
             endDateInput.removeAttribute('required');
@@ -224,7 +224,7 @@
     document.getElementById('paymentFrequency').addEventListener('change', function() {
         const endDateGroup = document.getElementById('endDateGroup');
         const endDateInput = endDateGroup.querySelector('input[name="end_date"]');
-        
+
         if (this.value === 'none') {
             endDateGroup.style.display = 'none';
             endDateInput.removeAttribute('required');
