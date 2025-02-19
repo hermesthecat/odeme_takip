@@ -431,10 +431,11 @@ function markAsPaid(id) {
         id: id
     }).done(function (response) {
         if (response.status === 'success') {
-            // Sadece ilgili ödemenin durumunu güncelle
+            // Tıklanan butonu bul
             const button = $(`button[onclick*="markAsPaid(${id})"]`);
             const isPaid = button.hasClass('btn-outline-success');
             
+            // Butonun durumunu güncelle
             if (isPaid) {
                 button.removeClass('btn-outline-success').addClass('btn-success');
                 button.find('i').removeClass('bi-check-circle').addClass('bi-check-circle-fill');
@@ -445,10 +446,34 @@ function markAsPaid(id) {
                 button.attr('title', 'Ödendi olarak işaretle');
             }
 
-            // Ödeme gücü tablosundaki ilgili satırı güncelle
-            const parentRow = button.closest('tr').parent().closest('tr');
-            if (parentRow.hasClass('payment-parent')) {
-                loadChildPayments(parentRow.data('payment-id'));
+            // Önce child payments container'ı bul
+            const childPaymentsContainer = button.closest('.child-payments');
+            if (childPaymentsContainer.length > 0) {
+                // Child payment ise, parent_id'yi al
+                const parentId = childPaymentsContainer.data('parent-id');
+                // Parent satırı bul
+                const parentRow = $(`.payment-parent[data-payment-id="${parentId}"]`);
+                
+                // Tüm child ödemeleri kontrol et
+                const allButtons = childPaymentsContainer.find('button');
+                const totalPayments = allButtons.length;
+                const paidPayments = allButtons.filter('.btn-success').length;
+                
+                // Progress bar'ı güncelle
+                const progress = (paidPayments / totalPayments) * 100;
+                const progressClass = progress < 25 ? 'bg-danger' :
+                    progress < 50 ? 'bg-warning' :
+                        progress < 75 ? 'bg-info' :
+                            'bg-success';
+
+                const progressBar = parentRow.find('.progress-bar');
+                progressBar.removeClass('bg-danger bg-warning bg-info bg-success')
+                    .addClass(progressClass)
+                    .css('width', progress + '%')
+                    .attr('aria-valuenow', progress);
+
+                // Ödeme durumu metnini güncelle
+                parentRow.find('.text-muted').text(`${paidPayments}/${totalPayments}`);
             }
         }
     });

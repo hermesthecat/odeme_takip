@@ -216,7 +216,7 @@
             <form data-type="user_settings">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Baz Para Birimi</label>
+                        <label class="form-label">Ana Para Birimi</label>
                         <select class="form-select" name="base_currency" id="user_base_currency" required>
                             <option value="TRY">TRY - Türk Lirası</option>
                             <option value="USD">USD - Amerikan Doları</option>
