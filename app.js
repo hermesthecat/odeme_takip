@@ -392,6 +392,29 @@ function transferUnpaidPayments() {
     });
 }
 
+// URL'den ay ve yıl bilgisini al
+function getDateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const month = params.get('month');
+    const year = params.get('year');
+    
+    if (month !== null && year !== null) {
+        return { month: parseInt(month), year: parseInt(year) };
+    }
+    
+    // URL'de tarih yoksa mevcut ay/yıl
+    const now = new Date();
+    return { month: now.getMonth(), year: now.getFullYear() };
+}
+
+// URL'i güncelle
+function updateUrl(month, year) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('month', month);
+    url.searchParams.set('year', year);
+    window.history.pushState({}, '', url);
+}
+
 // Ay/yıl değişikliği
 function previousMonth() {
     let month = parseInt($('#monthSelect').val());
@@ -406,6 +429,7 @@ function previousMonth() {
 
     $('#monthSelect').val(month);
     $('#yearSelect').val(year);
+    updateUrl(month, year);
     loadData();
 }
 
@@ -422,6 +446,7 @@ function nextMonth() {
 
     $('#monthSelect').val(month);
     $('#yearSelect').val(year);
+    updateUrl(month, year);
     loadData();
 }
 
@@ -446,13 +471,23 @@ function openUserSettings() {
 
 // Sayfa yüklendiğinde
 $(document).ready(function () {
-    // Mevcut ay ve yılı seç
-    const now = new Date();
-    $('#monthSelect').val(now.getMonth());
-    $('#yearSelect').val(now.getFullYear());
+    // URL'den tarih bilgisini al
+    const { month, year } = getDateFromUrl();
+    
+    // Select elementlerini güncelle
+    $('#monthSelect').val(month);
+    $('#yearSelect').val(year);
 
     // Verileri yükle
     loadData();
+
+    // Select elementleri değiştiğinde URL'i güncelle
+    $('#monthSelect, #yearSelect').on('change', function() {
+        const currentMonth = $('#monthSelect').val();
+        const currentYear = $('#yearSelect').val();
+        updateUrl(currentMonth, currentYear);
+        loadData();
+    });
 
     // Form submit işlemleri
     $('[data-action]').click(function () {
