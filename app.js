@@ -72,6 +72,17 @@ function updateIncomeList(incomes) {
     const tbody = $('#incomeList');
     tbody.empty();
 
+    if (incomes.length === 0) {
+        tbody.append(`
+            <tr>
+                <td colspan="8" class="text-center">
+                    <p class="text-muted">Henüz bir gelir eklenmemiş.</p>
+                </td>
+            </tr>
+        `);
+        return;
+    }
+
     incomes.forEach(function (income) {
         const isChild = income.parent_id !== null;
         const rowClass = isChild ? 'table-light' : '';
@@ -126,6 +137,17 @@ function markAsReceived(id) {
 function updateSavingsList(savings) {
     const tbody = $('#savingList');
     tbody.empty();
+
+    if (savings.length === 0) {
+        tbody.append(`
+            <tr>
+                <td colspan="8" class="text-center">
+                    <p class="text-muted">Henüz bir birikim eklenmemiş.</p>
+                </td>
+            </tr>
+        `);
+        return;
+    }
 
     savings.forEach(function (saving) {
         const progress = (saving.current_amount / saving.target_amount) * 100;
@@ -196,6 +218,16 @@ function updatePaymentsList(payments) {
     const tbody = $('#paymentList');
     tbody.empty();
 
+    if (payments.length === 0) {
+        tbody.append(`
+            <tr>
+                <td colspan="8" class="text-center">
+                    <p class="text-muted">Henüz bir ödeme eklenmemiş.</p>
+                </td>
+            </tr>
+        `);
+        return;
+    }
     payments.forEach(function (payment) {
         const isChild = payment.parent_id !== null;
         const rowClass = isChild ? 'table-light' : '';
@@ -397,11 +429,11 @@ function getDateFromUrl() {
     const params = new URLSearchParams(window.location.search);
     const month = params.get('month');
     const year = params.get('year');
-    
+
     if (month !== null && year !== null) {
         return { month: parseInt(month), year: parseInt(year) };
     }
-    
+
     // URL'de tarih yoksa mevcut ay/yıl
     const now = new Date();
     return { month: now.getMonth(), year: now.getFullYear() };
@@ -480,7 +512,7 @@ function openUserSettings() {
 $(document).ready(function () {
     // URL'den tarih bilgisini al
     const { month, year } = getDateFromUrl();
-    
+
     // Select elementlerini güncelle
     $('#monthSelect').val(month);
     $('#yearSelect').val(year);
@@ -498,7 +530,7 @@ $(document).ready(function () {
     loadData();
 
     // Select elementleri değiştiğinde URL'i güncelle
-    $('#monthSelect, #yearSelect').on('change', function() {
+    $('#monthSelect, #yearSelect').on('change', function () {
         const currentMonth = $('#monthSelect').val();
         const currentYear = $('#yearSelect').val();
         updateUrl(currentMonth, currentYear);

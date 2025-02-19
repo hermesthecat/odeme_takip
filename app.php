@@ -36,11 +36,12 @@ checkLogin();
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="month-selector d-flex align-items-center justify-content-center">
-                        <button class="btn btn-link text-primary me-2" onclick="previousMonth()">
+                        <button class="btn btn-link text-primary me-3 fs-4" onclick="previousMonth()" title="Önceki Ay">
                             <i class="bi bi-chevron-left"></i>
                         </button>
-                        <div class="d-flex align-items-center">
-                            <select id="monthSelect" class="form-select me-2">
+                        
+                        <div class="date-selector bg-light rounded-pill px-4 py-2 shadow-sm d-flex align-items-center">
+                            <select id="monthSelect" class="form-select form-select-lg border-0 bg-transparent me-2" style="width: auto;">
                                 <option value="0">Ocak</option>
                                 <option value="1">Şubat</option>
                                 <option value="2">Mart</option>
@@ -54,7 +55,7 @@ checkLogin();
                                 <option value="10">Kasım</option>
                                 <option value="11">Aralık</option>
                             </select>
-                            <select id="yearSelect" class="form-select">
+                            <select id="yearSelect" class="form-select form-select-lg border-0 bg-transparent" style="width: auto;">
                                 <?php
                                 $currentYear = date('Y');
                                 for ($year = $currentYear - 1; $year <= $currentYear + 5; $year++) {
@@ -63,7 +64,8 @@ checkLogin();
                                 ?>
                             </select>
                         </div>
-                        <button class="btn btn-link text-primary ms-2" onclick="nextMonth()">
+
+                        <button class="btn btn-link text-primary ms-3 fs-4" onclick="nextMonth()" title="Sonraki Ay">
                             <i class="bi bi-chevron-right"></i>
                         </button>
                     </div>
@@ -74,33 +76,45 @@ checkLogin();
         <!-- Aylık Özet -->
         <div class="row mb-4">
             <div class="col-md-3">
-                <div class="card bg-success bg-opacity-25 h-100">
+                <div class="card bg-success bg-opacity-10 border-success border-opacity-25 h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Aylık Gelir</h5>
+                        <h5 class="card-title text-success text-opacity-75">
+                            <i class="bi bi-graph-up me-2"></i>
+                            Aylık Gelir
+                        </h5>
                         <h3 class="card-text" id="monthlyIncome">0.00 TL</h3>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card bg-danger bg-opacity-25 h-100">
+                <div class="card bg-danger bg-opacity-10 border-danger border-opacity-25 h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Aylık Gider</h5>
+                        <h5 class="card-title text-danger text-opacity-75">
+                            <i class="bi bi-graph-down me-2"></i>
+                            Aylık Gider
+                        </h5>
                         <h3 class="card-text" id="monthlyExpense">0.00 TL</h3>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card bg-info bg-opacity-25 h-100">
+                <div class="card bg-info bg-opacity-10 border-info border-opacity-25 h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Net Durum</h5>
+                        <h5 class="card-title text-info text-opacity-75">
+                            <i class="bi bi-wallet2 me-2"></i>
+                            Net Durum
+                        </h5>
                         <h3 class="card-text" id="monthlyBalance">0.00 TL</h3>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card bg-warning bg-opacity-25 h-100">
+                <div class="card bg-warning bg-opacity-10 border-warning border-opacity-25 h-100">
                     <div class="card-body">
-                        <h5 class="card-title">Dönem</h5>
+                        <h5 class="card-title text-warning text-opacity-75">
+                            <i class="bi bi-calendar3 me-2"></i>
+                            Dönem
+                        </h5>
                         <h3 class="card-text" id="currentPeriod"></h3>
                     </div>
                 </div>
