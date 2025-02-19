@@ -8,9 +8,11 @@ import { updateSummaryCards } from '../calculations.js';
 import { updateCharts } from '../charts.js';
 
 // Ödeme listesini güncelleme
-export function updatePaymentList(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
+export async function updatePaymentList(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
+    console.log('Ödeme listesi güncelleniyor...', { selectedYear, selectedMonth });
     const tbody = document.getElementById('paymentList');
     if (!tbody) {
+        console.error('Ödeme listesi tablosu bulunamadı!');
         Swal.fire({
             icon: 'error',
             title: 'Hata!',
@@ -19,34 +21,54 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
         return;
     }
 
-    const payments = loadPayments();
-    tbody.innerHTML = '';
+    try {
+        const payments = await loadPayments();
+        console.log('Yüklenen ödemeler:', payments);
+        tbody.innerHTML = '';
 
-    if (!Array.isArray(payments) || payments.length === 0) {
-        const row = document.createElement('tr');
-        row.innerHTML = '<td colspan="7" class="text-center">Henüz ödeme kaydı bulunmamaktadır.</td>';
-        tbody.appendChild(row);
-        return;
-    }
+        if (!Array.isArray(payments) || payments.length === 0) {
+            console.log('Ödeme bulunamadı veya dizi değil:', payments);
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="7" class="text-center">Henüz ödeme kaydı bulunmamaktadır.</td>';
+            tbody.appendChild(row);
+            return;
+        }
 
-    const startDate = new Date(selectedYear, selectedMonth, 1);
-    const endDate = new Date(selectedYear, selectedMonth + 1, 0);
-    let hasUnpaidPayments = false;
-    let visiblePayments = []; // Görünür ödemeleri takip etmek için array
+        const startDate = new Date(selectedYear, selectedMonth, 1);
+        const endDate = new Date(selectedYear, selectedMonth + 1, 0);
+        console.log('Tarih aralığı:', { başlangıç: startDate, bitiş: endDate });
+        let hasUnpaidPayments = false;
+        let visiblePayments = [];
 
-    payments.forEach((payment, index) => {
-        try {
-            const firstPaymentDate = payment.first_payment_date;
-            const firstDate = firstPaymentDate ? new Date(firstPaymentDate) : null;
+        payments.forEach((payment, index) => {
+            try {
+                console.log(`Ödeme #${index + 1} işleniyor:`, payment);
+                const firstPaymentDate = payment.first_payment_date;
+                const firstDate = firstPaymentDate ? new Date(firstPaymentDate) : null;
 
-            if (firstDate) {
+                if (!firstDate) {
+                    console.error(`Ödeme #${index + 1} için geçersiz tarih:`, firstPaymentDate);
+                    return;
+                }
+
                 let shouldShow = false;
+                console.log(`Ödeme #${index + 1} tarih kontrolü:`, {
+                    ilkÖdemeTarihi: firstDate,
+                    seçiliYıl: selectedYear,
+                    seçiliAy: selectedMonth,
+                    sıklık: payment.frequency
+                });
 
                 if (payment.frequency === 0 || payment.frequency === '0') {
                     // Tek seferlik ödeme - sadece ay ve yıl kontrolü yap
                     const paymentYear = firstDate.getFullYear();
                     const paymentMonth = firstDate.getMonth();
                     shouldShow = paymentYear === selectedYear && paymentMonth === selectedMonth;
+                    console.log(`Tek seferlik ödeme #${index + 1} gösterilmeli mi:`, {
+                        ödemeTarihi: { yıl: paymentYear, ay: paymentMonth },
+                        seçiliTarih: { yıl: selectedYear, ay: selectedMonth },
+                        göster: shouldShow
+                    });
                 } else {
                     // Tekrarlı ödeme
                     let currentDate = new Date(firstDate);
@@ -55,35 +77,35 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
                     while (currentDate <= endDate) {
                         if (currentDate >= startDate && currentDate <= endDate) {
                             shouldShow = true;
+                            console.log(`Tekrarlı ödeme #${index + 1} bu ay gösterilecek:`, {
+                                şuAnkiTarih: currentDate,
+                                tekrarSayısı: repeatCounter
+                            });
                             break;
                         }
-                        if (payment.repeat_count && repeatCounter >= payment.repeat_count) break;
+                        if (payment.repeat_count && repeatCounter >= payment.repeat_count) {
+                            console.log(`Tekrarlı ödeme #${index + 1} tekrar limitine ulaştı:`, {
+                                limit: payment.repeat_count,
+                                şuAnkiTekrar: repeatCounter
+                            });
+                            break;
+                        }
                         currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
                         repeatCounter++;
                     }
                 }
 
                 if (shouldShow) {
+                    console.log(`Ödeme #${index + 1} tabloya ekleniyor`);
                     // Seçili ayın ödenme durumunu kontrol et
                     const monthKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
                     const isPaid = payment.paid_months && payment.paid_months.includes(monthKey);
 
-                    visiblePayments.push({ ...payment, index, isPaid }); // Görünür ödemeyi kaydet
+                    visiblePayments.push({ ...payment, index, isPaid });
                     const nextPaymentDate = calculateNextPaymentDate(payment.first_payment_date, payment.frequency, payment.repeat_count);
                     const frequencyText = getFrequencyText(payment.frequency);
                     const repeatText = payment.frequency !== '0' ?
                         (payment.repeat_count ? ` (${payment.repeat_count} tekrar)` : ' (Sonsuz)') : '';
-
-                    // Mevcut tekrar sayısını hesapla
-                    let currentRepeat = 0;
-                    if (payment.frequency !== '0') {
-                        const today = new Date();
-                        let currentDate = new Date(payment.first_payment_date);
-                        while (currentDate <= today) {
-                            currentRepeat++;
-                            currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
-                        }
-                    }
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
@@ -112,54 +134,58 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
                         </td>
                     `;
                     tbody.appendChild(row);
+                } else {
+                    console.log(`Ödeme #${index + 1} bu ay gösterilmeyecek`);
                 }
+            } catch (error) {
+                console.error(`Ödeme ${index + 1} işlenirken hata:`, error);
             }
-        } catch (error) {
-            console.error(`Ödeme ${index + 1} gösterilirken hata oluştu:`, error);
-        }
-    });
-
-    // Ödenmemiş ödemeler için sonraki aya aktarma butonu ekle
-    const unpaidPayments = visiblePayments.filter(payment => !payment.isPaid);
-
-    // Mevcut tfoot'u temizle
-    const paymentTable = tbody.closest('table');
-    const existingTfoot = paymentTable.querySelector('tfoot');
-    if (existingTfoot) {
-        existingTfoot.remove();
-    }
-
-    // Eğer ödenmemiş ödeme varsa uyarı satırını ekle
-    if (unpaidPayments.length > 0) {
-        const tfoot = document.createElement('tfoot');
-        const warningRow = document.createElement('tr');
-        warningRow.innerHTML = `
-            <td colspan="7" class="text-end">
-                <div class="d-flex justify-content-end align-items-center">
-                    <span class="me-2 text-danger">
-                        <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                        Bu ayda ${unpaidPayments.length} adet ödenmemiş ödeme bulunuyor
-                    </span>
-                    <button class="btn btn-warning" data-action="move-to-next-month">
-                        <i class="bi bi-arrow-right-circle me-1"></i>
-                        Sonraki Aya Aktar
-                    </button>
-                </div>
-            </td>
-        `;
-        tfoot.appendChild(warningRow);
-        tbody.parentNode.appendChild(tfoot);
-
-        // Sonraki aya aktarma butonu için event listener ekle
-        warningRow.querySelector('button[data-action="move-to-next-month"]')?.addEventListener('click', () => {
-            moveUnpaidToNextMonth(selectedYear, selectedMonth, unpaidPayments);
         });
-    }
 
-    // Event listener'ları ekle
-    tbody.querySelectorAll('button[data-action]').forEach(button => {
-        button.addEventListener('click', handlePaymentAction);
-    });
+        // Ödenmemiş ödemeler için sonraki aya aktarma butonu ekle
+        const unpaidPayments = visiblePayments.filter(payment => !payment.isPaid);
+
+        // Mevcut tfoot'u temizle
+        const paymentTable = tbody.closest('table');
+        const existingTfoot = paymentTable.querySelector('tfoot');
+        if (existingTfoot) {
+            existingTfoot.remove();
+        }
+
+        // Eğer ödenmemiş ödeme varsa uyarı satırını ekle
+        if (unpaidPayments.length > 0) {
+            const tfoot = document.createElement('tfoot');
+            const warningRow = document.createElement('tr');
+            warningRow.innerHTML = `
+                <td colspan="7" class="text-end">
+                    <div class="d-flex justify-content-end align-items-center">
+                        <span class="me-2 text-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            Bu ayda ${unpaidPayments.length} adet ödenmemiş ödeme bulunuyor
+                        </span>
+                        <button class="btn btn-warning" data-action="move-to-next-month">
+                            <i class="bi bi-arrow-right-circle me-1"></i>
+                            Sonraki Aya Aktar
+                        </button>
+                    </div>
+                </td>
+            `;
+            tfoot.appendChild(warningRow);
+            tbody.parentNode.appendChild(tfoot);
+
+            // Sonraki aya aktarma butonu için event listener ekle
+            warningRow.querySelector('button[data-action="move-to-next-month"]')?.addEventListener('click', () => {
+                moveUnpaidToNextMonth(selectedYear, selectedMonth, unpaidPayments);
+            });
+        }
+
+        // Event listener'ları ekle
+        tbody.querySelectorAll('button[data-action]').forEach(button => {
+            button.addEventListener('click', handlePaymentAction);
+        });
+    } catch (error) {
+        console.error('Ödeme listesi güncellenirken genel hata:', error);
+    }
 }
 
 // Ödeme güncelleme

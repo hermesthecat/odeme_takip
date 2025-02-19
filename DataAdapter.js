@@ -11,7 +11,7 @@ class DataAdapter {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
-                }
+                },
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -37,7 +37,7 @@ class DataAdapter {
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
-                }
+                },
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -121,37 +121,37 @@ class DataAdapter {
 
 class PaymentDataAdapter extends DataAdapter {
     constructor() {
-        super('http://butce.local/payments/index.php');
+        super('/payments/index.php');
     }
 }
 
 class IncomeDataAdapter extends DataAdapter {
     constructor() {
-        super('http://butce.local/incomes/index.php');
+        super('/incomes/index.php');
     }
 }
 
 class SavingDataAdapter extends DataAdapter {
     constructor() {
-        super('http://butce.local/savings/index.php');
+        super('/savings/index.php');
     }
 }
 
 class CategoryDataAdapter extends DataAdapter {
     constructor() {
-        super('http://butce.local/categories/index.php');
+        super('/categories/index.php');
     }
 }
 
 class BudgetGoalDataAdapter extends DataAdapter {
     constructor() {
-        super('http://butce.local/budget-goals/index.php');
+        super('/budget-goals/index.php');
     }
 }
 
 class ExchangeRateDataAdapter extends DataAdapter {
     constructor() {
-        super('http://butce.local/exchange-rates/index.php');
+        super('/exchange-rates/index.php');
     }
 }
 

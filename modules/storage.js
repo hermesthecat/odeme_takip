@@ -9,10 +9,15 @@ const budgetGoalAdapter = new BudgetGoalDataAdapter();
 // Ödemeleri yükleme
 export async function loadPayments() {
     try {
+        console.log('Ödemeler yükleniyor...');
         const response = await paymentAdapter.getAll();
+        console.log('API yanıtı:', response);
+
         if (response?.success && Array.isArray(response.data)) {
+            console.log(`${response.data.length} adet ödeme yüklendi:`, response.data);
             return response.data;
         }
+        
         console.error('API yanıtı geçersiz format:', response);
         return [];
     } catch (error) {
@@ -52,7 +57,7 @@ export async function loadIncomes() {
             console.log(`${response.data.length} adet gelir yüklendi`);
             return response.data;
         }
-        
+
         console.error('Gelirler API yanıtı geçersiz format:', response);
         return [];
     } catch (error) {

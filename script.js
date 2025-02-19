@@ -21,14 +21,18 @@ window.updateDisplays = async () => {
     const selectedYear = parseInt(document.getElementById('yearSelect').value);
     const selectedMonth = parseInt(document.getElementById('monthSelect').value);
 
-    lists.updatePaymentList(selectedYear, selectedMonth);
-    await lists.updateIncomeList(selectedYear, selectedMonth);
-    lists.updateSavingList(selectedYear, selectedMonth);
-    lists.updatePaymentPowerList(selectedYear, selectedMonth);
-    calculations.updateSummaryCards(selectedYear, selectedMonth);
-    charts.updateCharts(undefined, selectedYear, selectedMonth);
-    lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
-    await calendar.updateCalendar(selectedYear, selectedMonth);
+    try {
+        await lists.updatePaymentList(selectedYear, selectedMonth);
+        await lists.updateIncomeList(selectedYear, selectedMonth);
+        await lists.updateSavingList(selectedYear, selectedMonth);
+        await lists.updatePaymentPowerList(selectedYear, selectedMonth);
+        await calculations.updateSummaryCards(selectedYear, selectedMonth);
+        await charts.updateCharts(undefined, selectedYear, selectedMonth);
+        await lists.updateBudgetGoalsDisplay(selectedYear, selectedMonth);
+        await calendar.updateCalendar(selectedYear, selectedMonth);
+    } catch (error) {
+        console.error('Ekranlar güncellenirken hata:', error);
+    }
 };
 
 // Ana sayfa yüklendiğinde
