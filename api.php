@@ -486,12 +486,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     } else {
                         // Tekrarlanmayan ödeme ise
-                        $stmt = $pdo->prepare("INSERT INTO payments (user_id, name, amount, currency, first_date, frequency) 
-                                             VALUES (?, ?, ?, ?, ?, 'none')");
+                        $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency) 
+                                             VALUES (?, ?, ?, ?, ?, ?, 'none')");
                         $new_name = $payment['name'] . ' (' . $current_month_name . ' Ayından Aktarıldı)';
 
                         if (!$stmt->execute([
                             $user_id,
+                            $payment['parent_id'],
                             $new_name,
                             $payment['amount'],
                             $payment['currency'],
