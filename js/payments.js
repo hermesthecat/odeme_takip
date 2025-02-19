@@ -19,12 +19,11 @@ function updatePaymentsList(payments) {
 
     payments.forEach(function (payment) {
         const isChild = payment.parent_id !== null;
-        // const rowClass = isChild ? 'table-light' : '';
-        let amountText = `${parseFloat(payment.amount).toFixed(2)} ${payment.currency}`;
+        let amountText = `${parseFloat(payment.amount).toFixed(2)}`;
 
         if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
             const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
-            amountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
+            amountText += `<br><small class="text-muted">(${convertedAmount.toFixed(2)} ${data.user.base_currency})</small>`;
         }
 
         tbody.append(`
