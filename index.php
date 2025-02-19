@@ -1,247 +1,209 @@
-<?php
-require_once 'config.php';
-checkLogin();
-?>
 <!DOCTYPE html>
 <html lang="tr">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Bütçe Kontrol Sistemi</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bütçe Takip - Kişisel Finans Yönetimi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        .hero {
+            background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+            color: white;
+            padding: 100px 0;
+        }
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
+        .feature-icon {
+            font-size: 3rem;
+            color: #0d6efd;
+            margin-bottom: 1rem;
+        }
+
+        .testimonial {
+            background-color: #f8f9fa;
+            padding: 80px 0;
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 50px 0;
+        }
+
+        .cta-section {
+            background-color: #e9ecef;
+            padding: 80px 0;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container mt-4">
-        <!-- Başlık ve Kullanıcı Bilgisi -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="mb-0">Bütçe Kontrol Sistemi</h1>
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
-                    <i class="bi bi-gear me-1"></i>Ayarlar
-                </button>
-                <span class="me-3">Hoş geldiniz, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
-                <a href="logout.php" class="btn btn-outline-danger">
-                    <i class="bi bi-box-arrow-right me-1"></i>Çıkış Yap
-                </a>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-piggy-bank me-2"></i>
+                Bütçe Takip
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Özellikler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#testimonials">Yorumlar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-2" href="login.php">Giriş Yap</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light ms-2" href="register.php">Kayıt Ol</a>
+                    </li>
+                </ul>
             </div>
         </div>
+    </nav>
 
-        <!-- Ay Seçimi -->
-        <div class="container-fluid py-4">
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="month-selector d-flex align-items-center justify-content-center">
-                        <button class="btn btn-link text-primary me-2" onclick="previousMonth()">
-                            <i class="bi bi-chevron-left"></i>
-                        </button>
-                        <div class="d-flex align-items-center">
-                            <select id="monthSelect" class="form-select me-2">
-                                <option value="0">Ocak</option>
-                                <option value="1">Şubat</option>
-                                <option value="2">Mart</option>
-                                <option value="3">Nisan</option>
-                                <option value="4">Mayıs</option>
-                                <option value="5">Haziran</option>
-                                <option value="6">Temmuz</option>
-                                <option value="7">Ağustos</option>
-                                <option value="8">Eylül</option>
-                                <option value="9">Ekim</option>
-                                <option value="10">Kasım</option>
-                                <option value="11">Aralık</option>
-                            </select>
-                            <select id="yearSelect" class="form-select">
-                                <?php
-                                $currentYear = date('Y');
-                                for ($year = $currentYear - 1; $year <= $currentYear + 5; $year++) {
-                                    echo "<option value=\"$year\">$year</option>";
-                                }
-                                ?>
-                            </select>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container text-center">
+            <h1 class="display-4 mb-4">Finansal Özgürlüğünüzü Yönetin</h1>
+            <p class="lead mb-4">
+                Gelirlerinizi, giderlerinizi ve birikimlerinizi kolayca takip edin.
+                Finansal hedeflerinize ulaşmak hiç bu kadar kolay olmamıştı.
+            </p>
+            <a href="register.php" class="btn btn-light btn-lg">Hemen Başlayın</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Özellikler</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="bi bi-graph-up feature-icon"></i>
+                        <h3>Gelir Takibi</h3>
+                        <p>Tüm gelirlerinizi kategorize edin ve düzenli gelirlerinizi otomatik olarak takip edin.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="bi bi-credit-card feature-icon"></i>
+                        <h3>Gider Yönetimi</h3>
+                        <p>Harcamalarınızı kontrol altında tutun ve ödeme planlarınızı kolayca yönetin.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="bi bi-piggy-bank feature-icon"></i>
+                        <h3>Birikim Hedefleri</h3>
+                        <p>Finansal hedeflerinizi belirleyin ve ilerlemenizi görsel olarak takip edin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimonials" class="testimonial">
+        <div class="container">
+            <h2 class="text-center mb-5">Kullanıcı Yorumları</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <p class="card-text">"Bu uygulama sayesinde finansal durumumu çok daha iyi kontrol edebiliyorum. Artık her kuruşumun nereye gittiğini biliyorum."</p>
+                            <div class="d-flex align-items-center mt-3">
+                                <i class="bi bi-person-circle fs-2 me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">Ahmet Y.</h5>
+                                    <small class="text-muted">Yazılım Geliştirici</small>
+                                </div>
+                            </div>
                         </div>
-                        <button class="btn btn-link text-primary ms-2" onclick="nextMonth()">
-                            <i class="bi bi-chevron-right"></i>
-                        </button>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <p class="card-text">"Birikim hedeflerimi takip etmek artık çok kolay. Görsel grafikler motivasyonumu artırıyor."</p>
+                            <div class="d-flex align-items-center mt-3">
+                                <i class="bi bi-person-circle fs-2 me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">Ayşe K.</h5>
+                                    <small class="text-muted">Öğretmen</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <p class="card-text">"Düzenli ödemelerimi hiç kaçırmıyorum artık. Hatırlatma sistemi gerçekten çok işime yarıyor."</p>
+                            <div class="d-flex align-items-center mt-3">
+                                <i class="bi bi-person-circle fs-2 me-3"></i>
+                                <div>
+                                    <h5 class="mb-0">Mehmet S.</h5>
+                                    <small class="text-muted">Esnaf</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- Aylık Özet -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card bg-success bg-opacity-25 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Aylık Gelir</h5>
-                        <h3 class="card-text" id="monthlyIncome">0.00 TL</h3>
-                    </div>
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container text-center">
+            <h2 class="mb-4">Finansal Geleceğinizi Şekillendirin</h2>
+            <p class="lead mb-4">Hemen ücretsiz hesap oluşturun ve finansal kontrolü elinize alın.</p>
+            <a href="register.php" class="btn btn-primary btn-lg">Ücretsiz Başlayın</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Bütçe Takip</h5>
+                    <p>Kişisel finans yönetimini kolaylaştıran modern çözüm.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Bağlantılar</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#features" class="text-white">Özellikler</a></li>
+                        <li><a href="#testimonials" class="text-white">Yorumlar</a></li>
+                        <li><a href="login.php" class="text-white">Giriş Yap</a></li>
+                        <li><a href="register.php" class="text-white">Kayıt Ol</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>İletişim</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-envelope me-2"></i> info@butcetakip.com</li>
+                        <li><i class="bi bi-telephone me-2"></i> (0212) 555 0123</li>
+                    </ul>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card bg-danger bg-opacity-25 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Aylık Gider</h5>
-                        <h3 class="card-text" id="monthlyExpense">0.00 TL</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-info bg-opacity-25 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Net Durum</h5>
-                        <h3 class="card-text" id="monthlyBalance">0.00 TL</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card bg-warning bg-opacity-25 h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Dönem</h5>
-                        <h3 class="card-text" id="currentPeriod"></h3>
-                    </div>
-                </div>
+            <hr class="mt-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2024 Bütçe Takip. Tüm hakları saklıdır.</p>
+                <small>Geliştirici: A. Kerem Gök</small>
             </div>
         </div>
+    </footer>
 
-        <!-- Gelirler Tablosu -->
-        <div class="card mb-4">
-            <div class="card-header bg-success bg-opacity-25">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Gelirler</h2>
-                    <button class="btn btn-success" data-action="add" data-type="income">
-                        <i class="bi bi-plus-lg me-1"></i>Gelir Ekle
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Durum</th>
-                                <th>Gelir İsmi</th>
-                                <th>Tutar</th>
-                                <th>Kur</th>
-                                <th>İlk Gelir Tarihi</th>
-                                <th>Tekrarlama Sıklığı</th>
-                                <th>Sonraki Gelir</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody id="incomeList"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Birikimler Tablosu -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary bg-opacity-25">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Birikimler</h2>
-                    <button class="btn btn-primary" data-action="add" data-type="saving">
-                        <i class="bi bi-plus-lg me-1"></i>Birikim Ekle
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Birikim İsmi</th>
-                                <th>Hedef Tutar</th>
-                                <th>Biriken Tutar</th>
-                                <th>Kur</th>
-                                <th>Başlangıç Tarihi</th>
-                                <th>Hedef Tarihi</th>
-                                <th>İlerleme</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody id="savingList"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ödemeler Tablosu -->
-        <div class="card mb-4">
-            <div class="card-header bg-danger bg-opacity-25">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Ödemeler</h2>
-                    <button class="btn btn-danger" data-action="add" data-type="payment">
-                        <i class="bi bi-plus-lg me-1"></i>Ödeme Ekle
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Durum</th>
-                                <th>Ödeme İsmi</th>
-                                <th>Tutar</th>
-                                <th>Kur</th>
-                                <th>İlk Ödeme Tarihi</th>
-                                <th>Tekrarlama Sıklığı</th>
-                                <th>Sonraki Ödeme</th>
-                                <th>İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody id="paymentList"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ödeme Gücü Tablosu -->
-        <div class="card mb-4">
-            <div class="card-header bg-info bg-opacity-25">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Ödeme Gücü</h2>
-                    <small class="text-muted"></small>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Ödeme İsmi</th>
-                                <th>Tutar</th>
-                                <th>Kur</th>
-                                <th>Taksit Bilgisi</th>
-                                <th>Toplam</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recurringPaymentsList"></tbody>
-                        <tfoot>
-                            <tr class="table-info">
-                                <td colspan="4" class="text-end fw-bold">Toplam Ödeme:</td>
-                                <td id="totalYearlyPayment" class="fw-bold"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modals -->
-    <?php include 'modals.php'; ?>
-
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="app.js"></script>
 </body>
 
 </html>
