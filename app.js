@@ -379,11 +379,11 @@ function loadChildPayments(parentId) {
             }
 
             tbody.append(`
-                <tr class="table-primary">
+                <tr class="table-primary" style="cursor: default;">
                     <td>
                         <button
                             class="btn btn-sm ${parent.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
-                            onclick="markAsPaid(${parent.id})"
+                            onclick="markAsPaid(${parent.id}); return false;"
                             title="${parent.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
                         >
                             <i class="bi ${parent.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
@@ -404,11 +404,11 @@ function loadChildPayments(parentId) {
                 }
 
                 tbody.append(`
-                    <tr>
+                    <tr style="cursor: default;">
                         <td>
                             <button
                                 class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
-                                onclick="markAsPaid(${payment.id})"
+                                onclick="markAsPaid(${payment.id}); return false;"
                                 title="${payment.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
                             >
                                 <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
@@ -431,7 +431,25 @@ function markAsPaid(id) {
         id: id
     }).done(function (response) {
         if (response.status === 'success') {
-            loadData();
+            // Sadece ilgili ödemenin durumunu güncelle
+            const button = $(`button[onclick*="markAsPaid(${id})"]`);
+            const isPaid = button.hasClass('btn-outline-success');
+            
+            if (isPaid) {
+                button.removeClass('btn-outline-success').addClass('btn-success');
+                button.find('i').removeClass('bi-check-circle').addClass('bi-check-circle-fill');
+                button.attr('title', 'Ödenmedi olarak işaretle');
+            } else {
+                button.removeClass('btn-success').addClass('btn-outline-success');
+                button.find('i').removeClass('bi-check-circle-fill').addClass('bi-check-circle');
+                button.attr('title', 'Ödendi olarak işaretle');
+            }
+
+            // Ödeme gücü tablosundaki ilgili satırı güncelle
+            const parentRow = button.closest('tr').parent().closest('tr');
+            if (parentRow.hasClass('payment-parent')) {
+                loadChildPayments(parentRow.data('payment-id'));
+            }
         }
     });
 }
