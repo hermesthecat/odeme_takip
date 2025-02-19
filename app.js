@@ -85,11 +85,11 @@ function updateIncomeList(incomes) {
                 <td>${income.currency}</td>
                 <td>${income.first_date}</td>
                 <td>${getFrequencyText(income.frequency)}</td>
-                <td>${income.status === 'received' ? '<span class="badge bg-success">Alındı</span>' : '<span class="badge bg-warning">Bekliyor</span>'}</td>
+                <td>${income.next_income_date || ''}</td>
                 <td>
                     ${isChild ? `
                         <button class="btn btn-sm btn-success" onclick="markAsReceived(${income.id})">
-                            <i class="bi bi-check-lg"></i>
+                            ${income.status === 'received' ? '<span class="badge bg-success">Alındı</span>' : '<span class="badge bg-warning">Bekliyor</span>'}
                         </button>
                     ` : `
                         <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})">
@@ -164,11 +164,11 @@ function updatePaymentsList(payments) {
                 <td>${payment.currency}</td>
                 <td>${payment.first_date}</td>
                 <td>${getFrequencyText(payment.frequency)}</td>
-                <td>${payment.status === 'paid' ? '<span class="badge bg-success">Ödendi</span>' : '<span class="badge bg-warning">Bekliyor</span>'}</td>
+                <td>${payment.next_payment_date || ''}</td>
                 <td>
                     ${isChild ? `
                         <button class="btn btn-sm btn-success" onclick="markAsPaid(${payment.id})">
-                            <i class="bi bi-check-lg"></i>
+                            ${payment.status === 'paid' ? '<span class="badge bg-success">Ödendi</span>' : '<span class="badge bg-warning">Bekliyor</span>'}
                         </button>
                     ` : `
                         <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})">

@@ -251,25 +251,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $month = intval($_POST['month']) + 1;
             $year = intval($_POST['year']);
             
-            // Ödemeleri al (hem ana hem child kayıtlar)
-            $sql = "SELECT p.*, parent.id as parent_payment_id, parent.name as parent_name 
-                   FROM payments p 
-                   LEFT JOIN payments parent ON p.parent_id = parent.id 
-                   WHERE p.user_id = ? AND MONTH(p.first_date) = ? AND YEAR(p.first_date) = ?
-                   ORDER BY p.first_date ASC";
+            // Ödemeleri al
+            $sql = "SELECT p.*, 
+                    CASE 
+                        WHEN p.parent_id IS NULL THEN (
+                            SELECT MIN(p2.first_date)
+                            FROM payments p2
+                            WHERE p2.parent_id = p.id
+                            AND p2.user_id = p.user_id
+                        )
+                        ELSE (
+                            SELECT MIN(p2.first_date)
+                            FROM payments p2
+                            WHERE p2.parent_id = p.parent_id
+                            AND p2.first_date > p.first_date
+                            AND p2.user_id = p.user_id
+                        )
+                    END as next_payment_date
+                    FROM payments p 
+                    WHERE p.user_id = ? 
+                    AND MONTH(p.first_date) = ? 
+                    AND YEAR(p.first_date) = ?
+                    ORDER BY p.parent_id, p.first_date ASC";
             
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$user_id, $month, $year]);
             $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             // Gelirleri al
-            $sql = "SELECT * FROM income WHERE user_id = ? AND (
-                (frequency = 'none' AND MONTH(first_date) = ? AND YEAR(first_date) = ?) OR
-                (frequency != 'none' AND MONTH(next_date) = ? AND YEAR(next_date) = ?)
-            )";
+            $sql = "SELECT i.*, 
+                    CASE 
+                        WHEN i.parent_id IS NULL THEN (
+                            SELECT MIN(i2.first_date)
+                            FROM income i2
+                            WHERE i2.parent_id = i.id
+                            AND i2.user_id = i.user_id
+                        )
+                        ELSE (
+                            SELECT MIN(i2.first_date)
+                            FROM income i2
+                            WHERE i2.parent_id = i.parent_id
+                            AND i2.first_date > i.first_date
+                            AND i2.user_id = i.user_id
+                        )
+                    END as next_income_date
+                    FROM income i 
+                    WHERE i.user_id = ? 
+                    AND MONTH(i.first_date) = ? 
+                    AND YEAR(i.first_date) = ?
+                    ORDER BY i.parent_id, i.first_date ASC";
             
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$user_id, $month, $year, $month, $year]);
+            $stmt->execute([$user_id, $month, $year]);
             $incomes = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
             // Birikimleri al
