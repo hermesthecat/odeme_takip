@@ -215,6 +215,18 @@ function updatePaymentsList(payments) {
                     </tr>
         `);
     });
+
+    // Aktarma butonu satırı
+    tbody.append(`
+        <tr class="table-secondary">
+            <td colspan="8" class="text-end">
+                <button class="btn btn-warning" onclick="transferUnpaidPayments()">
+                    <i class="bi bi-arrow-right-circle me-1"></i>
+                    Ödenmemiş Ödemeleri Sonraki Aya Aktar
+                </button>
+            </td>
+        </tr>
+    `);
 }
 
 // Ödeme durumunu güncelle
@@ -292,6 +304,30 @@ function deletePayment(id) {
             }
         });
     }
+}
+
+// Ödenmemiş ödemeleri sonraki aya aktar
+function transferUnpaidPayments() {
+    if (!confirm('Ödenmemiş ödemeleri sonraki aya aktarmak istediğinizden emin misiniz?')) {
+        return;
+    }
+
+    const month = parseInt($('#monthSelect').val()) + 1; // API'de 1'den başlıyor
+    const year = parseInt($('#yearSelect').val());
+
+    ajaxRequest({
+        action: 'transfer_unpaid_payments',
+        current_month: month,
+        current_year: year
+    }).done(function (response) {
+        if (response.status === 'success') {
+            loadData();
+            // Sonraki aya geç
+            nextMonth();
+        } else {
+            alert('Hata: ' + response.message);
+        }
+    });
 }
 
 // Ay/yıl değişikliği
