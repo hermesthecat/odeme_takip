@@ -366,6 +366,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Tekrarlayan ödemeleri al
             $sql_recurring_payments = "SELECT 
+                        p1.id,
                         p1.name,
                         p1.amount,
                         p1.currency,
@@ -614,6 +615,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'success', 'message' => 'Kullanıcı ayarları güncellendi'];
             } else {
                 $response = ['status' => 'error', 'message' => 'Kullanıcı ayarları güncellenirken hata oluştu'];
+            }
+            break;
+
+        case 'get_child_payments':
+            $stmt = $pdo->prepare("SELECT id, name, amount, currency, first_date, status, exchange_rate 
+                                 FROM payments 
+                                 WHERE parent_id = ? AND user_id = ?
+                                 ORDER BY first_date ASC");
+            if ($stmt->execute([$_POST['parent_id'], $user_id])) {
+                $child_payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                $response = [
+                    'status' => 'success',
+                    'data' => $child_payments
+                ];
+            } else {
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Child ödemeler alınamadı'
+                ];
             }
             break;
     }

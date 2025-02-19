@@ -299,8 +299,11 @@ function updateRecurringPaymentsList(recurring_payments) {
                     'bg-success';
 
         tbody.append(`
-            <tr>
-                <td>${payment.name}</td>
+            <tr class="payment-parent" data-payment-id="${payment.id}" style="cursor: pointer;">
+                <td>
+                    <i class="bi bi-chevron-right me-2 toggle-icon"></i>
+                    ${payment.name}
+                </td>
                 <td>${parseFloat(payment.amount).toFixed(2)}</td>
                 <td>${payment.currency}</td>
                 <td>
@@ -313,10 +316,75 @@ function updateRecurringPaymentsList(recurring_payments) {
                 </td>
                 <td>${parseFloat(payment.yearly_total).toFixed(2)}</td>
             </tr>
+            <tr class="payment-children d-none" data-parent-id="${payment.id}">
+                <td colspan="5" class="p-0">
+                    <div class="child-payments-container bg-opacity-10 p-3">
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Durum</th>
+                                        <th>Ödeme Tarihi</th>
+                                        <th>Tutar</th>
+                                        <th>Kur</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="child-payments" data-parent-id="${payment.id}">
+                                    <!-- Child ödemeler buraya eklenecek -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </td>
+            </tr>
         `);
+
+        // Child ödemeleri yükle
+        loadChildPayments(payment.id);
     });
 
     $('#totalYearlyPayment').text(totalYearlyPayment.toFixed(2));
+
+    // Ana kayıtlara tıklama olayı ekle
+    $('.payment-parent').on('click', function() {
+        const paymentId = $(this).data('payment-id');
+        const childrenRow = $(`.payment-children[data-parent-id="${paymentId}"]`);
+        const toggleIcon = $(this).find('.toggle-icon');
+        
+        childrenRow.toggleClass('d-none');
+        toggleIcon.toggleClass('bi-chevron-right bi-chevron-down');
+        
+        if (!childrenRow.hasClass('d-none')) {
+            loadChildPayments(paymentId);
+        }
+    });
+}
+
+// Child ödemeleri yükle
+function loadChildPayments(parentId) {
+    ajaxRequest({
+        action: 'get_child_payments',
+        parent_id: parentId
+    }).done(function(response) {
+        if (response.status === 'success') {
+            const childPayments = response.data;
+            const tbody = $(`.child-payments[data-parent-id="${parentId}"]`);
+            tbody.empty();
+
+            childPayments.forEach(function(payment) {
+                tbody.append(`
+                    <tr>
+                        <td>
+                            <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'}"></i>
+                        </td>
+                        <td>${payment.first_date}</td>
+                        <td>${parseFloat(payment.amount).toFixed(2)} ${payment.currency}</td>
+                        <td>${payment.currency}</td>
+                    </tr>
+                `);
+            });
+        }
+    });
 }
 
 // Ödeme durumunu güncelle
