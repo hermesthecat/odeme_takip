@@ -141,6 +141,76 @@ function getExchangeRate($from_currency, $to_currency)
     return $result ? $result['rate'] : null;
 }
 
+// Validasyon fonksiyonları
+function validateRequired($value, $field_name)
+{
+    if (empty($value)) {
+        throw new Exception($field_name . " alanı zorunludur");
+    }
+    return $value;
+}
+
+function validateNumeric($value, $field_name)
+{
+    if (!is_numeric($value)) {
+        throw new Exception($field_name . " alanı sayısal olmalıdır");
+    }
+    return floatval($value);
+}
+
+function validateDate($value, $field_name)
+{
+    $date = DateTime::createFromFormat('Y-m-d', $value);
+    if (!$date || $date->format('Y-m-d') !== $value) {
+        throw new Exception($field_name . " alanı geçerli bir tarih olmalıdır (YYYY-MM-DD)");
+    }
+    return $value;
+}
+
+function validateCurrency($value, $field_name)
+{
+    $valid_currencies = ['TRY', 'USD', 'EUR', 'GBP'];
+    if (!in_array($value, $valid_currencies)) {
+        throw new Exception($field_name . " alanı geçerli bir para birimi olmalıdır");
+    }
+    return $value;
+}
+
+function validateFrequency($value, $field_name)
+{
+    $valid_frequencies = ['none', 'monthly', 'bimonthly', 'quarterly', 'fourmonthly', 'fivemonthly', 'sixmonthly', 'yearly'];
+    if (!in_array($value, $valid_frequencies)) {
+        throw new Exception($field_name . " alanı geçerli bir tekrarlama sıklığı olmalıdır");
+    }
+    return $value;
+}
+
+function validateMinValue($value, $min, $field_name)
+{
+    if (floatval($value) < $min) {
+        throw new Exception($field_name . " alanı en az " . $min . " olmalıdır");
+    }
+    return floatval($value);
+}
+
+function validateMaxValue($value, $max, $field_name)
+{
+    if (floatval($value) > $max) {
+        throw new Exception($field_name . " alanı en fazla " . $max . " olmalıdır");
+    }
+    return floatval($value);
+}
+
+function validateDateRange($start_date, $end_date)
+{
+    $start = new DateTime($start_date);
+    $end = new DateTime($end_date);
+    if ($start > $end) {
+        throw new Exception("Başlangıç tarihi bitiş tarihinden büyük olamaz");
+    }
+    return true;
+}
+
 header('Content-Type: application/json');
 
 $response = ['status' => 'error', 'message' => 'Invalid request'];
@@ -152,16 +222,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     switch ($action) {
         case 'add_income':
             try {
-                $pdo->beginTransaction();
 
-                $frequency = $_POST['frequency'];
-                $first_date = $_POST['first_date'];
-                $end_date = $_POST['end_date'] ?? $first_date;
+                if (isset($_POST['name'])) {
+                    $name = validateRequired($_POST['name'] ?? null, "Gelir adı");
+                }
+
+                if (isset($_POST['amount'])) {
+                    $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
+                    $amount = validateNumeric($amount, "Tutar");
+                    $amount = validateMinValue($amount, 0, "Tutar");
+                }
+
+                if (isset($_POST['currency'])) {
+                    $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
+                    $currency = validateCurrency($currency, "Para birimi");
+                }
+
+                if (isset($_POST['first_date'])) {
+                    $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
+                    $first_date = validateDate($first_date, "Tarih");
+                }
+
+                if (isset($_POST['frequency'])) {
+                    $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
+                    $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+                } else {
+                    $frequency = 'none';
+                }
+
+                if (isset($_POST['end_date']) && $_POST['end_date'] !== '') {
+                    $end_date = validateDate($_POST['end_date'], "Bitiş tarihi");
+                    validateDateRange($first_date, $end_date);
+                }
+
+                $pdo->beginTransaction();
 
                 // Kur bilgisini al
                 $exchange_rate = null;
-                if ($_POST['currency'] !== 'TRY') {
-                    $exchange_rate = getExchangeRate($_POST['currency'], 'TRY');
+                if ($currency !== 'TRY') {
+                    $exchange_rate = getExchangeRate($currency, 'TRY');
                     if (!$exchange_rate) {
                         throw new Exception("Kur bilgisi alınamadı");
                     }
@@ -173,9 +272,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!$stmt->execute([
                     $user_id,
-                    $_POST['name'],
-                    $_POST['amount'],
-                    $_POST['currency'],
+                    $name,
+                    $amount,
+                    $currency,
                     $first_date,
                     $frequency,
                     $exchange_rate
@@ -203,9 +302,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 if (!$stmt->execute([
                                     $user_id,
                                     $parent_id,
-                                    $_POST['name'],
-                                    $_POST['amount'],
-                                    $_POST['currency'],
+                                    $name,
+                                    $amount,
+                                    $currency,
                                     $income_date,
                                     $frequency,
                                     $exchange_rate
@@ -220,30 +319,99 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->commit();
                 $response = ['status' => 'success', 'message' => 'Gelir başarıyla eklendi'];
             } catch (Exception $e) {
-                $pdo->rollBack();
-                $response = ['status' => 'error', 'message' => 'Gelir eklenirken hata: ' . $e->getMessage()];
+                if (isset($pdo) && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;
 
         case 'add_saving':
-            $stmt = $pdo->prepare("INSERT INTO savings (user_id, name, target_amount, currency, start_date, target_date) VALUES (?, ?, ?, ?, ?, ?)");
-            if ($stmt->execute([$user_id, $_POST['name'], $_POST['target_amount'], $_POST['currency'], $_POST['start_date'], $_POST['target_date']])) {
-                $response = ['status' => 'success', 'message' => 'Birikim başarıyla eklendi'];
+            try {
+
+                if (isset($_POST['name'])) {
+                    $name = validateRequired($_POST['name'] ?? null, "Birikim adı");
+                }
+
+                if (isset($_POST['target_amount'])) {
+                    $target_amount = validateRequired($_POST['target_amount'] ?? null, "Hedef tutar");
+                    $target_amount = validateNumeric($target_amount, "Hedef tutar");
+                    $target_amount = validateMinValue($target_amount, 0, "Hedef tutar");
+                }
+
+                if (isset($_POST['current_amount'])) {
+                    $current_amount = validateRequired($_POST['current_amount'] ?? null, "Mevcut tutar");
+                    $current_amount = validateNumeric($current_amount, "Mevcut tutar");
+                    $current_amount = validateMinValue($current_amount, 0, "Mevcut tutar");
+                }
+
+                if (isset($_POST['currency'])) {
+                    $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
+                    $currency = validateCurrency($currency, "Para birimi");
+                }
+
+                if (isset($_POST['start_date'])) {
+                    $start_date = validateRequired($_POST['start_date'] ?? null, "Başlangıç tarihi");
+                    $start_date = validateDate($start_date, "Başlangıç tarihi");
+                }
+
+                if (isset($_POST['target_date'])) {
+                    $target_date = validateRequired($_POST['target_date'] ?? null, "Hedef tarihi");
+                    $target_date = validateDate($target_date, "Hedef tarihi");
+                    validateDateRange($start_date, $target_date);
+                }
+
+
+                $stmt = $pdo->prepare("INSERT INTO savings (user_id, name, target_amount, currency, start_date, target_date) VALUES (?, ?, ?, ?, ?, ?)");
+                if ($stmt->execute([$user_id, $name, $target_amount, $currency, $start_date, $target_date])) {
+                    $response = ['status' => 'success', 'message' => 'Birikim başarıyla eklendi'];
+                }
+            } catch (Exception $e) {
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;
 
         case 'add_payment':
             try {
-                $pdo->beginTransaction();
 
-                $frequency = $_POST['frequency'];
-                $first_date = $_POST['first_date'];
-                $end_date = $_POST['end_date'] ?? $first_date;
+                if (isset($_POST['name'])) {
+                    $name = validateRequired($_POST['name'] ?? null, "Ödeme adı");
+                }
+
+                if (isset($_POST['amount'])) {
+                    $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
+                    $amount = validateNumeric($amount, "Tutar");
+                    $amount = validateMinValue($amount, 0, "Tutar");
+                }
+
+                if (isset($_POST['currency'])) {
+                    $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
+                    $currency = validateCurrency($currency, "Para birimi");
+                }
+
+                if (isset($_POST['first_date'])) {
+                    $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
+                    $first_date = validateDate($first_date, "Tarih");
+                }
+
+                if (isset($_POST['frequency'])) {
+                    $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
+                    $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+                } else {
+                    $frequency = 'none';
+                }
+
+                if (isset($_POST['end_date']) && $_POST['end_date'] !== '') {
+                    $end_date = validateDate($_POST['end_date'], "Bitiş tarihi");
+                    validateDateRange($first_date, $end_date);
+                }
+
+                $pdo->beginTransaction();
 
                 // Kur bilgisini al
                 $exchange_rate = null;
-                if ($_POST['currency'] !== 'TRY') {
-                    $exchange_rate = getExchangeRate($_POST['currency'], 'TRY');
+                if ($currency !== 'TRY') {
+                    $exchange_rate = getExchangeRate($currency, 'TRY');
                     if (!$exchange_rate) {
                         throw new Exception("Kur bilgisi alınamadı");
                     }
@@ -255,9 +423,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!$stmt->execute([
                     $user_id,
-                    $_POST['name'],
-                    $_POST['amount'],
-                    $_POST['currency'],
+                    $name,
+                    $amount,
+                    $currency,
                     $first_date,
                     $frequency,
                     $exchange_rate
@@ -285,9 +453,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 if (!$stmt->execute([
                                     $user_id,
                                     $parent_id,
-                                    $_POST['name'],
-                                    $_POST['amount'],
-                                    $_POST['currency'],
+                                    $name,
+                                    $amount,
+                                    $currency,
                                     $payment_date,
                                     $frequency,
                                     $exchange_rate
@@ -302,8 +470,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $pdo->commit();
                 $response = ['status' => 'success', 'message' => 'Ödeme başarıyla eklendi'];
             } catch (Exception $e) {
-                $pdo->rollBack();
-                $response = ['status' => 'error', 'message' => 'Ödeme eklenirken hata: ' . $e->getMessage()];
+                if (isset($pdo) && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;
 
@@ -486,11 +656,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt_summary->execute([$user_id, $month, $year, $user_id, $month, $year]);
                     $summary = $stmt_summary->fetch(PDO::FETCH_ASSOC);
                     $response['data']['summary'] = $summary;
-                    break;
-
-                case 'all':
-                    // Tüm verileri al (eski davranış)
-                    // ... existing code for fetching all data ...
                     break;
             }
             break;
