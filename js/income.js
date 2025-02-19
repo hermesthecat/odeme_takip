@@ -16,7 +16,7 @@ function updateIncomeList(incomes) {
 
     incomes.forEach(function (income) {
         const isChild = income.parent_id !== null;
-        const rowClass = isChild ? 'table-light' : '';
+        // const rowClass = isChild ? 'table-light' : '';
         let amountText = `${parseFloat(income.amount).toFixed(2)} ${income.currency}`;
 
         // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
@@ -26,7 +26,7 @@ function updateIncomeList(incomes) {
         }
 
         tbody.append(`
-            <tr class="${rowClass}">
+            <tr>
                 <td style="width: 50px;">
                     <button
                         class="btn btn-sm ${income.status === 'received' ? 'btn-success' : 'btn-outline-success'}"

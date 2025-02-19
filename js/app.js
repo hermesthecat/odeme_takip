@@ -3,26 +3,122 @@ function loadData() {
     const month = $('#monthSelect').val();
     const year = $('#yearSelect').val();
 
+    // Yükleniyor göstergelerini göster
+    $('#incomeLoadingSpinner').show();
+    $('#savingsLoadingSpinner').show();
+    $('#paymentsLoadingSpinner').show();
+    $('#recurringPaymentsLoadingSpinner').show();
+    $('#summaryLoadingSpinner').show();
+
+    // Ana veriyi yükle
     ajaxRequest({
         action: 'get_data',
         month: month,
-        year: year
+        year: year,
+        load_type: 'summary'
     }).done(function (response) {
         if (response.status === 'success') {
             // Global data değişkenini set et
             window.data = response.data;
-
-            updateIncomeList(response.data.incomes);
-            updateSavingsList(response.data.savings);
-            updatePaymentsList(response.data.payments);
-            updateRecurringPaymentsList(response.data.recurring_payments);
+            
+            // Özet bilgileri güncelle
             updateSummary(response.data);
+            $('#summaryLoadingSpinner').hide();
+
+            // Diğer verileri lazy load et
+            loadIncomeData();
+            loadSavingsData();
+            loadPaymentsData();
+            loadRecurringPaymentsData();
         } else {
             console.error('Veri yükleme hatası:', response.message);
+            hideAllLoadingSpinners();
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
         console.error('AJAX hatası:', textStatus, errorThrown);
+        hideAllLoadingSpinners();
     });
+}
+
+// Gelir verilerini yükle
+function loadIncomeData() {
+    const month = $('#monthSelect').val();
+    const year = $('#yearSelect').val();
+
+    ajaxRequest({
+        action: 'get_data',
+        month: month,
+        year: year,
+        load_type: 'income'
+    }).done(function (response) {
+        if (response.status === 'success') {
+            updateIncomeList(response.data.incomes);
+            $('#incomeLoadingSpinner').hide();
+        }
+    });
+}
+
+// Birikim verilerini yükle
+function loadSavingsData() {
+    const month = $('#monthSelect').val();
+    const year = $('#yearSelect').val();
+
+    ajaxRequest({
+        action: 'get_data',
+        month: month,
+        year: year,
+        load_type: 'savings'
+    }).done(function (response) {
+        if (response.status === 'success') {
+            updateSavingsList(response.data.savings);
+            $('#savingsLoadingSpinner').hide();
+        }
+    });
+}
+
+// Ödeme verilerini yükle
+function loadPaymentsData() {
+    const month = $('#monthSelect').val();
+    const year = $('#yearSelect').val();
+
+    ajaxRequest({
+        action: 'get_data',
+        month: month,
+        year: year,
+        load_type: 'payments'
+    }).done(function (response) {
+        if (response.status === 'success') {
+            updatePaymentsList(response.data.payments);
+            $('#paymentsLoadingSpinner').hide();
+        }
+    });
+}
+
+// Tekrarlayan ödeme verilerini yükle
+function loadRecurringPaymentsData() {
+    const month = $('#monthSelect').val();
+    const year = $('#yearSelect').val();
+
+    ajaxRequest({
+        action: 'get_data',
+        month: month,
+        year: year,
+        load_type: 'recurring_payments'
+    }).done(function (response) {
+        if (response.status === 'success') {
+            updateRecurringPaymentsList(response.data.recurring_payments);
+            $('#recurringPaymentsLoadingSpinner').hide();
+        }
+    });
+}
+
+// Tüm yükleniyor göstergelerini gizle
+function hideAllLoadingSpinners() {
+    $('#incomeLoadingSpinner').hide();
+    $('#savingsLoadingSpinner').hide();
+    $('#paymentsLoadingSpinner').hide();
+    $('#recurringPaymentsLoadingSpinner').hide();
+    $('#summaryLoadingSpinner').hide();
 }
 
 // Sayfa yüklendiğinde

@@ -1,26 +1,12 @@
 // Özet bilgileri güncelle
 function updateSummary(data) {
-    let totalIncome = 0;
-    let totalExpense = 0;
+    if (!data.summary) {
+        console.error('Özet verisi bulunamadı');
+        return;
+    }
 
-    // Gelirleri topla
-    data.incomes.forEach(income => {
-        let amount = parseFloat(income.amount);
-        if (income.currency !== 'TRY' && income.exchange_rate) {
-            amount *= parseFloat(income.exchange_rate);
-        }
-        totalIncome += amount;
-    });
-
-    // Ödemeleri topla
-    data.payments.forEach(payment => {
-        let amount = parseFloat(payment.amount);
-        if (payment.currency !== 'TRY' && payment.exchange_rate) {
-            amount *= parseFloat(payment.exchange_rate);
-        }
-        totalExpense += amount;
-    });
-
+    const totalIncome = parseFloat(data.summary.total_income);
+    const totalExpense = parseFloat(data.summary.total_expense);
     const balance = totalIncome - totalExpense;
 
     // Özet bilgileri güncelle

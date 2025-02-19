@@ -16,7 +16,7 @@ function updatePaymentsList(payments) {
 
     payments.forEach(function (payment) {
         const isChild = payment.parent_id !== null;
-        const rowClass = isChild ? 'table-light' : '';
+        // const rowClass = isChild ? 'table-light' : '';
         let amountText = `${parseFloat(payment.amount).toFixed(2)} ${payment.currency}`;
 
         if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
@@ -25,7 +25,7 @@ function updatePaymentsList(payments) {
         }
 
         tbody.append(`
-            <tr class="${rowClass}">
+            <tr>
                 <td style="width: 50px;">
                     <button
                         class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
