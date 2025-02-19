@@ -174,50 +174,39 @@ function loadPayments()
 
 function loadRecurringPayments()
 {
-    global $pdo, $user_id, $month, $year;
+    global $pdo, $user_id;
 
     // Tekrarlayan ödemeleri al
     $sql_recurring_payments = "SELECT 
-                                p1.id,
-                                p1.name,
-                                p1.amount,
-                                p1.currency,
-                                p1.frequency,
-                                CASE 
-                                    WHEN p1.frequency = 'monthly' THEN 12
-                                    WHEN p1.frequency = 'bimonthly' THEN 6
-                                    WHEN p1.frequency = 'quarterly' THEN 4
-                                    WHEN p1.frequency = 'fourmonthly' THEN 3
-                                    WHEN p1.frequency = 'fivemonthly' THEN 2.4
-                                    WHEN p1.frequency = 'sixmonthly' THEN 2
-                                    WHEN p1.frequency = 'yearly' THEN 1
-                                    ELSE 1
-                                END as yearly_repeat_count,
-                                CASE 
-                                    WHEN p1.frequency = 'monthly' THEN p1.amount * 12
-                                    WHEN p1.frequency = 'bimonthly' THEN p1.amount * 6
-                                    WHEN p1.frequency = 'quarterly' THEN p1.amount * 4
-                                    WHEN p1.frequency = 'fourmonthly' THEN p1.amount * 3
-                                    WHEN p1.frequency = 'fivemonthly' THEN p1.amount * 2.4
-                                    WHEN p1.frequency = 'sixmonthly' THEN p1.amount * 2
-                                    WHEN p1.frequency = 'yearly' THEN p1.amount
-                                    ELSE p1.amount
-                                END as yearly_total,
-                                CONCAT(
-                                    (SELECT COUNT(*) FROM payments p2 
-                                     WHERE (p2.parent_id = p1.id OR p2.id = p1.id)
-                                     AND p2.status = 'paid'
-                                     AND p2.user_id = p1.user_id),
-                                    '/',
-                                    (SELECT COUNT(*) + 1 FROM payments p3 
-                                     WHERE p3.parent_id = p1.id 
-                                     AND p3.user_id = p1.user_id)
-                                ) as payment_status
-                            FROM payments p1 
-                            WHERE p1.user_id = ? 
-                            AND p1.frequency != 'none'
-                            AND p1.parent_id IS NULL
-                            ORDER BY yearly_total DESC";
+        p1.id,
+        p1.name,
+        p1.amount,
+        p1.currency,
+        p1.frequency,
+        (
+            SELECT SUM(CASE 
+                WHEN p2.currency = p1.currency THEN p2.amount 
+                ELSE p2.amount * p2.exchange_rate 
+            END)
+            FROM payments p2 
+            WHERE (p2.parent_id = p1.id OR p2.id = p1.id)
+            AND p2.user_id = p1.user_id
+        ) as yearly_total,
+        CONCAT(
+            (SELECT COUNT(*) FROM payments p2 
+             WHERE (p2.parent_id = p1.id OR p2.id = p1.id)
+             AND p2.status = 'paid'
+             AND p2.user_id = p1.user_id),
+            '/',
+            (SELECT COUNT(*) + 1 FROM payments p3 
+             WHERE p3.parent_id = p1.id 
+             AND p3.user_id = p1.user_id)
+        ) as payment_status
+    FROM payments p1 
+    WHERE p1.user_id = ? 
+    AND p1.frequency != 'none'
+    AND p1.parent_id IS NULL
+    ORDER BY yearly_total DESC";
 
     $stmt_recurring_payments = $pdo->prepare($sql_recurring_payments);
     $stmt_recurring_payments->execute([$user_id]);
