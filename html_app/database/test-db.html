@@ -213,8 +213,12 @@
                 });
 
                 if (data.success) {
-                    transactionButton.disabled = false;
-                    addLogMessage('Bütçe testleri başarıyla tamamlandı!', 'success');
+                    if (transactionButton) {
+                        transactionButton.disabled = false;
+                        addLogMessage('Bütçe testleri başarıyla tamamlandı!', 'success');
+                    } else {
+                        addLogMessage('Transaction test button not found!', 'error');
+                    }
                 } else {
                     addLogMessage('Bazı testler başarısız oldu.', 'error');
                     if (data.help) {
