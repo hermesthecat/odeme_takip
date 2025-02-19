@@ -124,6 +124,10 @@ function updateSavingsList(savings) {
 
     savings.forEach(function (saving) {
         const progress = (saving.current_amount / saving.target_amount) * 100;
+        const progressClass = progress < 25 ? 'bg-danger' :
+            progress < 50 ? 'bg-warning' :
+                progress < 75 ? 'bg-info' :
+                    'bg-success';
         tbody.append(`
             <tr>
                 <td>${saving.name}</td>
@@ -133,11 +137,12 @@ function updateSavingsList(savings) {
                 <td>${saving.start_date}</td>
                 <td>${saving.target_date}</td>
                 <td>
-                    <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: ${progress}%" 
+                    <div class="progress mb-1">
+                        <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${progress}%" 
                              aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
                         </div>
                     </div>
+                    <small class="text-muted text-center d-block">%${progress.toFixed(0)}</small>
                 </td>
                 <td>
                     <div class="btn-group">
