@@ -61,11 +61,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <style>
         body {
             background-color: #f8f9fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .login-container {
             max-width: 400px;
-            margin: 100px auto;
+            margin: 50px auto;
+            flex: 1;
         }
 
         .logo {
@@ -77,10 +81,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 48px;
             color: #0d6efd;
         }
+
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 50px 0;
+            margin-top: auto;
+        }
     </style>
 </head>
 
 <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.php">
+                <i class="bi bi-piggy-bank me-2"></i>
+                Bütçe Takip
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php#features">Özellikler</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.php#testimonials">Yorumlar</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary ms-2" href="login.php">Giriş Yap</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-outline-light ms-2" href="register.php">Kayıt Ol</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
     <div class="container login-container">
         <div class="logo">
             <i class="bi bi-piggy-bank"></i>
@@ -88,11 +128,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <p class="text-muted">Giriş Yap</p>
         </div>
 
-        <?php
-        if (!empty($login_err)) {
-            echo '<div class="alert alert-danger">' . $login_err . '</div>';
-        }
-        ?>
+        <?php if (!empty($login_err)): ?>
+            <div class="alert alert-danger"><?php echo $login_err; ?></div>
+        <?php endif; ?>
 
         <div class="card shadow">
             <div class="card-body">
@@ -120,6 +158,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Bütçe Takip</h5>
+                    <p>Kişisel finans yönetimini kolaylaştıran modern çözüm.</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Bağlantılar</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="index.php#features" class="text-white">Özellikler</a></li>
+                        <li><a href="index.php#testimonials" class="text-white">Yorumlar</a></li>
+                        <li><a href="login.php" class="text-white">Giriş Yap</a></li>
+                        <li><a href="register.php" class="text-white">Kayıt Ol</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>İletişim</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="bi bi-envelope me-2"></i> info@butcetakip.com</li>
+                        <li><i class="bi bi-telephone me-2"></i> (0212) 555 0123</li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="mt-4">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2024 Bütçe Takip. Tüm hakları saklıdır.</p>
+                <small>Geliştirici: A. Kerem Gök</small>
+            </div>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
