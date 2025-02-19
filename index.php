@@ -22,6 +22,9 @@ checkLogin();
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="mb-0">Bütçe Kontrol Sistemi</h1>
             <div class="d-flex align-items-center">
+                <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
+                    <i class="bi bi-gear me-1"></i>Ayarlar
+                </button>
                 <span class="me-3">Hoş geldiniz, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
                 <a href="logout.php" class="btn btn-outline-danger">
                     <i class="bi bi-box-arrow-right me-1"></i>Çıkış Yap

@@ -374,6 +374,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$user_id]);
             $savings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Kullanıcı bilgilerini al
+            $stmt = $pdo->prepare("SELECT id, username, base_currency FROM users WHERE id = ?");
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
             $response = [
                 'status' => 'success',
                 'data' => [
@@ -514,6 +519,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } catch (Exception $e) {
                 $pdo->rollBack();
                 $response = ['status' => 'error', 'message' => 'Ödemeler aktarılırken hata: ' . $e->getMessage()];
+            }
+            break;
+
+        case 'get_user_data':
+            $stmt = $pdo->prepare("SELECT id, username, base_currency FROM users WHERE id = ?");
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user) {
+                $response = [
+                    'status' => 'success',
+                    'data' => $user
+                ];
+            } else {
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Kullanıcı bilgileri bulunamadı'
+                ];
+            }
+            break;
+
+        case 'update_user_settings':
+            $stmt = $pdo->prepare("UPDATE users SET base_currency = ? WHERE id = ?");
+            if ($stmt->execute([$_POST['base_currency'], $user_id])) {
+                $response = ['status' => 'success', 'message' => 'Kullanıcı ayarları güncellendi'];
+            } else {
+                $response = ['status' => 'error', 'message' => 'Kullanıcı ayarları güncellenirken hata oluştu'];
             }
             break;
     }

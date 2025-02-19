@@ -205,6 +205,35 @@
     </div>
 </div>
 
+<!-- Kullanıcı Ayarları Modal -->
+<div class="modal fade" id="userSettingsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kullanıcı Ayarları</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form data-type="user_settings">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Baz Para Birimi</label>
+                        <select class="form-select" name="base_currency" id="user_base_currency" required>
+                            <option value="TRY">TRY - Türk Lirası</option>
+                            <option value="USD">USD - Amerikan Doları</option>
+                            <option value="EUR">EUR - Euro</option>
+                        </select>
+                        <small class="text-muted">Tüm hesaplamalar bu para birimi üzerinden yapılacaktır.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     // Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle (Gelirler için)
     document.getElementById('incomeFrequency').addEventListener('change', function() {

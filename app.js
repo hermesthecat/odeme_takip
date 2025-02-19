@@ -394,6 +394,25 @@ function nextMonth() {
     loadData();
 }
 
+// Kullanıcı ayarları modalını aç
+function openUserSettings() {
+    // Mevcut ayarları yükle
+    ajaxRequest({
+        action: 'get_user_data'
+    }).done(function (response) {
+        if (response.status === 'success') {
+            $('#user_base_currency').val(response.data.base_currency);
+            const modalElement = document.getElementById('userSettingsModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            console.error('Kullanıcı bilgileri alınamadı:', response.message);
+        }
+    }).fail(function (jqXHR, textStatus, errorThrown) {
+        console.error('AJAX hatası:', textStatus, errorThrown);
+    });
+}
+
 // Sayfa yüklendiğinde
 $(document).ready(function () {
     // Mevcut ay ve yılı seç
@@ -434,6 +453,25 @@ $(document).ready(function () {
                 modal.hide();
                 form[0].reset();
                 loadData();
+            }
+        });
+    });
+
+    // Kullanıcı ayarları formu submit
+    $('form[data-type="user_settings"]').on('submit', function (e) {
+        e.preventDefault();
+        const form = $(this);
+        const formData = form.serializeObject();
+
+        ajaxRequest({
+            action: 'update_user_settings',
+            ...formData
+        }).done(function (response) {
+            if (response.status === 'success') {
+                const modalElement = form.closest('.modal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
+                loadData(); // Verileri yeniden yükle
             }
         });
     });
