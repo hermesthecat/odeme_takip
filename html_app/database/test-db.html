@@ -182,6 +182,8 @@
 
                 if (data.success) {
                     addLogMessage('Temel testler başarıyla tamamlandı!', 'success');
+                    const budgetButton = document.querySelector('button[onclick="runBudgetTests()"]');
+                    budgetButton.disabled = false;
                 } else {
                     addLogMessage('Bazı testler başarısız oldu.', 'error');
                     if (data.help) {
