@@ -321,24 +321,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'mark_payment_paid':
-            $stmt = $pdo->prepare("UPDATE payments SET status = 'paid' WHERE id = ? AND user_id = ?");
+            $stmt = $pdo->prepare("UPDATE payments SET status = CASE WHEN status = 'paid' THEN 'pending' ELSE 'paid' END WHERE id = ? AND user_id = ?");
             if ($stmt->execute([$_POST['id'], $user_id])) {
                 $response = ['status' => 'success', 'message' => 'Ödeme durumu güncellendi'];
             }
             break;
 
         case 'mark_income_received':
-            $id = $_POST['id'];
-            $userId = $_SESSION['user_id'];
-            
-            $stmt = $pdo->prepare("UPDATE income SET status = 'received' WHERE id = :id AND user_id = :user_id");
-            $stmt->bindParam(':id', $id);
-            $stmt->bindParam(':user_id', $userId);
-            
-            if ($stmt->execute()) {
-                $response = array('status' => 'success');
-            } else {
-                $response = array('status' => 'error', 'message' => 'Gelir durumu güncellenirken bir hata oluştu.');
+            $stmt = $pdo->prepare("UPDATE income SET status = CASE WHEN status = 'received' THEN 'pending' ELSE 'received' END WHERE id = ? AND user_id = ?");
+            if ($stmt->execute([$_POST['id'], $user_id])) {
+                $response = ['status' => 'success', 'message' => 'Gelir durumu güncellendi'];
             }
             break;
     }

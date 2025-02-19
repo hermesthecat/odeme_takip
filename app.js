@@ -83,7 +83,7 @@ function updateIncomeList(incomes) {
                             <button
                                 class="btn btn-sm ${income.status === 'received' ? 'btn-success' : 'btn-outline-success'}"
                                 onclick="markAsReceived(${income.id})"
-                                title="${income.status === 'received' ? 'Alındı' : 'Bekliyor'}"
+                                title="${income.status === 'received' ? 'Alınmadı olarak işaretle' : 'Alındı olarak işaretle'}"
                             >
                                 <i class="bi ${income.status === 'received' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                             </button>
@@ -164,7 +164,7 @@ function updatePaymentsList(payments) {
                             <button
                                 class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
                                 onclick="markAsPaid(${payment.id})"
-                                title="${payment.status === 'paid' ? 'Ödendi' : 'Bekliyor'}"
+                                title="${payment.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
                             >
                                 <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                             </button>
