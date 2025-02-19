@@ -14,6 +14,9 @@ function updatePaymentsList(payments) {
         return;
     }
 
+    // Ödenmemiş ödemeleri kontrol et
+    const hasUnpaidPayments = payments.some(payment => payment.status !== 'paid');
+
     payments.forEach(function (payment) {
         const isChild = payment.parent_id !== null;
         // const rowClass = isChild ? 'table-light' : '';
@@ -50,17 +53,19 @@ function updatePaymentsList(payments) {
         `);
     });
 
-    // Aktarma butonu satırı
-    tbody.append(`
-        <tr class="table-secondary">
-            <td colspan="8" class="text-end">
-                <button class="btn btn-warning" onclick="transferUnpaidPayments()">
-                    <i class="bi bi-arrow-right-circle me-1"></i>
-                    Sonraki Aya Aktar
-                </button>
-            </td>
-        </tr>
-    `);
+    // Ödenmemiş ödeme varsa aktarma butonu satırını ekle
+    if (hasUnpaidPayments) {
+        tbody.append(`
+            <tr>
+                <td colspan="8" class="text-end">
+                    <button class="btn btn-warning" onclick="transferUnpaidPayments()">
+                        <i class="bi bi-arrow-right-circle me-1"></i>
+                        Sonraki Aya Aktar
+                    </button>
+                </td>
+            </tr>
+        `);
+    }
 }
 
 // Ödeme durumunu güncelle
