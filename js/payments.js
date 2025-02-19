@@ -43,7 +43,7 @@ function updatePaymentsList(payments) {
                 <td>${payment.first_date}</td>
                 <td>${getFrequencyText(payment.frequency)}</td>
                 <td>${payment.next_payment_date || ''}</td>
-                <td>
+                <td class="text-end">
                     <div class="btn-group">
                         <button class="btn btn-sm btn-primary" onclick="openUpdatePaymentModal(${payment.id})" title="Düzenle">
                             <i class="bi bi-pencil"></i>
@@ -160,7 +160,7 @@ function markAsPaid(id) {
                                                 <td class="fw-bold">${totalYearlyPayment.toFixed(2)}</td>
                                             </tr>
                                             <tr class="table-warning">
-                                                <td colspan="5" class="text-end fw-bold">Ödenmemiş Toplam:</td>
+                                                <td colspan="5" class="text-end fw-bold">Ödenmeyi Bekleyen:</td>
                                                 <td class="fw-bold">${totalUnpaidPayment.toFixed(2)}</td>
                                             </tr>
                                         `);
@@ -326,8 +326,8 @@ function updateRecurringPaymentsList(recurring_payments) {
                 </td>
                 <td>
                     ${parseFloat(payment.yearly_total).toFixed(2)}
-                    </td>
-                    <td>
+                </td>
+                <td class="text-end">
                     <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${payment.id})" title="Sil">
                         <i class="bi bi-trash"></i>
                     </button>
@@ -340,7 +340,7 @@ function updateRecurringPaymentsList(recurring_payments) {
                             <table class="table table-sm mb-0">
                                 <thead>
                                     <tr>
-                                        <th>Durum</th>
+                                        <th></th>
                                         <th>Ödeme Tarihi</th>
                                         <th>Tutar</th>
                                         <th>Kur</th>
@@ -377,7 +377,7 @@ function updateRecurringPaymentsList(recurring_payments) {
             <td class="fw-bold">${totalYearlyPayment.toFixed(2)}</td>
         </tr>
         <tr class="table-warning">
-            <td colspan="5" class="text-end fw-bold">Ödenmemiş Toplam:</td>
+            <td colspan="5" class="text-end fw-bold">Ödenmeyi Bekleyen:</td>
             <td class="fw-bold">${totalUnpaidPayment.toFixed(2)}</td>
         </tr>
     `);

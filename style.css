@@ -1440,53 +1440,51 @@ h6 {
 
 /* Child ödemeler tablosu stilleri */
 [data-theme="dark"] .child-payments-container {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="dark"] .child-payments-container .table {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 [data-theme="dark"] .child-payments-container .table th {
-    border-bottom: 1px solid #333333;
-    font-size: 0.9rem;
-    color: #e0e0e0;
+  border-bottom: 1px solid #333333;
+  font-size: 0.9rem;
+  color: #e0e0e0;
 }
 
 [data-theme="dark"] .child-payments-container .table td {
-    border: none;
-    font-size: 0.9rem;
+  border: none;
+  font-size: 0.9rem;
 }
 
 [data-theme="dark"] .payment-parent:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 [data-theme="dark"] .toggle-icon {
-    transition: transform 0.3s ease;
+  transition: transform 0.3s ease;
 }
 
 /* Açık tema için child ödemeler tablosu stilleri */
 [data-theme="light"] .child-payments-container {
-    background-color: rgba(0, 0, 0, 0.02);
-    border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
 [data-theme="light"] .child-payments-container .table {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 [data-theme="light"] .child-payments-container .table th {
-    border-bottom: 1px solid #dee2e6;
-    font-size: 0.9rem;
+  border-bottom: 1px solid #dee2e6;
+  font-size: 0.9rem;
 }
 
 [data-theme="light"] .child-payments-container .table td {
-    border: none;
-    font-size: 0.9rem;
+  border: none;
+  font-size: 0.9rem;
 }
 
 [data-theme="light"] .payment-parent:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+  background-color: rgba(0, 0, 0, 0.02);
 }

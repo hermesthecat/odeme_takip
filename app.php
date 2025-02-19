@@ -136,7 +136,7 @@ checkLogin();
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Durum</th>
+                                <th></th>
                                 <th>Gelir İsmi</th>
                                 <th>Tutar</th>
                                 <th>Kur</th>
@@ -198,7 +198,7 @@ checkLogin();
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Durum</th>
+                                <th></th>
                                 <th>Ödeme İsmi</th>
                                 <th>Tutar</th>
                                 <th>Kur</th>

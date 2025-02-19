@@ -36,7 +36,7 @@ function updateSavingsList(savings) {
                     </div>
                     <small class="text-muted text-center d-block">%${progress.toFixed(0)}</small>
                 </td>
-                <td>
+                <td class="text-end">
                     <div class="btn-group">
                         <button class="btn btn-sm btn-primary" onclick="openUpdateSavingModal(${JSON.stringify(saving).replace(/"/g, '&quot;')})" title="Düzenle">
                             <i class="bi bi-pencil"></i>

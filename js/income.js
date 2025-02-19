@@ -41,7 +41,7 @@ function updateIncomeList(incomes) {
                 <td>${income.first_date}</td>
                 <td>${getFrequencyText(income.frequency)}</td>
                 <td>${income.next_income_date || ''}</td>
-                <td>
+                <td class="text-end">
                     <div class="btn-group">
                         <button class="btn btn-sm btn-primary" onclick="openUpdateIncomeModal(${income.id})" title="Düzenle">
                             <i class="bi bi-pencil"></i>
