@@ -333,6 +333,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'success', 'message' => 'Gelir durumu güncellendi'];
             }
             break;
+
+        case 'update_saving':
+            $stmt = $pdo->prepare("UPDATE savings SET current_amount = ? WHERE id = ? AND user_id = ?");
+            if ($stmt->execute([$_POST['current_amount'], $_POST['id'], $user_id])) {
+                $response = ['status' => 'success', 'message' => 'Birikim güncellendi'];
+            }
+            break;
+
+        case 'update_full_saving':
+            $stmt = $pdo->prepare("UPDATE savings SET name = ?, target_amount = ?, current_amount = ?, currency = ?, start_date = ?, target_date = ? WHERE id = ? AND user_id = ?");
+            if ($stmt->execute([
+                $_POST['name'],
+                $_POST['target_amount'],
+                $_POST['current_amount'],
+                $_POST['currency'],
+                $_POST['start_date'],
+                $_POST['target_date'],
+                $_POST['id'],
+                $user_id
+            ])) {
+                $response = ['status' => 'success', 'message' => 'Birikim başarıyla güncellendi'];
+            }
+            break;
     }
 }
 

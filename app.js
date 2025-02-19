@@ -89,7 +89,7 @@ function updateIncomeList(incomes) {
                             </button>
                         </td>
                         <td>${income.name}</td>
-                        <td>${income.amount} ${income.currency}</td>
+                        <td>${income.amount}</td>
                         <td>${income.currency}</td>
                         <td>${income.first_date}</td>
                         <td>${getFrequencyText(income.frequency)}</td>
@@ -126,8 +126,8 @@ function updateSavingsList(savings) {
         tbody.append(`
             <tr>
                 <td>${saving.name}</td>
-                <td>${saving.target_amount} ${saving.currency}</td>
-                <td>${saving.current_amount} ${saving.currency}</td>
+                <td>${saving.target_amount}</td>
+                <td>${saving.current_amount}</td>
                 <td>${saving.currency}</td>
                 <td>${saving.start_date}</td>
                 <td>${saving.target_date}</td>
@@ -140,13 +140,45 @@ function updateSavingsList(savings) {
                     </div>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-danger" onclick="deleteSaving(${saving.id})">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateSavingModal(${JSON.stringify(saving).replace(/"/g, '&quot;')})" title="Düzenle">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteSaving(${saving.id})" title="Sil">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `);
     });
+}
+
+// Birikim güncelleme
+function updateSaving(id, current_amount) {
+    ajaxRequest({
+        action: 'update_saving',
+        id: id,
+        current_amount: current_amount
+    }).done(function (response) {
+        if (response.status === 'success') {
+            loadData();
+        }
+    });
+}
+
+// Birikim güncelleme modalını aç
+function openUpdateSavingModal(saving) {
+    $('#update_saving_id').val(saving.id);
+    $('#update_saving_name').val(saving.name);
+    $('#update_saving_target_amount').val(saving.target_amount);
+    $('#update_saving_current_amount').val(saving.current_amount);
+    $('#update_saving_currency').val(saving.currency);
+    $('#update_saving_start_date').val(saving.start_date);
+    $('#update_saving_target_date').val(saving.target_date);
+
+    const modal = new bootstrap.Modal(document.getElementById('updateSavingModal'));
+    modal.show();
 }
 
 // Ödemeler listesini güncelle
@@ -170,7 +202,7 @@ function updatePaymentsList(payments) {
                             </button>
                         </td>
                         <td>${payment.name}</td>
-                        <td>${payment.amount} ${payment.currency}</td>
+                        <td>${payment.amount}</td>
                         <td>${payment.currency}</td>
                         <td>${payment.first_date}</td>
                         <td>${getFrequencyText(payment.frequency)}</td>
@@ -317,7 +349,8 @@ $(document).ready(function () {
         e.preventDefault();
         const form = $(this);
         const formData = form.serializeObject();
-        const action = 'add_' + form.data('type');
+        const type = form.data('type');
+        const action = type === 'update_saving' ? 'update_full_saving' : 'add_' + type;
 
         // next_date değerini kaldır çünkü API'de hesaplanacak
         if (formData.next_date) {
