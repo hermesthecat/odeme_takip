@@ -224,9 +224,15 @@ function updateIncome()
         // Kur bilgisini al
         $exchange_rate = null;
         if ($currency !== $base_currency) {
-            $exchange_rate = getExchangeRate($currency, $base_currency);
-            if (!$exchange_rate) {
-                throw new Exception("Kur bilgisi alınamadı");
+            // Kur güncellemesi isteniyorsa veya ilk defa kur ekleniyorsa
+            if (isset($_POST['update_exchange_rate']) || $income['exchange_rate'] === null) {
+                $exchange_rate = getExchangeRate($currency, $base_currency);
+                if (!$exchange_rate) {
+                    throw new Exception("Kur bilgisi alınamadı");
+                }
+            } else {
+                // Mevcut kuru koru
+                $exchange_rate = $income['exchange_rate'];
             }
         }
 

@@ -92,7 +92,6 @@ function deleteIncome(id) {
 
 // Gelir güncelleme modalını aç
 function openUpdateIncomeModal(id) {
-
     // Gelir verilerini yükle
     ajaxRequest({
         action: 'get_data',
@@ -111,6 +110,17 @@ function openUpdateIncomeModal(id) {
                 $('#update_income_currency').val(income.currency);
                 $('#update_income_first_date').val(income.first_date);
                 $('#update_income_frequency').val(income.frequency);
+
+                // Kur güncelleme seçeneğini göster/gizle
+                const exchangeRateGroup = document.getElementById('updateIncomeExchangeRateGroup');
+                if (income.currency !== data.user.base_currency) {
+                    exchangeRateGroup.style.display = 'block';
+                    if (income.exchange_rate) {
+                        $('#current_income_exchange_rate').text(`Mevcut Kur: ${income.exchange_rate}`);
+                    }
+                } else {
+                    exchangeRateGroup.style.display = 'none';
+                }
 
                 // Frekansa göre bitiş tarihi alanını göster/gizle
                 const endDateGroup = document.getElementById('updateIncomeEndDateGroup');
@@ -143,6 +153,11 @@ function updateIncome() {
     // Form verilerini obje olarak al
     const formData = $('#updateIncomeForm').serializeObject();
     formData.action = 'update_income';
+
+    // Kur güncelleme seçeneğini kontrol et
+    if ($('#update_income_exchange_rate').is(':checked')) {
+        formData.update_exchange_rate = true;
+    }
 
     ajaxRequest(formData).done(function (response) {
         if (response.status === 'success') {

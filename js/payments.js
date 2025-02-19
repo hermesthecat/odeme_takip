@@ -526,7 +526,7 @@ function updatePayment() {
     // Form verilerini obje olarak al
     const formData = $('#updatePaymentForm').serializeObject();
     formData.action = 'update_payment';
-    
+
     // Kur güncelleme seçeneğini kontrol et
     if ($('#update_exchange_rate').is(':checked')) {
         formData.update_exchange_rate = true;
