@@ -1,9 +1,8 @@
 <?php
-require_once __DIR__ . './api/utils.php';
-require_once __DIR__ . './api/validate.php';
-require_once __DIR__ . './api/currency.php';
-require_once __DIR__ . './api/xss.php';
-
+require_once __DIR__ . '/api/utils.php';
+require_once __DIR__ . '/api/validate.php';
+require_once __DIR__ . '/api/currency.php';
+require_once __DIR__ . '/api/xss.php';
 
 require_once __DIR__ . '/api/income.php';
 require_once __DIR__ . '/api/savings.php';

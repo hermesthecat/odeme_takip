@@ -220,17 +220,35 @@ function updatePayment()
     global $pdo, $user_id;
 
     // Gerekli alanları doğrula
-    $id = validateRequired($_POST['id'] ?? null, "Ödeme ID");
-    $name = validateRequired($_POST['name'] ?? null, "Ödeme adı");
-    $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
-    $amount = validateNumeric($amount, "Tutar");
-    $amount = validateMinValue($amount, 0, "Tutar");
-    $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
-    $currency = validateCurrency($currency, "Para birimi");
-    $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
-    $first_date = validateDate($first_date, "Tarih");
-    $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
-    $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+
+    if (isset($_POST['id'])) {
+        $id = validateRequired($_POST['id'] ?? null, "Ödeme ID");
+    }
+
+    if (isset($_POST['name'])) {
+        $name = validateRequired($_POST['name'] ?? null, "Ödeme adı");
+    }
+
+    if (isset($_POST['amount'])) {
+        $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
+        $amount = validateNumeric($amount, "Tutar");
+        $amount = validateMinValue($amount, 0, "Tutar");
+    }
+
+    if (isset($_POST['currency'])) {
+        $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
+        $currency = validateCurrency($currency, "Para birimi");
+    }
+
+    if (isset($_POST['first_date'])) {
+        $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
+        $first_date = validateDate($first_date, "Tarih");
+    }
+
+    if (isset($_POST['frequency'])) {
+        $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
+        $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+    }
 
     // Ödemenin mevcut olduğunu kontrol et
     $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ? AND user_id = ?");
