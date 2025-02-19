@@ -36,10 +36,8 @@ function loadData() {
         year: year
     }).done(function (response) {
         if (response.status === 'success') {
-            // Debug bilgisini konsola yazdır
-            if (response.debug) {
-                console.log('Debug Bilgisi:', response.debug);
-            }
+            // Global data değişkenini set et
+            window.data = response.data;
 
             updateIncomeList(response.data.incomes);
             updateSavingsList(response.data.savings);
@@ -80,9 +78,9 @@ function updateIncomeList(incomes) {
         let amountText = `${parseFloat(income.amount).toFixed(2)} ${income.currency}`;
 
         // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
-        if (income.currency !== 'TRY' && income.exchange_rate) {
+        if (income.currency !== data.user.base_currency && income.exchange_rate) {
             const convertedAmount = parseFloat(income.amount) * parseFloat(income.exchange_rate);
-            amountText += ` (${convertedAmount.toFixed(2)} ${income.base_currency})`;
+            amountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
         }
 
         tbody.append(`
@@ -204,9 +202,9 @@ function updatePaymentsList(payments) {
         let amountText = `${parseFloat(payment.amount).toFixed(2)} ${payment.currency}`;
 
         // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
-        if (payment.currency !== 'TRY' && payment.exchange_rate) {
+        if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
             const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
-            amountText += ` (${convertedAmount.toFixed(2)} ${payment.base_currency})`;
+            amountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
         }
 
         tbody.append(`

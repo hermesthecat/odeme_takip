@@ -332,6 +332,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $month = intval($_POST['month']) + 1;
             $year = intval($_POST['year']);
 
+            // Kullanıcı bilgilerini al
+            $stmt = $pdo->prepare("SELECT id, username, base_currency FROM users WHERE id = ?");
+            $stmt->execute([$user_id]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
             // Ödemeleri al
             $sql_payments = "SELECT p.*, 
                     CASE 
@@ -437,14 +442,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$user_id]);
             $savings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Kullanıcı bilgilerini al
-            $stmt = $pdo->prepare("SELECT id, username, base_currency FROM users WHERE id = ?");
-            $stmt->execute([$user_id]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
             $response = [
                 'status' => 'success',
                 'data' => [
+                    'user' => $user,
                     'incomes' => $incomes,
                     'savings' => $savings,
                     'payments' => $payments,
