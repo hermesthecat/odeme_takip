@@ -296,6 +296,65 @@
     </div>
 </div>
 
+<!-- Ödeme Güncelleme Modal -->
+<div class="modal fade" id="updatePaymentModal" tabindex="-1" aria-labelledby="updatePaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updatePaymentModalLabel">Ödeme Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updatePaymentForm" onsubmit="return false;">
+                    <input type="hidden" id="update_payment_id" name="id">
+                    <div class="mb-3">
+                        <label for="update_payment_name" class="form-label">Ödeme Adı</label>
+                        <input type="text" class="form-control" id="update_payment_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update_payment_amount" class="form-label">Tutar</label>
+                        <input type="number" step="0.01" class="form-control" id="update_payment_amount" name="amount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update_payment_currency" class="form-label">Para Birimi</label>
+                        <select class="form-select" id="update_payment_currency" name="currency" required>
+                            <option value="TRY">TRY</option>
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="GBP">GBP</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update_payment_first_date" class="form-label">Tarih</label>
+                        <input type="date" class="form-control" id="update_payment_first_date" name="first_date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="update_payment_frequency" class="form-label">Tekrarlama Sıklığı</label>
+                        <select class="form-select" id="update_payment_frequency" name="frequency" required>
+                            <option value="none">Tekrarlama Yok</option>
+                            <option value="monthly">Aylık</option>
+                            <option value="bimonthly">2 Ayda Bir</option>
+                            <option value="quarterly">3 Ayda Bir</option>
+                            <option value="fourmonthly">4 Ayda Bir</option>
+                            <option value="fivemonthly">5 Ayda Bir</option>
+                            <option value="sixmonthly">6 Ayda Bir</option>
+                            <option value="yearly">Yıllık</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="updatePaymentEndDateGroup" style="display: none;">
+                        <label for="update_payment_end_date" class="form-label">Bitiş Tarihi</label>
+                        <input type="date" class="form-control" id="update_payment_end_date" name="end_date">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" onclick="updatePayment()">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle (Gelirler için)
     document.getElementById('incomeFrequency').addEventListener('change', function() {
@@ -344,5 +403,19 @@
         paymentModal.addEventListener('show.bs.modal', function() {
             this.querySelector('input[name="first_date"]').value = getTodayDate();
         });
+    });
+
+    // Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle (Ödeme güncelleme için)
+    document.getElementById('update_payment_frequency').addEventListener('change', function() {
+        const endDateGroup = document.getElementById('updatePaymentEndDateGroup');
+        const endDateInput = endDateGroup.querySelector('input[name="end_date"]');
+
+        if (this.value === 'none') {
+            endDateGroup.style.display = 'none';
+            endDateInput.removeAttribute('required');
+        } else {
+            endDateGroup.style.display = 'block';
+            endDateInput.setAttribute('required', 'required');
+        }
     });
 </script>

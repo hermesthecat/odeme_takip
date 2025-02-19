@@ -214,3 +214,72 @@ function markPaymentPaid()
         return false;
     }
 }
+
+function updatePayment()
+{
+    global $pdo, $user_id;
+
+    // Gerekli alanları doğrula
+    $id = validateRequired($_POST['id'] ?? null, "Ödeme ID");
+    $name = validateRequired($_POST['name'] ?? null, "Ödeme adı");
+    $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
+    $amount = validateNumeric($amount, "Tutar");
+    $amount = validateMinValue($amount, 0, "Tutar");
+    $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
+    $currency = validateCurrency($currency, "Para birimi");
+    $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
+    $first_date = validateDate($first_date, "Tarih");
+    $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
+    $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+
+    // Ödemenin mevcut olduğunu kontrol et
+    $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ? AND user_id = ?");
+    $stmt->execute([$id, $user_id]);
+    $payment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$payment) {
+        throw new Exception("Ödeme bulunamadı");
+    }
+
+    $pdo->beginTransaction();
+
+    try {
+        // Kur bilgisini al
+        $exchange_rate = null;
+        if ($currency !== 'TRY') {
+            $exchange_rate = getExchangeRate($currency, 'TRY');
+            if (!$exchange_rate) {
+                throw new Exception("Kur bilgisi alınamadı");
+            }
+        }
+
+        // Ana kaydı güncelle
+        $stmt = $pdo->prepare("UPDATE payments SET 
+            name = ?, 
+            amount = ?, 
+            currency = ?, 
+            first_date = ?, 
+            frequency = ?,
+            exchange_rate = ?
+            WHERE id = ? AND user_id = ?");
+
+        if (!$stmt->execute([
+            $name,
+            $amount,
+            $currency,
+            $first_date,
+            $frequency,
+            $exchange_rate,
+            $id,
+            $user_id
+        ])) {
+            throw new Exception("Ödeme güncellenemedi");
+        }
+
+        $pdo->commit();
+        return true;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
+}

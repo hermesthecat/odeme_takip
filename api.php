@@ -281,6 +281,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;
+
+        case 'update_payment':
+            try {
+                if (updatePayment()) {
+                    $response = ['status' => 'success', 'message' => 'Ödeme başarıyla güncellendi'];
+                } else {
+                    $response = ['status' => 'error', 'message' => 'Ödeme güncellenemedi'];
+                }
+            } catch (Exception $e) {
+                if (isset($pdo) && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
+            }
+            break;
     }
 
     // Response'u güvenli hale getir

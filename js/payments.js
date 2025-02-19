@@ -45,9 +45,14 @@ function updatePaymentsList(payments) {
                 <td>${getFrequencyText(payment.frequency)}</td>
                 <td>${payment.next_payment_date || ''}</td>
                 <td>
-                    <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdatePaymentModal(${payment.id})" title="Düzenle">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})" title="Sil">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
                 </td>
             </tr>
         `);
@@ -389,6 +394,84 @@ function loadChildPayments(parentId) {
                         <td>${payment.currency}</td>
                     </tr>
                 `);
+            });
+        }
+    });
+}
+
+// Ödeme güncelleme modalını aç
+function openUpdatePaymentModal(id) {
+    // Ödeme verilerini yükle
+    ajaxRequest({
+        action: 'get_data',
+        month: $('#monthSelect').val(),
+        year: $('#yearSelect').val(),
+        load_type: 'payments'
+    }).done(function (response) {
+        if (response.status === 'success') {
+            const payment = response.data.payments.find(p => String(p.id) === String(id));
+
+            if (payment) {
+                // Modal alanlarını doldur
+                $('#update_payment_id').val(payment.id);
+                $('#update_payment_name').val(payment.name);
+                $('#update_payment_amount').val(payment.amount);
+                $('#update_payment_currency').val(payment.currency);
+                $('#update_payment_first_date').val(payment.first_date);
+                $('#update_payment_frequency').val(payment.frequency);
+
+                // Frekansa göre bitiş tarihi alanını göster/gizle
+                const endDateGroup = document.getElementById('updatePaymentEndDateGroup');
+                const endDateInput = endDateGroup.querySelector('input[name="end_date"]');
+
+                if (payment.frequency === 'none') {
+                    endDateGroup.style.display = 'none';
+                    endDateInput.removeAttribute('required');
+                } else {
+                    endDateGroup.style.display = 'block';
+                    endDateInput.setAttribute('required', 'required');
+                }
+
+                // Modalı göster
+                const modal = new bootstrap.Modal(document.getElementById('updatePaymentModal'));
+                modal.show();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata',
+                    text: `Ödeme bulunamadı (ID: ${id})`
+                });
+            }
+        }
+    });
+}
+
+// Ödemeyi güncelle
+function updatePayment() {
+    // Form verilerini obje olarak al
+    const formData = $('#updatePaymentForm').serializeObject();
+    formData.action = 'update_payment';
+
+    ajaxRequest(formData).done(function (response) {
+        if (response.status === 'success') {
+            // Modalı kapat
+            const modal = bootstrap.Modal.getInstance(document.getElementById('updatePaymentModal'));
+            modal.hide();
+
+            // Tabloyu güncelle
+            loadData();
+
+            // Başarı mesajı göster
+            Swal.fire({
+                icon: 'success',
+                title: 'Başarılı',
+                text: 'Ödeme başarıyla güncellendi'
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata',
+                text: response.message || 'Ödeme güncellenirken bir hata oluştu'
             });
         }
     });

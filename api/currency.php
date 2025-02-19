@@ -33,7 +33,7 @@ function getExchangeRate($from_currency, $to_currency)
         // API'den güncel kur bilgisini al
         $api_url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{$from_currency}.json";
         $response = @file_get_contents($api_url);
-        
+
         if ($response === false) {
             throw new Exception("Kur bilgisi alınamadı");
         }

@@ -103,7 +103,6 @@ function openUpdateIncomeModal(id) {
     }).done(function (response) {
         if (response.status === 'success') {
             const income = response.data.incomes.find(inc => String(inc.id) === String(id));
-            console.log('Bulunan gelir:', income);
 
             if (income) {
                 // Modal alanlarını doldur
