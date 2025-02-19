@@ -156,11 +156,11 @@ function markAsPaid(id) {
                                         const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
                                         tfoot.html(`
                                             <tr class="table-info">
-                                                <td colspan="4" class="text-end fw-bold">Toplam Ödeme:</td>
+                                                <td colspan="5" class="text-end fw-bold">Toplam Ödeme:</td>
                                                 <td class="fw-bold">${totalYearlyPayment.toFixed(2)}</td>
                                             </tr>
                                             <tr class="table-warning">
-                                                <td colspan="4" class="text-end fw-bold">Ödenmemiş Toplam:</td>
+                                                <td colspan="5" class="text-end fw-bold">Ödenmemiş Toplam:</td>
                                                 <td class="fw-bold">${totalUnpaidPayment.toFixed(2)}</td>
                                             </tr>
                                         `);
@@ -195,7 +195,7 @@ function updateChildPayments(parentId, parent, children) {
     }
 
     tbody.append(`
-        <tr class="table-primary" style="cursor: default;">
+        <tr style="cursor: default;">
             <td>
                 <button
                     class="btn btn-sm ${parent.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
@@ -326,13 +326,15 @@ function updateRecurringPaymentsList(recurring_payments) {
                 </td>
                 <td>
                     ${parseFloat(payment.yearly_total).toFixed(2)}
+                    </td>
+                    <td>
                     <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${payment.id})" title="Sil">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
             </tr>
             <tr class="payment-children d-none" data-parent-id="${payment.id}">
-                <td colspan="5" class="p-0">
+                <td colspan="6" class="p-0">
                     <div class="child-payments-container bg-opacity-10 p-3">
                         <div class="table-responsive">
                             <table class="table table-sm mb-0">
@@ -342,6 +344,7 @@ function updateRecurringPaymentsList(recurring_payments) {
                                         <th>Ödeme Tarihi</th>
                                         <th>Tutar</th>
                                         <th>Kur</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody class="child-payments" data-parent-id="${payment.id}">
@@ -370,11 +373,11 @@ function updateRecurringPaymentsList(recurring_payments) {
     const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
     tfoot.html(`
         <tr class="table-info">
-            <td colspan="4" class="text-end fw-bold">Toplam Ödeme:</td>
+            <td colspan="5" class="text-end fw-bold">Toplam Ödeme:</td>
             <td class="fw-bold">${totalYearlyPayment.toFixed(2)}</td>
         </tr>
         <tr class="table-warning">
-            <td colspan="4" class="text-end fw-bold">Ödenmemiş Toplam:</td>
+            <td colspan="5" class="text-end fw-bold">Ödenmemiş Toplam:</td>
             <td class="fw-bold">${totalUnpaidPayment.toFixed(2)}</td>
         </tr>
     `);
@@ -413,7 +416,7 @@ function loadChildPayments(parentId) {
             }
 
             tbody.append(`
-                <tr class="table-primary" style="cursor: default;">
+                <tr style="cursor: default;">
                     <td>
                         <button
                             class="btn btn-sm ${parent.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
@@ -426,6 +429,7 @@ function loadChildPayments(parentId) {
                     <td>${parent.first_date}</td>
                     <td>${parentAmountText}</td>
                     <td>${parent.currency}</td>
+                    <td></td>
                 </tr>
             `);
 
@@ -451,6 +455,7 @@ function loadChildPayments(parentId) {
                         <td>${payment.first_date}</td>
                         <td>${amountText}</td>
                         <td>${payment.currency}</td>
+                        <td></td>
                     </tr>
                 `);
             });

@@ -143,7 +143,7 @@ checkLogin();
                                 <th>İlk Gelir Tarihi</th>
                                 <th>Tekrarlama Sıklığı</th>
                                 <th>Sonraki Gelir</th>
-                                <th>İşlemler</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="incomeList"></tbody>
@@ -174,7 +174,7 @@ checkLogin();
                                 <th>Başlangıç Tarihi</th>
                                 <th>Hedef Tarihi</th>
                                 <th>İlerleme</th>
-                                <th>İşlemler</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="savingList"></tbody>
@@ -205,7 +205,7 @@ checkLogin();
                                 <th>İlk Ödeme Tarihi</th>
                                 <th>Tekrarlama Sıklığı</th>
                                 <th>Sonraki Ödeme</th>
-                                <th>İşlemler</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="paymentList"></tbody>
@@ -232,12 +232,13 @@ checkLogin();
                                 <th>Kur</th>
                                 <th>Taksit Bilgisi</th>
                                 <th>Toplam</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="recurringPaymentsList"></tbody>
                         <tfoot>
                             <tr class="table-info">
-                                <td colspan="4" class="text-end fw-bold">Toplam Ödeme:</td>
+                                <td class="text-end fw-bold">Toplam Ödeme:</td>
                                 <td id="totalYearlyPayment" class="fw-bold"></td>
                             </tr>
                         </tfoot>
