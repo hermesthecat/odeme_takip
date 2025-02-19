@@ -150,11 +150,10 @@ export function showAddPaymentModal(existingPayment = null, editIndex = -1) {
                 });
             }
         }
+        // Yeni ödeme eklerken bugünün tarihini varsayılan olarak ayarla
+        if (!existingPayment) {
+            document.getElementById('firstPaymentDate').valueAsDate = new Date();
+        }
         return Promise.reject();
     });
-
-    // Yeni ödeme eklerken bugünün tarihini varsayılan olarak ayarla
-    if (!existingPayment) {
-        document.getElementById('firstPaymentDate').valueAsDate = new Date();
-    }
 } 
