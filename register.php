@@ -56,33 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Kayıt Ol - Bütçe Takip</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
-        .register-container {
-            max-width: 400px;
-            margin: 50px auto;
-        }
-
-        .logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .logo i {
-            font-size: 48px;
-            color: #0d6efd;
-        }
-
-        .footer {
-            background-color: #343a40;
-            color: white;
-            padding: 50px 0;
-            margin-top: 100px;
-        }
-    </style>
+    <link rel="stylesheet" href="register.css">
 </head>
 
 <body>

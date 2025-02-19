@@ -25,9 +25,8 @@ checkLogin();
                 <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
                     <i class="bi bi-gear me-1"></i>Ayarlar
                 </button>
-                <span class="me-3">Hoş geldiniz, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
                 <a href="logout.php" class="btn btn-outline-danger">
-                    <i class="bi bi-box-arrow-right me-1"></i>Çıkış Yap
+                    <?php echo htmlspecialchars($_SESSION['username']); ?> <i class="bi bi-box-arrow-right me-1"></i>
                 </a>
             </div>
         </div>
