@@ -224,6 +224,14 @@
                         </select>
                         <small class="text-muted">Tüm hesaplamalar bu para birimi üzerinden yapılacaktır.</small>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tema</label>
+                        <select class="form-select" name="theme_preference" id="user_theme_preference" required>
+                            <option value="light">Açık Tema</option>
+                            <option value="dark">Koyu Tema</option>
+                        </select>
+                        <small class="text-muted">Arayüz renk teması seçimi.</small>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>

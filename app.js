@@ -450,6 +450,12 @@ function nextMonth() {
     loadData();
 }
 
+// Tema değiştirme fonksiyonu
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+}
+
 // Kullanıcı ayarları modalını aç
 function openUserSettings() {
     // Mevcut ayarları yükle
@@ -458,6 +464,7 @@ function openUserSettings() {
     }).done(function (response) {
         if (response.status === 'success') {
             $('#user_base_currency').val(response.data.base_currency);
+            $('#user_theme_preference').val(response.data.theme_preference);
             const modalElement = document.getElementById('userSettingsModal');
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
@@ -477,6 +484,15 @@ $(document).ready(function () {
     // Select elementlerini güncelle
     $('#monthSelect').val(month);
     $('#yearSelect').val(year);
+
+    // Kullanıcı temasını yükle
+    ajaxRequest({
+        action: 'get_user_data'
+    }).done(function (response) {
+        if (response.status === 'success') {
+            setTheme(response.data.theme_preference);
+        }
+    });
 
     // Verileri yükle
     loadData();
@@ -537,7 +553,8 @@ $(document).ready(function () {
                 const modalElement = form.closest('.modal');
                 const modal = bootstrap.Modal.getInstance(modalElement);
                 modal.hide();
-                loadData(); // Verileri yeniden yükle
+                setTheme(formData.theme_preference);
+                loadData();
             }
         });
     });

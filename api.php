@@ -591,7 +591,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'get_user_data':
-            $stmt = $pdo->prepare("SELECT id, username, base_currency FROM users WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT id, username, base_currency, theme_preference FROM users WHERE id = ?");
             $stmt->execute([$user_id]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -609,8 +609,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'update_user_settings':
-            $stmt = $pdo->prepare("UPDATE users SET base_currency = ? WHERE id = ?");
-            if ($stmt->execute([$_POST['base_currency'], $user_id])) {
+            $stmt = $pdo->prepare("UPDATE users SET base_currency = ?, theme_preference = ? WHERE id = ?");
+            if ($stmt->execute([$_POST['base_currency'], $_POST['theme_preference'], $user_id])) {
                 $response = ['status' => 'success', 'message' => 'Kullanıcı ayarları güncellendi'];
             } else {
                 $response = ['status' => 'error', 'message' => 'Kullanıcı ayarları güncellenirken hata oluştu'];
