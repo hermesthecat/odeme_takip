@@ -161,11 +161,48 @@ function markIncomeReceived()
 {
     global $pdo, $user_id;
 
-    $stmt = $pdo->prepare("UPDATE income SET status = CASE WHEN status = 'received' THEN 'pending' ELSE 'received' END WHERE id = ? AND user_id = ?");
-    if ($stmt->execute([$_POST['id'], $user_id])) {
+    // Kullanıcının ana para birimini al
+    $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $base_currency = $user['base_currency'];
+
+    // Gelir bilgilerini al
+    $stmt = $pdo->prepare("SELECT * FROM income WHERE id = ? AND user_id = ?");
+    $stmt->execute([$_POST['id'], $user_id]);
+    $income = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$income) {
+        throw new Exception("Gelir bulunamadı");
+    }
+
+    $pdo->beginTransaction();
+
+    try {
+        // Kur bilgisini güncelle
+        $exchange_rate = null;
+        if ($income['currency'] !== $base_currency) {
+            $exchange_rate = getExchangeRate($income['currency'], $base_currency);
+            if (!$exchange_rate) {
+                throw new Exception("Kur bilgisi alınamadı");
+            }
+        }
+
+        // Gelir durumunu ve kur bilgisini güncelle
+        $stmt = $pdo->prepare("UPDATE income SET 
+            status = CASE WHEN status = 'received' THEN 'pending' ELSE 'received' END,
+            exchange_rate = ?
+            WHERE id = ? AND user_id = ?");
+
+        if (!$stmt->execute([$exchange_rate, $_POST['id'], $user_id])) {
+            throw new Exception("Gelir güncellenemedi");
+        }
+
+        $pdo->commit();
         return true;
-    } else {
-        return false;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        throw $e;
     }
 }
 

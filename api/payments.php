@@ -228,11 +228,48 @@ function markPaymentPaid()
 {
     global $pdo, $user_id;
 
-    $stmt = $pdo->prepare("UPDATE payments SET status = CASE WHEN status = 'paid' THEN 'pending' ELSE 'paid' END WHERE id = ? AND user_id = ?");
-    if ($stmt->execute([$_POST['id'], $user_id])) {
+    // Kullanıcının ana para birimini al
+    $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $base_currency = $user['base_currency'];
+
+    // Ödeme bilgilerini al
+    $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ? AND user_id = ?");
+    $stmt->execute([$_POST['id'], $user_id]);
+    $payment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$payment) {
+        throw new Exception("Ödeme bulunamadı");
+    }
+
+    $pdo->beginTransaction();
+
+    try {
+        // Kur bilgisini güncelle
+        $exchange_rate = null;
+        if ($payment['currency'] !== $base_currency) {
+            $exchange_rate = getExchangeRate($payment['currency'], $base_currency);
+            if (!$exchange_rate) {
+                throw new Exception("Kur bilgisi alınamadı");
+            }
+        }
+
+        // Ödeme durumunu ve kur bilgisini güncelle
+        $stmt = $pdo->prepare("UPDATE payments SET 
+            status = CASE WHEN status = 'paid' THEN 'pending' ELSE 'paid' END,
+            exchange_rate = ?
+            WHERE id = ? AND user_id = ?");
+
+        if (!$stmt->execute([$exchange_rate, $_POST['id'], $user_id])) {
+            throw new Exception("Ödeme güncellenemedi");
+        }
+
+        $pdo->commit();
         return true;
-    } else {
-        return false;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        throw $e;
     }
 }
 
