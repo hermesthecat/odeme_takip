@@ -80,14 +80,22 @@ function openUpdateSavingModal(saving) {
 
 // Birikimi sil
 function deleteSaving(id) {
-    if (confirm('Bu birikimi silmek istediğinizden emin misiniz?')) {
-        ajaxRequest({
-            action: 'delete_saving',
-            id: id
-        }).done(function (response) {
-            if (response.status === 'success') {
-                loadData();
-            }
-        });
-    }
+    Swal.fire({
+        icon: 'warning',
+        title: 'Bu birikimi silmek istediğinize emin misiniz?',
+        showCancelButton: true,
+        confirmButtonText: 'Evet, sil',
+        cancelButtonText: 'İptal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            ajaxRequest({
+                action: 'delete_saving',
+                id: id
+            }).done(function (response) {
+                if (response.status === 'success') {
+                    loadData();
+                }
+            });
+        }
+    });
 } 

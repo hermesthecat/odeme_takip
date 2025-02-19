@@ -66,14 +66,22 @@ function markAsReceived(id) {
 
 // Geliri sil
 function deleteIncome(id) {
-    if (confirm('Bu geliri silmek istediğinizden emin misiniz?')) {
-        ajaxRequest({
-            action: 'delete_income',
-            id: id
-        }).done(function (response) {
-            if (response.status === 'success') {
-                loadData();
-            }
-        });
-    }
+    Swal.fire({
+        icon: 'warning',
+        title: 'Silmek istediğinize emin misiniz?',
+        showCancelButton: true,
+        confirmButtonText: 'Evet, sil',
+        cancelButtonText: 'İptal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            ajaxRequest({
+                action: 'delete_income',
+                id: id
+            }).done(function (response) {
+                if (response.status === 'success') {
+                    loadData();
+                }
+            });
+        }
+    });
 } 

@@ -179,41 +179,55 @@ function updateChildPayments(parentId, parent, children) {
 
 // Ödemeyi sil
 function deletePayment(id) {
-    if (confirm('Bu ödemeyi silmek istediğinizden emin misiniz?')) {
-        ajaxRequest({
-            action: 'delete_payment',
-            id: id
-        }).done(function (response) {
-            if (response.status === 'success') {
-                loadData();
-            }
-        });
-    }
+    Swal.fire({
+        icon: 'warning',
+        title: 'Bu ödemeyi silmek istediğinize emin misiniz?',
+        showCancelButton: true,
+        confirmButtonText: 'Evet, sil',
+        cancelButtonText: 'İptal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            ajaxRequest({
+                action: 'delete_payment',
+                id: id
+            }).done(function (response) {
+                if (response.status === 'success') {
+                    loadData();
+                }
+            });
+        }
+    });
 }
 
 // Ödenmemiş ödemeleri sonraki aya aktar
 function transferUnpaidPayments() {
-    if (!confirm('Ödenmemiş ödemeleri sonraki aya aktarmak istediğinizden emin misiniz?')) {
-        return;
-    }
+    Swal.fire({
+        icon: 'warning',
+        title: 'Ödenmemiş ödemeleri sonraki aya aktarmak istediğinize emin misiniz?',
+        showCancelButton: true,
+        confirmButtonText: 'Evet, aktar',
+        cancelButtonText: 'İptal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const month = parseInt($('#monthSelect').val()) + 1;
+            const year = parseInt($('#yearSelect').val());
 
-    const month = parseInt($('#monthSelect').val()) + 1;
-    const year = parseInt($('#yearSelect').val());
-
-    ajaxRequest({
-        action: 'transfer_unpaid_payments',
-        current_month: month,
-        current_year: year
-    }).done(function (response) {
-        if (response.status === 'success') {
-            loadData();
-            nextMonth();
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Hata',
-                text: response.message,
-                timer: 1500
+            ajaxRequest({
+                action: 'transfer_unpaid_payments',
+                current_month: month,
+                current_year: year
+            }).done(function (response) {
+                if (response.status === 'success') {
+                    loadData();
+                    nextMonth();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Hata',
+                        text: response.message,
+                        timer: 1500
+                    });
+                }
             });
         }
     });
