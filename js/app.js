@@ -15,6 +15,7 @@ function loadData() {
             updateIncomeList(response.data.incomes);
             updateSavingsList(response.data.savings);
             updatePaymentsList(response.data.payments);
+            updateRecurringPaymentsList(response.data.recurring_payments);
             updateSummary(response.data);
         } else {
             console.error('Veri yükleme hatası:', response.message);
