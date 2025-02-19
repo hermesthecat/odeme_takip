@@ -15,6 +15,49 @@ $.fn.serializeObject = function () {
     return o;
 };
 
+// HTML escape fonksiyonu
+function escapeHtml(unsafe) {
+    if (typeof unsafe !== 'string') {
+        return unsafe;
+    }
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+// Sayısal değerleri formatla
+function formatNumber(number, decimals = 2) {
+    if (typeof number !== 'number') {
+        number = parseFloat(number);
+    }
+    if (isNaN(number)) {
+        return '0.00';
+    }
+    return number.toFixed(decimals);
+}
+
+// Güvenli HTML oluştur
+function createSafeHtml(template, data) {
+    for (let key in data) {
+        if (data.hasOwnProperty(key)) {
+            let value = data[key];
+            // Sayısal değerler için formatlama
+            if (key.includes('amount') || key.includes('total')) {
+                value = formatNumber(value);
+            }
+            // Diğer değerler için HTML escape
+            else if (typeof value === 'string') {
+                value = escapeHtml(value);
+            }
+            template = template.replace(new RegExp('\\${' + key + '}', 'g'), value);
+        }
+    }
+    return template;
+}
+
 // Validasyon fonksiyonları
 const validationRules = {
     required: (value) => {
@@ -202,14 +245,14 @@ function ajaxRequest(data) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Oturum Hatası',
-                    text: 'Oturumunuz sonlanmış. Sayfa yenilenecek.',
+                    text: escapeHtml(response.message),
                     confirmButtonText: 'Tamam'
                 }).then(() => {
                     window.location.reload();
                 });
                 throw new Error('Token hatası');
             }
-            throw new Error(response.message);
+            throw new Error(escapeHtml(response.message));
         }
         return response;
     });

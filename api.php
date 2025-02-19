@@ -211,6 +211,38 @@ function validateDateRange($start_date, $end_date)
     return true;
 }
 
+// Çıktı filtreleme fonksiyonları
+function sanitizeOutput($data) {
+    if (is_array($data)) {
+        foreach ($data as $key => $value) {
+            $data[$key] = sanitizeOutput($value);
+        }
+        return $data;
+    }
+    
+    if (is_object($data)) {
+        foreach ($data as $key => $value) {
+            $data->$key = sanitizeOutput($value);
+        }
+        return $data;
+    }
+    
+    if (is_string($data)) {
+        // HTML karakterlerini encode et
+        return htmlspecialchars($data, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
+    
+    return $data;
+}
+
+// Sayısal değerleri formatla
+function formatNumber($number, $decimals = 2) {
+    if (!is_numeric($number)) {
+        return '0.00';
+    }
+    return number_format((float)$number, $decimals, '.', '');
+}
+
 header('Content-Type: application/json');
 
 $response = ['status' => 'error', 'message' => 'Invalid request'];
@@ -883,6 +915,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ];
             }
             break;
+    }
+
+    // Response'u güvenli hale getir
+    if (isset($response['data'])) {
+        $response['data'] = sanitizeOutput($response['data']);
+    }
+    if (isset($response['message'])) {
+        $response['message'] = sanitizeOutput($response['message']);
+    }
+
+    // Sayısal değerleri formatla
+    if (isset($response['data']['summary'])) {
+        $response['data']['summary']['total_income'] = formatNumber($response['data']['summary']['total_income']);
+        $response['data']['summary']['total_expense'] = formatNumber($response['data']['summary']['total_expense']);
+    }
+
+    if (isset($response['data']['incomes'])) {
+        foreach ($response['data']['incomes'] as &$income) {
+            $income['amount'] = formatNumber($income['amount']);
+            if (isset($income['exchange_rate'])) {
+                $income['exchange_rate'] = formatNumber($income['exchange_rate']);
+            }
+        }
+    }
+
+    if (isset($response['data']['payments'])) {
+        foreach ($response['data']['payments'] as &$payment) {
+            $payment['amount'] = formatNumber($payment['amount']);
+            if (isset($payment['exchange_rate'])) {
+                $payment['exchange_rate'] = formatNumber($payment['exchange_rate']);
+            }
+        }
+    }
+
+    if (isset($response['data']['savings'])) {
+        foreach ($response['data']['savings'] as &$saving) {
+            $saving['target_amount'] = formatNumber($saving['target_amount']);
+            $saving['current_amount'] = formatNumber($saving['current_amount']);
+        }
+    }
+
+    if (isset($response['data']['recurring_payments'])) {
+        foreach ($response['data']['recurring_payments'] as &$payment) {
+            $payment['amount'] = formatNumber($payment['amount']);
+            $payment['yearly_total'] = formatNumber($payment['yearly_total']);
+        }
     }
 }
 
