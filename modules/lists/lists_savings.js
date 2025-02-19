@@ -24,7 +24,7 @@ export async function updateSavingList(selectedYear = new Date().getFullYear(), 
 
         if (!Array.isArray(savings) || savings.length === 0) {
             const row = document.createElement('tr');
-            row.innerHTML = '<td colspan="6" class="text-center">Henüz birikim kaydı bulunmamaktadır.</td>';
+            row.innerHTML = '<td colspan="7" class="text-center">Henüz birikim kaydı bulunmamaktadır.</td>';
             tbody.appendChild(row);
             return;
         }
@@ -41,20 +41,7 @@ export async function updateSavingList(selectedYear = new Date().getFullYear(), 
                     row.innerHTML = `
                         <td>${saving.name || '-'}</td>
                         <td>${saving.target_amount ? parseFloat(saving.target_amount).toFixed(2) : '0.00'}</td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <span>${saving.current_amount ? parseFloat(saving.current_amount).toFixed(2) : '0.00'}</span>
-                                <div class="progress ms-2" style="width: 100px; height: 4px;">
-                                    <div class="progress-bar ${saving.status === 'completed' ? 'bg-success' : 'bg-primary'}" 
-                                         role="progressbar" 
-                                         style="width: ${Math.min(100, saving.progress)}%" 
-                                         aria-valuenow="${Math.min(100, saving.progress)}" 
-                                         aria-valuemin="0" 
-                                         aria-valuemax="100">
-                                    </div>
-                                </div>
-                            </div>
-                        </td>
+                        <td>${saving.current_amount ? parseFloat(saving.current_amount).toFixed(2) : '0.00'}</td>
                         <td>${saving.currency || '-'}</td>
                         <td>${formatDate(saving.start_date)}</td>
                         <td>${formatDate(saving.target_date)}</td>
@@ -70,19 +57,8 @@ export async function updateSavingList(selectedYear = new Date().getFullYear(), 
                                         ${Math.round(saving.progress)}%
                                     </div>
                                 </div>
-                                <span class="badge ms-2 ${
-                                    saving.status === 'completed' ? 'bg-success' : 
-                                    saving.status === 'expired' ? 'bg-danger' : 
-                                    'bg-primary'
-                                }">
-                                    ${
-                                        saving.status === 'completed' ? 'Tamamlandı' : 
-                                        saving.status === 'expired' ? 'Süresi Doldu' : 
-                                        'Devam Ediyor'
-                                    }
-                                </span>
                             </div>
-                            ${saving.days_remaining > 0 ? `<small class="text-muted">${saving.days_remaining} gün kaldı</small>` : ''}
+
                         </td>
                         <td>
                             <button class="btn btn-primary btn-sm me-1" data-action="update-saving" data-index="${index}">

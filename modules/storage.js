@@ -9,13 +9,14 @@ const budgetGoalAdapter = new BudgetGoalDataAdapter();
 // Ödemeleri yükleme
 export async function loadPayments() {
     try {
-        const response = await paymentAdapter.get();
+        const response = await paymentAdapter.getAll();
         if (response?.success && Array.isArray(response.data)) {
             return response.data;
         }
         console.error('API yanıtı geçersiz format:', response);
         return [];
     } catch (error) {
+        console.error('Ödemeler yüklenirken hata:', error);
         Swal.fire({
             icon: 'error',
             title: 'Hata!',
