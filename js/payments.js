@@ -132,6 +132,33 @@ function markAsPaid(id) {
                                 .attr('aria-valuenow', progress);
 
                             statusText.text(`${paidCount}/${totalCount}`);
+
+                            // Tekrarlayan ödemeleri yeniden yükle ve toplam tutarı güncelle
+                            ajaxRequest({
+                                action: 'get_data',
+                                month: $('#monthSelect').val(),
+                                year: $('#yearSelect').val(),
+                                load_type: 'recurring_payments'
+                            }).done(function (response) {
+                                if (response.status === 'success' && response.data && response.data.recurring_payments) {
+                                    try {
+                                        let totalYearlyPayment = 0;
+                                        response.data.recurring_payments.forEach(payment => {
+                                            if (payment && payment.yearly_total) {
+                                                totalYearlyPayment += parseFloat(payment.yearly_total) || 0;
+                                            }
+                                        });
+                                        $('#totalYearlyPayment').text(totalYearlyPayment.toFixed(2));
+                                        console.log('Toplam tutar güncellendi:', totalYearlyPayment);
+                                    } catch (error) {
+                                        console.error('Toplam tutar güncellenirken hata:', error);
+                                    }
+                                } else {
+                                    console.error('Recurring payments verisi alınamadı:', response);
+                                }
+                            }).fail(function(jqXHR, textStatus, errorThrown) {
+                                console.error('Ajax isteği başarısız:', textStatus, errorThrown);
+                            });
                         }
                     });
                 }
