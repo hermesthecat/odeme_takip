@@ -379,8 +379,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $pdo->beginTransaction();
 
-                // Mevcut ayın ödenmemiş ödemelerini al
-                $stmt = $pdo->prepare("SELECT * FROM payments WHERE user_id = ? AND MONTH(first_date) = ? AND YEAR(first_date) = ? AND status = 'pending' AND parent_id IS NULL");
+                // Mevcut ayın ödenmemiş ödemelerini al (hem ana hem de tekrarlanan ödemeler)
+                $stmt = $pdo->prepare("SELECT * FROM payments WHERE user_id = ? AND MONTH(first_date) = ? AND YEAR(first_date) = ? AND status = 'pending'");
                 $stmt->execute([$user_id, $_POST['current_month'], $_POST['current_year']]);
                 $unpaid_payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -393,19 +393,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Yeni ödeme tarihi
                     $new_date = date('Y-m-d', mktime(0, 0, 0, $next_month, date('d', strtotime($payment['first_date'])), $next_year));
 
-                    // Yeni ödemeyi ekle
-                    $stmt = $pdo->prepare("INSERT INTO payments (user_id, name, amount, currency, first_date, frequency) 
-                                         VALUES (?, ?, ?, ?, ?, 'none')");
-                    $new_name = $payment['name'] . ' (' . $current_month_name . ' Ayından Aktarıldı)';
+                    // Eğer tekrarlanan bir ödeme ise
+                    if ($payment['frequency'] !== 'none') {
+                        // Ana kayıt ise
+                        if ($payment['parent_id'] === null) {
+                            // Yeni ana kaydı ekle
+                            $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency) 
+                                                 VALUES (?, NULL, ?, ?, ?, ?, ?)");
+                            $new_name = $payment['name'] . ' (' . $current_month_name . ' Ayından Aktarıldı)';
 
-                    if (!$stmt->execute([
-                        $user_id,
-                        $new_name,
-                        $payment['amount'],
-                        $payment['currency'],
-                        $new_date
-                    ])) {
-                        throw new Exception("Yeni ödeme eklenemedi");
+                            if (!$stmt->execute([
+                                $user_id,
+                                $new_name,
+                                $payment['amount'],
+                                $payment['currency'],
+                                $new_date,
+                                $payment['frequency']
+                            ])) {
+                                throw new Exception("Yeni ana kayıt eklenemedi");
+                            }
+
+                            $new_parent_id = $pdo->lastInsertId();
+
+                            // Child kayıtları da aktar
+                            $stmt = $pdo->prepare("SELECT * FROM payments WHERE parent_id = ? AND first_date > ?");
+                            $stmt->execute([$payment['id'], $payment['first_date']]);
+                            $child_payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($child_payments as $child) {
+                                $child_new_date = date('Y-m-d', strtotime($child['first_date'] . ' +1 month'));
+                                $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency) 
+                                                     VALUES (?, ?, ?, ?, ?, ?, ?)");
+                                if (!$stmt->execute([
+                                    $user_id,
+                                    $new_parent_id,
+                                    $new_name,
+                                    $child['amount'],
+                                    $child['currency'],
+                                    $child_new_date,
+                                    $child['frequency']
+                                ])) {
+                                    throw new Exception("Child kayıt eklenemedi");
+                                }
+                            }
+                        }
+                    } else {
+                        // Tekrarlanmayan ödeme ise
+                        $stmt = $pdo->prepare("INSERT INTO payments (user_id, name, amount, currency, first_date, frequency) 
+                                             VALUES (?, ?, ?, ?, ?, 'none')");
+                        $new_name = $payment['name'] . ' (' . $current_month_name . ' Ayından Aktarıldı)';
+
+                        if (!$stmt->execute([
+                            $user_id,
+                            $new_name,
+                            $payment['amount'],
+                            $payment['currency'],
+                            $new_date
+                        ])) {
+                            throw new Exception("Yeni ödeme eklenemedi");
+                        }
                     }
 
                     // Eski ödemeyi sil
