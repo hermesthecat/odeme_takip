@@ -165,17 +165,13 @@ function markAsPaid(id) {
                                             </tr>
                                         `);
 
-                                        console.log('Toplam tutarlar güncellendi:', {
-                                            totalYearlyPayment,
-                                            totalUnpaidPayment
-                                        });
                                     } catch (error) {
                                         console.error('Toplam tutarlar güncellenirken hata:', error);
                                     }
                                 } else {
                                     console.error('Recurring payments verisi alınamadı:', response);
                                 }
-                            }).fail(function(jqXHR, textStatus, errorThrown) {
+                            }).fail(function (jqXHR, textStatus, errorThrown) {
                                 console.error('Ajax isteği başarısız:', textStatus, errorThrown);
                             });
                         }
