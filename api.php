@@ -324,11 +324,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         END as yearly_total,
                         CONCAT(
                             (SELECT COUNT(*) FROM payments p2 
-                             WHERE p2.parent_id = p1.id 
+                             WHERE (p2.parent_id = p1.id OR p2.id = p1.id)
                              AND p2.status = 'paid'
                              AND p2.user_id = p1.user_id),
                             '/',
-                            (SELECT COUNT(*) FROM payments p3 
+                            (SELECT COUNT(*) + 1 FROM payments p3 
                              WHERE p3.parent_id = p1.id 
                              AND p3.user_id = p1.user_id)
                         ) as payment_status
