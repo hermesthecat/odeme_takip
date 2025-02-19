@@ -77,6 +77,13 @@ function updateIncomeList(incomes) {
     incomes.forEach(function (income) {
         const isChild = income.parent_id !== null;
         const rowClass = isChild ? 'table-light' : '';
+        let amountText = `${parseFloat(income.amount).toFixed(2)} ${income.currency}`;
+
+        // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
+        if (income.currency !== 'TRY' && income.exchange_rate) {
+            const convertedAmount = parseFloat(income.amount) * parseFloat(income.exchange_rate);
+            amountText += ` (${convertedAmount.toFixed(2)} ${income.base_currency})`;
+        }
 
         tbody.append(`
                     <tr class="${rowClass}">
@@ -90,7 +97,7 @@ function updateIncomeList(incomes) {
                             </button>
                         </td>
                         <td>${income.name}</td>
-                        <td>${income.amount}</td>
+                        <td>${amountText}</td>
                         <td>${income.currency}</td>
                         <td>${income.first_date}</td>
                         <td>${getFrequencyText(income.frequency)}</td>
@@ -194,6 +201,13 @@ function updatePaymentsList(payments) {
     payments.forEach(function (payment) {
         const isChild = payment.parent_id !== null;
         const rowClass = isChild ? 'table-light' : '';
+        let amountText = `${parseFloat(payment.amount).toFixed(2)} ${payment.currency}`;
+
+        // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
+        if (payment.currency !== 'TRY' && payment.exchange_rate) {
+            const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
+            amountText += ` (${convertedAmount.toFixed(2)} ${payment.base_currency})`;
+        }
 
         tbody.append(`
                     <tr class="${rowClass}">
@@ -207,7 +221,7 @@ function updatePaymentsList(payments) {
                             </button>
                         </td>
                         <td>${payment.name}</td>
-                        <td>${payment.amount}</td>
+                        <td>${amountText}</td>
                         <td>${payment.currency}</td>
                         <td>${payment.first_date}</td>
                         <td>${getFrequencyText(payment.frequency)}</td>
