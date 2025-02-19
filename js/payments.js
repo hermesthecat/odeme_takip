@@ -484,6 +484,17 @@ function openUpdatePaymentModal(id) {
                 $('#update_payment_first_date').val(payment.first_date);
                 $('#update_payment_frequency').val(payment.frequency);
 
+                // Kur güncelleme seçeneğini göster/gizle
+                const exchangeRateGroup = document.getElementById('updatePaymentExchangeRateGroup');
+                if (payment.currency !== data.user.base_currency) {
+                    exchangeRateGroup.style.display = 'block';
+                    if (payment.exchange_rate) {
+                        $('#current_exchange_rate').text(`Mevcut Kur: ${payment.exchange_rate}`);
+                    }
+                } else {
+                    exchangeRateGroup.style.display = 'none';
+                }
+
                 // Frekansa göre bitiş tarihi alanını göster/gizle
                 const endDateGroup = document.getElementById('updatePaymentEndDateGroup');
                 const endDateInput = endDateGroup.querySelector('input[name="end_date"]');
@@ -515,6 +526,11 @@ function updatePayment() {
     // Form verilerini obje olarak al
     const formData = $('#updatePaymentForm').serializeObject();
     formData.action = 'update_payment';
+    
+    // Kur güncelleme seçeneğini kontrol et
+    if ($('#update_exchange_rate').is(':checked')) {
+        formData.update_exchange_rate = true;
+    }
 
     ajaxRequest(formData).done(function (response) {
         if (response.status === 'success') {

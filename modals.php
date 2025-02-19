@@ -297,23 +297,23 @@
 </div>
 
 <!-- Ödeme Güncelleme Modal -->
-<div class="modal fade" id="updatePaymentModal" tabindex="-1" aria-labelledby="updatePaymentModalLabel" aria-hidden="true">
+<div class="modal fade" id="updatePaymentModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="updatePaymentModalLabel">Ödeme Güncelle</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                <h5 class="modal-title">Ödeme Güncelle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="updatePaymentForm" onsubmit="return false;">
+                <form id="updatePaymentForm">
                     <input type="hidden" id="update_payment_id" name="id">
                     <div class="mb-3">
-                        <label for="update_payment_name" class="form-label">Ödeme Adı</label>
+                        <label class="form-label">Ödeme İsmi</label>
                         <input type="text" class="form-control" id="update_payment_name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="update_payment_amount" class="form-label">Tutar</label>
-                        <input type="number" step="0.01" class="form-control" id="update_payment_amount" name="amount" required>
+                        <label class="form-label">Tutar</label>
+                        <input type="number" class="form-control" id="update_payment_amount" name="amount" step="0.01" min="0" required>
                     </div>
                     <div class="mb-3">
                         <label for="update_payment_currency" class="form-label">Para Birimi</label>
@@ -324,26 +324,30 @@
                             <option value="GBP">GBP</option>
                         </select>
                     </div>
+                    <div class="mb-3" id="updatePaymentExchangeRateGroup" style="display: none;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="update_exchange_rate" name="update_exchange_rate">
+                            <label class="form-check-label" for="update_exchange_rate">
+                                Güncel kur ile güncelle
+                            </label>
+                        </div>
+                        <small id="current_exchange_rate" class="text-muted d-block mt-1"></small>
+                    </div>
                     <div class="mb-3">
-                        <label for="update_payment_first_date" class="form-label">Tarih</label>
+                        <label class="form-label">İlk Ödeme Tarihi</label>
                         <input type="date" class="form-control" id="update_payment_first_date" name="first_date" required>
                     </div>
                     <div class="mb-3">
-                        <label for="update_payment_frequency" class="form-label">Tekrarlama Sıklığı</label>
+                        <label class="form-label">Tekrarlama Sıklığı</label>
                         <select class="form-select" id="update_payment_frequency" name="frequency" required>
-                            <option value="none">Tekrarlama Yok</option>
+                            <option value="none">Tek Seferlik</option>
                             <option value="monthly">Aylık</option>
-                            <option value="bimonthly">2 Ayda Bir</option>
-                            <option value="quarterly">3 Ayda Bir</option>
-                            <option value="fourmonthly">4 Ayda Bir</option>
-                            <option value="fivemonthly">5 Ayda Bir</option>
-                            <option value="sixmonthly">6 Ayda Bir</option>
                             <option value="yearly">Yıllık</option>
                         </select>
                     </div>
                     <div class="mb-3" id="updatePaymentEndDateGroup" style="display: none;">
-                        <label for="update_payment_end_date" class="form-label">Bitiş Tarihi</label>
-                        <input type="date" class="form-control" id="update_payment_end_date" name="end_date">
+                        <label class="form-label">Bitiş Tarihi</label>
+                        <input type="date" class="form-control" name="end_date">
                     </div>
                 </form>
             </div>
