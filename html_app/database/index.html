@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veritabanı Yönetimi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .tool-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+        .tool-card:hover {
+            border-color: #007bff;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .button:hover {
+            background: #0056b3;
+        }
+        .steps {
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Veritabanı Yönetimi</h1>
+            <p>Bu araçlar veritabanı kurulumu, testi ve veri aktarımı için kullanılır.</p>
+        </div>
+
+        <!-- Tool Cards -->
+        <div class="tool-card">
+            <h2>1. Veritabanı Kontrol</h2>
+            <p>Veritabanı bağlantısını ve yapılandırmasını kontrol edin.</p>
+            <ol class="steps">
+                <li>Veritabanı bağlantı ayarlarını kontrol eder</li>
+                <li>Kullanıcı yetkilerini doğrular</li>
+                <li>Gerekli tabloların varlığını kontrol eder</li>
+            </ol>
+            <a href="check-db.html" class="button">Kontrol Et</a>
+        </div>
+
+        <div class="tool-card">
+            <h2>2. Veritabanı Test</h2>
+            <p>Veritabanı operasyonlarını test edin.</p>
+            <ol class="steps">
+                <li>CRUD operasyonlarını test eder</li>
+                <li>Transaction desteğini kontrol eder</li>
+                <li>Bütçe işlemlerini test eder</li>
+            </ol>
+            <a href="test-db.html" class="button">Test Et</a>
+        </div>
+
+        <div class="tool-card">
+            <h2>3. Veri Aktarımı</h2>
+            <p>localStorage verilerini MySQL veritabanına aktarın.</p>
+            <ol class="steps">
+                <li>Mevcut verileri dışa aktarır</li>
+                <li>Veritabanı şemasını oluşturur</li>
+                <li>Verileri güvenli şekilde aktarır</li>
+            </ol>
+            <a href="migration.html" class="button">Aktarımı Başlat</a>
+        </div>
+
+        <div class="tool-card">
+            <h2>Yardım & Dokümantasyon</h2>
+            <p>Detaylı kurulum ve sorun giderme bilgileri için dokümantasyona göz atın.</p>
+            <p>Sorun yaşarsanız ilgili hata mesajları ile birlikte yardım alın.</p>
+            <a href="README.md" class="button">Dokümantasyonu Görüntüle</a>
+        </div>
+    </div>
+</body>
+</html>
