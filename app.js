@@ -1,8 +1,8 @@
 // Form verilerini objeye çeviren yardımcı fonksiyon
-$.fn.serializeObject = function() {
+$.fn.serializeObject = function () {
     var o = {};
     var a = this.serializeArray();
-    $.each(a, function() {
+    $.each(a, function () {
         if (o[this.name]) {
             if (!o[this.name].push) {
                 o[this.name] = [o[this.name]];
@@ -34,7 +34,7 @@ function loadData() {
         action: 'get_data',
         month: month,
         year: year
-    }).done(function(response) {
+    }).done(function (response) {
         if (response.status === 'success') {
             // Debug bilgisini konsola yazdır
             if (response.debug) {
@@ -48,7 +48,7 @@ function loadData() {
         } else {
             console.error('Veri yükleme hatası:', response.message);
         }
-    }).fail(function(jqXHR, textStatus, errorThrown) {
+    }).fail(function (jqXHR, textStatus, errorThrown) {
         console.error('AJAX hatası:', textStatus, errorThrown);
     });
 }
@@ -73,31 +73,33 @@ function updateIncomeList(incomes) {
     const tbody = $('#incomeList');
     tbody.empty();
 
-    incomes.forEach(function(income) {
+    incomes.forEach(function (income) {
         const isChild = income.parent_id !== null;
         const rowClass = isChild ? 'table-light' : '';
-        const incomeName = isChild ? `└─ ${income.name}` : income.name;
-        
+
         tbody.append(`
-            <tr class="${rowClass}">
-                <td>${incomeName}</td>
-                <td>${income.amount} ${income.currency}</td>
-                <td>${income.currency}</td>
-                <td>${income.first_date}</td>
-                <td>${getFrequencyText(income.frequency)}</td>
-                <td>${income.next_income_date || ''}</td>
-                <td>
-                    ${isChild ? `
-                        <button class="btn btn-sm btn-success" onclick="markAsReceived(${income.id})">
-                            ${income.status === 'received' ? '<span class="badge bg-success">Alındı</span>' : '<span class="badge bg-warning">Bekliyor</span>'}
-                        </button>
-                    ` : `
-                        <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    `}
-                </td>
-            </tr>
+                    <tr class="${rowClass}">
+                        <td style="width: 50px;">
+                            <button
+                                class="btn btn-sm ${income.status === 'received' ? 'btn-success' : 'btn-outline-success'}"
+                                onclick="markAsReceived(${income.id})"
+                                title="${income.status === 'received' ? 'Alındı' : 'Bekliyor'}"
+                            >
+                                <i class="bi ${income.status === 'received' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
+                            </button>
+                        </td>
+                        <td>${income.name}</td>
+                        <td>${income.amount} ${income.currency}</td>
+                        <td>${income.currency}</td>
+                        <td>${income.first_date}</td>
+                        <td>${getFrequencyText(income.frequency)}</td>
+                        <td>${income.next_income_date || ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
         `);
     });
 }
@@ -107,7 +109,7 @@ function markAsReceived(id) {
     ajaxRequest({
         action: 'mark_income_received',
         id: id
-    }).done(function(response) {
+    }).done(function (response) {
         if (response.status === 'success') {
             loadData();
         }
@@ -119,7 +121,7 @@ function updateSavingsList(savings) {
     const tbody = $('#savingList');
     tbody.empty();
 
-    savings.forEach(function(saving) {
+    savings.forEach(function (saving) {
         const progress = (saving.current_amount / saving.target_amount) * 100;
         tbody.append(`
             <tr>
@@ -152,14 +154,13 @@ function updatePaymentsList(payments) {
     const tbody = $('#paymentList');
     tbody.empty();
 
-    payments.forEach(function(payment) {
+    payments.forEach(function (payment) {
         const isChild = payment.parent_id !== null;
         const rowClass = isChild ? 'table-light' : '';
-        const paymentName = isChild ? `└─ ${payment.name}` : payment.name;
-        
+
         tbody.append(`
             <tr class="${rowClass}">
-                <td>${paymentName}</td>
+                <td>${payment.name}</td>
                 <td>${payment.amount} ${payment.currency}</td>
                 <td>${payment.currency}</td>
                 <td>${payment.first_date}</td>
@@ -186,7 +187,7 @@ function markAsPaid(id) {
     ajaxRequest({
         action: 'mark_payment_paid',
         id: id
-    }).done(function(response) {
+    }).done(function (response) {
         if (response.status === 'success') {
             loadData();
         }
@@ -224,7 +225,7 @@ function deleteIncome(id) {
         ajaxRequest({
             action: 'delete_income',
             id: id
-        }).done(function(response) {
+        }).done(function (response) {
             if (response.status === 'success') {
                 loadData();
             }
@@ -237,7 +238,7 @@ function deleteSaving(id) {
         ajaxRequest({
             action: 'delete_saving',
             id: id
-        }).done(function(response) {
+        }).done(function (response) {
             if (response.status === 'success') {
                 loadData();
             }
@@ -250,7 +251,7 @@ function deletePayment(id) {
         ajaxRequest({
             action: 'delete_payment',
             id: id
-        }).done(function(response) {
+        }).done(function (response) {
             if (response.status === 'success') {
                 loadData();
             }
@@ -292,7 +293,7 @@ function nextMonth() {
 }
 
 // Sayfa yüklendiğinde
-$(document).ready(function() {
+$(document).ready(function () {
     // Mevcut ay ve yılı seç
     const now = new Date();
     $('#monthSelect').val(now.getMonth());
@@ -302,14 +303,14 @@ $(document).ready(function() {
     loadData();
 
     // Form submit işlemleri
-    $('[data-action]').click(function() {
+    $('[data-action]').click(function () {
         const type = $(this).data('type');
         const modal = new bootstrap.Modal(document.getElementById(`${type}Modal`));
         modal.show();
     });
 
     // Form submit işlemleri
-    $('.modal form').on('submit', function(e) {
+    $('.modal form').on('submit', function (e) {
         e.preventDefault();
         const form = $(this);
         const formData = form.serializeObject();
@@ -323,7 +324,7 @@ $(document).ready(function() {
         ajaxRequest({
             action: action,
             ...formData
-        }).done(function(response) {
+        }).done(function (response) {
             if (response.status === 'success') {
                 const modalElement = form.closest('.modal');
                 const modal = bootstrap.Modal.getInstance(modalElement);
