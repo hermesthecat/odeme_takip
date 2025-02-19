@@ -31,10 +31,13 @@
                     <div class="mb-3">
                         <label class="form-label">Tekrarlama Sıklığı</label>
                         <select class="form-select" name="frequency" required>
-                            <option value="once">Bir Kez</option>
-                            <option value="daily">Günlük</option>
-                            <option value="weekly">Haftalık</option>
+                            <option value="none">Tekrar Yok</option>
                             <option value="monthly">Aylık</option>
+                            <option value="bimonthly">2 Ayda Bir</option>
+                            <option value="quarterly">3 Ayda Bir</option>
+                            <option value="fourmonthly">4 Ayda Bir</option>
+                            <option value="fivemonthly">5 Ayda Bir</option>
+                            <option value="sixmonthly">6 Ayda Bir</option>
                             <option value="yearly">Yıllık</option>
                         </select>
                     </div>
@@ -124,13 +127,20 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Tekrarlama Sıklığı</label>
-                        <select class="form-select" name="frequency" required>
-                            <option value="once">Bir Kez</option>
-                            <option value="daily">Günlük</option>
-                            <option value="weekly">Haftalık</option>
+                        <select class="form-select" name="frequency" id="paymentFrequency" required>
+                            <option value="none">Tekrar Yok</option>
                             <option value="monthly">Aylık</option>
+                            <option value="bimonthly">2 Ayda Bir</option>
+                            <option value="quarterly">3 Ayda Bir</option>
+                            <option value="fourmonthly">4 Ayda Bir</option>
+                            <option value="fivemonthly">5 Ayda Bir</option>
+                            <option value="sixmonthly">6 Ayda Bir</option>
                             <option value="yearly">Yıllık</option>
                         </select>
+                    </div>
+                    <div class="mb-3" id="endDateGroup" style="display: none;">
+                        <label class="form-label">Bitiş Tarihi</label>
+                        <input type="date" class="form-control" name="end_date">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -140,4 +150,20 @@
             </form>
         </div>
     </div>
-</div> 
+</div>
+
+<script>
+// Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle
+document.getElementById('paymentFrequency').addEventListener('change', function() {
+    const endDateGroup = document.getElementById('endDateGroup');
+    const endDateInput = document.querySelector('input[name="end_date"]');
+    
+    if (this.value === 'none') {
+        endDateGroup.style.display = 'none';
+        endDateInput.removeAttribute('required');
+    } else {
+        endDateGroup.style.display = 'block';
+        endDateInput.setAttribute('required', 'required');
+    }
+});
+</script>

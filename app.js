@@ -1,3 +1,20 @@
+// Form verilerini objeye çeviren yardımcı fonksiyon
+$.fn.serializeObject = function() {
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name]) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
+
 // AJAX istekleri için yardımcı fonksiyon
 function ajaxRequest(data) {
     return $.ajax({
@@ -19,12 +36,36 @@ function loadData() {
         year: year
     }).done(function(response) {
         if (response.status === 'success') {
+            // Debug bilgisini konsola yazdır
+            if (response.debug) {
+                console.log('Debug Bilgisi:', response.debug);
+            }
+
             updateIncomeList(response.data.incomes);
             updateSavingsList(response.data.savings);
             updatePaymentsList(response.data.payments);
             updateSummary(response.data);
+        } else {
+            console.error('Veri yükleme hatası:', response.message);
         }
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.error('AJAX hatası:', textStatus, errorThrown);
     });
+}
+
+// Tekrarlama sıklığı çevirisi
+function getFrequencyText(frequency) {
+    const frequencies = {
+        'none': 'Tekrar Yok',
+        'monthly': 'Aylık',
+        'bimonthly': '2 Ayda Bir',
+        'quarterly': '3 Ayda Bir',
+        'fourmonthly': '4 Ayda Bir',
+        'fivemonthly': '5 Ayda Bir',
+        'sixmonthly': '6 Ayda Bir',
+        'yearly': 'Yıllık'
+    };
+    return frequencies[frequency] || frequency;
 }
 
 // Gelir listesini güncelle
@@ -39,7 +80,7 @@ function updateIncomeList(incomes) {
                 <td>${income.amount} ${income.currency}</td>
                 <td>${income.currency}</td>
                 <td>${income.first_date}</td>
-                <td>${income.frequency}</td>
+                <td>${getFrequencyText(income.frequency)}</td>
                 <td>${income.next_date}</td>
                 <td>
                     <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})">
@@ -90,21 +131,43 @@ function updatePaymentsList(payments) {
     tbody.empty();
 
     payments.forEach(function(payment) {
+        const isChild = payment.parent_id !== null;
+        const rowClass = isChild ? 'table-light' : '';
+        const paymentName = isChild ? `└─ ${payment.name}` : payment.name;
+        
         tbody.append(`
-            <tr>
-                <td>${payment.name}</td>
+            <tr class="${rowClass}">
+                <td>${paymentName}</td>
                 <td>${payment.amount} ${payment.currency}</td>
                 <td>${payment.currency}</td>
                 <td>${payment.first_date}</td>
-                <td>${payment.frequency}</td>
-                <td>${payment.next_date}</td>
+                <td>${getFrequencyText(payment.frequency)}</td>
+                <td>${payment.status === 'paid' ? '<span class="badge bg-success">Ödendi</span>' : '<span class="badge bg-warning">Bekliyor</span>'}</td>
                 <td>
-                    <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                    ${isChild ? `
+                        <button class="btn btn-sm btn-success" onclick="markAsPaid(${payment.id})">
+                            <i class="bi bi-check-lg"></i>
+                        </button>
+                    ` : `
+                        <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    `}
                 </td>
             </tr>
         `);
+    });
+}
+
+// Ödeme durumunu güncelle
+function markAsPaid(id) {
+    ajaxRequest({
+        action: 'mark_payment_paid',
+        id: id
+    }).done(function(response) {
+        if (response.status === 'success') {
+            loadData();
+        }
     });
 }
 
@@ -224,17 +287,25 @@ $(document).ready(function() {
     });
 
     // Form submit işlemleri
-    $('.modal form').submit(function(e) {
+    $('.modal form').on('submit', function(e) {
         e.preventDefault();
         const form = $(this);
+        const formData = form.serializeObject();
         const action = 'add_' + form.data('type');
+
+        // next_date değerini kaldır çünkü API'de hesaplanacak
+        if (formData.next_date) {
+            delete formData.next_date;
+        }
 
         ajaxRequest({
             action: action,
-            ...form.serializeObject()
+            ...formData
         }).done(function(response) {
             if (response.status === 'success') {
-                form.closest('.modal').modal('hide');
+                const modalElement = form.closest('.modal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                modal.hide();
                 form[0].reset();
                 loadData();
             }
