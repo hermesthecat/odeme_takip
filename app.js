@@ -159,25 +159,28 @@ function updatePaymentsList(payments) {
         const rowClass = isChild ? 'table-light' : '';
 
         tbody.append(`
-            <tr class="${rowClass}">
-                <td>${payment.name}</td>
-                <td>${payment.amount} ${payment.currency}</td>
-                <td>${payment.currency}</td>
-                <td>${payment.first_date}</td>
-                <td>${getFrequencyText(payment.frequency)}</td>
-                <td>${payment.next_payment_date || ''}</td>
-                <td>
-                    ${isChild ? `
-                        <button class="btn btn-sm btn-success" onclick="markAsPaid(${payment.id})">
-                            ${payment.status === 'paid' ? '<span class="badge bg-success">Ödendi</span>' : '<span class="badge bg-warning">Bekliyor</span>'}
-                        </button>
-                    ` : `
-                        <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    `}
-                </td>
-            </tr>
+                    <tr class="${rowClass}">
+                        <td style="width: 50px;">
+                            <button
+                                class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
+                                onclick="markAsPaid(${payment.id})"
+                                title="${payment.status === 'paid' ? 'Ödendi' : 'Bekliyor'}"
+                            >
+                                <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
+                            </button>
+                        </td>
+                        <td>${payment.name}</td>
+                        <td>${payment.amount} ${payment.currency}</td>
+                        <td>${payment.currency}</td>
+                        <td>${payment.first_date}</td>
+                        <td>${getFrequencyText(payment.frequency)}</td>
+                        <td>${payment.next_payment_date || ''}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
         `);
     });
 }

@@ -4,6 +4,7 @@ checkLogin();
 ?>
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -14,6 +15,7 @@ checkLogin();
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
     <div class="container mt-4">
         <!-- Başlık ve Kullanıcı Bilgisi -->
@@ -118,6 +120,7 @@ checkLogin();
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Durum</th>
                                 <th>Gelir İsmi</th>
                                 <th>Tutar</th>
                                 <th>Kur</th>
@@ -179,6 +182,7 @@ checkLogin();
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Durum</th>
                                 <th>Ödeme İsmi</th>
                                 <th>Tutar</th>
                                 <th>Kur</th>
@@ -204,4 +208,5 @@ checkLogin();
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="app.js"></script>
 </body>
-</html> 
+
+</html>
