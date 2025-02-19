@@ -260,9 +260,7 @@ function updateRecurringPaymentsList(recurring_payments) {
     let totalYearlyPayment = 0;
 
     recurring_payments.forEach(function (payment) {
-        if (payment.currency === 'TRY') {
-            totalYearlyPayment += parseFloat(payment.yearly_total);
-        }
+        totalYearlyPayment += parseFloat(payment.yearly_total);
 
         // Taksit bilgisini parçala (örn: "2/5" -> [2, 5])
         const [paid, total] = payment.payment_status.split('/').map(Number);
@@ -351,10 +349,10 @@ function loadChildPayments(parentId) {
             tbody.empty();
 
             // Ana kaydı ekle
-            let parentAmountText = `${parseFloat(parent.amount).toFixed(2)} ${parent.currency}`;
+            let parentAmountText = `${parseFloat(parent.amount).toFixed(2)}`;
             if (parent.currency !== data.user.base_currency && parent.exchange_rate) {
                 const convertedAmount = parseFloat(parent.amount) * parseFloat(parent.exchange_rate);
-                parentAmountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
+                parentAmountText += `<br><small class="text-muted">(${convertedAmount.toFixed(2)} ${data.user.base_currency})</small>`;
             }
 
             tbody.append(`
@@ -376,10 +374,10 @@ function loadChildPayments(parentId) {
 
             // Child kayıtları ekle
             children.forEach(function (payment) {
-                let amountText = `${parseFloat(payment.amount).toFixed(2)} ${payment.currency}`;
+                let amountText = `${parseFloat(payment.amount).toFixed(2)}`;
                 if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
                     const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
-                    amountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
+                    amountText += `<br><small class="text-muted">(${convertedAmount.toFixed(2)} ${data.user.base_currency})</small>`;
                 }
 
                 tbody.append(`
