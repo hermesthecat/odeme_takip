@@ -619,6 +619,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'get_child_payments':
+            // Önce ana kaydı al
+            $stmt = $pdo->prepare("SELECT id, name, amount, currency, first_date, status, exchange_rate 
+                                 FROM payments 
+                                 WHERE id = ? AND user_id = ?");
+            if (!$stmt->execute([$_POST['parent_id'], $user_id])) {
+                $response = [
+                    'status' => 'error',
+                    'message' => 'Ana kayıt alınamadı'
+                ];
+                break;
+            }
+            $parent_payment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Sonra child kayıtları al
             $stmt = $pdo->prepare("SELECT id, name, amount, currency, first_date, status, exchange_rate 
                                  FROM payments 
                                  WHERE parent_id = ? AND user_id = ?
@@ -627,7 +641,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $child_payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 $response = [
                     'status' => 'success',
-                    'data' => $child_payments
+                    'data' => [
+                        'parent' => $parent_payment,
+                        'children' => $child_payments
+                    ]
                 ];
             } else {
                 $response = [

@@ -346,14 +346,14 @@ function updateRecurringPaymentsList(recurring_payments) {
     $('#totalYearlyPayment').text(totalYearlyPayment.toFixed(2));
 
     // Ana kayıtlara tıklama olayı ekle
-    $('.payment-parent').on('click', function() {
+    $('.payment-parent').on('click', function () {
         const paymentId = $(this).data('payment-id');
         const childrenRow = $(`.payment-children[data-parent-id="${paymentId}"]`);
         const toggleIcon = $(this).find('.toggle-icon');
-        
+
         childrenRow.toggleClass('d-none');
         toggleIcon.toggleClass('bi-chevron-right bi-chevron-down');
-        
+
         if (!childrenRow.hasClass('d-none')) {
             loadChildPayments(paymentId);
         }
@@ -365,13 +365,38 @@ function loadChildPayments(parentId) {
     ajaxRequest({
         action: 'get_child_payments',
         parent_id: parentId
-    }).done(function(response) {
+    }).done(function (response) {
         if (response.status === 'success') {
-            const childPayments = response.data;
+            const { parent, children } = response.data;
             const tbody = $(`.child-payments[data-parent-id="${parentId}"]`);
             tbody.empty();
 
-            childPayments.forEach(function(payment) {
+            // Ana kaydı ekle
+            let parentAmountText = `${parseFloat(parent.amount).toFixed(2)} ${parent.currency}`;
+            if (parent.currency !== data.user.base_currency && parent.exchange_rate) {
+                const convertedAmount = parseFloat(parent.amount) * parseFloat(parent.exchange_rate);
+                parentAmountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
+            }
+
+            tbody.append(`
+                <tr class="table-primary">
+                    <td>
+                        <button
+                            class="btn btn-sm ${parent.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
+                            onclick="markAsPaid(${parent.id})"
+                            title="${parent.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
+                        >
+                            <i class="bi ${parent.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
+                        </button>
+                    </td>
+                    <td>${parent.first_date}</td>
+                    <td>${parentAmountText}</td>
+                    <td>${parent.currency}</td>
+                </tr>
+            `);
+
+            // Child kayıtları ekle
+            children.forEach(function (payment) {
                 let amountText = `${parseFloat(payment.amount).toFixed(2)} ${payment.currency}`;
                 if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
                     const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
