@@ -293,15 +293,19 @@ function updateSummary(data) {
     let totalExpense = 0;
 
     data.incomes.forEach(income => {
-        if (income.currency === 'TRY') {
-            totalIncome += parseFloat(income.amount);
+        let amount = parseFloat(income.amount);
+        if (income.currency !== 'TRY' && income.exchange_rate) {
+            amount *= parseFloat(income.exchange_rate);
         }
+        totalIncome += amount;
     });
 
     data.payments.forEach(payment => {
-        if (payment.currency === 'TRY') {
-            totalExpense += parseFloat(payment.amount);
+        let amount = parseFloat(payment.amount);
+        if (payment.currency !== 'TRY' && payment.exchange_rate) {
+            amount *= parseFloat(payment.exchange_rate);
         }
+        totalExpense += amount;
     });
 
     const balance = totalIncome - totalExpense;
