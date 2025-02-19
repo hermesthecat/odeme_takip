@@ -10,7 +10,7 @@ window.savingsChart = null;
 // Grafikleri güncelle
 export function updateCharts(period = 'month', selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     updateIncomeExpenseChart(period, selectedYear, selectedMonth);
-    updateSavingsChart();
+    updateSavingsChart(period, selectedYear, selectedMonth);
 }
 
 // Gelir-Gider dağılımı grafiğini güncelle
@@ -110,74 +110,99 @@ function updateIncomeExpenseChart(period, selectedYear, selectedMonth) {
     }
 }
 
-// Birikim hedefleri grafiğini güncelle
-function updateSavingsChart() {
-    const ctx = document.getElementById('savingsChart');
-    if (!ctx) return;
+// Birikimler grafiğini güncelle
+async function updateSavingsChart(period = 'month', selectedYear, selectedMonth) {
+    try {
+        const savings = await loadSavings();
+        console.log('Birikimler grafiği için veriler:', savings);
 
-    // Mevcut grafiği temizle
-    if (window.savingsChart) {
-        window.savingsChart.destroy();
-    }
+        if (!Array.isArray(savings)) {
+            console.error('Birikimler verisi dizi değil:', savings);
+            return;
+        }
 
-    const savings = loadSavings();
-    if (!Array.isArray(savings)) {
-        console.error('Savings data is not an array:', savings);
-        return;
-    }
-    const labels = savings.map(saving => saving.name);
-    const targetData = savings.map(saving => saving.targetAmount);
-    const currentData = savings.map(saving => saving.currentAmount);
+        // Verileri para birimine göre grupla
+        const groupedData = savings.reduce((acc, saving) => {
+            const currency = saving.currency || 'TRY';
+            if (!acc[currency]) {
+                acc[currency] = {
+                    target: 0,
+                    current: 0,
+                    count: 0
+                };
+            }
+            acc[currency].target += parseFloat(saving.target_amount || 0);
+            acc[currency].current += parseFloat(saving.current_amount || 0);
+            acc[currency].count++;
+            return acc;
+        }, {});
 
-    window.savingsChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Hedef',
-                    data: targetData,
-                    backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                    borderColor: 'rgb(0, 123, 255)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Mevcut',
-                    data: currentData,
-                    backgroundColor: 'rgba(40, 167, 69, 0.5)',
-                    borderColor: 'rgb(40, 167, 69)',
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Birikim Hedefleri'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (context) {
-                            return `${context.dataset.label}: ${formatMoney(context.raw)}`;
-                        }
+        // Grafik verilerini oluştur
+        const labels = Object.keys(groupedData);
+        const targetData = labels.map(currency => groupedData[currency].target);
+        const currentData = labels.map(currency => groupedData[currency].current);
+
+        // Grafik konfigürasyonu
+        const config = {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Hedef Tutar',
+                        data: targetData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Mevcut Tutar',
+                        data: currentData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
                     }
-                }
+                ]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function (value) {
-                            return formatMoney(value);
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Birikimler Durumu'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('tr-TR', { minimumFractionDigits: 2 });
+                            }
                         }
                     }
                 }
             }
+        };
+
+        // Mevcut grafik varsa güncelle, yoksa yeni oluştur
+        if (window.savingsChart) {
+            window.savingsChart.data = config.data;
+            window.savingsChart.update();
+        } else {
+            const ctx = document.getElementById('savingsChart')?.getContext('2d');
+            if (ctx) {
+                window.savingsChart = new Chart(ctx, config);
+            }
         }
-    });
+
+        console.log('Birikimler grafiği güncellendi');
+    } catch (error) {
+        console.error('Birikimler grafiği güncellenirken hata:', error);
+    }
 }
 
 // Grafik değişkenlerini dışa aktar
