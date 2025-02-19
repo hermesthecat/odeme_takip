@@ -133,7 +133,7 @@ function markAsPaid(id) {
 
                             statusText.text(`${paidCount}/${totalCount}`);
 
-                            // Tekrarlayan ödemeleri yeniden yükle ve toplam tutarı güncelle
+                            // Tekrarlayan ödemeleri yeniden yükle ve toplam tutarları güncelle
                             ajaxRequest({
                                 action: 'get_data',
                                 month: $('#monthSelect').val(),
@@ -143,15 +143,34 @@ function markAsPaid(id) {
                                 if (response.status === 'success' && response.data && response.data.recurring_payments) {
                                     try {
                                         let totalYearlyPayment = 0;
+                                        let totalUnpaidPayment = 0;
+
                                         response.data.recurring_payments.forEach(payment => {
                                             if (payment && payment.yearly_total) {
                                                 totalYearlyPayment += parseFloat(payment.yearly_total) || 0;
+                                                totalUnpaidPayment += parseFloat(payment.unpaid_total) || 0;
                                             }
                                         });
-                                        $('#totalYearlyPayment').text(totalYearlyPayment.toFixed(2));
-                                        console.log('Toplam tutar güncellendi:', totalYearlyPayment);
+
+                                        // Tablo altbilgisini güncelle
+                                        const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
+                                        tfoot.html(`
+                                            <tr class="table-info">
+                                                <td colspan="4" class="text-end fw-bold">Toplam Ödeme:</td>
+                                                <td class="fw-bold">${totalYearlyPayment.toFixed(2)}</td>
+                                            </tr>
+                                            <tr class="table-warning">
+                                                <td colspan="4" class="text-end fw-bold">Ödenmemiş Toplam:</td>
+                                                <td class="fw-bold">${totalUnpaidPayment.toFixed(2)}</td>
+                                            </tr>
+                                        `);
+
+                                        console.log('Toplam tutarlar güncellendi:', {
+                                            totalYearlyPayment,
+                                            totalUnpaidPayment
+                                        });
                                     } catch (error) {
-                                        console.error('Toplam tutar güncellenirken hata:', error);
+                                        console.error('Toplam tutarlar güncellenirken hata:', error);
                                     }
                                 } else {
                                     console.error('Recurring payments verisi alınamadı:', response);
