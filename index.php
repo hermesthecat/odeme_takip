@@ -221,7 +221,7 @@ checkLogin();
                         <tbody id="recurringPaymentsList"></tbody>
                         <tfoot>
                             <tr class="table-info">
-                                <td colspan="5" class="text-end fw-bold">Toplam Ödeme:</td>
+                                <td colspan="4" class="text-end fw-bold">Toplam Ödeme:</td>
                                 <td id="totalYearlyPayment" class="fw-bold"></td>
                             </tr>
                         </tfoot>

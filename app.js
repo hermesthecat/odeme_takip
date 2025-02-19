@@ -245,7 +245,7 @@ function updateRecurringPaymentsList(recurring_payments) {
         tbody.append(`
             <tr>
                 <td>${payment.name}</td>
-                <td>${payment.amount}</td>
+                <td>${payment.amount.toFixed(2)}</td>
                 <td>${payment.currency}</td>
                 <td>${payment.payment_status}</td>
                 <td>${parseFloat(payment.yearly_total).toFixed(2)} ${payment.currency}</td>
