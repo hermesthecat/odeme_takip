@@ -1,5 +1,8 @@
 // Gelir listesini güncelle
 function updateIncomeList(incomes) {
+    console.log('Gelirler:', incomes);
+    console.log('Kullanıcı bilgileri:', data.user);
+
     const tbody = $('#incomeList');
     tbody.empty();
 
@@ -15,12 +18,17 @@ function updateIncomeList(incomes) {
     }
 
     incomes.forEach(function (income) {
+        console.log('İşlenen gelir:', income);
         const isChild = income.parent_id !== null;
-        // const rowClass = isChild ? 'table-light' : '';
         let amountText = `${parseFloat(income.amount).toFixed(2)} ${income.currency}`;
 
         // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
         if (income.currency !== data.user.base_currency && income.exchange_rate) {
+            console.log('Kur dönüşümü yapılıyor:', {
+                amount: income.amount,
+                exchange_rate: income.exchange_rate,
+                result: parseFloat(income.amount) * parseFloat(income.exchange_rate)
+            });
             const convertedAmount = parseFloat(income.amount) * parseFloat(income.exchange_rate);
             amountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
         }

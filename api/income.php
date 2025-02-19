@@ -8,6 +8,12 @@ function addIncome()
 {
     global $pdo, $user_id;
 
+    // Kullanıcının ana para birimini al
+    $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $base_currency = $user['base_currency'];
+
     if (isset($_POST['name'])) {
         $name = validateRequired($_POST['name'] ?? null, "Gelir adı");
     }
@@ -44,8 +50,8 @@ function addIncome()
 
     // Kur bilgisini al
     $exchange_rate = null;
-    if ($currency !== 'TRY') {
-        $exchange_rate = getExchangeRate($currency, 'TRY');
+    if ($currency !== $base_currency) {
+        $exchange_rate = getExchangeRate($currency, $base_currency);
         if (!$exchange_rate) {
             throw new Exception("Kur bilgisi alınamadı");
         }
@@ -70,7 +76,7 @@ function addIncome()
     $parent_id = $pdo->lastInsertId();
 
     // Tekrarlı kayıtlar için
-    if ($frequency !== 'none' && $end_date > $first_date) {
+    if ($frequency !== 'none' && isset($end_date) && $end_date > $first_date) {
         $month_interval = getMonthInterval($frequency);
         $total_months = getMonthDifference($first_date, $end_date);
         $repeat_count = floor($total_months / $month_interval);
@@ -167,8 +173,13 @@ function updateIncome()
 {
     global $pdo, $user_id;
 
-    // Gerekli alanları doğrula
+    // Kullanıcının ana para birimini al
+    $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $base_currency = $user['base_currency'];
 
+    // Gerekli alanları doğrula
     if (isset($_POST['id'])) {
         $id = validateRequired($_POST['id'] ?? null, "Gelir ID");
     }
@@ -212,8 +223,8 @@ function updateIncome()
     try {
         // Kur bilgisini al
         $exchange_rate = null;
-        if ($currency !== 'TRY') {
-            $exchange_rate = getExchangeRate($currency, 'TRY');
+        if ($currency !== $base_currency) {
+            $exchange_rate = getExchangeRate($currency, $base_currency);
             if (!$exchange_rate) {
                 throw new Exception("Kur bilgisi alınamadı");
             }
