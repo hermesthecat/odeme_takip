@@ -155,13 +155,13 @@ function markAsPaid(id) {
                                         // Tablo altbilgisini güncelle
                                         const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
                                         tfoot.html(`
-                                            <tr class="table-info">
+                                            <tr class="text-end">
                                                 <td colspan="5" class="text-end fw-bold">Toplam Ödeme:</td>
-                                                <td class="fw-bold">${totalYearlyPayment.toFixed(2)}</td>
+                                                <td class="fw-bold">${totalYearlyPayment.toFixed(2)} ${data.user.base_currency}</td>
                                             </tr>
-                                            <tr class="table-warning">
+                                            <tr class="text-end">
                                                 <td colspan="5" class="text-end fw-bold">Ödenmeyi Bekleyen:</td>
-                                                <td class="fw-bold">${totalUnpaidPayment.toFixed(2)}</td>
+                                                <td class="fw-bold">${totalUnpaidPayment.toFixed(2)} ${data.user.base_currency}</td>
                                             </tr>
                                         `);
 
@@ -185,6 +185,7 @@ function markAsPaid(id) {
 // Child ödemeleri güncelle (yeni fonksiyon)
 function updateChildPayments(parentId, parent, children) {
     const tbody = $(`.child-payments[data-parent-id="${parentId}"]`);
+    tbody.closest('.table-responsive').addClass('w-100');
     tbody.empty();
 
     // Ana kaydı ekle
@@ -208,6 +209,7 @@ function updateChildPayments(parentId, parent, children) {
             <td>${parent.first_date}</td>
             <td>${parentAmountText}</td>
             <td>${parent.currency}</td>
+            <td></td>
         </tr>
     `);
 
@@ -233,6 +235,7 @@ function updateChildPayments(parentId, parent, children) {
                 <td>${payment.first_date}</td>
                 <td>${amountText}</td>
                 <td>${payment.currency}</td>
+                <td></td>
             </tr>
         `);
     });
@@ -340,7 +343,7 @@ function updateRecurringPaymentsList(recurring_payments) {
                             <table class="table table-sm mb-0">
                                 <thead>
                                     <tr>
-                                        <th></th>
+                                        <th style="width: 50px;"></th>
                                         <th>Ödeme Tarihi</th>
                                         <th>Tutar</th>
                                         <th>Kur</th>
@@ -372,13 +375,13 @@ function updateRecurringPaymentsList(recurring_payments) {
     // Tablo altbilgisini güncelle
     const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
     tfoot.html(`
-        <tr class="table-info">
+        <tr class="text-end">
             <td colspan="5" class="text-end fw-bold">Toplam Ödeme:</td>
-            <td class="fw-bold">${totalYearlyPayment.toFixed(2)}</td>
+            <td class="fw-bold">${totalYearlyPayment.toFixed(2)} ${data.user.base_currency}</td>
         </tr>
-        <tr class="table-warning">
+        <tr class="text-end">
             <td colspan="5" class="text-end fw-bold">Ödenmeyi Bekleyen:</td>
-            <td class="fw-bold">${totalUnpaidPayment.toFixed(2)}</td>
+            <td class="fw-bold">${totalUnpaidPayment.toFixed(2)} ${data.user.base_currency}</td>
         </tr>
     `);
 

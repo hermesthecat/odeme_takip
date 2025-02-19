@@ -1441,6 +1441,7 @@ h6 {
 /* Child ödemeler tablosu stilleri */
 [data-theme="dark"] .child-payments-container {
   background-color: rgba(255, 255, 255, 0.05);
+  width: 100%;
 }
 
 [data-theme="dark"] .child-payments-container .table {
@@ -1469,6 +1470,7 @@ h6 {
 /* Açık tema için child ödemeler tablosu stilleri */
 [data-theme="light"] .child-payments-container {
   background-color: rgba(0, 0, 0, 0.02);
+  width: 100%;
 }
 
 [data-theme="light"] .child-payments-container .table {
