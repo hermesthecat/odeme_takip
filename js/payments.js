@@ -288,7 +288,12 @@ function updateRecurringPaymentsList(recurring_payments) {
                     </div>
                     <small class="text-muted text-center d-block">${payment.payment_status}</small>
                 </td>
-                <td>${parseFloat(payment.yearly_total).toFixed(2)}</td>
+                <td>
+                    ${parseFloat(payment.yearly_total).toFixed(2)}
+                    <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${payment.id})" title="Sil">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
             </tr>
             <tr class="payment-children d-none" data-parent-id="${payment.id}">
                 <td colspan="5" class="p-0">
@@ -471,6 +476,36 @@ function updatePayment() {
                 icon: 'error',
                 title: 'Hata',
                 text: response.message || 'Ödeme güncellenirken bir hata oluştu'
+            });
+        }
+    });
+}
+
+// Tekrarlayan ödemeyi sil
+function deleteRecurringPayment(parentId) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Bu ödemeyi ve tüm taksitlerini silmek istediğinize emin misiniz?',
+        text: 'Bu işlem geri alınamaz!',
+        showCancelButton: true,
+        confirmButtonText: 'Evet, sil',
+        cancelButtonText: 'İptal',
+    }).then((result) => {
+        if (result.isConfirmed) {
+            ajaxRequest({
+                action: 'delete_payment',
+                id: parentId,
+                delete_children: true
+            }).done(function (response) {
+                if (response.status === 'success') {
+                    loadData();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Başarılı',
+                        text: 'Ödeme ve tüm taksitleri başarıyla silindi',
+                        timer: 1500
+                    });
+                }
             });
         }
     });

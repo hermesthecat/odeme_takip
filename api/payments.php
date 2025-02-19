@@ -115,11 +115,27 @@ function deletePayment()
 {
     global $pdo, $user_id;
 
-    $stmt = $pdo->prepare("DELETE FROM payments WHERE id = ? AND user_id = ?");
-    if ($stmt->execute([$_POST['id'], $user_id])) {
+    $pdo->beginTransaction();
+
+    try {
+        $id = $_POST['id'];
+        $delete_children = isset($_POST['delete_children']) && $_POST['delete_children'] === 'true';
+
+        if ($delete_children) {
+            // Önce child kayıtları sil
+            $stmt = $pdo->prepare("DELETE FROM payments WHERE (parent_id = ? OR id = ?) AND user_id = ?");
+            $stmt->execute([$id, $id, $user_id]);
+        } else {
+            // Sadece seçili kaydı sil
+            $stmt = $pdo->prepare("DELETE FROM payments WHERE id = ? AND user_id = ?");
+            $stmt->execute([$id, $user_id]);
+        }
+
+        $pdo->commit();
         return true;
-    } else {
-        return false;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        throw $e;
     }
 }
 
