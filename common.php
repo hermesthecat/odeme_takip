@@ -7,7 +7,8 @@ require_once __DIR__ . '/error-handler.php';
 ErrorHandler::init();
 
 // Common response function
-function sendJsonResponse($data, $status = 200) {
+function sendJsonResponse($data, $status = 200)
+{
     if (!headers_sent()) {
         header('Content-Type: application/json');
         http_response_code($status);
@@ -22,7 +23,8 @@ function sendJsonResponse($data, $status = 200) {
 }
 
 // Common error response function
-function sendErrorResponse($message, $code = 500, $details = null) {
+function sendErrorResponse($message, $code = 500, $details = null)
+{
     $response = [
         'success' => false,
         'error' => [
@@ -46,7 +48,8 @@ function sendErrorResponse($message, $code = 500, $details = null) {
 }
 
 // Database connection validation
-function validateDatabaseConnection() {
+function validateDatabaseConnection()
+{
     try {
         $db = Database::getInstance();
         $db->query("SELECT 1");
@@ -61,7 +64,8 @@ function validateDatabaseConnection() {
 }
 
 // Input validation function
-function validateRequiredParams($data, $required) {
+function validateRequiredParams($data, $required)
+{
     $missing = [];
     foreach ($required as $param) {
         if (!isset($data[$param]) || (empty($data[$param]) && $data[$param] !== '0')) {
@@ -81,26 +85,25 @@ function validateRequiredParams($data, $required) {
 }
 
 // Clean input data
-function cleanInput($data) {
+function cleanInput($data)
+{
     if (is_array($data)) {
         return array_map('cleanInput', $data);
     }
-    
+
     if (is_string($data)) {
         $data = trim($data);
         $data = stripslashes($data);
         return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
     }
-    
+
     return $data;
 }
 
 // CORS headers for API requests
-function setCorsHeaders() {
+function setCorsHeaders()
+{
     if (isset($_SERVER['HTTP_ORIGIN'])) {
-        header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-        header('Access-Control-Allow-Credentials: true');
-        header('Access-Control-Max-Age: 86400');
     }
 
     if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -109,7 +112,6 @@ function setCorsHeaders() {
         }
 
         if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
-            header("Access-Control-Allow-Headers: {$_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']}");
         }
 
         exit(0);
@@ -120,7 +122,8 @@ function setCorsHeaders() {
 setCorsHeaders();
 
 // Get JSON request body
-function getRequestBody() {
+function getRequestBody()
+{
     $input = file_get_contents('php://input');
     if (empty($input)) {
         return [];
@@ -139,7 +142,8 @@ function getRequestBody() {
 }
 
 // Get query parameters
-function getQueryParams() {
+function getQueryParams()
+{
     return cleanInput($_GET);
 }
 

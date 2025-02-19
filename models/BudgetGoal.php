@@ -1,11 +1,13 @@
 <?php
 require_once __DIR__ . '/../Model.php';
 
-class BudgetGoal extends Model {
+class BudgetGoal extends Model
+{
     protected $table = 'monthly_budgets';
 
     // Get budget goal for specific month
-    public function getMonthlyBudget(int $userId, int $year, int $month): ?array {
+    public function getMonthlyBudget(int $userId, int $year, int $month): ?array
+    {
         $query = "
             SELECT *,
                 (
@@ -55,7 +57,8 @@ class BudgetGoal extends Model {
     }
 
     // Set or update monthly budget using the new insertOrUpdate method
-    public function setMonthlyBudget(int $userId, int $year, int $month, float $limit): bool {
+    public function setMonthlyBudget(int $userId, int $year, int $month, float $limit): bool
+    {
         $data = [
             'user_id' => $userId,
             'year' => $year,
@@ -73,7 +76,8 @@ class BudgetGoal extends Model {
     }
 
     // Get yearly budget summary
-    public function getYearlySummary(int $userId, int $year): array {
+    public function getYearlySummary(int $userId, int $year): array
+    {
         $query = "
             SELECT 
                 mb.month,
@@ -128,7 +132,8 @@ class BudgetGoal extends Model {
     }
 
     // Get budget status statistics
-    public function getBudgetStats(int $userId): array {
+    public function getBudgetStats(int $userId): array
+    {
         $query = "
             SELECT
                 COUNT(*) as total_months,

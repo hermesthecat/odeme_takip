@@ -11,15 +11,15 @@ import {
 } from '../modals/index.js';
 
 // Ödeme gücü tablosunu güncelle
-export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
+export async function updatePaymentPowerList(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
     const tbody = document.getElementById('paymentPowerList');
     if (!tbody) return;
 
-    const payments = loadPayments();
+    const payments = await loadPayments();
     tbody.innerHTML = '';
 
     // Sadece tekrarlayan ödemeleri filtrele
-    const recurringPayments = payments.filter(payment => payment.frequency !== '0');
+    const recurringPayments = Array.isArray(payments) ? payments.filter(payment => payment.frequency !== '0') : [];
 
     if (recurringPayments.length === 0) {
         const row = document.createElement('tr');
@@ -36,7 +36,7 @@ export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), 
         let remainingRepeats = payment.repeatCount;
         if (payment.repeatCount) {
             const selectedDate = new Date(selectedYear, selectedMonth, 1);
-            let currentDate = new Date(payment.firstPaymentDate);
+            let currentDate = new Date(payment.first_payment_date);
             let pastRepeats = 0;
 
             while (currentDate <= selectedDate) {
@@ -60,7 +60,7 @@ export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), 
             <td>
                 <i class="bi bi-credit-card-fill text-danger me-2"></i>${payment.name}
             </td>
-            <td>${payment.amount.toFixed(2)}</td>
+            <td>${parseFloat(payment.amount).toFixed(2)}</td>
             <td>${payment.currency}</td>
             <td>${getFrequencyText(payment.frequency)}</td>
             <td>
@@ -95,8 +95,8 @@ export function updatePaymentPowerList(selectedYear = new Date().getFullYear(), 
 }
 
 // Bütçe hedeflerini görüntüle
-export function updateBudgetGoalsDisplay(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
-    const goals = loadBudgetGoals();
+export async function updateBudgetGoalsDisplay(selectedYear = new Date().getFullYear(), selectedMonth = new Date().getMonth()) {
+    const goals = await loadBudgetGoals();
     const currentExpenses = calculateMonthlyBalance(selectedYear, selectedMonth).expense;
 
     // Seçili ayın limitini al
@@ -214,7 +214,7 @@ export function updateBudgetGoalsDisplay(selectedYear = new Date().getFullYear()
     });
 
     // Ödeme gücü tablosunu güncelle
-    updatePaymentPowerList(selectedYear, selectedMonth);
+    await updatePaymentPowerList(selectedYear, selectedMonth);
 }
 
 // Bütçe işlemlerini yönet

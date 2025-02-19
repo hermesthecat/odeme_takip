@@ -1,14 +1,16 @@
 <?php
-class Database {
+class Database
+{
     private static $instance = null;
     private $connection;
     private $config;
 
-    private function __construct() {
+    private function __construct()
+    {
         try {
             // Load and validate config
             $this->loadConfig();
-            
+
             // Build DSN
             $dsn = $this->buildDsn();
 
@@ -22,7 +24,6 @@ class Database {
 
             // Set error mode after connection
             $this->connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         } catch (PDOException $e) {
             throw new Exception(sprintf(
                 "Database connection failed:\nError: %s\nDSN: %s\nUser: %s\n",
@@ -35,9 +36,10 @@ class Database {
         }
     }
 
-    private function loadConfig(): void {
+    private function loadConfig(): void
+    {
         $configFile = __DIR__ . '/config.php';
-        
+
         if (!file_exists($configFile)) {
             throw new Exception("Config file not found at: $configFile");
         }
@@ -47,11 +49,11 @@ class Database {
         // Validate required config settings
         $required = ['host', 'dbname', 'username', 'password', 'charset'];
         $missing = array_diff($required, array_keys($this->config));
-        
+
         if (!empty($missing)) {
             throw new Exception(
-                "Missing required configuration parameters: " . 
-                implode(', ', $missing)
+                "Missing required configuration parameters: " .
+                    implode(', ', $missing)
             );
         }
 
@@ -68,7 +70,8 @@ class Database {
         ];
     }
 
-    private function buildDsn(): string {
+    private function buildDsn(): string
+    {
         // Validate host and database name
         if (empty($this->config['host'])) {
             throw new Exception("Database host not specified");
@@ -86,19 +89,22 @@ class Database {
         );
     }
 
-    public static function getInstance(): self {
+    public static function getInstance(): self
+    {
         if (self::$instance === null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    public function getConnection(): PDO {
+    public function getConnection(): PDO
+    {
         return $this->connection;
     }
 
     // Helper method for executing SELECT queries
-    public function select(string $query, array $params = []): array {
+    public function select(string $query, array $params = []): array
+    {
         try {
             $stmt = $this->connection->prepare($query);
             $stmt->execute($params);
@@ -114,7 +120,8 @@ class Database {
     }
 
     // Helper method for executing INSERT queries
-    public function insert(string $query, array $params = []): int {
+    public function insert(string $query, array $params = []): int
+    {
         try {
             $stmt = $this->connection->prepare($query);
             $stmt->execute($params);
@@ -130,11 +137,12 @@ class Database {
     }
 
     // Helper method for INSERT ... ON DUPLICATE KEY UPDATE queries
-    public function insertOrUpdate(string $table, array $data, array $updateColumns = null): int {
+    public function insertOrUpdate(string $table, array $data, array $updateColumns = null): int
+    {
         try {
             $columns = array_keys($data);
             $values = array_map(fn($col) => ":$col", $columns);
-            
+
             $query = sprintf(
                 "INSERT INTO %s (%s) VALUES (%s)",
                 $table,
@@ -149,16 +157,16 @@ class Database {
 
             // Add ON DUPLICATE KEY UPDATE clause
             if (!empty($updateColumns)) {
-                $updates = array_map(function($col) {
+                $updates = array_map(function ($col) {
                     return "$col = VALUES($col)";
                 }, $updateColumns);
-                
+
                 $query .= " ON DUPLICATE KEY UPDATE " . implode(', ', $updates);
             }
 
             $stmt = $this->connection->prepare($query);
             $stmt->execute($data);
-            
+
             return (int)$this->connection->lastInsertId();
         } catch (PDOException $e) {
             throw new Exception(sprintf(
@@ -171,7 +179,8 @@ class Database {
     }
 
     // Helper method for executing UPDATE queries
-    public function update(string $query, array $params = []): int {
+    public function update(string $query, array $params = []): int
+    {
         try {
             $stmt = $this->connection->prepare($query);
             $stmt->execute($params);
@@ -187,7 +196,8 @@ class Database {
     }
 
     // Helper method for executing DELETE queries
-    public function delete(string $query, array $params = []): int {
+    public function delete(string $query, array $params = []): int
+    {
         try {
             $stmt = $this->connection->prepare($query);
             $stmt->execute($params);
@@ -203,7 +213,8 @@ class Database {
     }
 
     // Execute a raw query
-    public function exec(string $query): bool {
+    public function exec(string $query): bool
+    {
         try {
             return $this->connection->exec($query) !== false;
         } catch (PDOException $e) {
@@ -216,7 +227,8 @@ class Database {
     }
 
     // Execute a query and return PDOStatement
-    public function query(string $query): PDOStatement {
+    public function query(string $query): PDOStatement
+    {
         try {
             $stmt = $this->connection->query($query);
             if ($stmt === false) {
@@ -233,17 +245,20 @@ class Database {
     }
 
     // Begin a transaction
-    public function beginTransaction(): bool {
+    public function beginTransaction(): bool
+    {
         return $this->connection->beginTransaction();
     }
 
     // Commit a transaction
-    public function commit(): bool {
+    public function commit(): bool
+    {
         return $this->connection->commit();
     }
 
     // Rollback a transaction
-    public function rollback(): bool {
+    public function rollback(): bool
+    {
         if ($this->connection->inTransaction()) {
             return $this->connection->rollBack();
         }
@@ -254,7 +269,8 @@ class Database {
     private function __clone() {}
 
     // Prevent unserializing of the instance
-    public function __wakeup() {
+    public function __wakeup()
+    {
         throw new Exception("Cannot unserialize singleton");
     }
 }

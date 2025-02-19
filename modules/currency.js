@@ -1,5 +1,5 @@
 // Döviz işlemleri modülü
-import { EXCHANGE_RATES_KEY, LAST_UPDATE_KEY } from './storage.js';
+//import { EXCHANGE_RATES_KEY } from './storage.js';
 
 export const CURRENCY_API_URL = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/try.json';
 
@@ -17,8 +17,8 @@ export async function updateExchangeRates() {
                 'GBP': 1 / data.try.gbp
             };
 
-            localStorage.setItem(EXCHANGE_RATES_KEY, JSON.stringify(exchangeRates));
-            localStorage.setItem(LAST_UPDATE_KEY, new Date().toISOString());
+            //localStorage.setItem(EXCHANGE_RATES_KEY, JSON.stringify(exchangeRates));
+            //localStorage.setItem(LAST_UPDATE_KEY, new Date().toISOString());
 
             return exchangeRates;
         }
@@ -26,17 +26,17 @@ export async function updateExchangeRates() {
     } catch (error) {
         console.error('Döviz kurları güncellenirken hata:', error);
         // Hata durumunda son kaydedilen kurları kullan
-        const savedRates = localStorage.getItem(EXCHANGE_RATES_KEY);
-        if (!savedRates) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Döviz Kuru Hatası',
-                text: 'Döviz kurları alınamadı ve kayıtlı kur verisi bulunamadı. Lütfen internet bağlantınızı kontrol edin.',
-                showConfirmButton: true
-            });
-            return null;
-        }
-        return JSON.parse(savedRates);
+        //const savedRates = localStorage.getItem(EXCHANGE_RATES_KEY);
+        //if (!savedRates) {
+        //    Swal.fire({
+        //        icon: 'error',
+        //        title: 'Döviz Kuru Hatası',
+        //        text: 'Döviz kurları alınamadı ve kayıtlı kur verisi bulunamadı. Lütfen internet bağlantınızı kontrol edin.',
+        //        showConfirmButton: true
+        //    });
+        //    return null;
+        //}
+        return { USD: 30, EUR: 33, GBP: 35 }; //JSON.parse(savedRates);
     }
 }
 
@@ -46,26 +46,26 @@ export function showExchangeRates() {
     if (!ratesContainer) return;
 
     // Son güncelleme zamanını kontrol et
-    const lastUpdate = localStorage.getItem(LAST_UPDATE_KEY);
-    const lastUpdateDate = lastUpdate ? new Date(lastUpdate) : null;
+    //const lastUpdate = localStorage.getItem(LAST_UPDATE_KEY);
+    //const lastUpdateDate = lastUpdate ? new Date(lastUpdate) : null;
     const now = new Date();
 
     // 24 saatten eski ise uyarı göster
-    const isOld = lastUpdateDate && (now - lastUpdateDate) > 24 * 60 * 60 * 1000;
+    const isOld = false; //lastUpdateDate && (now - lastUpdateDate) > 24 * 60 * 60 * 1000;
 
     // Kurları al
-    const rates = localStorage.getItem(EXCHANGE_RATES_KEY);
-    if (!rates) {
-        ratesContainer.innerHTML = `
-            <div class="alert alert-warning mb-0">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                Döviz kurları yüklenemedi. Lütfen internet bağlantınızı kontrol edin.
-            </div>
-        `;
-        return;
-    }
+    //const rates = localStorage.getItem(EXCHANGE_RATES_KEY);
+    //if (!rates) {
+    //    ratesContainer.innerHTML = `
+    //        <div class="alert alert-warning mb-0">
+    //            <i class="bi bi-exclamation-triangle me-2"></i>
+    //            Döviz kurları yüklenemedi. Lütfen internet bağlantınızı kontrol edin.
+    //        </div>
+    //    `;
+    //    return;
+    //}
 
-    const exchangeRates = JSON.parse(rates);
+    const exchangeRates = { USD: 30, EUR: 33, GBP: 35 }; //JSON.parse(rates);
     const html = `
         <div class="card shadow-sm">
             <div class="card-body p-2">
@@ -89,7 +89,7 @@ export function showExchangeRates() {
                     </div>
                     <small class="text-muted ${isOld ? 'text-danger' : ''}">
                         <i class="bi bi-clock-history me-1"></i>
-                        Son güncelleme: ${lastUpdateDate ? lastUpdateDate.toLocaleString('tr-TR') : 'Bilinmiyor'}
+                        Son güncelleme: Bilinmiyor
                         ${isOld ? ' (Güncel değil!)' : ''}
                     </small>
                 </div>
@@ -102,17 +102,17 @@ export function showExchangeRates() {
 
 // Tutarı TL'ye çevir
 export function convertToTRY(amount, currency) {
-    const rates = localStorage.getItem(EXCHANGE_RATES_KEY);
-    if (!rates) {
-        Swal.fire({
-            icon: 'error',
-            title: 'Döviz Kuru Hatası',
-            text: 'Döviz kurları bulunamadı. Lütfen internet bağlantınızı kontrol edin.',
-            showConfirmButton: true
-        });
-        return 0;
-    }
-    const exchangeRates = JSON.parse(rates);
+    //const rates = localStorage.getItem(EXCHANGE_RATES_KEY);
+    //if (!rates) {
+    //    Swal.fire({
+    //        icon: 'error',
+    //        title: 'Döviz Kuru Hatası',
+    //        text: 'Döviz kurları bulunamadı. Lütfen internet bağlantınızı kontrol edin.',
+    //        showConfirmButton: true
+    //    });
+    //    return 0;
+    //}
+    const exchangeRates = { USD: 30, EUR: 33, GBP: 35 }; //JSON.parse(rates);
     return amount * exchangeRates[currency];
 }
 

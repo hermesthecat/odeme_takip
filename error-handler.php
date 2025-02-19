@@ -1,13 +1,16 @@
 <?php
-class ErrorHandler {
-    public static function init() {
+class ErrorHandler
+{
+    public static function init()
+    {
         error_reporting(E_ALL);
         set_error_handler([self::class, 'handleError']);
         set_exception_handler([self::class, 'handleException']);
         register_shutdown_function([self::class, 'handleFatalError']);
     }
 
-    public static function handleError($errno, $errstr, $errfile, $errline) {
+    public static function handleError($errno, $errstr, $errfile, $errline)
+    {
         if (!(error_reporting() & $errno)) {
             // Error is not specified in error_reporting
             return false;
@@ -18,12 +21,14 @@ class ErrorHandler {
         return true;
     }
 
-    public static function handleException($exception) {
+    public static function handleException($exception)
+    {
         $error = self::formatException($exception);
         self::sendResponse('error', $error);
     }
 
-    public static function handleFatalError() {
+    public static function handleFatalError()
+    {
         $error = error_get_last();
         if ($error !== null && $error['type'] === E_ERROR) {
             $errorInfo = self::formatError(
@@ -35,7 +40,8 @@ class ErrorHandler {
         }
     }
 
-    private static function formatError($message, $file, $line): array {
+    private static function formatError($message, $file, $line): array
+    {
         return [
             'type' => 'PHP Error',
             'message' => $message,
@@ -45,7 +51,8 @@ class ErrorHandler {
         ];
     }
 
-    private static function formatException($exception): array {
+    private static function formatException($exception): array
+    {
         return [
             'type' => get_class($exception),
             'message' => $exception->getMessage(),
@@ -56,12 +63,14 @@ class ErrorHandler {
         ];
     }
 
-    private static function formatFilePath($path): string {
+    private static function formatFilePath($path): string
+    {
         return str_replace($_SERVER['DOCUMENT_ROOT'], '', $path);
     }
 
-    private static function formatTrace(array $trace): array {
-        return array_map(function($item) {
+    private static function formatTrace(array $trace): array
+    {
+        return array_map(function ($item) {
             return [
                 'function' => $item['function'] ?? '',
                 'file' => isset($item['file']) ? self::formatFilePath($item['file']) : '',
@@ -70,7 +79,8 @@ class ErrorHandler {
         }, $trace);
     }
 
-    private static function getHelpContent(string $message): string {
+    private static function getHelpContent(string $message): string
+    {
         $help = '<h4>Çözüm Önerileri</h4><ul>';
 
         // Database connection errors
@@ -122,7 +132,8 @@ class ErrorHandler {
         return $help;
     }
 
-    private static function sendResponse(string $status, array $data): void {
+    private static function sendResponse(string $status, array $data): void
+    {
         if (!headers_sent()) {
             header('Content-Type: application/json');
             http_response_code($status === 'error' ? 500 : 200);

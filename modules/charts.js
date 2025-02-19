@@ -121,6 +121,10 @@ function updateSavingsChart() {
     }
 
     const savings = loadSavings();
+    if (!Array.isArray(savings)) {
+        console.error('Savings data is not an array:', savings);
+        return;
+    }
     const labels = savings.map(saving => saving.name);
     const targetData = savings.map(saving => saving.targetAmount);
     const currentData = savings.map(saving => saving.currentAmount);
@@ -180,4 +184,4 @@ function updateSavingsChart() {
 export const charts = {
     incomeExpenseChart: window.incomeExpenseChart,
     savingsChart: window.savingsChart
-}; 
+};

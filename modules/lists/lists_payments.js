@@ -34,88 +34,92 @@ export function updatePaymentList(selectedYear = new Date().getFullYear(), selec
     let hasUnpaidPayments = false;
     let visiblePayments = []; // Görünür ödemeleri takip etmek için array
 
-    payments.forEach((payment, index) => {
-        try {
-            const firstDate = new Date(payment.firstPaymentDate);
-            let shouldShow = false;
-
-            if (payment.frequency === '0') {
-                // Tek seferlik ödeme - sadece ay ve yıl kontrolü yap
-                const paymentYear = firstDate.getFullYear();
-                const paymentMonth = firstDate.getMonth();
-                shouldShow = paymentYear === selectedYear && paymentMonth === selectedMonth;
-            } else {
-                // Tekrarlı ödeme
-                let currentDate = new Date(firstDate);
-                let repeatCounter = 0;
-
-                while (currentDate <= endDate) {
-                    if (currentDate >= startDate && currentDate <= endDate) {
-                        shouldShow = true;
-                        break;
+        payments.forEach((payment, index) => {
+            try {
+                const firstPaymentDate = payment.firstPaymentDate;
+                const firstDate = firstPaymentDate ? new Date(firstPaymentDate) : null;
+    
+                if (firstDate) {
+                    let shouldShow = false;
+    
+                    if (payment.frequency === '0') {
+                        // Tek seferlik ödeme - sadece ay ve yıl kontrolü yap
+                        const paymentYear = firstDate.getFullYear();
+                        const paymentMonth = firstDate.getMonth();
+                        shouldShow = paymentYear === selectedYear && paymentMonth === selectedMonth;
+                    } else {
+                        // Tekrarlı ödeme
+                        let currentDate = new Date(firstDate);
+                        let repeatCounter = 0;
+    
+                        while (currentDate <= endDate) {
+                            if (currentDate >= startDate && currentDate <= endDate) {
+                                shouldShow = true;
+                                break;
+                            }
+                            if (payment.repeatCount && repeatCounter >= payment.repeatCount) break;
+                            currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+                            repeatCounter++;
+                        }
                     }
-                    if (payment.repeatCount && repeatCounter >= payment.repeatCount) break;
-                    currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
-                    repeatCounter++;
-                }
-            }
-
-            if (shouldShow) {
-                // Seçili ayın ödenme durumunu kontrol et
-                const monthKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
-                const isPaid = payment.paidMonths && payment.paidMonths.includes(monthKey);
-
-                visiblePayments.push({ ...payment, index, isPaid }); // Görünür ödemeyi kaydet
-                const nextPaymentDate = calculateNextPaymentDate(payment.firstPaymentDate, payment.frequency, payment.repeatCount);
-                const frequencyText = getFrequencyText(payment.frequency);
-                const repeatText = payment.frequency !== '0' ?
-                    (payment.repeatCount ? ` (${payment.repeatCount} tekrar)` : ' (Sonsuz)') : '';
-
-                // Mevcut tekrar sayısını hesapla
-                let currentRepeat = 0;
-                if (payment.frequency !== '0') {
-                    const today = new Date();
-                    let currentDate = new Date(payment.firstPaymentDate);
-                    while (currentDate <= today) {
-                        currentRepeat++;
-                        currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+    
+                    if (shouldShow) {
+                        // Seçili ayın ödenme durumunu kontrol et
+                        const monthKey = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}`;
+                        const isPaid = payment.paidMonths && payment.paidMonths.includes(monthKey);
+    
+                        visiblePayments.push({ ...payment, index, isPaid }); // Görünür ödemeyi kaydet
+                        const nextPaymentDate = calculateNextPaymentDate(payment.firstPaymentDate, payment.frequency, payment.repeatCount);
+                        const frequencyText = getFrequencyText(payment.frequency);
+                        const repeatText = payment.frequency !== '0' ?
+                            (payment.repeatCount ? ` (${payment.repeatCount} tekrar)` : ' (Sonsuz)') : '';
+    
+                        // Mevcut tekrar sayısını hesapla
+                        let currentRepeat = 0;
+                        if (payment.frequency !== '0') {
+                            const today = new Date();
+                            let currentDate = new Date(payment.firstPaymentDate);
+                            while (currentDate <= today) {
+                                currentRepeat++;
+                                currentDate.setMonth(currentDate.getMonth() + parseInt(payment.frequency));
+                            }
+                        }
+    
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <button class="btn ${isPaid ? 'btn-success' : 'btn-outline-success'} btn-sm me-2"
+                                            data-action="toggle-payment" data-index="${index}"
+                                            title="${isPaid ? 'Ödendi' : 'Ödenmedi'}">
+                                        <i class="bi bi-check-circle${isPaid ? '-fill' : ''}"></i>
+                                    </button>
+                                    <span class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.name || '-'}</span>
+                                </div>
+                            </td>
+                            <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
+                            <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.currency || '-'}</td>
+                            <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${formatDate(payment.firstPaymentDate)}</td>
+                            <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${frequencyText}${repeatText}</td>
+                            <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${formatDate(nextPaymentDate)}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm me-1" data-action="update-payment" data-index="${index}">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm" data-action="delete-payment" data-index="${index}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
                     }
+                } catch (error) {
+                    alert(`Ödeme ${index + 1} gösterilirken hata oluştu: ${error.message}`);
                 }
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>
-                        <div class="d-flex align-items-center">
-                            <button class="btn ${isPaid ? 'btn-success' : 'btn-outline-success'} btn-sm me-2" 
-                                    data-action="toggle-payment" data-index="${index}" 
-                                    title="${isPaid ? 'Ödendi' : 'Ödenmedi'}">
-                                <i class="bi bi-check-circle${isPaid ? '-fill' : ''}"></i>
-                            </button>
-                            <span class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.name || '-'}</span>
-                        </div>
-                    </td>
-                    <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.amount ? payment.amount.toFixed(2) : '0.00'}</td>
-                    <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${payment.currency || '-'}</td>
-                    <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${formatDate(payment.firstPaymentDate)}</td>
-                    <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${frequencyText}${repeatText}</td>
-                    <td class="${isPaid ? 'text-decoration-line-through text-muted' : ''}">${formatDate(nextPaymentDate)}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm me-1" data-action="update-payment" data-index="${index}">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm" data-action="delete-payment" data-index="${index}">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            }
-        } catch (error) {
-            alert(`Ödeme ${index + 1} gösterilirken hata oluştu: ${error.message}`);
+            });
         }
-    });
-
-    // Ödenmemiş ödemeler için sonraki aya aktarma butonu ekle
+    
+        // Ödenmemiş ödemeler için sonraki aya aktarma butonu ekle
     const unpaidPayments = visiblePayments.filter(payment => !payment.isPaid);
 
     // Mevcut tfoot'u temizle

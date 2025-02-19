@@ -1,5 +1,5 @@
 // Yardımcı fonksiyonlar modülü
-import { loadIncomes, loadPayments, loadSavings, loadBudgetGoals, saveIncomes, savePayments, saveSavings, saveBudgetGoals, EXCHANGE_RATES_KEY, LAST_UPDATE_KEY } from './storage.js';
+import { loadIncomes, loadPayments, loadSavings, loadBudgetGoals, saveIncomes, savePayments, saveSavings, saveBudgetGoals } from './storage.js';
 import { THEME_KEY } from './theme.js';
 
 // Sonraki ödeme tarihini hesaplama
@@ -69,8 +69,8 @@ export function exportData() {
         payments: loadPayments(),
         savings: loadSavings(),
         budgetGoals: loadBudgetGoals(),
-        exchangeRates: localStorage.getItem(EXCHANGE_RATES_KEY),
-        lastUpdate: localStorage.getItem(LAST_UPDATE_KEY),
+        exchangeRates: null, //localStorage.getItem(EXCHANGE_RATES_KEY),
+        lastUpdate: null, //localStorage.getItem(LAST_UPDATE_KEY),
         theme: localStorage.getItem(THEME_KEY),
         exportDate: new Date().toISOString()
     };
@@ -116,8 +116,8 @@ export function importData() {
                 if (data.budgetGoals) saveBudgetGoals(data.budgetGoals);
 
                 // Ek verileri kaydet
-                if (data.exchangeRates) localStorage.setItem(EXCHANGE_RATES_KEY, data.exchangeRates);
-                if (data.lastUpdate) localStorage.setItem(LAST_UPDATE_KEY, data.lastUpdate);
+                //if (data.exchangeRates) localStorage.setItem(EXCHANGE_RATES_KEY, data.exchangeRates);
+                //if (data.lastUpdate) localStorage.setItem(LAST_UPDATE_KEY, data.lastUpdate);
                 if (data.theme) localStorage.setItem(THEME_KEY, data.theme);
 
                 Swal.fire({
