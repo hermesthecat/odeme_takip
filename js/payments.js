@@ -284,11 +284,7 @@ function updateRecurringPaymentsList(recurring_payments) {
     const tbody = $('#recurringPaymentsList');
     tbody.empty();
 
-    let totalYearlyPayment = 0;
-
     recurring_payments.forEach(function (payment) {
-        totalYearlyPayment += parseFloat(payment.yearly_total);
-
         // Taksit bilgisini parçala (örn: "2/5" -> [2, 5])
         const [paid, total] = payment.payment_status.split('/').map(Number);
         const progress = (paid / total) * 100;
@@ -347,7 +343,26 @@ function updateRecurringPaymentsList(recurring_payments) {
         loadChildPayments(payment.id);
     });
 
-    $('#totalYearlyPayment').text(totalYearlyPayment.toFixed(2));
+    let totalYearlyPayment = 0;
+    let totalUnpaidPayment = 0;
+
+    recurring_payments.forEach(function (payment) {
+        totalYearlyPayment += parseFloat(payment.yearly_total) || 0;
+        totalUnpaidPayment += parseFloat(payment.unpaid_total) || 0;
+    });
+
+    // Tablo altbilgisini güncelle
+    const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
+    tfoot.html(`
+        <tr class="table-info">
+            <td colspan="4" class="text-end fw-bold">Toplam Ödeme:</td>
+            <td class="fw-bold">${totalYearlyPayment.toFixed(2)}</td>
+        </tr>
+        <tr class="table-warning">
+            <td colspan="4" class="text-end fw-bold">Ödenmemiş Toplam:</td>
+            <td class="fw-bold">${totalUnpaidPayment.toFixed(2)}</td>
+        </tr>
+    `);
 
     // Ana kayıtlara tıklama olayı ekle
     $('.payment-parent').on('click', function () {

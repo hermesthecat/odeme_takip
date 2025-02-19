@@ -192,6 +192,16 @@ function loadRecurringPayments()
             WHERE (p2.parent_id = p1.id OR p2.id = p1.id)
             AND p2.user_id = p1.user_id
         ) as yearly_total,
+        (
+            SELECT SUM(CASE 
+                WHEN p2.currency = (SELECT base_currency FROM users WHERE id = p1.user_id) THEN p2.amount 
+                ELSE p2.amount * COALESCE(p2.exchange_rate, 1) 
+            END)
+            FROM payments p2 
+            WHERE (p2.parent_id = p1.id OR p2.id = p1.id)
+            AND p2.user_id = p1.user_id
+            AND p2.status = 'pending'
+        ) as unpaid_total,
         CONCAT(
             (SELECT COUNT(*) FROM payments p2 
              WHERE (p2.parent_id = p1.id OR p2.id = p1.id)
