@@ -372,13 +372,25 @@ function loadChildPayments(parentId) {
             tbody.empty();
 
             childPayments.forEach(function(payment) {
+                let amountText = `${parseFloat(payment.amount).toFixed(2)} ${payment.currency}`;
+                if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
+                    const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
+                    amountText += ` (${convertedAmount.toFixed(2)} ${data.user.base_currency})`;
+                }
+
                 tbody.append(`
                     <tr>
                         <td>
-                            <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill text-success' : 'bi-circle text-muted'}"></i>
+                            <button
+                                class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
+                                onclick="markAsPaid(${payment.id})"
+                                title="${payment.status === 'paid' ? 'Ödenmedi olarak işaretle' : 'Ödendi olarak işaretle'}"
+                            >
+                                <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
+                            </button>
                         </td>
                         <td>${payment.first_date}</td>
-                        <td>${parseFloat(payment.amount).toFixed(2)} ${payment.currency}</td>
+                        <td>${amountText}</td>
                         <td>${payment.currency}</td>
                     </tr>
                 `);
