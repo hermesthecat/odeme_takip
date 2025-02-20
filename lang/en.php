@@ -223,14 +223,27 @@ return [
     ],
 
     // Settings
-    'settings_title' => 'User Settings',
-    'theme' => 'Theme',
-    'theme_light' => 'Light Theme',
-    'theme_dark' => 'Dark Theme',
-    'language' => 'Language',
-    'current_password' => 'Current Password',
-    'new_password' => 'New Password',
-    'new_password_confirm' => 'Confirm New Password',
+    'settings' => [
+        'title' => 'User Settings',
+        'base_currency' => 'Base Currency',
+        'base_currency_info' => 'All calculations will be based on this currency.',
+        'theme' => 'Theme',
+        'theme_light' => 'Light Theme',
+        'theme_dark' => 'Dark Theme',
+        'theme_info' => 'Interface color theme selection.',
+        'language' => 'Language',
+        'language_info' => 'Interface language selection.',
+        'save_success' => 'Settings saved successfully',
+        'save_error' => 'An error occurred while saving settings',
+        'current_password' => 'Current Password',
+        'new_password' => 'New Password',
+        'new_password_confirm' => 'Confirm New Password',
+        'password_success' => 'Password changed successfully',
+        'password_error' => 'An error occurred while changing password',
+        'password_mismatch' => 'Current password is incorrect',
+        'password_same' => 'New password cannot be the same as the old one',
+        'password_requirements' => 'Password must be at least 6 characters long'
+    ],
 
     // Errors
     'error' => 'Error!',

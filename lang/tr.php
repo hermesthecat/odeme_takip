@@ -263,4 +263,27 @@ return [
         'eur' => 'Euro',
         'gbp' => 'İngiliz Sterlini'
     ],
+
+    // Ayarlar
+    'settings' => [
+        'title' => 'Kullanıcı Ayarları',
+        'base_currency' => 'Ana Para Birimi',
+        'base_currency_info' => 'Tüm hesaplamalar bu para birimi üzerinden yapılacaktır.',
+        'theme' => 'Tema',
+        'theme_light' => 'Açık Tema',
+        'theme_dark' => 'Koyu Tema',
+        'theme_info' => 'Arayüz renk teması seçimi.',
+        'language' => 'Dil',
+        'language_info' => 'Arayüz dili seçimi.',
+        'save_success' => 'Ayarlar başarıyla kaydedildi',
+        'save_error' => 'Ayarlar kaydedilirken bir hata oluştu',
+        'current_password' => 'Mevcut Şifre',
+        'new_password' => 'Yeni Şifre',
+        'new_password_confirm' => 'Yeni Şifre Tekrar',
+        'password_success' => 'Şifre başarıyla değiştirildi',
+        'password_error' => 'Şifre değiştirilirken bir hata oluştu',
+        'password_mismatch' => 'Mevcut şifre yanlış',
+        'password_same' => 'Yeni şifre eskisiyle aynı olamaz',
+        'password_requirements' => 'Şifre en az 6 karakter olmalıdır'
+    ],
 ];
