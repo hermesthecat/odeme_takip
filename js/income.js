@@ -7,7 +7,7 @@ function updateIncomeList(incomes) {
         tbody.append(`
             <tr>
                 <td colspan="8" class="text-center">
-                    <p class="text-muted">Henüz bir gelir eklenmemiş.</p>
+                    <p class="text-muted">${translations.income.no_data}</p>
                 </td>
             </tr>
         `);
@@ -30,7 +30,7 @@ function updateIncomeList(incomes) {
                     <button
                         class="btn btn-sm ${income.status === 'received' ? 'btn-success' : 'btn-outline-success'}"
                         onclick="markAsReceived(${income.id})"
-                        title="${income.status === 'received' ? 'Alınmadı olarak işaretle' : 'Alındı olarak işaretle'}"
+                        title="${income.status === 'received' ? translations.income.mark_received.mark_as_not_received : translations.income.mark_received.mark_as_received}"
                     >
                         <i class="bi ${income.status === 'received' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                     </button>
@@ -43,10 +43,10 @@ function updateIncomeList(incomes) {
                 <td>${income.next_income_date || ''}</td>
                 <td class="text-end">
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-primary" onclick="openUpdateIncomeModal(${income.id})" title="Düzenle">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateIncomeModal(${income.id})" title="${translations.income.buttons.edit}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})" title="Sil">
+                        <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})" title="${translations.income.buttons.delete}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -72,10 +72,10 @@ function markAsReceived(id) {
 function deleteIncome(id) {
     Swal.fire({
         icon: 'warning',
-        title: 'Silmek istediğinize emin misiniz?',
+        title: translations.income.delete.title,
         showCancelButton: true,
-        confirmButtonText: 'Evet, sil',
-        cancelButtonText: 'İptal',
+        confirmButtonText: translations.income.delete.confirm,
+        cancelButtonText: translations.income.delete.cancel,
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
@@ -116,7 +116,7 @@ function openUpdateIncomeModal(id) {
                 if (income.currency !== data.user.base_currency) {
                     exchangeRateGroup.style.display = 'block';
                     if (income.exchange_rate) {
-                        $('#current_income_exchange_rate').text(`Mevcut Kur: ${income.exchange_rate}`);
+                        $('#current_income_exchange_rate').text(`${translations.income.modal.current_rate}: ${income.exchange_rate}`);
                     }
                 } else {
                     exchangeRateGroup.style.display = 'none';
@@ -140,8 +140,8 @@ function openUpdateIncomeModal(id) {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Hata',
-                    text: `Gelir bulunamadı (ID: ${id})`
+                    title: translations.income.modal.error_title,
+                    text: translations.income.modal.error_not_found.replace(':id', id)
                 });
             }
         }
@@ -171,14 +171,14 @@ function updateIncome() {
             // Başarı mesajı göster
             Swal.fire({
                 icon: 'success',
-                title: 'Başarılı',
-                text: 'Gelir başarıyla güncellendi'
+                title: translations.income.modal.success_title,
+                text: translations.income.modal.success_message
             });
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Hata',
-                text: response.message || 'Gelir güncellenirken bir hata oluştu'
+                title: translations.income.modal.error_title,
+                text: response.message || translations.income.modal.error_message
             });
         }
     });

@@ -113,6 +113,30 @@ require_once __DIR__ . '/config.php';
                     behind: '<?php echo t('saving.behind'); ?>',
                     ahead: '<?php echo t('saving.ahead'); ?>'
                 }
+            },
+            income: {
+                no_data: '<?php echo t('income.not_found'); ?>',
+                mark_received: {
+                    mark_as_received: '<?php echo t('income.mark_received'); ?>',
+                    mark_as_not_received: '<?php echo t('income.mark_not_received'); ?>'
+                },
+                delete: {
+                    title: '<?php echo t('income.delete_confirm'); ?>',
+                    confirm: '<?php echo t('yes_delete'); ?>',
+                    cancel: '<?php echo t('cancel'); ?>'
+                },
+                buttons: {
+                    edit: '<?php echo t('edit'); ?>',
+                    delete: '<?php echo t('delete'); ?>'
+                },
+                modal: {
+                    error_title: '<?php echo t('error'); ?>',
+                    error_not_found: '<?php echo t('income.not_found'); ?>',
+                    success_title: '<?php echo t('success'); ?>',
+                    success_message: '<?php echo t('income.edit_success'); ?>',
+                    error_message: '<?php echo t('income.edit_error'); ?>',
+                    current_rate: '<?php echo t('currency.current_rate'); ?>'
+                }
             }
         };
     </script>
