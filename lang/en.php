@@ -23,6 +23,9 @@ return [
     'password' => 'Password',
     'remember_me' => 'Remember Me',
     'login_title' => 'Login',
+    'register_title' => 'Create a free account',
+    'login.have_account' => 'Already have an account? Login',
+    'currency.base_info' => 'All calculations will be based on this currency. Don\'t worry, you can change it later.',
     'login' => [
         'error_message' => 'Invalid username or password.',
         'no_account' => 'Don\'t have an account? Create one for free',
@@ -98,7 +101,6 @@ return [
     'unique' => 'This value is already in use',
 
     // Authentication
-    'register_title' => 'Create Account',
     'password_confirm' => 'Confirm Password',
     'forgot_password' => 'Forgot Password',
     'register_success' => 'Registration successful! You can now login.',
@@ -201,4 +203,14 @@ return [
     'not_found' => 'Page not found',
     'unauthorized' => 'Unauthorized access',
     'forbidden' => 'Access forbidden',
+
+    // Registration
+    'register' => [
+        'error_message' => 'An error occurred during registration.',
+        'success' => 'Registration successful! You can now login.',
+        'username_taken' => 'This username is already taken.',
+        'password_mismatch' => 'Passwords do not match.',
+        'invalid_currency' => 'Invalid currency selection.',
+        'required' => 'Please fill in all fields.',
+    ],
 ];

@@ -23,6 +23,9 @@ return [
     'password' => 'Şifre',
     'remember_me' => 'Beni Hatırla',
     'login_title' => 'Giriş Yap',
+    'register_title' => 'Ücretsiz bir hesap oluşturun',
+    'login.have_account' => 'Zaten hesabınız var mı? Giriş yapın',
+    'currency.base_info' => 'Tüm hesaplamalar bu para birimi üzerinden yapılacaktır. Merak etmeyin, daha sonra değiştirebilirsiniz.',
     'login' => [
         'error_message' => 'Geçersiz kullanıcı adı veya şifre.',
         'no_account' => 'Hesabınız yok mu? Ücretsiz bir hesap oluşturun',
@@ -98,7 +101,6 @@ return [
     'unique' => 'Bu değer zaten kullanılıyor',
 
     // Kimlik Doğrulama
-    'register_title' => 'Hesap Oluştur',
     'password_confirm' => 'Şifre Tekrar',
     'forgot_password' => 'Şifremi Unuttum',
     'login_success' => 'Giriş başarılı!',
@@ -201,4 +203,14 @@ return [
     'not_found' => 'Sayfa bulunamadı',
     'unauthorized' => 'Yetkisiz erişim',
     'forbidden' => 'Erişim engellendi',
+
+    // Yeni eklenen kısımlar
+    'register' => [
+        'error_message' => 'Kayıt olurken bir hata oluştu.',
+        'success' => 'Kayıt başarılı! Giriş yapabilirsiniz.',
+        'username_taken' => 'Bu kullanıcı adı zaten kullanılıyor.',
+        'password_mismatch' => 'Şifreler eşleşmiyor.',
+        'invalid_currency' => 'Geçersiz para birimi seçimi.',
+        'required' => 'Lütfen tüm alanları doldurun.',
+    ],
 ];
