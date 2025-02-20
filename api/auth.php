@@ -9,6 +9,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
+        case 'register':
+            $username = trim($_POST['username'] ?? '');
+            $password = trim($_POST['password'] ?? '');
+            $password_confirm = trim($_POST['password_confirm'] ?? '');
+            $base_currency = trim($_POST['base_currency'] ?? 'TRY');
+
+            // Validasyon
+            $errors = [];
+
+            if (strlen($username) < 3) {
+                $errors[] = "Kullanıcı adı en az 3 karakter olmalıdır.";
+            }
+
+            if (strlen($password) < 6) {
+                $errors[] = "Şifre en az 6 karakter olmalıdır.";
+            }
+
+            if ($password !== $password_confirm) {
+                $errors[] = "Şifreler eşleşmiyor.";
+            }
+
+            // Kullanıcı adı benzersizlik kontrolü
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+            $stmt->execute([$username]);
+            if ($stmt->fetchColumn() > 0) {
+                $errors[] = "Bu kullanıcı adı zaten kullanılıyor.";
+            }
+
+            if (!empty($errors)) {
+                $response = ['status' => 'error', 'message' => implode("\n", $errors)];
+                break;
+            }
+
+            try {
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare("INSERT INTO users (username, password, base_currency) VALUES (?, ?, ?)");
+
+                if ($stmt->execute([$username, $hashed_password, $base_currency])) {
+                    $response = ['status' => 'success', 'message' => 'Kayıt başarılı!'];
+                } else {
+                    $response = ['status' => 'error', 'message' => 'Kayıt sırasında bir hata oluştu.'];
+                }
+            } catch (PDOException $e) {
+                $response = ['status' => 'error', 'message' => 'Veritabanı hatası: ' . $e->getMessage()];
+            }
+            break;
+
         case 'login':
             $username = trim($_POST['username'] ?? '');
             $password = trim($_POST['password'] ?? '');
@@ -33,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             if (session_status() === PHP_SESSION_NONE) {
                                 session_start();
                             }
-                            
+
                             $_SESSION['user_id'] = $row['id'];
                             $_SESSION['username'] = $row['username'];
 

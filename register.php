@@ -1,51 +1,5 @@
 <?php
 require_once 'config.php';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $password_confirm = $_POST['password_confirm'] ?? '';
-    $base_currency = $_POST['base_currency'] ?? 'TRY';
-
-    $errors = [];
-
-    // Kullanıcı adı kontrolü
-    if (strlen($username) < 3) {
-        $errors[] = "Kullanıcı adı en az 3 karakter olmalıdır.";
-    }
-
-    // Şifre kontrolü
-    if (strlen($password) < 6) {
-        $errors[] = "Şifre en az 6 karakter olmalıdır.";
-    }
-
-    // Şifre eşleşme kontrolü
-    if ($password !== $password_confirm) {
-        $errors[] = "Şifreler eşleşmiyor.";
-    }
-
-    // Kullanıcı adı benzersizlik kontrolü
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
-    $stmt->execute([$username]);
-    if ($stmt->fetchColumn() > 0) {
-        $errors[] = "Bu kullanıcı adı zaten kullanılıyor.";
-    }
-
-    if (empty($errors)) {
-        try {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (username, password, base_currency) VALUES (?, ?, ?)");
-
-            if ($stmt->execute([$username, $hashed_password, $base_currency])) {
-                $success_message = 'Kayıt başarılı! <a href="login.php">Giriş yapın</a>';
-            } else {
-                $error_message = 'Kayıt sırasında bir hata oluştu.';
-            }
-        } catch (PDOException $e) {
-            $error_message = 'Veritabanı hatası: ' . $e->getMessage();
-        }
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -56,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Kayıt Ol - Bütçe Takip</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="register.css">
 </head>
 
@@ -116,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="card shadow">
             <div class="card-body">
-                <form method="POST" action="">
+                <form id="registerForm">
                     <div class="mb-3">
                         <label class="form-label">Kullanıcı Adı</label>
                         <input type="text" class="form-control" name="username" required minlength="3">
@@ -186,7 +141,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </footer>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/auth.js"></script>
 </body>
 
 </html>
