@@ -1490,3 +1490,31 @@ h6 {
 [data-theme="light"] .payment-parent:hover {
   background-color: rgba(0, 0, 0, 0.02);
 }
+
+.hero {
+  background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+  color: white;
+  padding: 100px 0;
+}
+
+.feature-icon {
+  font-size: 3rem;
+  color: #0d6efd;
+  margin-bottom: 1rem;
+}
+
+.testimonial {
+  background-color: #f8f9fa;
+  padding: 80px 0;
+}
+
+.footer {
+  background-color: #343a40;
+  color: white;
+  padding: 50px 0;
+}
+
+.cta-section {
+  background-color: #e9ecef;
+  padding: 80px 0;
+}
