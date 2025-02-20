@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
 
-            $sql = "SELECT id, username, password FROM users WHERE username = :username";
+            $sql = "SELECT * FROM users WHERE username = :username";
 
             try {
                 $stmt = $pdo->prepare($sql);
@@ -83,6 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             $_SESSION['user_id'] = $row['id'];
                             $_SESSION['username'] = $row['username'];
+                            $_SESSION['base_currency'] = $row['base_currency'];
+                            //$_SESSION['lang'] = $row['lang'];
+                            $_SESSION['theme'] = $row['theme_preference'];
 
                             if ($remember_me) {
                                 $token = bin2hex(random_bytes(32));

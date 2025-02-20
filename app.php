@@ -1,6 +1,9 @@
 <?php
 require_once 'config.php';
 checkLogin();
+
+// get user default currency from session
+$user_default_currency = $_SESSION['base_currency'];
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $lang->getCurrentLanguage(); ?>">
@@ -73,7 +76,7 @@ checkLogin();
                             <i class="bi bi-graph-up me-2"></i>
                             <?php echo t('app.monthly_income'); ?>
                         </h5>
-                        <h3 class="card-text" id="monthlyIncome">0.00 TL</h3>
+                        <h3 class="card-text" id="monthlyIncome">0.00 <?php echo $user_default_currency; ?></h3>
                     </div>
                 </div>
             </div>
@@ -84,7 +87,7 @@ checkLogin();
                             <i class="bi bi-graph-down me-2"></i>
                             <?php echo t('app.monthly_expense'); ?>
                         </h5>
-                        <h3 class="card-text" id="monthlyExpense">0.00 TL</h3>
+                        <h3 class="card-text" id="monthlyExpense">0.00 <?php echo $user_default_currency; ?></h3>
                     </div>
                 </div>
             </div>
@@ -95,7 +98,7 @@ checkLogin();
                             <i class="bi bi-wallet2 me-2"></i>
                             <?php echo t('app.net_balance'); ?>
                         </h5>
-                        <h3 class="card-text" id="monthlyBalance">0.00 TL</h3>
+                        <h3 class="card-text" id="monthlyBalance">0.00 <?php echo $user_default_currency; ?></h3>
                     </div>
                 </div>
             </div>
