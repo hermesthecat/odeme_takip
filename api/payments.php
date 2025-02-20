@@ -14,34 +14,34 @@ function addPayment()
     $base_currency = $user['base_currency'];
 
     if (isset($_POST['name'])) {
-        $name = validateRequired($_POST['name'] ?? null, "Ödeme adı");
+        $name = validateRequired($_POST['name'] ?? null, t('payment.name'));
     }
 
     if (isset($_POST['amount'])) {
-        $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
-        $amount = validateNumeric($amount, "Tutar");
-        $amount = validateMinValue($amount, 0, "Tutar");
+        $amount = validateRequired($_POST['amount'] ?? null, t('payment.amount'));
+        $amount = validateNumeric($amount, t('payment.amount'));
+        $amount = validateMinValue($amount, 0, t('payment.amount'));
     }
 
     if (isset($_POST['currency'])) {
-        $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
-        $currency = validateCurrency($currency, "Para birimi");
+        $currency = validateRequired($_POST['currency'] ?? null, t('payment.currency'));
+        $currency = validateCurrency($currency, t('payment.currency'));
     }
 
     if (isset($_POST['first_date'])) {
-        $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
-        $first_date = validateDate($first_date, "Tarih");
+        $first_date = validateRequired($_POST['first_date'] ?? null, t('payment.date'));
+        $first_date = validateDate($first_date, t('payment.date'));
     }
 
     if (isset($_POST['frequency'])) {
-        $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
-        $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+        $frequency = validateRequired($_POST['frequency'] ?? null, t('payment.frequency'));
+        $frequency = validateFrequency($frequency, t('payment.frequency'));
     } else {
         $frequency = 'none';
     }
 
     if (isset($_POST['end_date']) && $_POST['end_date'] !== '') {
-        $end_date = validateDate($_POST['end_date'], "Bitiş tarihi");
+        $end_date = validateDate($_POST['end_date'], t('payment.end_date'));
         validateDateRange($first_date, $end_date);
     }
 
@@ -52,7 +52,7 @@ function addPayment()
     if ($currency !== $base_currency) {
         $exchange_rate = getExchangeRate($currency, $base_currency);
         if (!$exchange_rate) {
-            throw new Exception("Kur bilgisi alınamadı");
+            throw new Exception(t('payment.rate_error'));
         }
     }
 
@@ -69,7 +69,7 @@ function addPayment()
         $frequency,
         $exchange_rate
     ])) {
-        throw new Exception("Ana kayıt eklenemedi");
+        throw new Exception(t('payment.add_error'));
     }
 
     $parent_id = $pdo->lastInsertId();
@@ -99,7 +99,7 @@ function addPayment()
                         $frequency,
                         $exchange_rate
                     ])) {
-                        throw new Exception("Child kayıt eklenemedi");
+                        throw new Exception(t('payment.add_recurring_error'));
                     }
                 }
             }
@@ -123,11 +123,15 @@ function deletePayment()
         if ($delete_children) {
             // Önce child kayıtları sil
             $stmt = $pdo->prepare("DELETE FROM payments WHERE (parent_id = ? OR id = ?) AND user_id = ?");
-            $stmt->execute([$id, $id, $user_id]);
+            if (!$stmt->execute([$id, $id, $user_id])) {
+                throw new Exception(t('payment.delete_error'));
+            }
         } else {
             // Sadece seçili kaydı sil
             $stmt = $pdo->prepare("DELETE FROM payments WHERE id = ? AND user_id = ?");
-            $stmt->execute([$id, $user_id]);
+            if (!$stmt->execute([$id, $user_id])) {
+                throw new Exception(t('payment.delete_error'));
+            }
         }
 
         $pdo->commit();
@@ -239,7 +243,7 @@ function markPaymentPaid()
     $payment = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$payment) {
-        throw new Exception("Ödeme bulunamadı");
+        throw new Exception(t('payment.not_found'));
     }
 
     $pdo->beginTransaction();
@@ -250,7 +254,7 @@ function markPaymentPaid()
         if ($payment['currency'] !== $base_currency) {
             $exchange_rate = getExchangeRate($payment['currency'], $base_currency);
             if (!$exchange_rate) {
-                throw new Exception("Kur bilgisi alınamadı");
+                throw new Exception(t('payment.rate_error'));
             }
         }
 
@@ -261,7 +265,7 @@ function markPaymentPaid()
             WHERE id = ? AND user_id = ?");
 
         if (!$stmt->execute([$exchange_rate, $_POST['id'], $user_id])) {
-            throw new Exception("Ödeme güncellenemedi");
+            throw new Exception(t('payment.update_error'));
         }
 
         $pdo->commit();
@@ -284,41 +288,43 @@ function updatePayment()
 
     // Gerekli alanları doğrula
     if (isset($_POST['id'])) {
-        $id = validateRequired($_POST['id'] ?? null, "Ödeme ID");
+        $id = validateRequired($_POST['id'] ?? null, t('payment.id'));
     }
 
     if (isset($_POST['name'])) {
-        $name = validateRequired($_POST['name'] ?? null, "Ödeme adı");
+        $name = validateRequired($_POST['name'] ?? null, t('payment.name'));
     }
 
     if (isset($_POST['amount'])) {
-        $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
-        $amount = validateNumeric($amount, "Tutar");
-        $amount = validateMinValue($amount, 0, "Tutar");
+        $amount = validateRequired($_POST['amount'] ?? null, t('payment.amount'));
+        $amount = validateNumeric($amount, t('payment.amount'));
+        $amount = validateMinValue($amount, 0, t('payment.amount'));
     }
 
     if (isset($_POST['currency'])) {
-        $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
-        $currency = validateCurrency($currency, "Para birimi");
+        $currency = validateRequired($_POST['currency'] ?? null, t('payment.currency'));
+        $currency = validateCurrency($currency, t('payment.currency'));
     }
 
     if (isset($_POST['first_date'])) {
-        $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
-        $first_date = validateDate($first_date, "Tarih");
+        $first_date = validateRequired($_POST['first_date'] ?? null, t('payment.date'));
+        $first_date = validateDate($first_date, t('payment.date'));
     }
 
     if (isset($_POST['frequency'])) {
-        $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
-        $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+        $frequency = validateRequired($_POST['frequency'] ?? null, t('payment.frequency'));
+        $frequency = validateFrequency($frequency, t('payment.frequency'));
     }
 
     // Ödemenin mevcut olduğunu kontrol et
     $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ? AND user_id = ?");
-    $stmt->execute([$id, $user_id]);
+    if (!$stmt->execute([$id, $user_id])) {
+        throw new Exception(t('payment.not_found'));
+    }
     $payment = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$payment) {
-        throw new Exception("Ödeme bulunamadı");
+        throw new Exception(t('payment.not_found'));
     }
 
     $pdo->beginTransaction();
@@ -331,7 +337,7 @@ function updatePayment()
             if (isset($_POST['update_exchange_rate']) || $payment['exchange_rate'] === null) {
                 $exchange_rate = getExchangeRate($currency, $base_currency);
                 if (!$exchange_rate) {
-                    throw new Exception("Kur bilgisi alınamadı");
+                    throw new Exception(t('payment.rate_error'));
                 }
             } else {
                 // Mevcut kuru koru
@@ -359,7 +365,7 @@ function updatePayment()
             $id,
             $user_id
         ])) {
-            throw new Exception("Ödeme güncellenemedi");
+            throw new Exception(t('payment.update_error'));
         }
 
         $pdo->commit();
