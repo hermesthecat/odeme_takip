@@ -3,7 +3,7 @@ require_once '../config.php';
 
 header('Content-Type: application/json');
 
-$response = ['status' => 'error', 'message' => 'Geçersiz istek'];
+$response = ['status' => 'error', 'message' => t('auth.invalid_request')];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
@@ -19,22 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors = [];
 
             if (strlen($username) < 3) {
-                $errors[] = "Kullanıcı adı en az 3 karakter olmalıdır.";
+                $errors[] = t('auth.username_min_length');
             }
 
             if (strlen($password) < 6) {
-                $errors[] = "Şifre en az 6 karakter olmalıdır.";
+                $errors[] = t('auth.password_min_length');
             }
 
             if ($password !== $password_confirm) {
-                $errors[] = "Şifreler eşleşmiyor.";
+                $errors[] = t('auth.password_mismatch');
             }
 
             // Kullanıcı adı benzersizlik kontrolü
             $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
             $stmt->execute([$username]);
             if ($stmt->fetchColumn() > 0) {
-                $errors[] = "Bu kullanıcı adı zaten kullanılıyor.";
+                $errors[] = t('auth.username_taken');
             }
 
             if (!empty($errors)) {
@@ -47,12 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("INSERT INTO users (username, password, base_currency) VALUES (?, ?, ?)");
 
                 if ($stmt->execute([$username, $hashed_password, $base_currency])) {
-                    $response = ['status' => 'success', 'message' => 'Kayıt başarılı!'];
+                    $response = ['status' => 'success', 'message' => t('auth.register_success')];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'Kayıt sırasında bir hata oluştu.'];
+                    $response = ['status' => 'error', 'message' => t('auth.register_error')];
                 }
             } catch (PDOException $e) {
-                $response = ['status' => 'error', 'message' => 'Veritabanı hatası: ' . $e->getMessage()];
+                $response = ['status' => 'error', 'message' => t('auth.database_error')];
             }
             break;
 
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'true';
 
             if (empty($username) || empty($password)) {
-                $response = ['status' => 'error', 'message' => 'Kullanıcı adı ve şifre gereklidir.'];
+                $response = ['status' => 'error', 'message' => t('auth.credentials_required')];
                 break;
             }
 
@@ -95,16 +95,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 $updateStmt->execute([$token, $row['id']]);
                             }
 
-                            $response = ['status' => 'success', 'message' => 'Giriş başarılı'];
+                            $response = ['status' => 'success', 'message' => t('auth.login_success')];
                         } else {
-                            $response = ['status' => 'error', 'message' => 'Geçersiz kullanıcı adı veya şifre.'];
+                            $response = ['status' => 'error', 'message' => t('auth.invalid_credentials')];
                         }
                     } else {
-                        $response = ['status' => 'error', 'message' => 'Geçersiz kullanıcı adı veya şifre.'];
+                        $response = ['status' => 'error', 'message' => t('auth.invalid_credentials')];
                     }
                 }
             } catch (PDOException $e) {
-                $response = ['status' => 'error', 'message' => 'Veritabanı hatası: ' . $e->getMessage()];
+                $response = ['status' => 'error', 'message' => t('auth.database_error')];
             }
             break;
 
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             session_destroy();
-            $response = ['status' => 'success', 'message' => 'Çıkış başarılı'];
+            $response = ['status' => 'success', 'message' => t('auth.logout_success')];
             break;
     }
 }

@@ -14,34 +14,34 @@ function addIncome()
     $base_currency = $user['base_currency'];
 
     if (isset($_POST['name'])) {
-        $name = validateRequired($_POST['name'] ?? null, "Gelir adı");
+        $name = validateRequired($_POST['name'] ?? null, t('income.name'));
     }
 
     if (isset($_POST['amount'])) {
-        $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
-        $amount = validateNumeric($amount, "Tutar");
-        $amount = validateMinValue($amount, 0, "Tutar");
+        $amount = validateRequired($_POST['amount'] ?? null, t('income.amount'));
+        $amount = validateNumeric($amount, t('income.amount'));
+        $amount = validateMinValue($amount, 0, t('income.amount'));
     }
 
     if (isset($_POST['currency'])) {
-        $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
-        $currency = validateCurrency($currency, "Para birimi");
+        $currency = validateRequired($_POST['currency'] ?? null, t('income.currency'));
+        $currency = validateCurrency($currency, t('income.currency'));
     }
 
     if (isset($_POST['first_date'])) {
-        $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
-        $first_date = validateDate($first_date, "Tarih");
+        $first_date = validateRequired($_POST['first_date'] ?? null, t('income.date'));
+        $first_date = validateDate($first_date, t('income.date'));
     }
 
     if (isset($_POST['frequency'])) {
-        $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
-        $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+        $frequency = validateRequired($_POST['frequency'] ?? null, t('income.frequency'));
+        $frequency = validateFrequency($frequency, t('income.frequency'));
     } else {
         $frequency = 'none';
     }
 
     if (isset($_POST['end_date']) && $_POST['end_date'] !== '') {
-        $end_date = validateDate($_POST['end_date'], "Bitiş tarihi");
+        $end_date = validateDate($_POST['end_date'], t('income.end_date'));
         validateDateRange($first_date, $end_date);
     }
 
@@ -52,7 +52,7 @@ function addIncome()
     if ($currency !== $base_currency) {
         $exchange_rate = getExchangeRate($currency, $base_currency);
         if (!$exchange_rate) {
-            throw new Exception("Kur bilgisi alınamadı");
+            throw new Exception(t('income.rate_error'));
         }
     }
 
@@ -69,7 +69,7 @@ function addIncome()
         $frequency,
         $exchange_rate
     ])) {
-        throw new Exception("Ana kayıt eklenemedi");
+        throw new Exception(t('income.add_error'));
     }
 
     $parent_id = $pdo->lastInsertId();
@@ -99,7 +99,7 @@ function addIncome()
                         $frequency,
                         $exchange_rate
                     ])) {
-                        throw new Exception("Child kayıt eklenemedi");
+                        throw new Exception(t('income.add_recurring_error'));
                     }
                 }
             }
@@ -118,7 +118,7 @@ function deleteIncome()
     if ($stmt->execute([$_POST['id'], $user_id])) {
         return true;
     } else {
-        return false;
+        throw new Exception(t('income.delete_error'));
     }
 }
 
@@ -172,7 +172,7 @@ function markIncomeReceived()
     $income = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$income) {
-        throw new Exception("Gelir bulunamadı");
+        throw new Exception(t('income.not_found'));
     }
 
     $pdo->beginTransaction();
@@ -183,7 +183,7 @@ function markIncomeReceived()
         if ($income['currency'] !== $base_currency) {
             $exchange_rate = getExchangeRate($income['currency'], $base_currency);
             if (!$exchange_rate) {
-                throw new Exception("Kur bilgisi alınamadı");
+                throw new Exception(t('income.rate_error'));
             }
         }
 
@@ -194,7 +194,7 @@ function markIncomeReceived()
             WHERE id = ? AND user_id = ?");
 
         if (!$stmt->execute([$exchange_rate, $_POST['id'], $user_id])) {
-            throw new Exception("Gelir güncellenemedi");
+            throw new Exception(t('income.update_error'));
         }
 
         $pdo->commit();
@@ -217,41 +217,43 @@ function updateIncome()
 
     // Gerekli alanları doğrula
     if (isset($_POST['id'])) {
-        $id = validateRequired($_POST['id'] ?? null, "Gelir ID");
+        $id = validateRequired($_POST['id'] ?? null, t('income.id'));
     }
 
     if (isset($_POST['name'])) {
-        $name = validateRequired($_POST['name'] ?? null, "Gelir adı");
+        $name = validateRequired($_POST['name'] ?? null, t('income.name'));
     }
 
     if (isset($_POST['amount'])) {
-        $amount = validateRequired($_POST['amount'] ?? null, "Tutar");
-        $amount = validateNumeric($amount, "Tutar");
-        $amount = validateMinValue($amount, 0, "Tutar");
+        $amount = validateRequired($_POST['amount'] ?? null, t('income.amount'));
+        $amount = validateNumeric($amount, t('income.amount'));
+        $amount = validateMinValue($amount, 0, t('income.amount'));
     }
 
     if (isset($_POST['currency'])) {
-        $currency = validateRequired($_POST['currency'] ?? null, "Para birimi");
-        $currency = validateCurrency($currency, "Para birimi");
+        $currency = validateRequired($_POST['currency'] ?? null, t('income.currency'));
+        $currency = validateCurrency($currency, t('income.currency'));
     }
 
     if (isset($_POST['first_date'])) {
-        $first_date = validateRequired($_POST['first_date'] ?? null, "Tarih");
-        $first_date = validateDate($first_date, "Tarih");
+        $first_date = validateRequired($_POST['first_date'] ?? null, t('income.date'));
+        $first_date = validateDate($first_date, t('income.date'));
     }
 
     if (isset($_POST['frequency'])) {
-        $frequency = validateRequired($_POST['frequency'] ?? null, "Tekrarlama sıklığı");
-        $frequency = validateFrequency($frequency, "Tekrarlama sıklığı");
+        $frequency = validateRequired($_POST['frequency'] ?? null, t('income.frequency'));
+        $frequency = validateFrequency($frequency, t('income.frequency'));
     }
 
     // Gelirin mevcut olduğunu kontrol et
     $stmt = $pdo->prepare("SELECT * FROM income WHERE id = ? AND user_id = ?");
-    $stmt->execute([$id, $user_id]);
+    if (!$stmt->execute([$id, $user_id])) {
+        throw new Exception(t('income.not_found'));
+    }
     $income = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$income) {
-        throw new Exception("Gelir bulunamadı");
+        throw new Exception(t('income.not_found'));
     }
 
     $pdo->beginTransaction();
@@ -264,7 +266,7 @@ function updateIncome()
             if (isset($_POST['update_exchange_rate']) || $income['exchange_rate'] === null) {
                 $exchange_rate = getExchangeRate($currency, $base_currency);
                 if (!$exchange_rate) {
-                    throw new Exception("Kur bilgisi alınamadı");
+                    throw new Exception(t('income.rate_error'));
                 }
             } else {
                 // Mevcut kuru koru
@@ -292,7 +294,7 @@ function updateIncome()
             $id,
             $user_id
         ])) {
-            throw new Exception("Gelir güncellenemedi");
+            throw new Exception(t('income.update_error'));
         }
 
         $pdo->commit();

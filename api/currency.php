@@ -35,7 +35,7 @@ function getExchangeRate($from_currency, $to_currency)
         $response = @file_get_contents($api_url);
 
         if ($response === false) {
-            throw new Exception("Kur bilgisi alınamadı");
+            throw new Exception(t('currency.rate_fetch_error'));
         }
 
         $data = json_decode($response, true);
@@ -63,6 +63,6 @@ function getExchangeRate($from_currency, $to_currency)
         }
     }
 
-    // Hiçbir şekilde kur bulunamazsa 1 döndür
+    // Hiçbir şekilde kur bulunamazsa 1 döndür ve hata mesajı döndür
     return 1;
 }
