@@ -3,34 +3,8 @@ require_once __DIR__ . '/header.php';
 ?>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="index.php">
-                <i class="bi bi-piggy-bank me-2"></i>
-                Bütçe Takip
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php#features">Özellikler</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php#testimonials">Yorumlar</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-primary ms-2" href="login.php">Giriş Yap</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="btn btn-outline-light ms-2" href="register.php">Kayıt Ol</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+
+    <?php require_once __DIR__ . '/navbar.php'; ?>
 
     <div class="container login-container">
         <div class="logo">

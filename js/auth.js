@@ -154,7 +154,7 @@ $(document).ready(function () {
                     dataType: 'json',
                     success: function (response) {
                         if (response.status === 'success') {
-                            window.location.href = 'login.php';
+                            window.location.href = 'index.php';
                         }
                     }
                 });
