@@ -17,9 +17,7 @@ function openUserSettings() {
             const modal = new bootstrap.Modal(modalElement);
             modal.show();
         } else {
-            console.error('Kullanıcı bilgileri alınamadı:', response.message);
         }
     }).fail(function (jqXHR, textStatus, errorThrown) {
-        console.error('AJAX hatası:', textStatus, errorThrown);
     });
 } 

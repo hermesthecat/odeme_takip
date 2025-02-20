@@ -7,7 +7,7 @@ function updateSavingsList(savings) {
         tbody.append(`
             <tr>
                 <td colspan="8" class="text-center">
-                    <p class="text-muted">Henüz bir birikim eklenmemiş.</p>
+                    <p class="text-muted">${translations.savings.no_data}</p>
                 </td>
             </tr>
         `);
@@ -38,10 +38,10 @@ function updateSavingsList(savings) {
                 </td>
                 <td class="text-end">
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-primary" onclick="openUpdateSavingModal(${JSON.stringify(saving).replace(/"/g, '&quot;')})" title="Düzenle">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateSavingModal(${JSON.stringify(saving).replace(/"/g, '&quot;')})" title="${translations.savings.buttons.edit}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteSaving(${saving.id})" title="Sil">
+                        <button class="btn btn-sm btn-danger" onclick="deleteSaving(${saving.id})" title="${translations.savings.buttons.delete}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -82,10 +82,10 @@ function openUpdateSavingModal(saving) {
 function deleteSaving(id) {
     Swal.fire({
         icon: 'warning',
-        title: 'Bu birikimi silmek istediğinize emin misiniz?',
+        title: translations.savings.delete.title,
         showCancelButton: true,
-        confirmButtonText: 'Evet, sil',
-        cancelButtonText: 'İptal',
+        confirmButtonText: translations.savings.delete.confirm,
+        cancelButtonText: translations.savings.delete.cancel,
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({

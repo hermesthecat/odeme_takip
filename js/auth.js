@@ -9,7 +9,7 @@ $(document).ready(function () {
 
         // Loading göster
         Swal.fire({
-            title: 'Giriş yapılıyor...',
+            title: translations.auth.login.loading,
             allowOutsideClick: false,
             showConfirmButton: false,
             didOpen: () => {
@@ -32,8 +32,8 @@ $(document).ready(function () {
                 if (response.status === 'success') {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Başarılı!',
-                        text: 'Giriş yapılıyor..',
+                        title: translations.auth.login.success,
+                        text: response.message,
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
@@ -42,18 +42,18 @@ $(document).ready(function () {
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Hata!',
-                        text: response.message || 'Giriş yapılamadı.',
-                        confirmButtonText: 'Tamam'
+                        title: translations.auth.login.error,
+                        text: response.message,
+                        confirmButtonText: translations.auth.buttons.confirm
                     });
                 }
             },
             error: function () {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Hata!',
-                    text: 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
-                    confirmButtonText: 'Tamam'
+                    title: translations.auth.login.error,
+                    text: translations.auth.login.invalid,
+                    confirmButtonText: translations.auth.buttons.confirm
                 });
             }
         });
@@ -72,16 +72,16 @@ $(document).ready(function () {
         if (password !== password_confirm) {
             Swal.fire({
                 icon: 'error',
-                title: 'Hata!',
-                text: 'Şifreler eşleşmiyor.',
-                confirmButtonText: 'Tamam'
+                title: translations.auth.register.error,
+                text: translations.auth.register.password_mismatch,
+                confirmButtonText: translations.auth.buttons.confirm
             });
             return;
         }
 
         // Loading göster
         Swal.fire({
-            title: 'Kayıt yapılıyor..',
+            title: translations.auth.register.loading,
             allowOutsideClick: false,
             showConfirmButton: false,
             didOpen: () => {
@@ -105,8 +105,8 @@ $(document).ready(function () {
                 if (response.status === 'success') {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Başarılı!',
-                        text: 'Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz..',
+                        title: translations.auth.register.success,
+                        text: response.message,
                         timer: 2000,
                         showConfirmButton: false
                     }).then(() => {
@@ -115,18 +115,18 @@ $(document).ready(function () {
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Hata!',
-                        text: response.message || 'Kayıt yapılamadı.',
-                        confirmButtonText: 'Tamam'
+                        title: translations.auth.register.error,
+                        text: response.message,
+                        confirmButtonText: translations.auth.buttons.confirm
                     });
                 }
             },
             error: function () {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Hata!',
-                    text: 'Bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
-                    confirmButtonText: 'Tamam'
+                    title: translations.auth.register.error,
+                    text: translations.auth.register.error,
+                    confirmButtonText: translations.auth.buttons.confirm
                 });
             }
         });
@@ -137,11 +137,11 @@ $(document).ready(function () {
         e.preventDefault();
 
         Swal.fire({
-            title: 'Çıkış yapmak istediğinize emin misiniz?',
+            title: translations.auth.logout.confirm,
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Evet, çıkış yap',
-            cancelButtonText: 'İptal',
+            confirmButtonText: translations.auth.logout.yes,
+            cancelButtonText: translations.auth.logout.no,
             reverseButtons: true
         }).then((result) => {
             if (result.isConfirmed) {

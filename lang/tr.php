@@ -268,7 +268,7 @@ return [
         'behind' => 'Plandan Geride',
         'ahead' => 'Plandan İleride',
         'load_error' => 'Birikimler yüklenirken bir hata oluştu',
-        'not_found' => 'Birikim bulunamadı',
+        'not_found' => 'Henüz bir birikim eklenmemiş',
         'update_error' => 'Birikim güncellenirken bir hata oluştu',
         'name' => 'Birikim Adı',
         'target_amount' => 'Hedef Tutar',
@@ -561,5 +561,47 @@ return [
         'valid_phone' => 'Geçerli bir telefon numarası giriniz',
         'valid_credit_card' => 'Geçerli bir kredi kartı numarası giriniz',
         'valid_color' => 'Geçerli bir renk kodu giriniz'
+    ],
+
+    // Utils
+    'utils' => [
+        'validation' => [
+            'required' => ':field alanı zorunludur',
+            'numeric' => ':field alanı sayısal olmalıdır',
+            'date' => ':field alanı geçerli bir tarih olmalıdır',
+            'currency' => ':field alanı geçerli bir para birimi olmalıdır',
+            'frequency' => ':field alanı geçerli bir tekrarlama sıklığı olmalıdır',
+            'min_value' => ':field alanı en az :min olmalıdır',
+            'max_value' => ':field alanı en fazla :max olmalıdır',
+            'error_title' => 'Validasyon Hatası',
+            'confirm_button' => 'Tamam'
+        ],
+        'session' => [
+            'error_title' => 'Oturum Hatası',
+            'invalid_token' => 'Geçersiz güvenlik tokeni'
+        ],
+        'frequency' => [
+            'none' => 'Tekrarsız',
+            'monthly' => 'Aylık',
+            'bimonthly' => '2 Aylık',
+            'quarterly' => '3 Aylık',
+            'fourmonthly' => '4 Aylık',
+            'fivemonthly' => '5 Aylık',
+            'sixmonthly' => '6 Aylık',
+            'yearly' => 'Yıllık'
+        ],
+        'form' => [
+            'income_name' => 'Gelir adı',
+            'payment_name' => 'Ödeme adı',
+            'amount' => 'Tutar',
+            'currency' => 'Para birimi',
+            'date' => 'Tarih',
+            'frequency' => 'Tekrarlama sıklığı',
+            'saving_name' => 'Birikim adı',
+            'target_amount' => 'Hedef tutar',
+            'current_amount' => 'Mevcut tutar',
+            'start_date' => 'Başlangıç tarihi',
+            'target_date' => 'Hedef tarihi'
+        ]
     ],
 ];

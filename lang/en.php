@@ -268,7 +268,7 @@ return [
         'behind' => 'Behind Schedule',
         'ahead' => 'Ahead of Schedule',
         'load_error' => 'An error occurred while loading savings',
-        'not_found' => 'Saving not found',
+        'not_found' => 'No savings added yet',
         'update_error' => 'An error occurred while updating saving',
         'name' => 'Saving Name',
         'target_amount' => 'Target Amount',
@@ -552,5 +552,47 @@ return [
         'valid_phone' => 'Please enter a valid phone number',
         'valid_credit_card' => 'Please enter a valid credit card number',
         'valid_color' => 'Please enter a valid color code'
+    ],
+
+    // Utils
+    'utils' => [
+        'validation' => [
+            'required' => ':field is required',
+            'numeric' => ':field must be numeric',
+            'date' => ':field must be a valid date',
+            'currency' => ':field must be a valid currency',
+            'frequency' => ':field must be a valid frequency',
+            'min_value' => ':field must be at least :min',
+            'max_value' => ':field must be at most :max',
+            'error_title' => 'Validation Error',
+            'confirm_button' => 'OK'
+        ],
+        'session' => [
+            'error_title' => 'Session Error',
+            'invalid_token' => 'Invalid security token'
+        ],
+        'frequency' => [
+            'none' => 'None',
+            'monthly' => 'Monthly',
+            'bimonthly' => 'Bimonthly',
+            'quarterly' => 'Quarterly',
+            'fourmonthly' => '4 Monthly',
+            'fivemonthly' => '5 Monthly',
+            'sixmonthly' => '6 Monthly',
+            'yearly' => 'Yearly'
+        ],
+        'form' => [
+            'income_name' => 'Income name',
+            'payment_name' => 'Payment name',
+            'amount' => 'Amount',
+            'currency' => 'Currency',
+            'date' => 'Date',
+            'frequency' => 'Repeat frequency',
+            'saving_name' => 'Saving name',
+            'target_amount' => 'Target amount',
+            'current_amount' => 'Current amount',
+            'start_date' => 'Start date',
+            'target_date' => 'Target date'
+        ]
     ],
 ];

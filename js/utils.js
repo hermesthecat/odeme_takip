@@ -93,6 +93,7 @@ function validateForm(formData, rules) {
     for (const field in rules) {
         const fieldRules = rules[field];
         const value = formData[field];
+        const fieldTranslation = translations.utils.form[field] || field;
 
         for (const rule of fieldRules) {
             let isValid = true;
@@ -101,31 +102,35 @@ function validateForm(formData, rules) {
             switch (rule.type) {
                 case 'required':
                     isValid = validationRules.required(value);
-                    errorMessage = rule.message || `${field} alanı zorunludur`;
+                    errorMessage = rule.message || translations.utils.validation.required.replace(':field', fieldTranslation);
                     break;
                 case 'numeric':
                     isValid = validationRules.numeric(value);
-                    errorMessage = rule.message || `${field} alanı sayısal olmalıdır`;
+                    errorMessage = rule.message || translations.utils.validation.numeric.replace(':field', fieldTranslation);
                     break;
                 case 'date':
                     isValid = validationRules.date(value);
-                    errorMessage = rule.message || `${field} alanı geçerli bir tarih olmalıdır`;
+                    errorMessage = rule.message || translations.utils.validation.date.replace(':field', fieldTranslation);
                     break;
                 case 'currency':
                     isValid = validationRules.currency(value);
-                    errorMessage = rule.message || `${field} alanı geçerli bir para birimi olmalıdır`;
+                    errorMessage = rule.message || translations.utils.validation.currency.replace(':field', fieldTranslation);
                     break;
                 case 'frequency':
                     isValid = validationRules.frequency(value);
-                    errorMessage = rule.message || `${field} alanı geçerli bir tekrarlama sıklığı olmalıdır`;
+                    errorMessage = rule.message || translations.utils.validation.frequency.replace(':field', fieldTranslation);
                     break;
                 case 'minValue':
                     isValid = validationRules.minValue(value, rule.value);
-                    errorMessage = rule.message || `${field} alanı en az ${rule.value} olmalıdır`;
+                    errorMessage = rule.message || translations.utils.validation.min_value
+                        .replace(':field', fieldTranslation)
+                        .replace(':min', rule.value);
                     break;
                 case 'maxValue':
                     isValid = validationRules.maxValue(value, rule.value);
-                    errorMessage = rule.message || `${field} alanı en fazla ${rule.value} olmalıdır`;
+                    errorMessage = rule.message || translations.utils.validation.max_value
+                        .replace(':field', fieldTranslation)
+                        .replace(':max', rule.value);
                     break;
             }
 
@@ -142,76 +147,78 @@ function validateForm(formData, rules) {
 function ajaxRequest(data) {
     // İstek öncesi validasyon kuralları
     const validationRules = {
-        // Gelir/Gider formları için
+        // Gelir formları için
         'add_income': {
             name: [
-                { type: 'required', message: 'Gelir adı zorunludur' }
+                { type: 'required' }
             ],
             amount: [
-                { type: 'required', message: 'Tutar zorunludur' },
-                { type: 'numeric', message: 'Tutar sayısal olmalıdır' },
-                { type: 'minValue', value: 0, message: 'Tutar 0\'dan büyük olmalıdır' }
+                { type: 'required' },
+                { type: 'numeric' },
+                { type: 'minValue', value: 0 }
             ],
             currency: [
-                { type: 'required', message: 'Para birimi zorunludur' },
-                { type: 'currency', message: 'Geçerli bir para birimi seçiniz' }
+                { type: 'required' },
+                { type: 'currency' }
             ],
             first_date: [
-                { type: 'required', message: 'Tarih zorunludur' },
-                { type: 'date', message: 'Geçerli bir tarih giriniz' }
+                { type: 'required' },
+                { type: 'date' }
             ],
             frequency: [
-                { type: 'required', message: 'Tekrarlama sıklığı zorunludur' },
-                { type: 'frequency', message: 'Geçerli bir tekrarlama sıklığı seçiniz' }
+                { type: 'required' },
+                { type: 'frequency' }
             ]
         },
+        // Ödeme formları için
         'add_payment': {
             name: [
-                { type: 'required', message: 'Ödeme adı zorunludur' }
+                { type: 'required' }
             ],
             amount: [
-                { type: 'required', message: 'Tutar zorunludur' },
-                { type: 'numeric', message: 'Tutar sayısal olmalıdır' },
-                { type: 'minValue', value: 0, message: 'Tutar 0\'dan büyük olmalıdır' }
+                { type: 'required' },
+                { type: 'numeric' },
+                { type: 'minValue', value: 0 }
             ],
             currency: [
-                { type: 'required', message: 'Para birimi zorunludur' },
-                { type: 'currency', message: 'Geçerli bir para birimi seçiniz' }
+                { type: 'required' },
+                { type: 'currency' }
             ],
             first_date: [
-                { type: 'required', message: 'Tarih zorunludur' },
-                { type: 'date', message: 'Geçerli bir tarih giriniz' }
+                { type: 'required' },
+                { type: 'date' }
             ],
             frequency: [
-                { type: 'required', message: 'Tekrarlama sıklığı zorunludur' },
-                { type: 'frequency', message: 'Geçerli bir tekrarlama sıklığı seçiniz' }
+                { type: 'required' },
+                { type: 'frequency' }
             ]
         },
+        // Birikim formları için
         'add_saving': {
             name: [
-                { type: 'required', message: 'Birikim adı zorunludur' }
+                { type: 'required' }
             ],
             target_amount: [
-                { type: 'required', message: 'Hedef tutar zorunludur' },
-                { type: 'numeric', message: 'Hedef tutar sayısal olmalıdır' },
-                { type: 'minValue', value: 0, message: 'Hedef tutar 0\'dan büyük olmalıdır' }
+                { type: 'required' },
+                { type: 'numeric' },
+                { type: 'minValue', value: 0 }
             ],
             current_amount: [
-                { type: 'required', message: 'Mevcut tutar zorunludur' },
-                { type: 'numeric', message: 'Mevcut tutar sayısal olmalıdır' },
-                { type: 'minValue', value: 0, message: 'Mevcut tutar 0\'dan büyük olmalıdır' }
+                { type: 'required' },
+                { type: 'numeric' },
+                { type: 'minValue', value: 0 }
             ],
             currency: [
-                { type: 'required', message: 'Para birimi zorunludur' },
-                { type: 'currency', message: 'Geçerli bir para birimi seçiniz' }
+                { type: 'required' },
+                { type: 'currency' }
             ],
             start_date: [
-                { type: 'required', message: 'Başlangıç tarihi zorunludur' },
-                { type: 'date', message: 'Geçerli bir başlangıç tarihi giriniz' }
+                { type: 'required' },
+                { type: 'date' }
             ],
             target_date: [
-                { type: 'required', message: 'Hedef tarihi zorunludur' },
-                { type: 'date', message: 'Geçerli bir hedef tarihi giriniz' }
+                { type: 'required' },
+                { type: 'date' }
             ]
         }
     };
@@ -223,9 +230,9 @@ function ajaxRequest(data) {
             return new Promise((resolve, reject) => {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Validasyon Hatası',
+                    title: translations.utils.validation.error_title,
                     html: errors.join('<br>'),
-                    confirmButtonText: 'Tamam'
+                    confirmButtonText: translations.utils.validation.confirm_button
                 });
                 reject(new Error('Validasyon hatası'));
             });
@@ -241,51 +248,33 @@ function ajaxRequest(data) {
     }).then(function (response) {
         if (response.status === 'error') {
             // Token hatası kontrolü
-            if (response.message && response.message.includes('Geçersiz güvenlik tokeni')) {
+            if (response.message && response.message.includes(translations.utils.session.invalid_token)) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Oturum Hatası',
+                    title: translations.utils.session.error_title,
                     text: escapeHtml(response.message),
-                    confirmButtonText: 'Tamam'
+                    confirmButtonText: translations.utils.validation.confirm_button
                 }).then(() => {
-                    window.location.reload();
+                    window.location.href = 'login.php';
                 });
-                throw new Error('Token hatası');
             }
-            throw new Error(escapeHtml(response.message));
+            return Promise.reject(response);
         }
         return response;
     });
 }
 
-// Tekrarlama sıklığı çevirisi
+// Tekrarlama sıklığı metni
 function getFrequencyText(frequency) {
-    const frequencies = {
-        'none': 'Tekrar Yok',
-        'monthly': 'Aylık',
-        'bimonthly': '2 Ayda Bir',
-        'quarterly': '3 Ayda Bir',
-        'fourmonthly': '4 Ayda Bir',
-        'fivemonthly': '5 Ayda Bir',
-        'sixmonthly': '6 Ayda Bir',
-        'yearly': 'Yıllık'
-    };
-    return frequencies[frequency] || frequency;
+    return translations.utils.frequency[frequency] || frequency;
 }
 
-// URL'den ay ve yıl bilgisini al
+// URL'den tarih parametrelerini al
 function getDateFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    const month = params.get('month');
-    const year = params.get('year');
-
-    if (month !== null && year !== null) {
-        return { month: parseInt(month), year: parseInt(year) };
-    }
-
-    // URL'de tarih yoksa mevcut ay/yıl
-    const now = new Date();
-    return { month: now.getMonth(), year: now.getFullYear() };
+    const urlParams = new URLSearchParams(window.location.search);
+    const month = parseInt(urlParams.get('month')) || new Date().getMonth() + 1;
+    const year = parseInt(urlParams.get('year')) || new Date().getFullYear();
+    return { month, year };
 }
 
 // URL'i güncelle
