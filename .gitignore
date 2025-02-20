@@ -58,7 +58,6 @@ package-lock.json
 *.crt
 
 # Database dumps
-*.sql
 *.sqlite
 *.db
 
