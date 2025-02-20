@@ -225,6 +225,12 @@ return [
         'recurring' => [
             'total_payment' => 'Toplam Ödeme',
             'pending_payment' => 'Ödenmeyi Bekleyen'
+        ],
+        'buttons' => [
+            'delete' => 'Sil',
+            'edit' => 'Düzenle',
+            'mark_paid' => 'Ödendi olarak işaretle',
+            'mark_not_paid' => 'Ödenmedi olarak işaretle'
         ]
     ],
 
@@ -481,29 +487,14 @@ return [
 
     'transfer' => [
         'title' => 'Ödeme Aktarımı',
+        'confirm' => 'Ödenmemiş ödemeleri sonraki aya aktarmak istediğinize emin misiniz?',
+        'transfer_button' => 'Evet, aktar',
+        'cancel_button' => 'İptal',
+        'error' => 'Ödemeler aktarılırken bir hata oluştu',
+        'success' => 'Ödemeler başarıyla aktarıldı',
         'no_unpaid_payments' => 'Aktarılacak ödenmemiş ödeme bulunamadı',
         'payment_transferred_from' => '%s (%s ayından aktarıldı)',
-        'update_error' => 'Ödeme güncellenemedi',
-        'success' => 'Ödemeler başarıyla aktarıldı',
-        'error' => 'Ödemeler aktarılırken bir hata oluştu',
-        'confirm' => 'Ödenmemiş ödemeleri aktarmak istediğinize emin misiniz?',
-        'select_month' => 'Aktarılacak Ay',
-        'select_year' => 'Aktarılacak Yıl',
-        'transfer_to' => 'Aktarılacak Dönem',
-        'transfer_from' => 'Aktarım Yapılacak Dönem',
-        'transfer_button' => 'Ödemeleri Aktar',
-        'cancel_button' => 'İptal',
-        'no_payments' => 'Aktarılacak ödeme bulunamadı',
-        'transfer_count' => 'Aktarılacak Ödeme Sayısı',
-        'total_amount' => 'Toplam Tutar',
-        'transfer_summary' => 'Aktarım Özeti',
-        'transfer_details' => 'Aktarım Detayları',
-        'transfer_date' => 'Aktarım Tarihi',
-        'transfer_status' => 'Aktarım Durumu',
-        'transfer_completed' => 'Aktarım Tamamlandı',
-        'transfer_failed' => 'Aktarım Başarısız',
-        'transfer_partial' => 'Kısmi Aktarım',
-        'transfer_cancelled' => 'Aktarım İptal Edildi'
+        'update_error' => 'Ödeme güncellenemedi'
     ],
 
     'validation' => [

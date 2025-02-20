@@ -267,10 +267,11 @@ function deletePayment(id) {
 function transferUnpaidPayments() {
     Swal.fire({
         icon: 'warning',
-        title: 'Ödenmemiş ödemeleri sonraki aya aktarmak istediğinize emin misiniz?',
+        title: translations.transfer.title,
+        text: translations.transfer.confirm,
         showCancelButton: true,
-        confirmButtonText: 'Evet, aktar',
-        cancelButtonText: 'İptal',
+        confirmButtonText: translations.transfer.transfer_button,
+        cancelButtonText: translations.transfer.cancel_button,
     }).then((result) => {
         if (result.isConfirmed) {
             const month = parseInt($('#monthSelect').val()) + 1;
@@ -287,8 +288,8 @@ function transferUnpaidPayments() {
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: 'Hata',
-                        text: response.message,
+                        title: translations.error,
+                        text: response.message || translations.transfer.error,
                         timer: 1500
                     });
                 }
@@ -331,7 +332,7 @@ function updateRecurringPaymentsList(recurring_payments) {
                     ${parseFloat(payment.yearly_total).toFixed(2)}
                 </td>
                 <td class="text-end">
-                    <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${payment.id})" title="Sil">
+                    <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${payment.id})" title="${translations.payment.buttons.delete}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
@@ -376,11 +377,11 @@ function updateRecurringPaymentsList(recurring_payments) {
     const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
     tfoot.html(`
         <tr class="text-end">
-            <td colspan="5" class="text-end fw-bold">Toplam Ödeme:</td>
+            <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.total_payment}:</td>
             <td class="fw-bold">${totalYearlyPayment.toFixed(2)} ${data.user.base_currency}</td>
         </tr>
         <tr class="text-end">
-            <td colspan="5" class="text-end fw-bold">Ödenmeyi Bekleyen:</td>
+            <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.pending_payment}:</td>
             <td class="fw-bold">${totalUnpaidPayment.toFixed(2)} ${data.user.base_currency}</td>
         </tr>
     `);

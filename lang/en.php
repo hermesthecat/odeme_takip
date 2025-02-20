@@ -226,6 +226,12 @@ return [
         'recurring' => [
             'total_payment' => 'Total Payment',
             'pending_payment' => 'Pending Payment'
+        ],
+        'buttons' => [
+            'delete' => 'Delete',
+            'edit' => 'Edit',
+            'mark_paid' => 'Mark as paid',
+            'mark_not_paid' => 'Mark as not paid'
         ]
     ],
 
@@ -473,29 +479,14 @@ return [
     // Transfer
     'transfer' => [
         'title' => 'Payment Transfer',
+        'confirm' => 'Are you sure you want to transfer unpaid payments to next month?',
+        'transfer_button' => 'Yes, transfer',
+        'cancel_button' => 'Cancel',
+        'error' => 'An error occurred while transferring payments',
+        'success' => 'Payments transferred successfully',
         'no_unpaid_payments' => 'No unpaid payments found to transfer',
         'payment_transferred_from' => '%s (transferred from %s)',
-        'update_error' => 'Failed to update payment',
-        'success' => 'Payments transferred successfully',
-        'error' => 'An error occurred while transferring payments',
-        'confirm' => 'Are you sure you want to transfer unpaid payments?',
-        'select_month' => 'Select Month to Transfer',
-        'select_year' => 'Select Year to Transfer',
-        'transfer_to' => 'Transfer to Period',
-        'transfer_from' => 'Transfer from Period',
-        'transfer_button' => 'Transfer Payments',
-        'cancel_button' => 'Cancel',
-        'no_payments' => 'No payments found to transfer',
-        'transfer_count' => 'Number of Payments to Transfer',
-        'total_amount' => 'Total Amount',
-        'transfer_summary' => 'Transfer Summary',
-        'transfer_details' => 'Transfer Details',
-        'transfer_date' => 'Transfer Date',
-        'transfer_status' => 'Transfer Status',
-        'transfer_completed' => 'Transfer Completed',
-        'transfer_failed' => 'Transfer Failed',
-        'transfer_partial' => 'Partial Transfer',
-        'transfer_cancelled' => 'Transfer Cancelled'
+        'update_error' => 'Failed to update payment'
     ],
 
     'validation' => [

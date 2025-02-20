@@ -166,6 +166,14 @@ require_once __DIR__ . '/config.php';
                     total_payment: '<?php echo t('payment.recurring.total_payment'); ?>',
                     pending_payment: '<?php echo t('payment.recurring.pending_payment'); ?>'
                 }
+            },
+            transfer: {
+                title: '<?php echo t('transfer.title'); ?>',
+                confirm: '<?php echo t('transfer.confirm'); ?>',
+                transfer_button: '<?php echo t('transfer.transfer_button'); ?>',
+                cancel_button: '<?php echo t('transfer.cancel_button'); ?>',
+                error: '<?php echo t('transfer.error'); ?>',
+                success: '<?php echo t('transfer.success'); ?>'
             }
         };
     </script>
