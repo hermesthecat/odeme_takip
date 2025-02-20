@@ -18,6 +18,22 @@ return [
     'confirm' => 'Onayla',
     'go_to_app' => 'Uygulamaya Git',
 
+    // Giriş/Kayıt
+    'username' => 'Kullanıcı Adı',
+    'password' => 'Şifre',
+    'remember_me' => 'Beni Hatırla',
+    'login_title' => 'Giriş Yap',
+    'login' => [
+        'error_message' => 'Geçersiz kullanıcı adı veya şifre.',
+        'no_account' => 'Hesabınız yok mu? Ücretsiz bir hesap oluşturun',
+        'success' => 'Giriş başarılı! Yönlendiriliyorsunuz...',
+        'error' => 'Giriş yapılırken bir hata oluştu.',
+        'required' => 'Lütfen kullanıcı adı ve şifrenizi girin.',
+        'invalid' => 'Geçersiz kullanıcı adı veya şifre.',
+        'locked' => 'Hesabınız kilitlendi. Lütfen daha sonra tekrar deneyin.',
+        'inactive' => 'Hesabınız henüz aktif değil. Lütfen e-postanızı kontrol edin.'
+    ],
+
     // Footer
     'footer' => [
         'links' => 'Bağlantılar',
@@ -82,16 +98,10 @@ return [
     'unique' => 'Bu değer zaten kullanılıyor',
 
     // Kimlik Doğrulama
-    'login_title' => 'Giriş Yap',
     'register_title' => 'Hesap Oluştur',
-    'username' => 'Kullanıcı Adı',
-    'password' => 'Şifre',
     'password_confirm' => 'Şifre Tekrar',
-    'remember_me' => 'Beni Hatırla',
     'forgot_password' => 'Şifremi Unuttum',
     'login_success' => 'Giriş başarılı!',
-    'login_error' => 'Geçersiz kullanıcı adı veya şifre',
-    'register_success' => 'Kayıt başarılı! Giriş yapabilirsiniz.',
     'logout_confirm' => 'Çıkış yapmak istediğinize emin misiniz?',
     'logout_success' => 'Başarıyla çıkış yapıldı',
 

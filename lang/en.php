@@ -18,6 +18,22 @@ return [
     'confirm' => 'Confirm',
     'go_to_app' => 'Go to App',
 
+    // Login/Register
+    'username' => 'Username',
+    'password' => 'Password',
+    'remember_me' => 'Remember Me',
+    'login_title' => 'Login',
+    'login' => [
+        'error_message' => 'Invalid username or password.',
+        'no_account' => 'Don\'t have an account? Create one for free',
+        'success' => 'Login successful! Redirecting...',
+        'error' => 'An error occurred while logging in.',
+        'required' => 'Please enter your username and password.',
+        'invalid' => 'Invalid username or password.',
+        'locked' => 'Your account has been locked. Please try again later.',
+        'inactive' => 'Your account is not active yet. Please check your email.'
+    ],
+
     // Footer
     'footer' => [
         'links' => 'Links',
@@ -82,15 +98,9 @@ return [
     'unique' => 'This value is already in use',
 
     // Authentication
-    'login_title' => 'Login',
     'register_title' => 'Create Account',
-    'username' => 'Username',
-    'password' => 'Password',
     'password_confirm' => 'Confirm Password',
-    'remember_me' => 'Remember Me',
     'forgot_password' => 'Forgot Password',
-    'login_success' => 'Login successful!',
-    'login_error' => 'Invalid username or password',
     'register_success' => 'Registration successful! You can now login.',
     'logout_confirm' => 'Are you sure you want to logout?',
     'logout_success' => 'Successfully logged out',
