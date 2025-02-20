@@ -12,7 +12,41 @@ try {
     die("HATA: Veritabanına bağlanılamadı. " . $e->getMessage());
 }
 
+// Autoload sınıfları
+spl_autoload_register(function ($class) {
+    $file = __DIR__ . '/classes/' . $class . '.php';
+    if (file_exists($file)) {
+        require_once $file;
+    }
+});
+
 session_start();
+
+// Dil yönetimi
+$lang = Language::getInstance();
+
+// Dil seçimini belirle
+if (isset($_GET['lang'])) {
+    // URL'den dil seçimi
+    $lang->setLanguage($_GET['lang']);
+} elseif (isset($_SESSION['lang'])) {
+    // Session'dan dil seçimi
+    $lang->setLanguage($_SESSION['lang']);
+} elseif (isset($_COOKIE['lang'])) {
+    // Cookie'den dil seçimi
+    $lang->setLanguage($_COOKIE['lang']);
+} else {
+    // Tarayıcı dilini kontrol et
+    $browserLang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+    if (in_array($browserLang, $lang->getAvailableLanguages())) {
+        $lang->setLanguage($browserLang);
+    }
+}
+
+// Kısaltma fonksiyonu
+function t($key, $params = []) {
+    return Language::t($key, $params);
+}
 
 // Oturum kontrolü
 function checkLogin()
@@ -25,14 +59,14 @@ function checkLogin()
 
 // supported currencies
 $supported_currencies = [
-    'TRY' => 'TRY - Türk Lirası',
-    'USD' => 'USD - Amerikan Doları',
-    'EUR' => 'EUR - Euro',
-    'GBP' => 'GBP - İngiliz Sterlini'
+    'TRY' => 'TRY - ' . t('currencies.try'),
+    'USD' => 'USD - ' . t('currencies.usd'),
+    'EUR' => 'EUR - ' . t('currencies.eur'),
+    'GBP' => 'GBP - ' . t('currencies.gbp')
 ];
 
-$site_name = 'Bütçe Takip';
-$site_description = 'Bütçe Takip, kişisel finans yönetimini kolaylaştıran modern bir çözümdür.';
+$site_name = t('site_name');
+$site_description = t('site_description');
 $site_keywords = 'bütçe, takip, kişisel, finans, yönetim';
 $site_author = 'A. Kerem Gök & Hermes';
-$site_slogan = 'Kişisel finans yönetimini kolaylaştıran modern çözüm.';
+$site_slogan = t('site_description');

@@ -1,4 +1,6 @@
 <?php
+
+require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/api/utils.php';
 require_once __DIR__ . '/api/validate.php';
 require_once __DIR__ . '/api/currency.php';
