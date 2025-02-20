@@ -1,5 +1,6 @@
 <?php
 return [
+    'language_name' => 'Türkçe',
     // Genel
     'site_name' => 'Bütçe Takip',
     'site_description' => 'Kişisel finans yönetimini kolaylaştıran modern çözüm',

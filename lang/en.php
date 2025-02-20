@@ -1,5 +1,6 @@
 <?php
 return [
+    'language_name' => 'English',
     // General
     'site_name' => 'Budget Tracker',
     'site_description' => 'Modern solution for personal finance management',

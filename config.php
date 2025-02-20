@@ -44,7 +44,8 @@ if (isset($_GET['lang'])) {
 }
 
 // Kısaltma fonksiyonu
-function t($key, $params = []) {
+function t($key, $params = [])
+{
     return Language::t($key, $params);
 }
 
@@ -65,7 +66,7 @@ $supported_currencies = [
     'GBP' => 'GBP - ' . t('currencies.gbp')
 ];
 
-$site_name = t('site_name');
+$site_name = "Parendo";
 $site_description = t('site_description');
 $site_keywords = 'bütçe, takip, kişisel, finans, yönetim';
 $site_author = 'A. Kerem Gök & Hermes';

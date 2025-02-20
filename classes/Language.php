@@ -6,10 +6,12 @@ class Language
     private $translations = [];
     private $currentLang = 'tr';
     private $fallbackLang = 'en';
-    private $availableLangs = ['tr', 'en'];
+    private $availableLangs = [];
+    private $languageNames = [];
 
     private function __construct()
     {
+        $this->loadAvailableLanguages();
         $this->loadLanguage();
     }
 
@@ -46,6 +48,33 @@ class Language
     public function getAvailableLanguages()
     {
         return $this->availableLangs;
+    }
+
+    private function loadAvailableLanguages()
+    {
+        $langPath = __DIR__ . '/../lang/';
+        if (is_dir($langPath)) {
+            $files = glob($langPath . '*.php');
+            foreach ($files as $file) {
+                $langCode = basename($file, '.php');
+                $this->availableLangs[] = $langCode;
+                
+                // Dil dosyasından dil ismini oku
+                $langData = require $file;
+                if (isset($langData['language_name'])) {
+                    $this->languageNames[$langCode] = $langData['language_name'];
+                }
+            }
+        }
+        
+        // Eğer hiç dil dosyası bulunamazsa varsayılan dilleri ekle
+        if (empty($this->availableLangs)) {
+            $this->availableLangs = ['tr', 'en'];
+            $this->languageNames = [
+                'tr' => 'Türkçe',
+                'en' => 'English'
+            ];
+        }
     }
 
     private function loadLanguage()
@@ -88,11 +117,7 @@ class Language
 
     public function getLanguageName($code)
     {
-        $languages = [
-            'tr' => 'Türkçe',
-            'en' => 'English'
-        ];
-        return $languages[$code] ?? $code;
+        return $this->languageNames[$code] ?? $code;
     }
 
     // Kısaltma fonksiyonu
