@@ -195,15 +195,10 @@ return [
         'delete_success' => 'Ödeme başarıyla silindi',
         'delete_error' => 'Ödeme silinirken bir hata oluştu',
         'delete_confirm' => 'Bu ödemeyi silmek istediğinize emin misiniz?',
-        'mark_paid' => 'Ödendi Olarak İşaretle',
-        'mark_paid_success' => 'Ödeme ödendi olarak işaretlendi',
-        'mark_paid_error' => 'Ödeme ödendi olarak işaretlenirken bir hata oluştu',
-        'transfer_success' => 'Ödemeler başarıyla aktarıldı',
-        'transfer_error' => 'Ödemeler aktarılırken bir hata oluştu',
-        'transfer_confirm' => 'Ödenmemiş ödemeleri aktarmak istediğinize emin misiniz?',
+        'mark_paid' => 'Ödendi olarak işaretle',
+        'mark_not_paid' => 'Ödenmedi olarak işaretle',
+        'not_found' => 'Henüz bir ödeme eklenmemiş',
         'load_error' => 'Ödemeler yüklenirken bir hata oluştu',
-        'load_recurring_error' => 'Tekrarlanan ödemeler yüklenirken bir hata oluştu',
-        'not_found' => 'Ödeme bulunamadı',
         'update_error' => 'Ödeme güncellenirken bir hata oluştu',
         'rate_error' => 'Kur bilgisi alınamadı',
         'id' => 'Ödeme ID',
@@ -226,17 +221,11 @@ return [
         'recurring_completed' => 'Tamamlanan Tekrar',
         'recurring_next' => 'Sonraki Tekrar',
         'recurring_last' => 'Son Tekrar',
-        'delete_children' => 'Tüm tekrarlanan ödemeleri sil',
-        'delete_single' => 'Sadece bu ödemeyi sil',
-        'update_rate' => 'Kur bilgisini güncelle',
-        'current_rate' => 'Mevcut kur',
-        'yearly_total' => 'Yıllık toplam',
-        'monthly_total' => 'Aylık toplam',
-        'payment_status' => 'Ödeme durumu',
-        'paid' => 'Ödendi',
-        'pending' => 'Bekliyor',
-        'cancelled' => 'İptal edildi',
-        'overdue' => 'Gecikmiş'
+        'transfer' => 'Sonraki Aya Aktar',
+        'recurring' => [
+            'total_payment' => 'Toplam Ödeme',
+            'pending_payment' => 'Ödenmeyi Bekleyen'
+        ]
     ],
 
     // Birikimler

@@ -137,6 +137,35 @@ require_once __DIR__ . '/config.php';
                     error_message: '<?php echo t('income.edit_error'); ?>',
                     current_rate: '<?php echo t('currency.current_rate'); ?>'
                 }
+            },
+            payment: {
+                no_data: '<?php echo t('payment.not_found'); ?>',
+                mark_paid: {
+                    mark_as_paid: '<?php echo t('payment.mark_paid'); ?>',
+                    mark_as_not_paid: '<?php echo t('payment.mark_not_paid'); ?>'
+                },
+                delete: {
+                    title: '<?php echo t('payment.delete_confirm'); ?>',
+                    confirm: '<?php echo t('yes_delete'); ?>',
+                    cancel: '<?php echo t('cancel'); ?>'
+                },
+                buttons: {
+                    edit: '<?php echo t('edit'); ?>',
+                    delete: '<?php echo t('delete'); ?>',
+                    transfer: '<?php echo t('payment.transfer'); ?>'
+                },
+                modal: {
+                    error_title: '<?php echo t('error'); ?>',
+                    error_not_found: '<?php echo t('payment.not_found'); ?>',
+                    success_title: '<?php echo t('success'); ?>',
+                    success_message: '<?php echo t('payment.edit_success'); ?>',
+                    error_message: '<?php echo t('payment.edit_error'); ?>',
+                    current_rate: '<?php echo t('currency.current_rate'); ?>'
+                },
+                recurring: {
+                    total_payment: '<?php echo t('payment.recurring.total_payment'); ?>',
+                    pending_payment: '<?php echo t('payment.recurring.pending_payment'); ?>'
+                }
             }
         };
     </script>

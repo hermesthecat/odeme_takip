@@ -196,15 +196,10 @@ return [
         'delete_success' => 'Payment deleted successfully',
         'delete_error' => 'An error occurred while deleting payment',
         'delete_confirm' => 'Are you sure you want to delete this payment?',
-        'mark_paid' => 'Mark as Paid',
-        'mark_paid_success' => 'Payment marked as paid',
-        'mark_paid_error' => 'An error occurred while marking payment as paid',
-        'transfer_success' => 'Payments transferred successfully',
-        'transfer_error' => 'An error occurred while transferring payments',
-        'transfer_confirm' => 'Are you sure you want to transfer unpaid payments?',
+        'mark_paid' => 'Mark as paid',
+        'mark_not_paid' => 'Mark as not paid',
+        'not_found' => 'No payments added yet',
         'load_error' => 'An error occurred while loading payments',
-        'load_recurring_error' => 'An error occurred while loading recurring payments',
-        'not_found' => 'Payment not found',
         'update_error' => 'An error occurred while updating payment',
         'rate_error' => 'Could not fetch exchange rate',
         'id' => 'Payment ID',
@@ -227,17 +222,11 @@ return [
         'recurring_completed' => 'Completed Repeats',
         'recurring_next' => 'Next Repeat',
         'recurring_last' => 'Last Repeat',
-        'delete_children' => 'Delete all recurring payments',
-        'delete_single' => 'Delete only this payment',
-        'update_rate' => 'Update exchange rate',
-        'current_rate' => 'Current rate',
-        'yearly_total' => 'Yearly total',
-        'monthly_total' => 'Monthly total',
-        'payment_status' => 'Payment status',
-        'paid' => 'Paid',
-        'pending' => 'Pending',
-        'cancelled' => 'Cancelled',
-        'overdue' => 'Overdue'
+        'transfer' => 'Transfer to Next Month',
+        'recurring' => [
+            'total_payment' => 'Total Payment',
+            'pending_payment' => 'Pending Payment'
+        ]
     ],
 
     // Savings
