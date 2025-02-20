@@ -3,7 +3,6 @@
 require_once __DIR__ . '/../config.php';
 checkLogin();
 
-
 function addIncome()
 {
     global $pdo, $user_id;

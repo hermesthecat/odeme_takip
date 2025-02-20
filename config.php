@@ -22,3 +22,11 @@ function checkLogin()
         exit;
     }
 }
+
+// supported currencies
+$supported_currencies = [
+    'TRY' => 'TRY - Türk Lirası',
+    'USD' => 'USD - Amerikan Doları',
+    'EUR' => 'EUR - Euro',
+    'GBP' => 'GBP - İngiliz Sterlini'
+];

@@ -61,17 +61,6 @@ function getExchangeRate($from_currency, $to_currency)
         if ($result) {
             return $result['rate'];
         }
-
-        // Hiç kur bulunamazsa varsayılan değerler
-        $default_rates = [
-            'usd' => ['try' => 31.5],
-            'eur' => ['try' => 34.2],
-            'gbp' => ['try' => 39.8]
-        ];
-
-        if (isset($default_rates[$from_currency][$to_currency])) {
-            return $default_rates[$from_currency][$to_currency];
-        }
     }
 
     // Hiçbir şekilde kur bulunamazsa 1 döndür

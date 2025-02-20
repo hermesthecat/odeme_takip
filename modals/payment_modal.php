@@ -19,9 +19,9 @@
                     <div class="mb-3">
                         <label class="form-label">Para Birimi</label>
                         <select class="form-select" name="currency" required>
-                            <option value="TRY">TRY</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
+                            <?php foreach ($supported_currencies as $code => $name) : ?>
+                                <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -77,10 +77,9 @@
                     <div class="mb-3">
                         <label for="update_payment_currency" class="form-label">Para Birimi</label>
                         <select class="form-select" id="update_payment_currency" name="currency" required>
-                            <option value="TRY">TRY</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="GBP">GBP</option>
+                            <?php foreach ($supported_currencies as $code => $name) : ?>
+                                <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="mb-3" id="updatePaymentExchangeRateGroup" style="display: none;">
@@ -99,8 +98,13 @@
                     <div class="mb-3">
                         <label class="form-label">Tekrarlama Sıklığı</label>
                         <select class="form-select" id="update_payment_frequency" name="frequency" required>
-                            <option value="none">Tek Seferlik</option>
+                            <option value="none">Tekrar Yok</option>
                             <option value="monthly">Aylık</option>
+                            <option value="bimonthly">2 Ayda Bir</option>
+                            <option value="quarterly">3 Ayda Bir</option>
+                            <option value="fourmonthly">4 Ayda Bir</option>
+                            <option value="fivemonthly">5 Ayda Bir</option>
+                            <option value="sixmonthly">6 Ayda Bir</option>
                             <option value="yearly">Yıllık</option>
                         </select>
                     </div>

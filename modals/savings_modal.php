@@ -19,9 +19,9 @@
                     <div class="mb-3">
                         <label class="form-label">Para Birimi</label>
                         <select class="form-select" name="currency" required>
-                            <option value="TRY">TRY</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
+                            <?php foreach ($supported_currencies as $code => $name) : ?>
+                                <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -68,9 +68,9 @@
                     <div class="mb-3">
                         <label class="form-label">Para Birimi</label>
                         <select class="form-select" name="currency" id="update_saving_currency" required>
-                            <option value="TRY">TRY</option>
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
+                            <?php foreach ($supported_currencies as $code => $name) : ?>
+                                <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="mb-3">

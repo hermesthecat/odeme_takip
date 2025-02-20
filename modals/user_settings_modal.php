@@ -11,9 +11,9 @@
                     <div class="mb-3">
                         <label class="form-label">Ana Para Birimi</label>
                         <select class="form-select" name="base_currency" id="user_base_currency" required>
-                            <option value="TRY">TRY - Türk Lirası</option>
-                            <option value="USD">USD - Amerikan Doları</option>
-                            <option value="EUR">EUR - Euro</option>
+                            <?php foreach ($supported_currencies as $code => $name) : ?>
+                                <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
+                            <?php endforeach; ?>
                         </select>
                         <small class="text-muted">Tüm hesaplamalar bu para birimi üzerinden yapılacaktır.</small>
                     </div>

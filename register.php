@@ -54,9 +54,9 @@ require_once __DIR__ . '/header.php';
                     <div class="mb-3">
                         <label class="form-label">Ana Para Birimi</label>
                         <select class="form-select" name="base_currency" required>
-                            <option value="TRY">TRY - Türk Lirası</option>
-                            <option value="USD">USD - Amerikan Doları</option>
-                            <option value="EUR">EUR - Euro</option>
+                            <?php foreach ($supported_currencies as $code => $name) : ?>
+                                <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
+                            <?php endforeach; ?>
                         </select>
                         <div class="form-text">Tüm hesaplamalar bu para birimi üzerinden yapılacaktır. Merak etmeyin, daha sonra değiştirebilirsiniz.</div>
                     </div>

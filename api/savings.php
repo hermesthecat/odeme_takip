@@ -49,7 +49,6 @@ function addSaving()
     }
 }
 
-
 function deleteSaving()
 {
     global $pdo, $user_id;

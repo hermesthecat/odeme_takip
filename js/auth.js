@@ -33,7 +33,7 @@ $(document).ready(function () {
                     Swal.fire({
                         icon: 'success',
                         title: 'Başarılı!',
-                        text: 'Giriş yapılıyor...',
+                        text: 'Giriş yapılıyor..',
                         timer: 1500,
                         showConfirmButton: false
                     }).then(() => {
@@ -81,7 +81,7 @@ $(document).ready(function () {
 
         // Loading göster
         Swal.fire({
-            title: 'Kayıt yapılıyor...',
+            title: 'Kayıt yapılıyor..',
             allowOutsideClick: false,
             showConfirmButton: false,
             didOpen: () => {
@@ -106,7 +106,7 @@ $(document).ready(function () {
                     Swal.fire({
                         icon: 'success',
                         title: 'Başarılı!',
-                        text: 'Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...',
+                        text: 'Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz..',
                         timer: 2000,
                         showConfirmButton: false
                     }).then(() => {

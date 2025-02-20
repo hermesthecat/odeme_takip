@@ -5,7 +5,6 @@ checkLogin();
 
 require_once __DIR__ . '/./currency.php';
 
-
 function transferUnpaidPayments()
 {
     global $pdo, $user_id;
