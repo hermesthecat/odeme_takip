@@ -344,9 +344,9 @@ function updateRecurringPaymentsList(recurring_payments) {
                                 <thead>
                                     <tr>
                                         <th style="width: 50px;"></th>
-                                        <th>Ödeme Tarihi</th>
-                                        <th>Tutar</th>
-                                        <th>Kur</th>
+                                        <th>${translations.payment.date}</th>
+                                        <th>${translations.payment.amount}</th>
+                                        <th>${translations.payment.currency}</th>
                                         <th></th>
                                     </tr>
                                 </thead>
