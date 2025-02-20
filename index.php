@@ -11,39 +11,38 @@ require_once __DIR__ . '/header.php';
     <!-- Hero Section -->
     <section class="hero">
         <div class="container text-center">
-            <h1 class="display-4 mb-4">Finansal Özgürlüğünüzü Yönetin</h1>
+            <h1 class="display-4 mb-4"><?php echo t('hero.title'); ?></h1>
             <p class="lead mb-4">
-                Gelirlerinizi, giderlerinizi ve birikimlerinizi kolayca takip edin.
-                Finansal hedeflerinize ulaşmak hiç bu kadar kolay olmamıştı.
+                <?php echo t('hero.description'); ?>
             </p>
-            <a href="register.php" class="btn btn-light btn-lg">Hemen Başlayın</a>
+            <a href="register.php" class="btn btn-light btn-lg"><?php echo t('hero.cta'); ?></a>
         </div>
     </section>
 
     <!-- Features Section -->
     <section id="features" class="py-5">
         <div class="container">
-            <h2 class="text-center mb-5">Özellikler</h2>
+            <h2 class="text-center mb-5"><?php echo t('features.title'); ?></h2>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="text-center">
                         <i class="bi bi-graph-up feature-icon"></i>
-                        <h3>Gelir Takibi</h3>
-                        <p>Tüm gelirlerinizi kategorize edin ve düzenli gelirlerinizi otomatik olarak takip edin.</p>
+                        <h3><?php echo t('features.income_tracking.title'); ?></h3>
+                        <p><?php echo t('features.income_tracking.description'); ?></p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="text-center">
                         <i class="bi bi-credit-card feature-icon"></i>
-                        <h3>Gider Yönetimi</h3>
-                        <p>Harcamalarınızı kontrol altında tutun ve ödeme planlarınızı kolayca yönetin.</p>
+                        <h3><?php echo t('features.expense_management.title'); ?></h3>
+                        <p><?php echo t('features.expense_management.description'); ?></p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="text-center">
                         <i class="bi bi-piggy-bank feature-icon"></i>
-                        <h3>Birikim Hedefleri</h3>
-                        <p>Finansal hedeflerinizi belirleyin ve ilerlemenizi görsel olarak takip edin.</p>
+                        <h3><?php echo t('features.savings_goals.title'); ?></h3>
+                        <p><?php echo t('features.savings_goals.description'); ?></p>
                     </div>
                 </div>
             </div>
@@ -53,17 +52,17 @@ require_once __DIR__ . '/header.php';
     <!-- Testimonials Section -->
     <section id="testimonials" class="testimonial">
         <div class="container">
-            <h2 class="text-center mb-5">Kullanıcı Yorumları</h2>
+            <h2 class="text-center mb-5"><?php echo t('testimonials.title'); ?></h2>
             <div class="row">
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
                         <div class="card-body">
-                            <p class="card-text">"Bu uygulama sayesinde finansal durumumu çok daha iyi kontrol edebiliyorum. Artık her kuruşumun nereye gittiğini biliyorum."</p>
+                            <p class="card-text"><?php echo t('testimonials.1.text'); ?></p>
                             <div class="d-flex align-items-center mt-3">
                                 <i class="bi bi-person-circle fs-2 me-3"></i>
                                 <div>
-                                    <h5 class="mb-0">Ahmet Y.</h5>
-                                    <small class="text-muted">Yazılım Geliştirici</small>
+                                    <h5 class="mb-0"><?php echo t('testimonials.1.name'); ?></h5>
+                                    <small class="text-muted"><?php echo t('testimonials.1.title'); ?></small>
                                 </div>
                             </div>
                         </div>
@@ -72,12 +71,12 @@ require_once __DIR__ . '/header.php';
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
                         <div class="card-body">
-                            <p class="card-text">"Birikim hedeflerimi takip etmek artık çok kolay. Görsel grafikler motivasyonumu artırıyor."</p>
+                            <p class="card-text"><?php echo t('testimonials.2.text'); ?></p>
                             <div class="d-flex align-items-center mt-3">
                                 <i class="bi bi-person-circle fs-2 me-3"></i>
                                 <div>
-                                    <h5 class="mb-0">Ayşe K.</h5>
-                                    <small class="text-muted">Öğretmen</small>
+                                    <h5 class="mb-0"><?php echo t('testimonials.2.name'); ?></h5>
+                                    <small class="text-muted"><?php echo t('testimonials.2.title'); ?></small>
                                 </div>
                             </div>
                         </div>
@@ -86,12 +85,12 @@ require_once __DIR__ . '/header.php';
                 <div class="col-md-4 mb-4">
                     <div class="card h-100">
                         <div class="card-body">
-                            <p class="card-text">"Düzenli ödemelerimi hiç kaçırmıyorum artık. Hatırlatma sistemi gerçekten çok işime yarıyor."</p>
+                            <p class="card-text"><?php echo t('testimonials.3.text'); ?></p>
                             <div class="d-flex align-items-center mt-3">
                                 <i class="bi bi-person-circle fs-2 me-3"></i>
                                 <div>
-                                    <h5 class="mb-0">Mehmet S.</h5>
-                                    <small class="text-muted">Esnaf</small>
+                                    <h5 class="mb-0"><?php echo t('testimonials.3.name'); ?></h5>
+                                    <small class="text-muted"><?php echo t('testimonials.3.title'); ?></small>
                                 </div>
                             </div>
                         </div>
@@ -104,9 +103,9 @@ require_once __DIR__ . '/header.php';
     <!-- CTA Section -->
     <section class="cta-section">
         <div class="container text-center">
-            <h2 class="mb-4">Finansal Geleceğinizi Şekillendirin</h2>
-            <p class="lead mb-4">Hemen ücretsiz hesap oluşturun ve finansal kontrolü elinize alın.</p>
-            <a href="register.php" class="btn btn-primary btn-lg">Ücretsiz Başlayın</a>
+            <h2 class="mb-4"><?php echo t('cta.title'); ?></h2>
+            <p class="lead mb-4"><?php echo t('cta.description'); ?></p>
+            <a href="register.php" class="btn btn-primary btn-lg"><?php echo t('cta.button'); ?></a>
         </div>
     </section>
 

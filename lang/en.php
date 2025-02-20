@@ -17,8 +17,54 @@ return [
     'no' => 'No',
     'confirm' => 'Confirm',
     'go_to_app' => 'Go to App',
-    'features' => 'Features',
-    'testimonials' => 'Testimonials',
+
+    // Home Page
+    'hero' => [
+        'title' => 'Manage Your Financial Freedom',
+        'description' => 'Easily track your income, expenses, and savings. Reaching your financial goals has never been easier.',
+        'cta' => 'Get Started Now'
+    ],
+
+    'features' => [
+        'title' => 'Features',
+        'income_tracking' => [
+            'title' => 'Income Tracking',
+            'description' => 'Categorize all your income and automatically track your regular earnings.'
+        ],
+        'expense_management' => [
+            'title' => 'Expense Management',
+            'description' => 'Keep your expenses under control and easily manage your payment plans.'
+        ],
+        'savings_goals' => [
+            'title' => 'Savings Goals',
+            'description' => 'Set your financial goals and visually track your progress.'
+        ]
+    ],
+
+    'testimonials' => [
+        'title' => 'Testimonials',
+        '1' => [
+            'text' => '"Thanks to this app, I can control my financial situation much better. Now I know where every penny goes."',
+            'name' => 'John D.',
+            'title' => 'Software Developer'
+        ],
+        '2' => [
+            'text' => '"Tracking my savings goals is now so easy. The visual graphs boost my motivation."',
+            'name' => 'Sarah M.',
+            'title' => 'Teacher'
+        ],
+        '3' => [
+            'text' => '"I never miss my regular payments anymore. The reminder system really works for me."',
+            'name' => 'Mike R.',
+            'title' => 'Business Owner'
+        ]
+    ],
+
+    'cta' => [
+        'title' => 'Shape Your Financial Future',
+        'description' => 'Create a free account now and take control of your finances.',
+        'button' => 'Start Free'
+    ],
 
     // Validation
     'required' => 'This field is required',

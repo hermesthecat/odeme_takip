@@ -17,8 +17,54 @@ return [
     'no' => 'Hayır',
     'confirm' => 'Onayla',
     'go_to_app' => 'Uygulamaya Git',
-    'features' => 'Özellikler',
-    'testimonials' => 'Yorumlar',
+
+    // Ana Sayfa
+    'hero' => [
+        'title' => 'Finansal Özgürlüğünüzü Yönetin',
+        'description' => 'Gelirlerinizi, giderlerinizi ve birikimlerinizi kolayca takip edin. Finansal hedeflerinize ulaşmak hiç bu kadar kolay olmamıştı.',
+        'cta' => 'Hemen Başlayın'
+    ],
+
+    'features' => [
+        'title' => 'Özellikler',
+        'income_tracking' => [
+            'title' => 'Gelir Takibi',
+            'description' => 'Tüm gelirlerinizi kategorize edin ve düzenli gelirlerinizi otomatik olarak takip edin.'
+        ],
+        'expense_management' => [
+            'title' => 'Gider Yönetimi',
+            'description' => 'Harcamalarınızı kontrol altında tutun ve ödeme planlarınızı kolayca yönetin.'
+        ],
+        'savings_goals' => [
+            'title' => 'Birikim Hedefleri',
+            'description' => 'Finansal hedeflerinizi belirleyin ve ilerlemenizi görsel olarak takip edin.'
+        ]
+    ],
+
+    'testimonials' => [
+        'title' => 'Yorumlar',
+        '1' => [
+            'text' => '"Bu uygulama sayesinde finansal durumumu çok daha iyi kontrol edebiliyorum. Artık her kuruşumun nereye gittiğini biliyorum."',
+            'name' => 'Ahmet Y.',
+            'title' => 'Yazılım Geliştirici'
+        ],
+        '2' => [
+            'text' => '"Birikim hedeflerimi takip etmek artık çok kolay. Görsel grafikler motivasyonumu artırıyor."',
+            'name' => 'Ayşe K.',
+            'title' => 'Öğretmen'
+        ],
+        '3' => [
+            'text' => '"Düzenli ödemelerimi hiç kaçırmıyorum artık. Hatırlatma sistemi gerçekten çok işime yarıyor."',
+            'name' => 'Mehmet S.',
+            'title' => 'Esnaf'
+        ]
+    ],
+
+    'cta' => [
+        'title' => 'Finansal Geleceğinizi Şekillendirin',
+        'description' => 'Hemen ücretsiz hesap oluşturun ve finansal kontrolü elinize alın.',
+        'button' => 'Ücretsiz Başlayın'
+    ],
 
     // Doğrulama
     'required' => 'Bu alan zorunludur',
