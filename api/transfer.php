@@ -26,7 +26,7 @@ function transferUnpaidPayments()
         $unpaid_payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (empty($unpaid_payments)) {
-            throw new Exception('Aktarılacak ödenmemiş ödeme bulunamadı');
+            throw new Exception(t('transfer.no_unpaid_payments'));
         }
 
         // Ay ve yıl hesaplama
@@ -51,7 +51,7 @@ function transferUnpaidPayments()
                 exchange_rate = ?
                 WHERE id = ? AND user_id = ?");
 
-            $new_name = $payment['name'] . ' (' . $current_month_name . ' ayından aktarıldı)';
+            $new_name = sprintf(t('transfer.payment_transferred_from'), $payment['name'], $current_month_name);
 
             if (!$stmt->execute([
                 $new_date,
@@ -60,7 +60,7 @@ function transferUnpaidPayments()
                 $payment['id'],
                 $user_id
             ])) {
-                throw new Exception("Ödeme güncellenemedi");
+                throw new Exception(t('transfer.update_error'));
             }
         }
 
