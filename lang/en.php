@@ -18,6 +18,13 @@ return [
     'confirm' => 'Confirm',
     'go_to_app' => 'Go to App',
 
+    // Footer
+    'footer' => [
+        'links' => 'Links',
+        'contact' => 'Contact',
+        'copyright' => 'All rights reserved.'
+    ],
+
     // Home Page
     'hero' => [
         'title' => 'Manage Your Financial Freedom',
@@ -184,4 +191,4 @@ return [
     'not_found' => 'Page not found',
     'unauthorized' => 'Unauthorized access',
     'forbidden' => 'Access forbidden',
-]; 
+];

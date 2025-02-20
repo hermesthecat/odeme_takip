@@ -18,6 +18,13 @@ return [
     'confirm' => 'Onayla',
     'go_to_app' => 'Uygulamaya Git',
 
+    // Footer
+    'footer' => [
+        'links' => 'Bağlantılar',
+        'contact' => 'İletişim',
+        'copyright' => 'Tüm hakları saklıdır.'
+    ],
+
     // Ana Sayfa
     'hero' => [
         'title' => 'Finansal Özgürlüğünüzü Yönetin',
@@ -184,4 +191,4 @@ return [
     'not_found' => 'Sayfa bulunamadı',
     'unauthorized' => 'Yetkisiz erişim',
     'forbidden' => 'Erişim engellendi',
-]; 
+];
