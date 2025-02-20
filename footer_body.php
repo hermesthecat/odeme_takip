@@ -3,7 +3,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5 class="text-white">Bütçe Takip</h5>
+                    <h5 class="text-white"><?php echo $site_name; ?></h5>
                     <p class="text-white">Kişisel finans yönetimini kolaylaştıran modern çözüm.</p>
                 </div>
                 <div class="col-md-3">
@@ -25,8 +25,8 @@
             </div>
             <hr class="mt-4">
             <div class="text-center">
-                <p class="mb-0">&copy; <?php echo date('Y'); ?> Bütçe Takip. Tüm hakları saklıdır.</p>
-                <small>Geliştirici: A. Kerem Gök</small>
+                <p class="mb-0">&copy; <?php echo date('Y'); ?> <?php echo $site_name; ?>. Tüm hakları saklıdır.</p>
+                <small><?php echo $site_author; ?></small>
             </div>
         </div>
     </footer>

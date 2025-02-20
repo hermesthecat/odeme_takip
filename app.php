@@ -8,7 +8,7 @@ checkLogin();
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Bütçe Kontrol Sistemi</title>
+    <title><?php echo $site_name; ?> - <?php echo $site_slogan; ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
@@ -20,7 +20,7 @@ checkLogin();
     <div class="container mt-4">
         <!-- Başlık ve Kullanıcı Bilgisi -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="mb-0">Bütçe Kontrol Sistemi</h1>
+            <h1 class="mb-0"><?php echo $site_name; ?></h1>
             <div class="d-flex align-items-center">
                 <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
                     <i class="bi bi-gear me-1"></i>Ayarlar

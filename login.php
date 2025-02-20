@@ -9,13 +9,9 @@ require_once __DIR__ . '/header.php';
     <div class="container login-container">
         <div class="logo">
             <i class="bi bi-piggy-bank"></i>
-            <h2 class="mt-3">Bütçe Takip</h2>
+            <h2 class="mt-3"><?php echo $site_name; ?></h2>
             <p class="text-muted">Giriş Yap</p>
         </div>
-
-        <?php if (!empty($login_err)): ?>
-            <div class="alert alert-danger"><?php echo $login_err; ?></div>
-        <?php endif; ?>
 
         <div class="card shadow">
             <div class="card-body">
@@ -37,7 +33,7 @@ require_once __DIR__ . '/header.php';
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">Giriş Yap</button>
-                        <a href="register.php" class="btn btn-link">Hesabınız yok mu? Kayıt olun</a>
+                        <a href="register.php" class="btn btn-link">Hesabınız yok mu? Ücretsiz bir hesap oluşturun</a>
                     </div>
                 </form>
             </div>

@@ -30,3 +30,9 @@ $supported_currencies = [
     'EUR' => 'EUR - Euro',
     'GBP' => 'GBP - İngiliz Sterlini'
 ];
+
+$site_name = 'Bütçe Takip';
+$site_description = 'Bütçe Takip, kişisel finans yönetimini kolaylaştıran modern bir çözümdür.';
+$site_keywords = 'bütçe, takip, kişisel, finans, yönetim';
+$site_author = 'A. Kerem Gök & Hermes';
+$site_slogan = 'Kişisel finans yönetimini kolaylaştıran modern çözüm.';
