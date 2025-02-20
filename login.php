@@ -10,7 +10,7 @@ require_once __DIR__ . '/header.php';
         <div class="logo">
             <i class="bi bi-piggy-bank"></i>
             <h2 class="mt-3"><?php echo t('site_name'); ?></h2>
-            <p class="text-muted"><?php echo t('login_title'); ?></p>
+            <p class="text-muted"><?php echo t('login.title'); ?></p>
         </div>
 
         <div class="card shadow">
@@ -32,7 +32,7 @@ require_once __DIR__ . '/header.php';
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary"><?php echo t('login'); ?></button>
+                        <button type="submit" class="btn btn-primary"><?php echo t('login.title'); ?></button>
                         <a href="register.php" class="btn btn-link"><?php echo t('login.no_account'); ?></a>
                     </div>
                 </form>

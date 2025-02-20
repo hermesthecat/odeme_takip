@@ -11,8 +11,8 @@
                     <ul class="list-unstyled">
                         <li><a href="index.php#features" class="text-white"><?php echo t('features.title'); ?></a></li>
                         <li><a href="index.php#testimonials" class="text-white"><?php echo t('testimonials.title'); ?></a></li>
-                        <li><a href="login.php" class="text-white"><?php echo t('login'); ?></a></li>
-                        <li><a href="register.php" class="text-white"><?php echo t('register'); ?></a></li>
+                        <li><a href="login.php" class="text-white"><?php echo t('login.title'); ?></a></li>
+                        <li><a href="register.php" class="text-white"><?php echo t('register.title'); ?></a></li>
                     </ul>
                 </div>
                 <div class="col-md-3">

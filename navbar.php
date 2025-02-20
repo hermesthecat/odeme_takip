@@ -43,10 +43,10 @@ $is_logged_in = isset($_SESSION['user_id']);
 
                 <?php if (!$is_logged_in): ?>
                     <li class="nav-item">
-                        <a class="btn btn-primary ms-2" href="login.php"><?php echo t('login'); ?></a>
+                        <a class="btn btn-primary ms-2" href="login.php"><?php echo t('login.title'); ?></a>
                     </li>
                     <li class="nav-item">
-                        <a class="btn btn-outline-light ms-2" href="register.php"><?php echo t('register'); ?></a>
+                        <a class="btn btn-outline-light ms-2" href="register.php"><?php echo t('register.title'); ?></a>
                     </li>
                 <?php else: ?>
                     <li class="nav-item">

@@ -4,8 +4,6 @@ return [
     'site_name' => 'Bütçe Takip',
     'site_description' => 'Kişisel finans yönetimini kolaylaştıran modern çözüm',
     'welcome' => 'Hoş Geldiniz',
-    'login' => 'Giriş Yap',
-    'register' => 'Kayıt Ol',
     'logout' => 'Çıkış Yap',
     'settings' => 'Ayarlar',
     'save' => 'Kaydet',
@@ -22,11 +20,8 @@ return [
     'username' => 'Kullanıcı Adı',
     'password' => 'Şifre',
     'remember_me' => 'Beni Hatırla',
-    'login_title' => 'Giriş Yap',
-    'register_title' => 'Ücretsiz bir hesap oluşturun',
-    'login.have_account' => 'Zaten hesabınız var mı? Giriş yapın',
-    'currency.base_info' => 'Tüm hesaplamalar bu para birimi üzerinden yapılacaktır. Merak etmeyin, daha sonra değiştirebilirsiniz.',
     'login' => [
+        'title' => 'Giriş',
         'error_message' => 'Geçersiz kullanıcı adı veya şifre.',
         'no_account' => 'Hesabınız yok mu? Ücretsiz bir hesap oluşturun',
         'success' => 'Giriş başarılı! Yönlendiriliyorsunuz...',
@@ -34,7 +29,8 @@ return [
         'required' => 'Lütfen kullanıcı adı ve şifrenizi girin.',
         'invalid' => 'Geçersiz kullanıcı adı veya şifre.',
         'locked' => 'Hesabınız kilitlendi. Lütfen daha sonra tekrar deneyin.',
-        'inactive' => 'Hesabınız henüz aktif değil. Lütfen e-postanızı kontrol edin.'
+        'inactive' => 'Hesabınız henüz aktif değil. Lütfen e-postanızı kontrol edin.',
+        'have_account' => 'Hesabınız var mı? Giriş yapın'
     ],
 
     // Footer
@@ -206,11 +202,21 @@ return [
 
     // Yeni eklenen kısımlar
     'register' => [
+        'title' => 'Hesap Oluştur',
         'error_message' => 'Kayıt olurken bir hata oluştu.',
         'success' => 'Kayıt başarılı! Giriş yapabilirsiniz.',
         'username_taken' => 'Bu kullanıcı adı zaten kullanılıyor.',
         'password_mismatch' => 'Şifreler eşleşmiyor.',
         'invalid_currency' => 'Geçersiz para birimi seçimi.',
         'required' => 'Lütfen tüm alanları doldurun.',
+    ],
+
+    // Currencies
+    'currencies' => [
+        'base_info' => 'Tüm hesaplamalar bu para birimi üzerinden yapılacaktır. Merak etmeyin, daha sonra değiştirebilirsiniz.',
+        'try' => 'Türk Lirası',
+        'usd' => 'Amerikan Doları',
+        'eur' => 'Euro',
+        'gbp' => 'İngiliz Sterlini'
     ],
 ];

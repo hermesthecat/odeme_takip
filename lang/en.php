@@ -4,8 +4,6 @@ return [
     'site_name' => 'Budget Tracker',
     'site_description' => 'Modern solution for personal finance management',
     'welcome' => 'Welcome',
-    'login' => 'Login',
-    'register' => 'Register',
     'logout' => 'Logout',
     'settings' => 'Settings',
     'save' => 'Save',
@@ -22,11 +20,8 @@ return [
     'username' => 'Username',
     'password' => 'Password',
     'remember_me' => 'Remember Me',
-    'login_title' => 'Login',
-    'register_title' => 'Create a free account',
-    'login.have_account' => 'Already have an account? Login',
-    'currency.base_info' => 'All calculations will be based on this currency. Don\'t worry, you can change it later.',
     'login' => [
+        'title' => 'Login',
         'error_message' => 'Invalid username or password.',
         'no_account' => 'Don\'t have an account? Create one for free',
         'success' => 'Login successful! Redirecting...',
@@ -34,7 +29,8 @@ return [
         'required' => 'Please enter your username and password.',
         'invalid' => 'Invalid username or password.',
         'locked' => 'Your account has been locked. Please try again later.',
-        'inactive' => 'Your account is not active yet. Please check your email.'
+        'inactive' => 'Your account is not active yet. Please check your email.',
+        'have_account' => 'Have an account? Login'
     ],
 
     // Footer
@@ -206,11 +202,21 @@ return [
 
     // Registration
     'register' => [
+        'title' => 'Register',
         'error_message' => 'An error occurred during registration.',
         'success' => 'Registration successful! You can now login.',
         'username_taken' => 'This username is already taken.',
         'password_mismatch' => 'Passwords do not match.',
         'invalid_currency' => 'Invalid currency selection.',
         'required' => 'Please fill in all fields.',
+    ],
+
+    // Currencies
+    'currencies' => [
+        'base_info' => 'All calculations will be based on this currency. Don\'t worry, you can change it later.',
+        'try' => 'Turkish Lira',
+        'usd' => 'US Dollar',
+        'eur' => 'Euro',
+        'gbp' => 'British Pound'
     ],
 ];

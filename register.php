@@ -10,7 +10,7 @@ require_once __DIR__ . '/header.php';
         <div class="logo">
             <i class="bi bi-piggy-bank"></i>
             <h2 class="mt-3"><?php echo t('site_name'); ?></h2>
-            <p class="text-muted"><?php echo t('register_title'); ?></p>
+            <p class="text-muted"><?php echo t('register.title'); ?></p>
         </div>
 
         <div class="card shadow">
@@ -40,11 +40,11 @@ require_once __DIR__ . '/header.php';
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
                             <?php endforeach; ?>
                         </select>
-                        <div class="form-text"><?php echo t('currency.base_info'); ?></div>
+                        <div class="form-text"><?php echo t('currencies.base_info'); ?></div>
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary"><?php echo t('register'); ?></button>
+                        <button type="submit" class="btn btn-primary"><?php echo t('register.title'); ?></button>
                         <a href="login.php" class="btn btn-link"><?php echo t('login.have_account'); ?></a>
                     </div>
                 </form>
