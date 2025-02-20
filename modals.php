@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/config.php';
+
 // Tüm modalları include et
 require_once __DIR__ . '/modals/income_modal.php';
 require_once __DIR__ . '/modals/savings_modal.php';

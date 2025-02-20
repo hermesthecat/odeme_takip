@@ -3,21 +3,21 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Yeni Ödeme Ekle</h5>
+                <h5 class="modal-title"><?php echo t('add_payment'); ?></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form data-type="payment">
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">Ödeme İsmi</label>
+                        <label class="form-label"><?php echo t('payment_name'); ?></label>
                         <input type="text" class="form-control" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tutar</label>
+                        <label class="form-label"><?php echo t('payment_amount'); ?></label>
                         <input type="number" step="0.01" class="form-control" name="amount" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Para Birimi</label>
+                        <label class="form-label"><?php echo t('currency'); ?></label>
                         <select class="form-select" name="currency" required>
                             <?php foreach ($supported_currencies as $code => $name) : ?>
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
@@ -25,30 +25,30 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">İlk Ödeme Tarihi</label>
+                        <label class="form-label"><?php echo t('payment_date'); ?></label>
                         <input type="date" class="form-control" name="first_date" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tekrarlama Sıklığı</label>
+                        <label class="form-label"><?php echo t('payment_frequency'); ?></label>
                         <select class="form-select" name="frequency" id="paymentFrequency" required>
-                            <option value="none">Tekrar Yok</option>
-                            <option value="monthly">Aylık</option>
-                            <option value="bimonthly">2 Ayda Bir</option>
-                            <option value="quarterly">3 Ayda Bir</option>
-                            <option value="fourmonthly">4 Ayda Bir</option>
-                            <option value="fivemonthly">5 Ayda Bir</option>
-                            <option value="sixmonthly">6 Ayda Bir</option>
-                            <option value="yearly">Yıllık</option>
+                            <option value="none"><?php echo t('frequency.none'); ?></option>
+                            <option value="monthly"><?php echo t('frequency.monthly'); ?></option>
+                            <option value="bimonthly"><?php echo t('frequency.bimonthly'); ?></option>
+                            <option value="quarterly"><?php echo t('frequency.quarterly'); ?></option>
+                            <option value="fourmonthly"><?php echo t('frequency.fourmonthly'); ?></option>
+                            <option value="fivemonthly"><?php echo t('frequency.fivemonthly'); ?></option>
+                            <option value="sixmonthly"><?php echo t('frequency.sixmonthly'); ?></option>
+                            <option value="yearly"><?php echo t('frequency.yearly'); ?></option>
                         </select>
                     </div>
                     <div class="mb-3" id="endDateGroup" style="display: none;">
-                        <label class="form-label">Bitiş Tarihi</label>
+                        <label class="form-label"><?php echo t('payment_end_date'); ?></label>
                         <input type="date" class="form-control" name="end_date">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="submit" class="btn btn-danger">Kaydet</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo t('cancel'); ?></button>
+                    <button type="submit" class="btn btn-danger"><?php echo t('save'); ?></button>
                 </div>
             </form>
         </div>
@@ -60,22 +60,22 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Ödeme Güncelle</h5>
+                <h5 class="modal-title"><?php echo t('edit_payment'); ?></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <form id="updatePaymentForm">
                     <input type="hidden" id="update_payment_id" name="id">
                     <div class="mb-3">
-                        <label class="form-label">Ödeme İsmi</label>
+                        <label class="form-label"><?php echo t('payment_name'); ?></label>
                         <input type="text" class="form-control" id="update_payment_name" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tutar</label>
+                        <label class="form-label"><?php echo t('payment_amount'); ?></label>
                         <input type="number" class="form-control" id="update_payment_amount" name="amount" step="0.01" min="0" required>
                     </div>
                     <div class="mb-3">
-                        <label for="update_payment_currency" class="form-label">Para Birimi</label>
+                        <label class="form-label"><?php echo t('currency'); ?></label>
                         <select class="form-select" id="update_payment_currency" name="currency" required>
                             <?php foreach ($supported_currencies as $code => $name) : ?>
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
@@ -86,37 +86,37 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="update_exchange_rate" name="update_exchange_rate">
                             <label class="form-check-label" for="update_exchange_rate">
-                                Güncel kur ile güncelle
+                                <?php echo t('update_rate'); ?>
                             </label>
                         </div>
                         <small id="current_exchange_rate" class="text-muted d-block mt-1"></small>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">İlk Ödeme Tarihi</label>
+                        <label class="form-label"><?php echo t('payment_date'); ?></label>
                         <input type="date" class="form-control" id="update_payment_first_date" name="first_date" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Tekrarlama Sıklığı</label>
+                        <label class="form-label"><?php echo t('payment_frequency'); ?></label>
                         <select class="form-select" id="update_payment_frequency" name="frequency" required>
-                            <option value="none">Tekrar Yok</option>
-                            <option value="monthly">Aylık</option>
-                            <option value="bimonthly">2 Ayda Bir</option>
-                            <option value="quarterly">3 Ayda Bir</option>
-                            <option value="fourmonthly">4 Ayda Bir</option>
-                            <option value="fivemonthly">5 Ayda Bir</option>
-                            <option value="sixmonthly">6 Ayda Bir</option>
-                            <option value="yearly">Yıllık</option>
+                            <option value="none"><?php echo t('frequency.none'); ?></option>
+                            <option value="monthly"><?php echo t('frequency.monthly'); ?></option>
+                            <option value="bimonthly"><?php echo t('frequency.bimonthly'); ?></option>
+                            <option value="quarterly"><?php echo t('frequency.quarterly'); ?></option>
+                            <option value="fourmonthly"><?php echo t('frequency.fourmonthly'); ?></option>
+                            <option value="fivemonthly"><?php echo t('frequency.fivemonthly'); ?></option>
+                            <option value="sixmonthly"><?php echo t('frequency.sixmonthly'); ?></option>
+                            <option value="yearly"><?php echo t('frequency.yearly'); ?></option>
                         </select>
                     </div>
                     <div class="mb-3" id="updatePaymentEndDateGroup" style="display: none;">
-                        <label class="form-label">Bitiş Tarihi</label>
+                        <label class="form-label"><?php echo t('payment_end_date'); ?></label>
                         <input type="date" class="form-control" name="end_date">
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                <button type="button" class="btn btn-primary" onclick="updatePayment()">Güncelle</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><?php echo t('cancel'); ?></button>
+                <button type="button" class="btn btn-primary" onclick="updatePayment()"><?php echo t('update'); ?></button>
             </div>
         </div>
     </div>
