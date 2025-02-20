@@ -3,12 +3,12 @@ require_once 'config.php';
 checkLogin();
 ?>
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="<?php echo $lang->getCurrentLanguage(); ?>">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title><?php echo $site_name; ?> - <?php echo $site_slogan; ?></title>
+    <title><?php echo t('site_name'); ?> - <?php echo t('site_description'); ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
@@ -20,10 +20,10 @@ checkLogin();
     <div class="container mt-4">
         <!-- Başlık ve Kullanıcı Bilgisi -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="mb-0"><?php echo $site_name; ?></h1>
+            <h1 class="mb-0"><?php echo t('site_name'); ?></h1>
             <div class="d-flex align-items-center">
                 <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
-                    <i class="bi bi-gear me-1"></i>Ayarlar
+                    <i class="bi bi-gear me-1"></i><?php echo t('settings.title'); ?>
                 </button>
                 <button class="btn btn-outline-danger logout-btn">
                     <?php echo htmlspecialchars($_SESSION['username']); ?> <i class="bi bi-box-arrow-right ms-1"></i>
@@ -36,24 +36,15 @@ checkLogin();
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="month-selector d-flex align-items-center justify-content-center">
-                        <button class="btn btn-link text-primary me-3 fs-4" onclick="previousMonth()" title="Önceki Ay">
+                        <button class="btn btn-link text-primary me-3 fs-4" onclick="previousMonth()" title="<?php echo t('app.previous_month'); ?>">
                             <i class="bi bi-chevron-left"></i>
                         </button>
 
                         <div class="date-selector bg-light rounded-pill px-4 py-2 shadow-sm d-flex align-items-center">
                             <select id="monthSelect" class="form-select form-select-lg border-0 bg-transparent me-2" style="width: auto;">
-                                <option value="0">Ocak</option>
-                                <option value="1">Şubat</option>
-                                <option value="2">Mart</option>
-                                <option value="3">Nisan</option>
-                                <option value="4">Mayıs</option>
-                                <option value="5">Haziran</option>
-                                <option value="6">Temmuz</option>
-                                <option value="7">Ağustos</option>
-                                <option value="8">Eylül</option>
-                                <option value="9">Ekim</option>
-                                <option value="10">Kasım</option>
-                                <option value="11">Aralık</option>
+                                <?php foreach (t('months') as $num => $month): ?>
+                                    <option value="<?php echo $num - 1; ?>"><?php echo $month; ?></option>
+                                <?php endforeach; ?>
                             </select>
                             <select id="yearSelect" class="form-select form-select-lg border-0 bg-transparent" style="width: auto;">
                                 <?php
@@ -65,7 +56,7 @@ checkLogin();
                             </select>
                         </div>
 
-                        <button class="btn btn-link text-primary ms-3 fs-4" onclick="nextMonth()" title="Sonraki Ay">
+                        <button class="btn btn-link text-primary ms-3 fs-4" onclick="nextMonth()" title="<?php echo t('app.next_month'); ?>">
                             <i class="bi bi-chevron-right"></i>
                         </button>
                     </div>
@@ -80,7 +71,7 @@ checkLogin();
                     <div class="card-body">
                         <h5 class="card-title text-success text-opacity-75">
                             <i class="bi bi-graph-up me-2"></i>
-                            Aylık Gelir
+                            <?php echo t('app.monthly_income'); ?>
                         </h5>
                         <h3 class="card-text" id="monthlyIncome">0.00 TL</h3>
                     </div>
@@ -91,7 +82,7 @@ checkLogin();
                     <div class="card-body">
                         <h5 class="card-title text-danger text-opacity-75">
                             <i class="bi bi-graph-down me-2"></i>
-                            Aylık Gider
+                            <?php echo t('app.monthly_expense'); ?>
                         </h5>
                         <h3 class="card-text" id="monthlyExpense">0.00 TL</h3>
                     </div>
@@ -102,7 +93,7 @@ checkLogin();
                     <div class="card-body">
                         <h5 class="card-title text-info text-opacity-75">
                             <i class="bi bi-wallet2 me-2"></i>
-                            Net Durum
+                            <?php echo t('app.net_balance'); ?>
                         </h5>
                         <h3 class="card-text" id="monthlyBalance">0.00 TL</h3>
                     </div>
@@ -113,7 +104,7 @@ checkLogin();
                     <div class="card-body">
                         <h5 class="card-title text-warning text-opacity-75">
                             <i class="bi bi-calendar3 me-2"></i>
-                            Dönem
+                            <?php echo t('app.period'); ?>
                         </h5>
                         <h3 class="card-text" id="currentPeriod"></h3>
                     </div>
@@ -125,9 +116,9 @@ checkLogin();
         <div class="card mb-4">
             <div class="card-header bg-success bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Gelirler</h2>
+                    <h2 class="mb-0"><?php echo t('incomes'); ?></h2>
                     <button class="btn btn-success" data-action="add" data-type="income">
-                        <i class="bi bi-plus-lg me-1"></i>Ekle
+                        <i class="bi bi-plus-lg me-1"></i><?php echo t('add_income'); ?>
                     </button>
                 </div>
             </div>
@@ -137,12 +128,12 @@ checkLogin();
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>Gelir İsmi</th>
-                                <th>Tutar</th>
-                                <th>Kur</th>
-                                <th>İlk Gelir Tarihi</th>
-                                <th>Tekrarlama Sıklığı</th>
-                                <th>Sonraki Gelir</th>
+                                <th><?php echo t('income_name'); ?></th>
+                                <th><?php echo t('income_amount'); ?></th>
+                                <th><?php echo t('currency'); ?></th>
+                                <th><?php echo t('income_date'); ?></th>
+                                <th><?php echo t('income_frequency'); ?></th>
+                                <th><?php echo t('app.next_income'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -156,9 +147,9 @@ checkLogin();
         <div class="card mb-4">
             <div class="card-header bg-primary bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Birikimler</h2>
+                    <h2 class="mb-0"><?php echo t('savings'); ?></h2>
                     <button class="btn btn-primary" data-action="add" data-type="saving">
-                        <i class="bi bi-plus-lg me-1"></i>Ekle
+                        <i class="bi bi-plus-lg me-1"></i><?php echo t('add_saving'); ?>
                     </button>
                 </div>
             </div>
@@ -167,13 +158,13 @@ checkLogin();
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Birikim İsmi</th>
-                                <th>Hedef Tutar</th>
-                                <th>Biriken Tutar</th>
-                                <th>Kur</th>
-                                <th>Başlangıç Tarihi</th>
-                                <th>Hedef Tarihi</th>
-                                <th>İlerleme</th>
+                                <th><?php echo t('saving_name'); ?></th>
+                                <th><?php echo t('target_amount'); ?></th>
+                                <th><?php echo t('current_amount'); ?></th>
+                                <th><?php echo t('currency'); ?></th>
+                                <th><?php echo t('start_date'); ?></th>
+                                <th><?php echo t('target_date'); ?></th>
+                                <th><?php echo t('saving.progress'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -187,9 +178,9 @@ checkLogin();
         <div class="card mb-4">
             <div class="card-header bg-danger bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Ödemeler</h2>
+                    <h2 class="mb-0"><?php echo t('payments'); ?></h2>
                     <button class="btn btn-danger" data-action="add" data-type="payment">
-                        <i class="bi bi-plus-lg me-1"></i>Ekle
+                        <i class="bi bi-plus-lg me-1"></i><?php echo t('add_payment'); ?>
                     </button>
                 </div>
             </div>
@@ -199,12 +190,12 @@ checkLogin();
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>Ödeme İsmi</th>
-                                <th>Tutar</th>
-                                <th>Kur</th>
-                                <th>İlk Ödeme Tarihi</th>
-                                <th>Tekrarlama Sıklığı</th>
-                                <th>Sonraki Ödeme</th>
+                                <th><?php echo t('payment_name'); ?></th>
+                                <th><?php echo t('payment_amount'); ?></th>
+                                <th><?php echo t('currency'); ?></th>
+                                <th><?php echo t('payment_date'); ?></th>
+                                <th><?php echo t('payment_frequency'); ?></th>
+                                <th><?php echo t('app.next_payment'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -218,7 +209,7 @@ checkLogin();
         <div class="card mb-4">
             <div class="card-header bg-info bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Ödeme Gücü</h2>
+                    <h2 class="mb-0"><?php echo t('app.payment_power'); ?></h2>
                     <small class="text-muted"></small>
                 </div>
             </div>
@@ -227,18 +218,18 @@ checkLogin();
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Ödeme İsmi</th>
-                                <th>Tutar</th>
-                                <th>Kur</th>
-                                <th>Taksit Bilgisi</th>
-                                <th>Toplam</th>
+                                <th><?php echo t('payment_name'); ?></th>
+                                <th><?php echo t('payment_amount'); ?></th>
+                                <th><?php echo t('currency'); ?></th>
+                                <th><?php echo t('app.installment_info'); ?></th>
+                                <th><?php echo t('app.total'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody id="recurringPaymentsList"></tbody>
                         <tfoot>
                             <tr class="table-info">
-                                <td class="text-end fw-bold">Toplam Ödeme:</td>
+                                <td class="text-end fw-bold"><?php echo t('app.total_payment'); ?>:</td>
                                 <td id="totalYearlyPayment" class="fw-bold"></td>
                             </tr>
                         </tfoot>

@@ -5,7 +5,6 @@ return [
     'site_description' => 'Kişisel finans yönetimini kolaylaştıran modern çözüm',
     'welcome' => 'Hoş Geldiniz',
     'logout' => 'Çıkış Yap',
-    'settings' => 'Ayarlar',
     'save' => 'Kaydet',
     'cancel' => 'İptal',
     'delete' => 'Sil',
@@ -285,5 +284,34 @@ return [
         'password_mismatch' => 'Mevcut şifre yanlış',
         'password_same' => 'Yeni şifre eskisiyle aynı olamaz',
         'password_requirements' => 'Şifre en az 6 karakter olmalıdır'
+    ],
+
+    // Uygulama
+    'app' => [
+        'previous_month' => 'Önceki Ay',
+        'next_month' => 'Sonraki Ay',
+        'monthly_income' => 'Aylık Gelir',
+        'monthly_expense' => 'Aylık Gider',
+        'net_balance' => 'Net Durum',
+        'period' => 'Dönem',
+        'next_income' => 'Sonraki Gelir',
+        'next_payment' => 'Sonraki Ödeme',
+        'payment_power' => 'Ödeme Gücü',
+        'installment_info' => 'Taksit Bilgisi',
+        'total' => 'Toplam',
+        'total_payment' => 'Toplam Ödeme',
+        'loading' => 'Yükleniyor...',
+        'no_data' => 'Veri bulunamadı',
+        'confirm_delete' => 'Silmek istediğinize emin misiniz?',
+        'yes_delete' => 'Evet, Sil',
+        'no_cancel' => 'Hayır, İptal',
+        'operation_success' => 'İşlem başarılı',
+        'operation_error' => 'İşlem sırasında bir hata oluştu',
+        'save_success' => 'Başarıyla kaydedildi',
+        'save_error' => 'Kaydedilirken bir hata oluştu',
+        'update_success' => 'Başarıyla güncellendi',
+        'update_error' => 'Güncellenirken bir hata oluştu',
+        'delete_success' => 'Başarıyla silindi',
+        'delete_error' => 'Silinirken bir hata oluştu'
     ],
 ];

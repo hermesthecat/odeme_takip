@@ -5,7 +5,6 @@ return [
     'site_description' => 'Modern solution for personal finance management',
     'welcome' => 'Welcome',
     'logout' => 'Logout',
-    'settings' => 'Settings',
     'save' => 'Save',
     'cancel' => 'Cancel',
     'delete' => 'Delete',
@@ -275,5 +274,34 @@ return [
         'usd' => 'US Dollar',
         'eur' => 'Euro',
         'gbp' => 'British Pound'
+    ],
+
+    // Application
+    'app' => [
+        'previous_month' => 'Previous Month',
+        'next_month' => 'Next Month',
+        'monthly_income' => 'Monthly Income',
+        'monthly_expense' => 'Monthly Expense',
+        'net_balance' => 'Net Balance',
+        'period' => 'Period',
+        'next_income' => 'Next Income',
+        'next_payment' => 'Next Payment',
+        'payment_power' => 'Payment Power',
+        'installment_info' => 'Installment Info',
+        'total' => 'Total',
+        'total_payment' => 'Total Payment',
+        'loading' => 'Loading...',
+        'no_data' => 'No data found',
+        'confirm_delete' => 'Are you sure you want to delete?',
+        'yes_delete' => 'Yes, Delete',
+        'no_cancel' => 'No, Cancel',
+        'operation_success' => 'Operation successful',
+        'operation_error' => 'An error occurred during operation',
+        'save_success' => 'Successfully saved',
+        'save_error' => 'An error occurred while saving',
+        'update_success' => 'Successfully updated',
+        'update_error' => 'An error occurred while updating',
+        'delete_success' => 'Successfully deleted',
+        'delete_error' => 'An error occurred while deleting'
     ],
 ];
