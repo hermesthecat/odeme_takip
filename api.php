@@ -25,9 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'add_income':
             try {
                 if (addIncome()) {
-                    $response = ['status' => 'success', 'message' => 'Gelir başarıyla eklendi'];
+                    $response = ['status' => 'success', 'message' => t('income.add_success')];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'Gelir eklenemedi'];
+                    $response = ['status' => 'error', 'message' => t('income.add_error')];
                 }
             } catch (Exception $e) {
                 if (isset($pdo) && $pdo->inTransaction()) {
@@ -39,11 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'add_saving':
             try {
-
                 if (addSaving()) {
-                    $response = ['status' => 'success', 'message' => 'Birikim başarıyla eklendi'];
+                    $response = ['status' => 'success', 'message' => t('saving.add_success')];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'Birikim eklenemedi'];
+                    $response = ['status' => 'error', 'message' => t('saving.add_error')];
                 }
             } catch (Exception $e) {
                 $response = ['status' => 'error', 'message' => $e->getMessage()];
@@ -52,11 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'add_payment':
             try {
-
                 if (addPayment()) {
-                    $response = ['status' => 'success', 'message' => 'Ödeme başarıyla eklendi'];
+                    $response = ['status' => 'success', 'message' => t('payment.add_success')];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'Ödeme eklenemedi'];
+                    $response = ['status' => 'error', 'message' => t('payment.add_error')];
                 }
             } catch (Exception $e) {
                 if (isset($pdo) && $pdo->inTransaction()) {
@@ -68,25 +66,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'delete_income':
             if (deleteIncome()) {
-                $response = ['status' => 'success', 'message' => 'Gelir başarıyla silindi'];
+                $response = ['status' => 'success', 'message' => t('income.delete_success')];
             } else {
-                $response = ['status' => 'error', 'message' => 'Gelir silinemedi'];
+                $response = ['status' => 'error', 'message' => t('income.delete_error')];
             }
             break;
 
         case 'delete_saving':
             if (deleteSaving()) {
-                $response = ['status' => 'success', 'message' => 'Birikim başarıyla silindi'];
+                $response = ['status' => 'success', 'message' => t('saving.delete_success')];
             } else {
-                $response = ['status' => 'error', 'message' => 'Birikim silinemedi'];
+                $response = ['status' => 'error', 'message' => t('saving.delete_error')];
             }
             break;
 
         case 'delete_payment':
             if (deletePayment()) {
-                $response = ['status' => 'success', 'message' => 'Ödeme başarıyla silindi'];
+                $response = ['status' => 'success', 'message' => t('payment.delete_success')];
             } else {
-                $response = ['status' => 'error', 'message' => 'Ödeme silinemedi'];
+                $response = ['status' => 'error', 'message' => t('payment.delete_error')];
             }
             break;
 
@@ -138,46 +136,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'mark_payment_paid':
             if (markPaymentPaid()) {
-                $response = ['status' => 'success', 'message' => 'Ödeme ödendi'];
+                $response = ['status' => 'success', 'message' => t('payment.mark_paid.success')];
             } else {
-                $response = ['status' => 'error', 'message' => 'Ödeme ödenemedi'];
+                $response = ['status' => 'error', 'message' => t('payment.mark_paid.error')];
             }
             break;
 
         case 'mark_income_received':
             if (markIncomeReceived()) {
-                $response = ['status' => 'success', 'message' => 'Gelir alındı'];
+                $response = ['status' => 'success', 'message' => t('income.mark_received.success')];
             } else {
-                $response = ['status' => 'error', 'message' => 'Gelir alınamadı'];
+                $response = ['status' => 'error', 'message' => t('income.mark_received.error')];
             }
             break;
 
         case 'update_saving':
             if (updateSaving()) {
-                $response = ['status' => 'success', 'message' => 'Birikim güncellendi'];
+                $response = ['status' => 'success', 'message' => t('saving.update_success')];
             } else {
-                $response = ['status' => 'error', 'message' => 'Birikim güncellenemedi'];
+                $response = ['status' => 'error', 'message' => t('saving.update_error')];
             }
             break;
 
         case 'update_full_saving':
             if (updateFullSaving()) {
-                $response = ['status' => 'success', 'message' => 'Birikim güncellendi'];
+                $response = ['status' => 'success', 'message' => t('saving.update_success')];
             } else {
-                $response = ['status' => 'error', 'message' => 'Birikim güncellenemedi'];
+                $response = ['status' => 'error', 'message' => t('saving.update_error')];
             }
             break;
 
         case 'transfer_unpaid_payments':
             try {
                 if (transferUnpaidPayments()) {
-                    $response = ['status' => 'success', 'message' => 'Ödemeler aktarıldı'];
+                    $response = ['status' => 'success', 'message' => t('transfer.success')];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'Ödemeler aktarılırken hata'];
+                    $response = ['status' => 'error', 'message' => t('transfer.error')];
                 }
             } catch (Exception $e) {
                 $pdo->rollBack();
-                $response = ['status' => 'error', 'message' => 'Ödemeler aktarılırken hata: ' . $e->getMessage()];
+                $response = ['status' => 'error', 'message' => t('transfer.error') . ': ' . $e->getMessage()];
             }
             break;
 
@@ -194,16 +192,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $response = [
                     'status' => 'error',
-                    'message' => 'Kullanıcı bilgileri bulunamadı'
+                    'message' => t('user.not_found')
                 ];
             }
             break;
 
         case 'update_user_settings':
             if (updateUserSettings()) {
-                $response = ['status' => 'success', 'message' => 'Kullanıcı ayarları güncellendi'];
+                $response = ['status' => 'success', 'message' => t('settings.save_success')];
             } else {
-                $response = ['status' => 'error', 'message' => 'Kullanıcı ayarları güncellenemedi'];
+                $response = ['status' => 'error', 'message' => t('settings.save_error')];
             }
             break;
 
@@ -215,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$stmt->execute([$_POST['parent_id'], $user_id])) {
                 $response = [
                     'status' => 'error',
-                    'message' => 'Ana kayıt alınamadı'
+                    'message' => t('payment.load_error')
                 ];
                 break;
             }
@@ -238,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $response = [
                     'status' => 'error',
-                    'message' => 'Child ödemeler alınamadı'
+                    'message' => t('payment.load_error')
                 ];
             }
             break;
@@ -257,7 +255,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $response = [
                         'status' => 'error',
-                        'message' => 'Ödeme bulunamadı'
+                        'message' => t('payment.not_found')
                     ];
                 }
             } catch (Exception $e) {
@@ -271,9 +269,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'update_income':
             try {
                 if (updateIncome()) {
-                    $response = ['status' => 'success', 'message' => 'Gelir başarıyla güncellendi'];
+                    $response = ['status' => 'success', 'message' => t('income.edit_success')];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'Gelir güncellenemedi'];
+                    $response = ['status' => 'error', 'message' => t('income.edit_error')];
                 }
             } catch (Exception $e) {
                 if (isset($pdo) && $pdo->inTransaction()) {
@@ -286,9 +284,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'update_payment':
             try {
                 if (updatePayment()) {
-                    $response = ['status' => 'success', 'message' => 'Ödeme başarıyla güncellendi'];
+                    $response = ['status' => 'success', 'message' => t('payment.edit_success')];
                 } else {
-                    $response = ['status' => 'error', 'message' => 'Ödeme güncellenemedi'];
+                    $response = ['status' => 'error', 'message' => t('payment.edit_error')];
                 }
             } catch (Exception $e) {
                 if (isset($pdo) && $pdo->inTransaction()) {

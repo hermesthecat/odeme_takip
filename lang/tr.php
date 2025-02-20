@@ -145,7 +145,10 @@ return [
         'delete_success' => 'Gelir başarıyla silindi',
         'delete_error' => 'Gelir silinirken bir hata oluştu',
         'delete_confirm' => 'Bu geliri silmek istediğinize emin misiniz?',
-        'mark_received' => 'Alındı olarak işaretle',
+        'mark_received' => [
+            'success' => 'Gelir başarıyla alındı olarak işaretlendi',
+            'error' => 'Gelir alındı olarak işaretlenemedi'
+        ],
         'mark_not_received' => 'Alınmadı olarak işaretle',
         'not_found' => 'Henüz bir gelir eklenmemiş',
         'load_error' => 'Gelirler yüklenirken bir hata oluştu',
@@ -195,7 +198,10 @@ return [
         'delete_success' => 'Ödeme başarıyla silindi',
         'delete_error' => 'Ödeme silinirken bir hata oluştu',
         'delete_confirm' => 'Bu ödemeyi silmek istediğinize emin misiniz?',
-        'mark_paid' => 'Ödendi olarak işaretle',
+        'mark_paid' => [
+            'success' => 'Ödeme başarıyla ödendi olarak işaretlendi',
+            'error' => 'Ödeme ödendi olarak işaretlenemedi'
+        ],
         'mark_not_paid' => 'Ödenmedi olarak işaretle',
         'not_found' => 'Henüz bir ödeme eklenmemiş',
         'load_error' => 'Ödemeler yüklenirken bir hata oluştu',
@@ -581,5 +587,11 @@ return [
             'start_date' => 'Başlangıç tarihi',
             'target_date' => 'Hedef tarihi'
         ]
+    ],
+
+    'user' => [
+        'not_found' => 'Kullanıcı bilgileri bulunamadı',
+        'update_success' => 'Kullanıcı bilgileri başarıyla güncellendi',
+        'update_error' => 'Kullanıcı bilgileri güncellenemedi'
     ],
 ];

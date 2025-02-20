@@ -146,7 +146,10 @@ return [
         'delete_success' => 'Income deleted successfully',
         'delete_error' => 'An error occurred while deleting income',
         'delete_confirm' => 'Are you sure you want to delete this income?',
-        'mark_received' => 'Mark as received',
+        'mark_received' => [
+            'success' => 'Income successfully marked as received',
+            'error' => 'Failed to mark income as received'
+        ],
         'mark_not_received' => 'Mark as not received',
         'not_found' => 'No income added yet',
         'load_error' => 'An error occurred while loading incomes',
@@ -196,7 +199,10 @@ return [
         'delete_success' => 'Payment deleted successfully',
         'delete_error' => 'An error occurred while deleting payment',
         'delete_confirm' => 'Are you sure you want to delete this payment?',
-        'mark_paid' => 'Mark as paid',
+        'mark_paid' => [
+            'success' => 'Payment successfully marked as paid',
+            'error' => 'Failed to mark payment as paid'
+        ],
         'mark_not_paid' => 'Mark as not paid',
         'not_found' => 'No payments added yet',
         'load_error' => 'An error occurred while loading payments',
@@ -573,5 +579,11 @@ return [
             'start_date' => 'Start date',
             'target_date' => 'Target date'
         ]
+    ],
+
+    'user' => [
+        'not_found' => 'User information not found',
+        'update_success' => 'User information updated successfully',
+        'update_error' => 'Failed to update user information'
     ],
 ];
