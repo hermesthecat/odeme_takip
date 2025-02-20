@@ -48,7 +48,7 @@ function loadSummary()
     $summary['year'] = $year;
     $summary['month_name'] = t('months.' . $month);
     $summary['status'] = $summary['net_balance'] >= 0 ? t('summary.positive_balance') : t('summary.negative_balance');
-    $summary['percentage'] = $summary['total_income'] > 0 ? 
+    $summary['percentage'] = $summary['total_income'] > 0 ?
         round(($summary['total_expense'] / $summary['total_income']) * 100, 2) : 0;
 
     return $summary;

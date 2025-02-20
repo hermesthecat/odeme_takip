@@ -1,48 +1,55 @@
 <?php
 
-class Language {
+class Language
+{
     private static $instance = null;
     private $translations = [];
     private $currentLang = 'tr';
     private $fallbackLang = 'en';
     private $availableLangs = ['tr', 'en'];
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->loadLanguage();
     }
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance === null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    public function setLanguage($lang) {
+    public function setLanguage($lang)
+    {
         if (in_array($lang, $this->availableLangs)) {
             $this->currentLang = $lang;
             $this->loadLanguage();
-            
+
             // Dil tercihini session'a kaydet
             $_SESSION['lang'] = $lang;
-            
+
             // Dil tercihini cookie'ye kaydet (30 gün)
             setcookie('lang', $lang, time() + (86400 * 30), '/');
-            
+
             return true;
         }
         return false;
     }
 
-    public function getCurrentLanguage() {
+    public function getCurrentLanguage()
+    {
         return $this->currentLang;
     }
 
-    public function getAvailableLanguages() {
+    public function getAvailableLanguages()
+    {
         return $this->availableLangs;
     }
 
-    private function loadLanguage() {
+    private function loadLanguage()
+    {
         // Ana dil dosyasını yükle
         $langFile = __DIR__ . '/../lang/' . $this->currentLang . '.php';
         if (file_exists($langFile)) {
@@ -56,9 +63,10 @@ class Language {
         }
     }
 
-    public function get($key, $params = []) {
+    public function get($key, $params = [])
+    {
         $translation = $this->translations;
-        
+
         // Nokta notasyonunu kullanarak iç içe dizilere eriş
         foreach (explode('.', $key) as $segment) {
             if (isset($translation[$segment])) {
@@ -78,7 +86,8 @@ class Language {
         return $translation;
     }
 
-    public function getLanguageName($code) {
+    public function getLanguageName($code)
+    {
         $languages = [
             'tr' => 'Türkçe',
             'en' => 'English'
@@ -87,7 +96,8 @@ class Language {
     }
 
     // Kısaltma fonksiyonu
-    public static function t($key, $params = []) {
+    public static function t($key, $params = [])
+    {
         return self::getInstance()->get($key, $params);
     }
-} 
+}
