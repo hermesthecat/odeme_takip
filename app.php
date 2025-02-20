@@ -25,9 +25,9 @@ checkLogin();
                 <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
                     <i class="bi bi-gear me-1"></i>Ayarlar
                 </button>
-                <a href="logout.php" class="btn btn-outline-danger">
-                    <?php echo htmlspecialchars($_SESSION['username']); ?> <i class="bi bi-box-arrow-right me-1"></i>
-                </a>
+                <button class="btn btn-outline-danger logout-btn">
+                    <?php echo htmlspecialchars($_SESSION['username']); ?> <i class="bi bi-box-arrow-right ms-1"></i>
+                </button>
             </div>
         </div>
 
@@ -262,6 +262,7 @@ checkLogin();
     <script src="js/summary.js"></script>
     <script src="js/theme.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
 </body>
 
 </html>
