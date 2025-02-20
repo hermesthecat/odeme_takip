@@ -1,52 +1,5 @@
 <?php
 require_once 'config.php';
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST["username"]);
-    $password = trim($_POST["password"]);
-    $remember_me = isset($_POST['remember_me']);
-
-    $sql = "SELECT id, username, password FROM users WHERE username = :username";
-
-    if ($stmt = $pdo->prepare($sql)) {
-        $stmt->bindParam(":username", $username, PDO::PARAM_STR);
-
-        if ($stmt->execute()) {
-            if ($stmt->rowCount() == 1) {
-                if ($row = $stmt->fetch()) {
-                    $id = $row["id"];
-                    $hashed_password = $row["password"];
-                    if (password_verify($password, $hashed_password)) {
-                        session_start();
-                        $_SESSION["user_id"] = $id;
-                        $_SESSION["username"] = $username;
-
-                        // Beni hatırla
-                        if ($remember_me) {
-                            $token = bin2hex(random_bytes(32));
-                            setcookie('remember_token', $token, time() + (86400 * 30), "/"); // 30 gün
-
-                            // Token'ı veritabanına kaydet
-                            $stmt = $pdo->prepare("UPDATE users SET remember_token = ? WHERE id = ?");
-                            $stmt->execute([$token, $id]);
-                        }
-
-                        header("location: app.php");
-                        exit;
-                    } else {
-                        $login_err = "Geçersiz kullanıcı adı veya şifre.";
-                    }
-                }
-            } else {
-                $login_err = "Geçersiz kullanıcı adı veya şifre.";
-            }
-        } else {
-            $login_err = "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.";
-        }
-        unset($stmt);
-    }
-    unset($pdo);
-}
 ?>
 
 <!DOCTYPE html>
@@ -58,6 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Giriş Yap - Bütçe Takip</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="login.css">
 </head>
 
@@ -104,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <div class="card shadow">
             <div class="card-body">
-                <form method="POST" action="">
+                <form id="loginForm">
                     <div class="mb-3">
                         <label class="form-label">Kullanıcı Adı</label>
                         <input type="text" class="form-control" name="username" required>
@@ -162,7 +116,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </footer>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/auth.js"></script>
 </body>
 
 </html>
