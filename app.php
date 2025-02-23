@@ -77,8 +77,10 @@ $user_default_currency = $_SESSION['base_currency'];
                             <i class="bi bi-graph-up me-2"></i>
                             <?php echo t('app.monthly_income'); ?>
                         </h5>
-                        <h3 class="card-text" id="monthlyIncome">0.00 </h3>
-                        <h3 class="card-text"><?php echo $user_default_currency; ?></h3>
+                        <span class="d-flex justify-content-between">
+                            <h3 class="card-text" id="monthlyIncome">0.00 </h3>
+                            <h3 class="card-text"><?php echo $user_default_currency; ?></h3>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -89,8 +91,10 @@ $user_default_currency = $_SESSION['base_currency'];
                             <i class="bi bi-graph-down me-2"></i>
                             <?php echo t('app.monthly_expense'); ?>
                         </h5>
-                        <h3 class="card-text" id="monthlyExpense">0.00 </h3>
-                        <h3 class="card-text"><?php echo $user_default_currency; ?></h3>
+                        <span class="d-flex justify-content-between">
+                            <h3 class="card-text" id="monthlyExpense">0.00 </h3>
+                            <h3 class="card-text"><?php echo $user_default_currency; ?></h3>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -101,8 +105,10 @@ $user_default_currency = $_SESSION['base_currency'];
                             <i class="bi bi-wallet2 me-2"></i>
                             <?php echo t('app.net_balance'); ?>
                         </h5>
-                        <h3 class="card-text" id="monthlyBalance">0.00 </h3>
-                        <h3 class="card-text"><?php echo $user_default_currency; ?></h3>
+                        <span class="d-flex justify-content-between">
+                            <h3 class="card-text" id="monthlyBalance">0.00 </h3>
+                            <h3 class="card-text"><?php echo $user_default_currency; ?></h3>
+                        </span>
                     </div>
                 </div>
             </div>
