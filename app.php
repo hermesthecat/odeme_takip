@@ -387,6 +387,9 @@ $user_default_currency = $_SESSION['base_currency'];
             },
             payment: {
                 no_data: '<?php echo t('payment.not_found'); ?>',
+                date: '<?php echo t('payment.date'); ?>',
+                amount: '<?php echo t('payment.amount'); ?>',
+                currency: '<?php echo t('payment.currency'); ?>',
                 mark_paid: {
                     mark_as_paid: '<?php echo t('payment.mark_paid'); ?>',
                     mark_as_not_paid: '<?php echo t('payment.mark_not_paid'); ?>'
