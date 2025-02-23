@@ -51,7 +51,13 @@ function transferUnpaidPayments()
                 exchange_rate = ?
                 WHERE id = ? AND user_id = ?");
 
-            $new_name = sprintf(t('transfer.payment_transferred_from'), $payment['name'], $current_month_name);
+
+            // Eğer ödeme zaten aktarılmış bir ödeme ise, adını değiştirme
+            if (strpos($payment['name'], t('transfer.payment_transferred_from')) !== false) {
+                $new_name = $payment['name'];
+            } else {
+                $new_name = sprintf(t('transfer.payment_transferred_from'), $payment['name'], $current_month_name);
+            }
 
             if (!$stmt->execute([
                 $new_date,
