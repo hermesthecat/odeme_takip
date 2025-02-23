@@ -12,6 +12,13 @@ function transferUnpaidPayments()
     try {
         $pdo->beginTransaction();
 
+        // Kullanıcının ana para birimini al
+        $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $base_currency = $user['base_currency'];
+
+
         // Mevcut ayın ödenmemiş ödemelerini al
         $stmt = $pdo->prepare("SELECT * FROM payments 
                               WHERE user_id = ? 
@@ -40,8 +47,8 @@ function transferUnpaidPayments()
 
             // Kur bilgisini al
             $exchange_rate = null;
-            if ($payment['currency'] !== 'TRY') {
-                $exchange_rate = getExchangeRate($payment['currency'], 'TRY');
+            if ($payment['currency'] !== $base_currency) {
+                $exchange_rate = getExchangeRate($payment['currency'], $base_currency);
             }
 
             // Mevcut kaydı güncelle
