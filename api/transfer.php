@@ -18,7 +18,6 @@ function transferUnpaidPayments()
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         $base_currency = $user['base_currency'];
 
-
         // Mevcut ayın ödenmemiş ödemelerini al
         $stmt = $pdo->prepare("SELECT * FROM payments 
                               WHERE user_id = ? 
@@ -57,7 +56,6 @@ function transferUnpaidPayments()
                 name = ?,
                 exchange_rate = ?
                 WHERE id = ? AND user_id = ?");
-
 
             // Eğer ödeme zaten aktarılmış bir ödeme ise, adını değiştirme
             if (strpos($payment['name'], t('transfer.payment_transferred_from')) !== false) {
