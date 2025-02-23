@@ -33,7 +33,7 @@ require_once __DIR__ . '/header.php';
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary"><?php echo t('login.title'); ?></button>
-                        <a href="register.php" class="btn btn-link"><?php echo t('login.no_account'); ?></a>
+                        <a href="register.php" class="btn btn-link text-decoration-none"><?php echo t('login.no_account'); ?></a>
                     </div>
                 </form>
             </div>
