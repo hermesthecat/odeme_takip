@@ -146,10 +146,7 @@ return [
         'delete_success' => 'Gelir başarıyla silindi',
         'delete_error' => 'Gelir silinirken bir hata oluştu',
         'delete_confirm' => 'Bu geliri silmek istediğinize emin misiniz?',
-        'mark_received' => [
-            'success' => 'Gelir başarıyla alındı olarak işaretlendi',
-            'error' => 'Gelir alındı olarak işaretlenemedi'
-        ],
+        'mark_received' => 'Alındı olarak işaretle',
         'mark_not_received' => 'Alınmadı olarak işaretle',
         'not_found' => 'Henüz bir gelir eklenmemiş',
         'load_error' => 'Gelirler yüklenirken bir hata oluştu',
@@ -199,10 +196,7 @@ return [
         'delete_success' => 'Ödeme başarıyla silindi',
         'delete_error' => 'Ödeme silinirken bir hata oluştu',
         'delete_confirm' => 'Bu ödemeyi silmek istediğinize emin misiniz?',
-        'mark_paid' => [
-            'success' => 'Ödeme başarıyla ödendi olarak işaretlendi',
-            'error' => 'Ödeme ödendi olarak işaretlenemedi'
-        ],
+        'mark_paid' => 'Ödendi olarak işaretle',
         'mark_not_paid' => 'Ödenmedi olarak işaretle',
         'not_found' => 'Henüz bir ödeme eklenmemiş',
         'load_error' => 'Ödemeler yüklenirken bir hata oluştu',

@@ -272,7 +272,7 @@ function getFrequencyText(frequency) {
 // URL'den tarih parametrelerini al
 function getDateFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
-    const month = parseInt(urlParams.get('month')) || new Date().getMonth() + 1;
+    const month = parseInt(urlParams.get('month')) || new Date().getMonth();
     const year = parseInt(urlParams.get('year')) || new Date().getFullYear();
     return { month, year };
 }

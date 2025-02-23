@@ -53,7 +53,7 @@ $user_default_currency = $_SESSION['base_currency'];
                             <select id="yearSelect" class="form-select form-select-lg border-0 bg-transparent" style="width: auto;">
                                 <?php
                                 $currentYear = date('Y');
-                                for ($year = $currentYear - 1; $year <= $currentYear + 5; $year++) {
+                                for ($year = $currentYear - 5; $year <= $currentYear + 5; $year++) {
                                     echo "<option value=\"$year\">$year</option>";
                                 }
                                 ?>
@@ -134,7 +134,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                 <th></th>
                                 <th><?php echo t('income_name'); ?></th>
                                 <th><?php echo t('income_amount'); ?></th>
-                                <th><?php echo t('currency'); ?></th>
+                                <th><?php echo t('income.currency'); ?></th>
                                 <th><?php echo t('income_date'); ?></th>
                                 <th><?php echo t('income_frequency'); ?></th>
                                 <th><?php echo t('app.next_income'); ?></th>
@@ -165,7 +165,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                 <th><?php echo t('saving_name'); ?></th>
                                 <th><?php echo t('target_amount'); ?></th>
                                 <th><?php echo t('current_amount'); ?></th>
-                                <th><?php echo t('currency'); ?></th>
+                                <th><?php echo t('saving.currency'); ?></th>
                                 <th><?php echo t('start_date'); ?></th>
                                 <th><?php echo t('target_date'); ?></th>
                                 <th><?php echo t('saving.progress'); ?></th>
@@ -196,7 +196,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                 <th></th>
                                 <th><?php echo t('payment_name'); ?></th>
                                 <th><?php echo t('payment_amount'); ?></th>
-                                <th><?php echo t('currency'); ?></th>
+                                <th><?php echo t('payment.currency'); ?></th>
                                 <th><?php echo t('payment_date'); ?></th>
                                 <th><?php echo t('payment_frequency'); ?></th>
                                 <th><?php echo t('app.next_payment'); ?></th>
@@ -224,7 +224,7 @@ $user_default_currency = $_SESSION['base_currency'];
                             <tr>
                                 <th><?php echo t('payment_name'); ?></th>
                                 <th><?php echo t('payment_amount'); ?></th>
-                                <th><?php echo t('currency'); ?></th>
+                                <th><?php echo t('payment.currency'); ?></th>
                                 <th><?php echo t('app.installment_info'); ?></th>
                                 <th><?php echo t('app.total'); ?></th>
                                 <th></th>
@@ -261,13 +261,6 @@ $user_default_currency = $_SESSION['base_currency'];
                     success: '<?php echo t('login.success'); ?>',
                     error: '<?php echo t('login.error'); ?>',
                     invalid: '<?php echo t('login.invalid'); ?>'
-                },
-                register: {
-                    title: '<?php echo t('register.title'); ?>',
-                    loading: '<?php echo t('register.loading'); ?>',
-                    success: '<?php echo t('register.success'); ?>',
-                    error: '<?php echo t('register.error_message'); ?>',
-                    password_mismatch: '<?php echo t('register.password_mismatch'); ?>'
                 },
                 logout: {
                     confirm: '<?php echo t('logout_confirm'); ?>',
