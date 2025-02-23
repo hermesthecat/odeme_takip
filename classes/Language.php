@@ -58,7 +58,7 @@ class Language
             foreach ($files as $file) {
                 $langCode = basename($file, '.php');
                 $this->availableLangs[] = $langCode;
-                
+
                 // Dil dosyasından dil ismini oku
                 $langData = require $file;
                 if (isset($langData['language_name'])) {
@@ -66,7 +66,7 @@ class Language
                 }
             }
         }
-        
+
         // Eğer hiç dil dosyası bulunamazsa varsayılan dilleri ekle
         if (empty($this->availableLangs)) {
             $this->availableLangs = ['tr', 'en'];
