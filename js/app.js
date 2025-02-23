@@ -3,12 +3,15 @@ function loadData() {
     const month = $('#monthSelect').val();
     const year = $('#yearSelect').val();
 
-    // Yükleniyor göstergelerini göster
+    // Yükleme göstergelerini göster
     $('#incomeLoadingSpinner').show();
     $('#savingsLoadingSpinner').show();
     $('#paymentsLoadingSpinner').show();
     $('#recurringPaymentsLoadingSpinner').show();
     $('#summaryLoadingSpinner').show();
+
+    // Tabloları gizle
+    $('.table').hide();
 
     // Ana veriyi yükle
     ajaxRequest({
@@ -61,6 +64,7 @@ function loadIncomeData() {
         if (response.status === 'success') {
             updateIncomeList(response.data.incomes);
             $('#incomeLoadingSpinner').hide();
+            $('#incomeList').closest('.table').show();
         }
     });
 }
@@ -79,6 +83,7 @@ function loadSavingsData() {
         if (response.status === 'success') {
             updateSavingsList(response.data.savings);
             $('#savingsLoadingSpinner').hide();
+            $('#savingList').closest('.table').show();
         }
     });
 }
@@ -97,6 +102,7 @@ function loadPaymentsData() {
         if (response.status === 'success') {
             updatePaymentsList(response.data.payments);
             $('#paymentsLoadingSpinner').hide();
+            $('#paymentList').closest('.table').show();
         }
     });
 }
@@ -115,6 +121,7 @@ function loadRecurringPaymentsData() {
         if (response.status === 'success') {
             updateRecurringPaymentsList(response.data.recurring_payments);
             $('#recurringPaymentsLoadingSpinner').hide();
+            $('#recurringPaymentsList').closest('.table').show();
         }
     });
 }

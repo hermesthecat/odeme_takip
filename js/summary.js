@@ -10,9 +10,9 @@ function updateSummary(data) {
     const balance = totalIncome - totalExpense;
 
     // Özet bilgileri güncelle
-    $('#monthlyIncome').text(totalIncome.toFixed(2) + ' TL');
-    $('#monthlyExpense').text(totalExpense.toFixed(2) + ' TL');
-    $('#monthlyBalance').text(balance.toFixed(2) + ' TL');
+    $('#monthlyIncome').text(totalIncome.toFixed(2));
+    $('#monthlyExpense').text(totalExpense.toFixed(2));
+    $('#monthlyBalance').text(balance.toFixed(2));
     $('#currentPeriod').text($('#monthSelect option:selected').text() + ' ' + $('#yearSelect').val());
 }
 
