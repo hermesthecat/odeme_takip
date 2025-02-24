@@ -23,14 +23,19 @@ class BorsaTakip
      */
     public function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi)
     {
-        $sql = "INSERT INTO portfolio (sembol, adet, alis_fiyati, alis_tarihi) 
-                VALUES (:sembol, :adet, :alis_fiyati, :alis_tarihi)";
+        // Önce anlık fiyatı API'den al
+        $anlik_fiyat = $this->collectApiFiyatCek($sembol);
+        error_log("Yeni hisse eklenirken anlık fiyat alındı - Hisse: $sembol, Fiyat: $anlik_fiyat");
+
+        $sql = "INSERT INTO portfolio (sembol, adet, alis_fiyati, alis_tarihi, anlik_fiyat, son_guncelleme) 
+                VALUES (:sembol, :adet, :alis_fiyati, :alis_tarihi, :anlik_fiyat, CURRENT_TIMESTAMP)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             'sembol' => $sembol,
             'adet' => $adet,
             'alis_fiyati' => $alis_fiyati,
-            'alis_tarihi' => $alis_tarihi
+            'alis_tarihi' => $alis_tarihi,
+            'anlik_fiyat' => $anlik_fiyat
         ]);
     }
 
