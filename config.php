@@ -1,4 +1,10 @@
 <?php
+
+// check session
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 define('DB_SERVER', 'localhost');
 define('DB_USERNAME', 'root');
 define('DB_PASSWORD', 'root');
@@ -19,8 +25,6 @@ spl_autoload_register(function ($class) {
         require_once $file;
     }
 });
-
-session_start();
 
 // Dil yönetimi
 $lang = Language::getInstance();
