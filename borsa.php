@@ -541,7 +541,7 @@ if (isset($_GET['liste'])) {
 
         // Detay satırları (başlangıçta gizli)
         $html_output .= "<tr class='detay-satir' data-sembol='{$hisse['sembol']}' style='display: none; background-color: #f8f9fa;'><td colspan='7'><div class='p-3'>";
-        
+
         // Satış formu
         $html_output .= "<div id='satis-form-{$hisse['sembol']}' class='satis-form mb-3' style='display:none;'>
             <div class='card'>
@@ -654,7 +654,7 @@ if (isset($_GET['liste'])) {
                 $satis_tarihi = date('d.m.Y H:i', strtotime($detay['satis_tarihi']));
                 $satis_kar = ($detay['satis_fiyati'] - $detay['alis_fiyati']) * $detay['satis_adet'];
                 $satis_kar_class = $satis_kar >= 0 ? 'kar' : 'zarar';
-                
+
                 $html_output .= "<tr class='table-light'>
                     <td><small><i>Satış: {$satis_tarihi}</i></small></td>
                     <td><small>{$detay['satis_adet']}</small></td>
@@ -787,7 +787,7 @@ if (isset($_GET['ara'])) {
             if (event) {
                 event.stopPropagation(); // Event propagation'ı durdur
             }
-            
+
             // Önce tüm detay satırlarını göster
             const detayRow = document.querySelector(`.detay-satir[data-sembol="${sembol}"]`);
             if (detayRow) {
@@ -816,7 +816,7 @@ if (isset($_GET['ara'])) {
                     checkbox.addEventListener('change', function() {
                         const adetInput = this.closest('tr').querySelector('.satis-adet');
                         const maxAdet = parseInt(this.dataset.maxAdet);
-                        
+
                         if (this.checked) {
                             adetInput.disabled = false;
                             adetInput.value = maxAdet;
@@ -824,7 +824,7 @@ if (isset($_GET['ara'])) {
                             adetInput.disabled = true;
                             adetInput.value = 0;
                         }
-                        
+
                         karZararHesapla(sembol);
                     });
                 });
@@ -853,7 +853,7 @@ if (isset($_GET['ara'])) {
             const form = document.getElementById(`satis-form-${sembol}`);
             if (form) {
                 form.style.display = 'none';
-                
+
                 // Form içindeki inputları sıfırla
                 form.querySelectorAll('.satis-secim').forEach(checkbox => {
                     checkbox.checked = false;
@@ -861,7 +861,7 @@ if (isset($_GET['ara'])) {
                     adetInput.disabled = true;
                     adetInput.value = 0;
                 });
-                
+
                 karZararHesapla(sembol);
             }
         }
@@ -922,23 +922,23 @@ if (isset($_GET['ara'])) {
             }
 
             // Her bir satış için ayrı istek gönder
-            Promise.all(satislar.map(satis => 
-                fetch(`borsa.php?sat=1&id=${satis.id}&adet=${satis.adet}&fiyat=${satisFiyati}`)
+            Promise.all(satislar.map(satis =>
+                    fetch(`borsa.php?sat=1&id=${satis.id}&adet=${satis.adet}&fiyat=${satisFiyati}`)
                     .then(response => response.text())
-            ))
-            .then(results => {
-                const basarili = results.every(result => result === 'success');
-                if (basarili) {
-                    topluSatisFormunuGizle(sembol);
-                    portfoyGuncelle();
-                } else {
-                    alert('Bazı satış işlemleri başarısız oldu!');
-                }
-            })
-            .catch(error => {
-                console.error('Hata:', error);
-                alert('Satış işlemi sırasında bir hata oluştu!');
-            });
+                ))
+                .then(results => {
+                    const basarili = results.every(result => result === 'success');
+                    if (basarili) {
+                        topluSatisFormunuGizle(sembol);
+                        portfoyGuncelle();
+                    } else {
+                        alert('Bazı satış işlemleri başarısız oldu!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    alert('Satış işlemi sırasında bir hata oluştu!');
+                });
         }
 
         // Hisse sil
@@ -946,7 +946,10 @@ if (isset($_GET['ara'])) {
             if (event) {
                 event.stopPropagation(); // Event propagation'ı durdur
             }
-            
+
+            // ids'yi string'e çevir
+            ids = ids.toString();
+
             const idList = ids.split(',');
             const message = idList.length > 1 ?
                 'Bu hissenin tüm kayıtlarını silmek istediğinizden emin misiniz?' :
