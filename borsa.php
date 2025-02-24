@@ -21,21 +21,22 @@ class BorsaTakip
     /**
      * Yeni hisse senedi ekler
      */
-    public function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi)
+    public function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi = '')
     {
         // Önce anlık fiyatı API'den al
         $anlik_fiyat = $this->collectApiFiyatCek($sembol);
         error_log("Yeni hisse eklenirken anlık fiyat alındı - Hisse: $sembol, Fiyat: $anlik_fiyat");
 
-        $sql = "INSERT INTO portfolio (sembol, adet, alis_fiyati, alis_tarihi, anlik_fiyat, son_guncelleme) 
-                VALUES (:sembol, :adet, :alis_fiyati, :alis_tarihi, :anlik_fiyat, CURRENT_TIMESTAMP)";
+        $sql = "INSERT INTO portfolio (sembol, adet, alis_fiyati, alis_tarihi, anlik_fiyat, son_guncelleme, hisse_adi) 
+                VALUES (:sembol, :adet, :alis_fiyati, :alis_tarihi, :anlik_fiyat, CURRENT_TIMESTAMP, :hisse_adi)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
             'sembol' => $sembol,
             'adet' => $adet,
             'alis_fiyati' => $alis_fiyati,
             'alis_tarihi' => $alis_tarihi,
-            'anlik_fiyat' => $anlik_fiyat
+            'anlik_fiyat' => $anlik_fiyat,
+            'hisse_adi' => $hisse_adi
         ]);
     }
 
@@ -306,13 +307,14 @@ class BorsaTakip
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $borsaTakip = new BorsaTakip();
 
-    if (isset($_POST['sembol'], $_POST['adet'], $_POST['alis_fiyati'])) {
+    if (isset($_POST['sembol'], $_POST['adet'], $_POST['alis_fiyati'], $_POST['hisse_adi'])) {
         $sembol = strtoupper(trim($_POST['sembol']));
         $adet = intval($_POST['adet']);
         $alis_fiyati = floatval($_POST['alis_fiyati']);
+        $hisse_adi = trim($_POST['hisse_adi']);
         $alis_tarihi = date('Y-m-d H:i:s');
 
-        if ($borsaTakip->hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi)) {
+        if ($borsaTakip->hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi)) {
             header('Location: ' . $_SERVER['PHP_SELF']);
             exit;
         }
@@ -356,9 +358,12 @@ if (isset($_GET['liste'])) {
         $son_guncelleme = isset($hisse['son_guncelleme']) ? date('H:i:s', strtotime($hisse['son_guncelleme'])) : '';
         $guncelleme_bilgisi = $son_guncelleme ? " <small class='text-muted'>($son_guncelleme)</small>" : '';
 
+        // Hisse adını ve sembolü birleştir
+        $hisse_baslik = $hisse['hisse_adi'] ? $hisse['hisse_adi'] . " (" . $hisse['sembol'] . ")" : $hisse['sembol'];
+
         // Debug için HTML çıktısı
         $html_output = "<tr>
-                <td class='sembol'>{$hisse['sembol']}</td>
+                <td class='sembol'>{$hisse_baslik}</td>
                 <td class='adet'>{$hisse['adet']}</td>
                 <td class='alis_fiyati'>{$hisse['alis_fiyati']} ₺</td>
                 <td class='anlik_fiyat'>{$anlik_fiyat} ₺{$guncelleme_bilgisi}</td>
@@ -422,6 +427,7 @@ if (isset($_GET['ara'])) {
                         <div class="col-md-3">
                             <button type="submit" class="btn btn-primary">Ekle</button>
                         </div>
+                        <input type="hidden" name="hisse_adi" value="">
                     </div>
                 </form>
             </div>
@@ -434,7 +440,7 @@ if (isset($_GET['ara'])) {
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>Sembol</th>
+                            <th>Hisse</th>
                             <th>Adet</th>
                             <th>Alış Fiyatı</th>
                             <th>Güncel Fiyat</th>
@@ -514,6 +520,7 @@ if (isset($_GET['ara'])) {
                             div.addEventListener('click', function() {
                                 sembolInput.value = hisse.code;
                                 document.getElementsByName('alis_fiyati')[0].value = hisse.price;
+                                document.getElementsByName('hisse_adi')[0].value = hisse.title;
                                 sembolOnerileri.innerHTML = '';
                             });
                         }

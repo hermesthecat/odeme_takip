@@ -20,7 +20,7 @@ class BorsaCron
     }
 
     /**
-     * Portföy tablosuna anlik_fiyat kolonu ekler
+     * Portföy tablosuna gerekli kolonları ekler
      */
     private function tabloyuGuncelle()
     {
@@ -41,6 +41,15 @@ class BorsaCron
                 $sql = "ALTER TABLE portfolio ADD COLUMN son_guncelleme TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
                 $this->db->exec($sql);
                 error_log("Son güncelleme kolonu eklendi");
+            }
+
+            $sql = "SHOW COLUMNS FROM portfolio LIKE 'hisse_adi'";
+            $stmt = $this->db->query($sql);
+
+            if ($stmt->rowCount() == 0) {
+                $sql = "ALTER TABLE portfolio ADD COLUMN hisse_adi VARCHAR(255) DEFAULT ''";
+                $this->db->exec($sql);
+                error_log("Hisse adı kolonu eklendi");
             }
         } catch (PDOException $e) {
             error_log("Tablo güncelleme hatası: " . $e->getMessage());
@@ -145,25 +154,62 @@ class BorsaCron
         $guncellenen = 0;
         $basarisiz = 0;
 
+        // Önce hisse listesini al
+        $curl = curl_init();
+        $url = "https://bigpara.hurriyet.com.tr/api/v1/hisse/list";
+        
+        curl_setopt_array($curl, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTPHEADER => [
+                "content-type: application/json",
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+            ],
+        ]);
+
+        $response = curl_exec($curl);
+        $hisse_listesi = json_decode($response, true);
+        curl_close($curl);
+
+        $hisse_isimleri = [];
+        if (isset($hisse_listesi['data']) && is_array($hisse_listesi['data'])) {
+            foreach ($hisse_listesi['data'] as $hisse) {
+                if (!empty($hisse['kod']) && !empty($hisse['ad'])) {
+                    $hisse_isimleri[$hisse['kod']] = $hisse['ad'];
+                }
+            }
+        }
+
         foreach ($hisseler as $sembol) {
             $fiyat = $this->hisseFiyatiCek($sembol);
+            $hisse_adi = isset($hisse_isimleri[$sembol]) ? $hisse_isimleri[$sembol] : '';
 
             if ($fiyat > 0) {
                 try {
                     // Aynı hissenin tüm kayıtlarını güncelle
                     $sql = "UPDATE portfolio SET 
                             anlik_fiyat = :fiyat,
-                            son_guncelleme = CURRENT_TIMESTAMP
+                            son_guncelleme = CURRENT_TIMESTAMP,
+                            hisse_adi = :hisse_adi
                             WHERE sembol = :sembol";
 
                     $stmt = $this->db->prepare($sql);
                     $stmt->execute([
                         'fiyat' => $fiyat,
-                        'sembol' => $sembol
+                        'sembol' => $sembol,
+                        'hisse_adi' => $hisse_adi
                     ]);
 
                     $guncellenen++;
-                    error_log("Fiyat güncellendi - Hisse: $sembol, Fiyat: $fiyat");
+                    error_log("Fiyat ve isim güncellendi - Hisse: $sembol, Ad: $hisse_adi, Fiyat: $fiyat");
                 } catch (PDOException $e) {
                     error_log("Veritabanı güncelleme hatası - Hisse: $sembol, Hata: " . $e->getMessage());
                     $basarisiz++;
