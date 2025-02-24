@@ -998,20 +998,26 @@ if (isset($_GET['ara'])) {
             let totalKarZarar = 0;
             let totalSatisKar = 0;
 
-            portfoyData.forEach(hisse => {
-                const detaylar = document.querySelector(`.ana-satir[data-sembol="${hisse.sembol}"]`);
-                if (detaylar) {
-                    const karZararElement = detaylar.querySelector('.kar, .zarar');
-                    const satisKarElement = detaylar.querySelector('.kar:last-child, .zarar:last-child');
-
-                    if (karZararElement) {
-                        const karZararText = karZararElement.textContent;
-                        totalKarZarar += parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
+            // Tüm satış detaylarını topla
+            document.querySelectorAll('.table-light').forEach(satisDetay => {
+                const karZararHucresi = satisDetay.querySelector('td.kar, td.zarar');
+                if (karZararHucresi) {
+                    const karZararText = karZararHucresi.textContent.trim();
+                    const karZararDeger = parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
+                    if (!isNaN(karZararDeger)) {
+                        totalSatisKar += karZararDeger;
                     }
+                }
+            });
 
-                    if (satisKarElement) {
-                        const satisKarText = satisKarElement.textContent;
-                        totalSatisKar += parseFloat(satisKarText.replace(/[^0-9.-]+/g, ""));
+            // Aktif hisselerin kar/zararını topla
+            document.querySelectorAll('.ana-satir').forEach(satir => {
+                const karZararHucresi = satir.querySelector('td.kar, td.zarar');
+                if (karZararHucresi && !karZararHucresi.classList.contains('satis-kar')) {
+                    const karZararText = karZararHucresi.textContent.trim();
+                    const karZararDeger = parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
+                    if (!isNaN(karZararDeger)) {
+                        totalKarZarar += karZararDeger;
                     }
                 }
             });
