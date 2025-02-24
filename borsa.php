@@ -370,59 +370,85 @@ class BorsaTakip
     }
 
     /**
-     * Hisse satış kaydı ekler
+     * Hisse satış kaydı ekler (FIFO mantığı ile)
      */
     public function hisseSat($id, $satis_adet, $satis_fiyati)
     {
-        // Önce mevcut kaydı kontrol et
-        $sql = "SELECT * FROM portfolio WHERE id = :id AND (durum = 'aktif' OR durum = 'kismi_satildi')";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        $kayit = $stmt->fetch(PDO::FETCH_ASSOC);
+        try {
+            // İşlemi transaction içinde yap
+            $this->db->beginTransaction();
 
-        if (!$kayit) {
-            error_log("Satış hatası: Kayıt bulunamadı veya satılmış - ID: $id");
+            // Önce satılacak hissenin sembolünü bul
+            $sql = "SELECT sembol FROM portfolio WHERE id = :id";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['id' => $id]);
+            $sembol = $stmt->fetchColumn();
+
+            if (!$sembol) {
+                throw new Exception("Hisse bulunamadı");
+            }
+
+            // Bu sembole ait tüm aktif kayıtları alış tarihine göre sırala (FIFO)
+            $sql = "SELECT * FROM portfolio 
+                    WHERE sembol = :sembol 
+                    AND (durum = 'aktif' OR durum = 'kismi_satildi')
+                    ORDER BY alis_tarihi ASC";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['sembol' => $sembol]);
+            $kayitlar = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $kalan_satis_adet = $satis_adet;
+            
+            foreach ($kayitlar as $kayit) {
+                // Her kayıt için satılabilecek maksimum adedi hesapla
+                $mevcut_satis = $kayit['satis_adet'] ? $kayit['satis_adet'] : 0;
+                $satilabilir_adet = $kayit['adet'] - $mevcut_satis;
+
+                if ($satilabilir_adet <= 0) continue;
+
+                // Bu kayıttan satılacak adedi belirle
+                $bu_satis_adet = min($kalan_satis_adet, $satilabilir_adet);
+                
+                if ($bu_satis_adet <= 0) break;
+
+                // Satış durumunu belirle
+                $yeni_durum = ($bu_satis_adet + $mevcut_satis == $kayit['adet']) ? 'satildi' : 'kismi_satildi';
+
+                // Satış kaydını güncelle
+                $sql = "UPDATE portfolio SET 
+                        satis_fiyati = :satis_fiyati,
+                        satis_tarihi = CURRENT_TIMESTAMP,
+                        satis_adet = IFNULL(satis_adet, 0) + :satis_adet,
+                        durum = :durum
+                        WHERE id = :id";
+
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([
+                    'satis_fiyati' => $satis_fiyati,
+                    'satis_adet' => $bu_satis_adet,
+                    'durum' => $yeni_durum,
+                    'id' => $kayit['id']
+                ]);
+
+                $kalan_satis_adet -= $bu_satis_adet;
+                
+                error_log("Satış kaydı eklendi - ID: {$kayit['id']}, Adet: $bu_satis_adet, Fiyat: $satis_fiyati");
+                
+                if ($kalan_satis_adet <= 0) break;
+            }
+
+            if ($kalan_satis_adet > 0) {
+                throw new Exception("Yeterli satılabilir hisse bulunamadı");
+            }
+
+            $this->db->commit();
+            return true;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            error_log("Satış hatası: " . $e->getMessage());
             return false;
         }
-
-        // Satılan adet kontrolü
-        $mevcut_satis = $kayit['satis_adet'] ? $kayit['satis_adet'] : 0;
-        if ($satis_adet > $kayit['adet'] - $mevcut_satis) {
-            error_log("Satış hatası: Yetersiz adet - ID: $id");
-            return false;
-        }
-
-        // Satış durumunu belirle
-        $yeni_durum = 'aktif';
-        if ($satis_adet == $kayit['adet']) {
-            $yeni_durum = 'satildi';
-        } elseif ($satis_adet > 0) {
-            $yeni_durum = 'kismi_satildi';
-        }
-
-        // Satış kaydını güncelle
-        $sql = "UPDATE portfolio SET 
-                satis_fiyati = :satis_fiyati,
-                satis_tarihi = CURRENT_TIMESTAMP,
-                satis_adet = IFNULL(satis_adet, 0) + :satis_adet,
-                durum = :durum
-                WHERE id = :id";
-
-        $stmt = $this->db->prepare($sql);
-        $sonuc = $stmt->execute([
-            'satis_fiyati' => $satis_fiyati,
-            'satis_adet' => $satis_adet,
-            'durum' => $yeni_durum,
-            'id' => $id
-        ]);
-
-        if ($sonuc) {
-            error_log("Satış kaydı eklendi - ID: $id, Adet: $satis_adet, Fiyat: $satis_fiyati");
-        } else {
-            error_log("Satış kaydı eklenirken hata - ID: $id");
-        }
-
-        return $sonuc;
     }
 
     /**
@@ -571,17 +597,17 @@ if (isset($_GET['liste'])) {
 
             if ($kalan_adet > 0) {
                 $alis_tarihi = date('d.m.Y H:i', strtotime($detay['alis_tarihi']));
-                $html_output .= "<tr data-alis-fiyati='{$detay['alis_fiyati']}'>
+                $html_output .= "<tr data-alis-fiyati='{$detay['alis_fiyati']}' data-alis-tarihi='{$detay['alis_tarihi']}'>
                     <td>
                         <input type='checkbox' class='form-check-input satis-secim' 
-                               data-id='{$detay['id']}' data-max-adet='{$kalan_adet}'>
+                               data-id='{$detay['id']}' data-max-adet='{$kalan_adet}' checked disabled>
                     </td>
                     <td>{$alis_tarihi}</td>
                     <td>{$detay['alis_fiyati']} ₺</td>
                     <td>{$kalan_adet}</td>
                     <td>
                         <input type='number' class='form-control form-control-sm satis-adet' 
-                               min='0' max='{$kalan_adet}' value='0' disabled>
+                               min='0' max='{$kalan_adet}' value='0'>
                     </td>
                 </tr>";
             }
@@ -597,7 +623,14 @@ if (isset($_GET['liste'])) {
                                        step='0.01' value='{$anlik_fiyat}'>
                             </div>
                         </div>
-                        <div class='col-md-8'>
+                        <div class='col-md-4'>
+                            <div class='input-group input-group-sm'>
+                                <span class='input-group-text'>Toplam Satış Adedi</span>
+                                <input type='number' class='form-control' id='toplam-satis-adet-{$hisse['sembol']}' 
+                                       min='0' max='{$hisse['toplam_adet']}' value='0'>
+                            </div>
+                        </div>
+                        <div class='col-md-4'>
                             <small class='text-muted'>Tahmini Kar/Zarar: <span id='kar-zarar-{$hisse['sembol']}'>0.00 ₺</span></small>
                         </div>
                     </div>
@@ -785,10 +818,9 @@ if (isset($_GET['ara'])) {
         // Toplu satış formunu göster
         function topluSatisFormunuGoster(sembol, guncelFiyat, event) {
             if (event) {
-                event.stopPropagation(); // Event propagation'ı durdur
+                event.stopPropagation();
             }
-
-            // Önce tüm detay satırlarını göster
+            
             const detayRow = document.querySelector(`.detay-satir[data-sembol="${sembol}"]`);
             if (detayRow) {
                 detayRow.style.display = 'table-row';
@@ -800,73 +832,54 @@ if (isset($_GET['ara'])) {
                 }
             }
 
-            // Sonra satış formunu göster
             const form = document.getElementById(`satis-form-${sembol}`);
             if (form) {
                 form.style.display = 'block';
                 document.getElementById(`satis-fiyat-${sembol}`).value = guncelFiyat;
-
-                // Checkbox'ları sıfırla ve dinle
-                form.querySelectorAll('.satis-secim').forEach(checkbox => {
-                    checkbox.checked = false;
-                    const adetInput = checkbox.closest('tr').querySelector('.satis-adet');
-                    adetInput.disabled = true;
-                    adetInput.value = 0;
-
-                    checkbox.addEventListener('change', function() {
-                        const adetInput = this.closest('tr').querySelector('.satis-adet');
-                        const maxAdet = parseInt(this.dataset.maxAdet);
-
-                        if (this.checked) {
-                            adetInput.disabled = false;
-                            adetInput.value = maxAdet;
-                        } else {
-                            adetInput.disabled = true;
-                            adetInput.value = 0;
-                        }
-
-                        karZararHesapla(sembol);
+                
+                // Toplam satış adedi inputunu dinle
+                const toplamAdetInput = document.getElementById(`toplam-satis-adet-${sembol}`);
+                if (toplamAdetInput) {
+                    toplamAdetInput.addEventListener('input', function() {
+                        dagitimYap(sembol, this.value);
                     });
-                });
-
-                // Adet inputlarını dinle
-                form.querySelectorAll('.satis-adet').forEach(input => {
-                    input.addEventListener('input', () => karZararHesapla(sembol));
-                });
+                }
 
                 // Fiyat inputunu dinle
                 const fiyatInput = document.getElementById(`satis-fiyat-${sembol}`);
                 if (fiyatInput) {
                     fiyatInput.addEventListener('input', () => karZararHesapla(sembol));
                 }
-
-                // İlk kar/zarar hesaplamasını yap
-                karZararHesapla(sembol);
             }
         }
 
-        // Toplu satış formunu gizle
-        function topluSatisFormunuGizle(sembol, event) {
-            if (event) {
-                event.stopPropagation(); // Event propagation'ı durdur
-            }
+        // FIFO mantığına göre adetleri dağıt
+        function dagitimYap(sembol, toplamAdet) {
             const form = document.getElementById(`satis-form-${sembol}`);
-            if (form) {
-                form.style.display = 'none';
+            if (!form) return;
 
-                // Form içindeki inputları sıfırla
-                form.querySelectorAll('.satis-secim').forEach(checkbox => {
-                    checkbox.checked = false;
-                    const adetInput = checkbox.closest('tr').querySelector('.satis-adet');
-                    adetInput.disabled = true;
+            const satirlar = Array.from(form.querySelectorAll('tr[data-alis-tarihi]'))
+                .sort((a, b) => new Date(a.dataset.alisTarihi) - new Date(b.dataset.alisTarihi));
+
+            let kalanAdet = parseInt(toplamAdet) || 0;
+            
+            satirlar.forEach(satir => {
+                const adetInput = satir.querySelector('.satis-adet');
+                const maxAdet = parseInt(adetInput.max);
+                
+                if (kalanAdet > 0) {
+                    const dagitilacakAdet = Math.min(kalanAdet, maxAdet);
+                    adetInput.value = dagitilacakAdet;
+                    kalanAdet -= dagitilacakAdet;
+                } else {
                     adetInput.value = 0;
-                });
+                }
+            });
 
-                karZararHesapla(sembol);
-            }
+            karZararHesapla(sembol);
         }
 
-        // Kar/zarar hesapla
+        // Kar/zarar hesaplama fonksiyonunu güncelle
         function karZararHesapla(sembol) {
             const form = document.getElementById(`satis-form-${sembol}`);
             const fiyatInput = document.getElementById(`satis-fiyat-${sembol}`);
@@ -875,13 +888,10 @@ if (isset($_GET['ara'])) {
 
             if (form) {
                 form.querySelectorAll('tr[data-alis-fiyati]').forEach(row => {
-                    const checkbox = row.querySelector('.satis-secim');
-                    if (checkbox && checkbox.checked) {
-                        const alisFiyati = parseFloat(row.dataset.alisFiyati);
-                        const adetInput = row.querySelector('.satis-adet');
-                        const adet = adetInput ? (parseFloat(adetInput.value) || 0) : 0;
-                        toplamKar += (satisFiyati - alisFiyati) * adet;
-                    }
+                    const alisFiyati = parseFloat(row.dataset.alisFiyati);
+                    const adetInput = row.querySelector('.satis-adet');
+                    const adet = adetInput ? (parseFloat(adetInput.value) || 0) : 0;
+                    toplamKar += (satisFiyati - alisFiyati) * adet;
                 });
 
                 const karZararSpan = document.getElementById(`kar-zarar-${sembol}`);
@@ -941,10 +951,31 @@ if (isset($_GET['ara'])) {
                 });
         }
 
+        // Toplu satış formunu gizle
+        function topluSatisFormunuGizle(sembol, event) {
+            if (event) {
+                event.stopPropagation();
+            }
+            const form = document.getElementById(`satis-form-${sembol}`);
+            if (form) {
+                form.style.display = 'none';
+
+                // Form içindeki inputları sıfırla
+                form.querySelectorAll('.satis-secim').forEach(checkbox => {
+                    checkbox.checked = false;
+                    const adetInput = checkbox.closest('tr').querySelector('.satis-adet');
+                    adetInput.disabled = true;
+                    adetInput.value = 0;
+                });
+
+                karZararHesapla(sembol);
+            }
+        }
+
         // Hisse sil
         function hisseSil(ids, event) {
             if (event) {
-                event.stopPropagation(); // Event propagation'ı durdur
+                event.stopPropagation();
             }
 
             // ids'yi string'e çevir
