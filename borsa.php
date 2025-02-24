@@ -521,12 +521,82 @@ if (isset($_GET['liste'])) {
                 <td class='anlik_fiyat'>{$anlik_fiyat} ₺{$guncelleme_bilgisi}</td>
                 <td class='{$kar_zarar_class}'>" . number_format($toplam_kar_zarar, 2) . " ₺</td>
                 <td>
-                    <button class='btn btn-danger btn-sm' onclick='event.stopPropagation(); hisseSil(\"{$hisse['kayit_idler']}\")'>Tümünü Sil</button>
+                    <button class='btn btn-success btn-sm' onclick='topluSatisFormunuGoster(\"{$hisse['sembol']}\", {$anlik_fiyat}, event)'>Sat</button>
+                    <button class='btn btn-danger btn-sm ms-1' onclick='hisseSil(\"{$hisse['kayit_idler']}\")'>Tümünü Sil</button>
                 </td>
             </tr>";
 
         // Detay satırları (başlangıçta gizli)
         $html_output .= "<tr class='detay-satir' data-sembol='{$hisse['sembol']}' style='display: none; background-color: #f8f9fa;'><td colspan='6'><div class='p-3'>";
+        
+        // Satış formu
+        $html_output .= "<div id='satis-form-{$hisse['sembol']}' class='satis-form mb-3' style='display:none;'>
+            <div class='card'>
+                <div class='card-header'>
+                    <h6 class='mb-0'>Satış Detayları</h6>
+                </div>
+                <div class='card-body'>
+                    <div class='table-responsive'>
+                        <table class='table table-sm'>
+                            <thead>
+                                <tr>
+                                    <th>Seç</th>
+                                    <th>Alış Tarihi</th>
+                                    <th>Alış Fiyatı</th>
+                                    <th>Kalan Adet</th>
+                                    <th>Satılacak Adet</th>
+                                </tr>
+                            </thead>
+                            <tbody>";
+
+        // Aktif alım kayıtlarını listele
+        foreach ($portfoy['detaylar'][$hisse['sembol']] as $detay) {
+            $kalan_adet = $detay['adet'];
+            if (isset($detay['satis_adet'])) {
+                $kalan_adet -= $detay['satis_adet'];
+            }
+
+            if ($kalan_adet > 0) {
+                $alis_tarihi = date('d.m.Y H:i', strtotime($detay['alis_tarihi']));
+                $html_output .= "<tr data-alis-fiyati='{$detay['alis_fiyati']}'>
+                    <td>
+                        <input type='checkbox' class='form-check-input satis-secim' 
+                               data-id='{$detay['id']}' data-max-adet='{$kalan_adet}'>
+                    </td>
+                    <td>{$alis_tarihi}</td>
+                    <td>{$detay['alis_fiyati']} ₺</td>
+                    <td>{$kalan_adet}</td>
+                    <td>
+                        <input type='number' class='form-control form-control-sm satis-adet' 
+                               min='0' max='{$kalan_adet}' value='0' disabled>
+                    </td>
+                </tr>";
+            }
+        }
+
+        $html_output .= "</tbody></table>
+                    </div>
+                    <div class='row mt-3'>
+                        <div class='col-md-4'>
+                            <div class='input-group input-group-sm'>
+                                <span class='input-group-text'>Satış Fiyatı</span>
+                                <input type='number' class='form-control' id='satis-fiyat-{$hisse['sembol']}' 
+                                       step='0.01' value='{$anlik_fiyat}'>
+                            </div>
+                        </div>
+                        <div class='col-md-8'>
+                            <small class='text-muted'>Tahmini Kar/Zarar: <span id='kar-zarar-{$hisse['sembol']}'>0.00 ₺</span></small>
+                        </div>
+                    </div>
+                    <div class='mt-3'>
+                        <button class='btn btn-primary btn-sm' onclick='topluSatisKaydet(\"{$hisse['sembol']}\")'>Satışı Onayla</button>
+                        <button class='btn btn-secondary btn-sm' onclick='topluSatisFormunuGizle(\"{$hisse['sembol']}\", event)'>İptal</button>
+                    </div>
+                </div>
+            </div>
+        </div>";
+
+        // Alım detayları tablosu
         $html_output .= "<table class='table table-sm mb-0'><thead><tr>
                 <th>Alış Tarihi</th>
                 <th>Adet</th>
@@ -561,27 +631,10 @@ if (isset($_GET['liste'])) {
                 <td>{$anlik_fiyat} ₺</td>
                 <td class='{$detay_kar_zarar_class}'>" . number_format($detay_kar_zarar, 2) . " ₺</td>
                 <td>{$satis_durumu}</td>
-                <td>";
-
-            // Satış butonu ve formu (sadece aktif veya kısmi satılmış kayıtlar için)
-            if ($detay['durum'] != 'satildi' && $kalan_adet > 0) {
-                $html_output .= "
-                    <button class='btn btn-success btn-sm' onclick='satisFormunuGoster({$detay['id']}, {$kalan_adet}, {$anlik_fiyat})'>Sat</button>
-                    <button class='btn btn-danger btn-sm ms-1' onclick='hisseSil({$detay['id']})'>Sil</button>
-                    
-                    <div id='satis-form-{$detay['id']}' class='satis-form mt-2' style='display:none;'>
-                        <div class='input-group input-group-sm'>
-                            <input type='number' class='form-control' id='satis-adet-{$detay['id']}' 
-                                   placeholder='Adet' min='1' max='{$kalan_adet}' value='{$kalan_adet}'>
-                            <input type='number' class='form-control' id='satis-fiyat-{$detay['id']}' 
-                                   placeholder='Fiyat' step='0.01' value='{$anlik_fiyat}'>
-                            <button class='btn btn-primary' onclick='hisseSatisKaydet({$detay['id']})'>Kaydet</button>
-                            <button class='btn btn-secondary' onclick='satisFormunuGizle({$detay['id']})'>İptal</button>
-                        </div>
-                    </div>";
-            }
-
-            $html_output .= "</td></tr>";
+                <td>
+                    <button class='btn btn-danger btn-sm' onclick='hisseSil({$detay['id']})'>Sil</button>
+                </td>
+            </tr>";
 
             // Satış detayları (eğer satış yapılmışsa)
             if ($detay['durum'] != 'aktif' && isset($detay['satis_fiyati'])) {
@@ -715,48 +768,163 @@ if (isset($_GET['ara'])) {
                 .catch(error => console.error('Hata:', error));
         }
 
-        // Satış formunu göster
-        function satisFormunuGoster(id, maxAdet, guncelFiyat) {
-            const form = document.getElementById(`satis-form-${id}`);
+        // Toplu satış formunu göster
+        function topluSatisFormunuGoster(sembol, guncelFiyat, event) {
+            if (event) {
+                event.stopPropagation(); // Event propagation'ı durdur
+            }
+            
+            // Önce tüm detay satırlarını göster
+            const detayRow = document.querySelector(`.detay-satir[data-sembol="${sembol}"]`);
+            if (detayRow) {
+                detayRow.style.display = 'table-row';
+                const anaSatir = document.querySelector(`.ana-satir[data-sembol="${sembol}"]`);
+                if (anaSatir) {
+                    const icon = anaSatir.querySelector('.fas');
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-down');
+                }
+            }
+
+            // Sonra satış formunu göster
+            const form = document.getElementById(`satis-form-${sembol}`);
             if (form) {
                 form.style.display = 'block';
-                document.getElementById(`satis-adet-${id}`).value = maxAdet;
-                document.getElementById(`satis-fiyat-${id}`).value = guncelFiyat;
+                document.getElementById(`satis-fiyat-${sembol}`).value = guncelFiyat;
+
+                // Checkbox'ları sıfırla ve dinle
+                form.querySelectorAll('.satis-secim').forEach(checkbox => {
+                    checkbox.checked = false;
+                    const adetInput = checkbox.closest('tr').querySelector('.satis-adet');
+                    adetInput.disabled = true;
+                    adetInput.value = 0;
+
+                    checkbox.addEventListener('change', function() {
+                        const adetInput = this.closest('tr').querySelector('.satis-adet');
+                        const maxAdet = parseInt(this.dataset.maxAdet);
+                        
+                        if (this.checked) {
+                            adetInput.disabled = false;
+                            adetInput.value = maxAdet;
+                        } else {
+                            adetInput.disabled = true;
+                            adetInput.value = 0;
+                        }
+                        
+                        karZararHesapla(sembol);
+                    });
+                });
+
+                // Adet inputlarını dinle
+                form.querySelectorAll('.satis-adet').forEach(input => {
+                    input.addEventListener('input', () => karZararHesapla(sembol));
+                });
+
+                // Fiyat inputunu dinle
+                const fiyatInput = document.getElementById(`satis-fiyat-${sembol}`);
+                if (fiyatInput) {
+                    fiyatInput.addEventListener('input', () => karZararHesapla(sembol));
+                }
+
+                // İlk kar/zarar hesaplamasını yap
+                karZararHesapla(sembol);
             }
         }
 
-        // Satış formunu gizle
-        function satisFormunuGizle(id) {
-            const form = document.getElementById(`satis-form-${id}`);
+        // Toplu satış formunu gizle
+        function topluSatisFormunuGizle(sembol, event) {
+            if (event) {
+                event.stopPropagation(); // Event propagation'ı durdur
+            }
+            const form = document.getElementById(`satis-form-${sembol}`);
             if (form) {
                 form.style.display = 'none';
+                
+                // Form içindeki inputları sıfırla
+                form.querySelectorAll('.satis-secim').forEach(checkbox => {
+                    checkbox.checked = false;
+                    const adetInput = checkbox.closest('tr').querySelector('.satis-adet');
+                    adetInput.disabled = true;
+                    adetInput.value = 0;
+                });
+                
+                karZararHesapla(sembol);
+            }
+        }
+
+        // Kar/zarar hesapla
+        function karZararHesapla(sembol) {
+            const form = document.getElementById(`satis-form-${sembol}`);
+            const fiyatInput = document.getElementById(`satis-fiyat-${sembol}`);
+            const satisFiyati = fiyatInput ? (parseFloat(fiyatInput.value) || 0) : 0;
+            let toplamKar = 0;
+
+            if (form) {
+                form.querySelectorAll('tr[data-alis-fiyati]').forEach(row => {
+                    const checkbox = row.querySelector('.satis-secim');
+                    if (checkbox && checkbox.checked) {
+                        const alisFiyati = parseFloat(row.dataset.alisFiyati);
+                        const adetInput = row.querySelector('.satis-adet');
+                        const adet = adetInput ? (parseFloat(adetInput.value) || 0) : 0;
+                        toplamKar += (satisFiyati - alisFiyati) * adet;
+                    }
+                });
+
+                const karZararSpan = document.getElementById(`kar-zarar-${sembol}`);
+                if (karZararSpan) {
+                    karZararSpan.textContent = toplamKar.toFixed(2) + ' ₺';
+                    karZararSpan.className = toplamKar >= 0 ? 'text-success' : 'text-danger';
+                }
             }
         }
 
         // Satış kaydını kaydet
-        function hisseSatisKaydet(id) {
-            const adet = document.getElementById(`satis-adet-${id}`).value;
-            const fiyat = document.getElementById(`satis-fiyat-${id}`).value;
+        function topluSatisKaydet(sembol) {
+            const form = document.getElementById(`satis-form-${sembol}`);
+            const satisFiyati = document.getElementById(`satis-fiyat-${sembol}`).value;
+            const satislar = [];
 
-            if (!adet || !fiyat) {
-                alert('Lütfen adet ve fiyat bilgilerini giriniz!');
+            form.querySelectorAll('.satis-secim:checked').forEach(checkbox => {
+                const adetInput = checkbox.closest('tr').querySelector('.satis-adet');
+                const adet = parseInt(adetInput.value);
+                const maxAdet = parseInt(checkbox.dataset.maxAdet);
+
+                if (adet > 0 && adet <= maxAdet) {
+                    satislar.push({
+                        id: checkbox.dataset.id,
+                        adet: adet
+                    });
+                }
+            });
+
+            if (satislar.length === 0) {
+                alert('Lütfen satılacak hisseleri seçin!');
                 return;
             }
 
-            fetch(`borsa.php?sat=1&id=${id}&adet=${adet}&fiyat=${fiyat}`)
-                .then(response => response.text())
-                .then(data => {
-                    if (data === 'success') {
-                        satisFormunuGizle(id);
-                        portfoyGuncelle();
-                    } else {
-                        alert('Satış kaydı eklenirken bir hata oluştu!');
-                    }
-                })
-                .catch(error => {
-                    console.error('Hata:', error);
-                    alert('Satış kaydı eklenirken bir hata oluştu!');
-                });
+            if (!satisFiyati || satisFiyati <= 0) {
+                alert('Lütfen geçerli bir satış fiyatı girin!');
+                return;
+            }
+
+            // Her bir satış için ayrı istek gönder
+            Promise.all(satislar.map(satis => 
+                fetch(`borsa.php?sat=1&id=${satis.id}&adet=${satis.adet}&fiyat=${satisFiyati}`)
+                    .then(response => response.text())
+            ))
+            .then(results => {
+                const basarili = results.every(result => result === 'success');
+                if (basarili) {
+                    topluSatisFormunuGizle(sembol);
+                    portfoyGuncelle();
+                } else {
+                    alert('Bazı satış işlemleri başarısız oldu!');
+                }
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                alert('Satış işlemi sırasında bir hata oluştu!');
+            });
         }
 
         // Hisse sil
