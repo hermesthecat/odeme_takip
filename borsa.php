@@ -1021,13 +1021,15 @@ if (isset($_GET['ara'])) {
         const sembolInput = document.getElementById('sembolInput');
         const sembolOnerileri = document.getElementById('sembolOnerileri');
 
+        // Input event listener'ı güncellendi
         sembolInput.addEventListener('input', function() {
             clearTimeout(typingTimer);
+            sembolOnerileri.innerHTML = '';
+
             const searchTerm = this.value.trim();
 
-            // Arama terimini temizle veya çok kısaysa önerileri gizle
+            // 3 karakterden az ise hiçbir şey yapma
             if (searchTerm.length < minSearchLength) {
-                sembolOnerileri.innerHTML = '';
                 lastSearchTerm = '';
                 return;
             }
@@ -1039,16 +1041,19 @@ if (isset($_GET['ara'])) {
 
             // Yeterli süre bekledikten sonra aramayı yap
             typingTimer = setTimeout(() => {
-                lastSearchTerm = searchTerm;
-                hisseAra();
+                if (searchTerm.length >= minSearchLength) {
+                    lastSearchTerm = searchTerm;
+                    hisseAra();
+                }
             }, doneTypingInterval);
         });
 
         function hisseAra() {
             const aranan = sembolInput.value.trim();
-            
-            // Minimum karakter kontrolü
-            if (aranan.length < minSearchLength) {
+
+            // Minimum karakter kontrolünü tekrar yap
+            if (!aranan || aranan.length < minSearchLength) {
+                sembolOnerileri.innerHTML = '';
                 return;
             }
 
@@ -1058,6 +1063,12 @@ if (isset($_GET['ara'])) {
             fetch('borsa.php?ara=' + encodeURIComponent(aranan))
                 .then(response => response.json())
                 .then(data => {
+                    // Arama sırasında input temizlendiyse sonuçları gösterme
+                    if (sembolInput.value.trim().length < minSearchLength) {
+                        sembolOnerileri.innerHTML = '';
+                        return;
+                    }
+
                     sembolOnerileri.innerHTML = '';
                     if (!Array.isArray(data) || data.length === 0) {
                         const div = document.createElement('div');
@@ -1077,7 +1088,7 @@ if (isset($_GET['ara'])) {
                                 document.getElementsByName('alis_fiyati')[0].value = hisse.price;
                                 document.getElementsByName('hisse_adi')[0].value = hisse.title;
                                 sembolOnerileri.innerHTML = '';
-                                lastSearchTerm = hisse.code; // Seçilen değeri son arama terimi olarak kaydet
+                                lastSearchTerm = hisse.code;
                             });
                         }
                         sembolOnerileri.appendChild(div);
