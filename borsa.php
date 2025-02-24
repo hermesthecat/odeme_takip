@@ -786,6 +786,34 @@ if (isset($_GET['ara'])) {
             </div>
         </div>
 
+        <!-- Mali Durum Grafiği -->
+        <div class="card mb-4">
+            <div class="card-header">Mali Durum Özeti</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <canvas id="maliDurumGrafik"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="list-group">
+                            <div class="list-group-item">
+                                <h6 class="mb-1">Toplam Portföy Değeri</h6>
+                                <h4 id="toplamPortfoyDeger">0.00 ₺</h4>
+                            </div>
+                            <div class="list-group-item">
+                                <h6 class="mb-1">Toplam Kar/Zarar</h6>
+                                <h4 id="toplamKarZarar">0.00 ₺</h4>
+                            </div>
+                            <div class="list-group-item">
+                                <h6 class="mb-1">Gerçekleşen Kar/Zarar</h6>
+                                <h4 id="toplamSatisKar">0.00 ₺</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Portföy Listesi -->
         <div class="card">
             <div class="card-header">Portföyüm</div>
@@ -810,13 +838,122 @@ if (isset($_GET['ara'])) {
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Portföy listesini güncelle
+        // Mevcut JavaScript kodları buraya gelecek
+        
+        // Mali durum grafiği için yeni fonksiyonlar
+        let maliDurumChart = null;
+
+        function maliDurumGrafigiGuncelle(portfoyData) {
+            const ctx = document.getElementById('maliDurumGrafik').getContext('2d');
+            
+            // Eğer grafik zaten varsa yok et
+            if (maliDurumChart) {
+                maliDurumChart.destroy();
+            }
+
+            let toplamDeger = 0;
+            let toplamKarZarar = 0;
+            let toplamSatisKar = 0;
+            const hisseler = [];
+            const degerler = [];
+            const renkler = [];
+
+            // Verileri hazırla
+            portfoyData.forEach(hisse => {
+                const guncelDeger = parseFloat(hisse.anlik_fiyat) * parseInt(hisse.toplam_adet);
+                toplamDeger += guncelDeger;
+                
+                if (guncelDeger > 0) {
+                    hisseler.push(hisse.sembol);
+                    degerler.push(guncelDeger);
+                    // Rastgele renk üret
+                    renkler.push('#' + Math.floor(Math.random()*16777215).toString(16));
+                }
+            });
+
+            // Grafiği oluştur
+            maliDurumChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: hisseler,
+                    datasets: [{
+                        data: degerler,
+                        backgroundColor: renkler,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Portföy Dağılımı'
+                        }
+                    }
+                }
+            });
+
+            // Özet bilgileri güncelle
+            document.getElementById('toplamPortfoyDeger').textContent = 
+                new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(toplamDeger);
+            
+            // Kar/zarar ve satış karı bilgilerini güncelle
+            let totalKarZarar = 0;
+            let totalSatisKar = 0;
+            
+            portfoyData.forEach(hisse => {
+                const detaylar = document.querySelector(`.ana-satir[data-sembol="${hisse.sembol}"]`);
+                if (detaylar) {
+                    const karZararElement = detaylar.querySelector('.kar, .zarar');
+                    const satisKarElement = detaylar.querySelector('.kar:last-child, .zarar:last-child');
+                    
+                    if (karZararElement) {
+                        const karZararText = karZararElement.textContent;
+                        totalKarZarar += parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
+                    }
+                    
+                    if (satisKarElement) {
+                        const satisKarText = satisKarElement.textContent;
+                        totalSatisKar += parseFloat(satisKarText.replace(/[^0-9.-]+/g, ""));
+                    }
+                }
+            });
+
+            document.getElementById('toplamKarZarar').textContent = 
+                new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalKarZarar);
+            document.getElementById('toplamSatisKar').textContent = 
+                new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalSatisKar);
+
+            // Renk sınıflarını güncelle
+            document.getElementById('toplamKarZarar').className = totalKarZarar >= 0 ? 'text-success' : 'text-danger';
+            document.getElementById('toplamSatisKar').className = totalSatisKar >= 0 ? 'text-success' : 'text-danger';
+        }
+
+        // Portföy güncelleme fonksiyonunu güncelle
         function portfoyGuncelle() {
             fetch('borsa.php?liste=1')
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('portfoyListesi').innerHTML = data;
+                    
+                    // Portföy verilerini topla
+                    const portfoyData = [];
+                    document.querySelectorAll('.ana-satir').forEach(row => {
+                        portfoyData.push({
+                            sembol: row.dataset.sembol,
+                            toplam_adet: parseInt(row.querySelector('.adet').textContent),
+                            anlik_fiyat: parseFloat(row.querySelector('.anlik_fiyat').textContent)
+                        });
+                    });
+
+                    // Mali durum grafiğini güncelle
+                    maliDurumGrafigiGuncelle(portfoyData);
+
                     // Tıklama olaylarını ekle
                     document.querySelectorAll('.ana-satir').forEach(row => {
                         row.addEventListener('click', function() {
