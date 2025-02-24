@@ -368,6 +368,76 @@ class BorsaTakip
 
         return $sonuclar;
     }
+
+    /**
+     * Hisse satış kaydı ekler
+     */
+    public function hisseSat($id, $satis_adet, $satis_fiyati)
+    {
+        // Önce mevcut kaydı kontrol et
+        $sql = "SELECT * FROM portfolio WHERE id = :id AND (durum = 'aktif' OR durum = 'kismi_satildi')";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['id' => $id]);
+        $kayit = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$kayit) {
+            error_log("Satış hatası: Kayıt bulunamadı veya satılmış - ID: $id");
+            return false;
+        }
+
+        // Satılan adet kontrolü
+        $mevcut_satis = $kayit['satis_adet'] ? $kayit['satis_adet'] : 0;
+        if ($satis_adet > $kayit['adet'] - $mevcut_satis) {
+            error_log("Satış hatası: Yetersiz adet - ID: $id");
+            return false;
+        }
+
+        // Satış durumunu belirle
+        $yeni_durum = 'aktif';
+        if ($satis_adet == $kayit['adet']) {
+            $yeni_durum = 'satildi';
+        } elseif ($satis_adet > 0) {
+            $yeni_durum = 'kismi_satildi';
+        }
+
+        // Satış kaydını güncelle
+        $sql = "UPDATE portfolio SET 
+                satis_fiyati = :satis_fiyati,
+                satis_tarihi = CURRENT_TIMESTAMP,
+                satis_adet = IFNULL(satis_adet, 0) + :satis_adet,
+                durum = :durum
+                WHERE id = :id";
+
+        $stmt = $this->db->prepare($sql);
+        $sonuc = $stmt->execute([
+            'satis_fiyati' => $satis_fiyati,
+            'satis_adet' => $satis_adet,
+            'durum' => $yeni_durum,
+            'id' => $id
+        ]);
+
+        if ($sonuc) {
+            error_log("Satış kaydı eklendi - ID: $id, Adet: $satis_adet, Fiyat: $satis_fiyati");
+        } else {
+            error_log("Satış kaydı eklenirken hata - ID: $id");
+        }
+
+        return $sonuc;
+    }
+
+    /**
+     * Satış karını hesaplar
+     */
+    public function satisKariHesapla($kayit)
+    {
+        if ($kayit['durum'] == 'aktif' || !$kayit['satis_fiyati']) {
+            return null;
+        }
+
+        $satis_adet = $kayit['satis_adet'] ?? 0;
+        $kar = ($kayit['satis_fiyati'] - $kayit['alis_fiyati']) * $satis_adet;
+        return $kar;
+    }
 }
 
 // POST işlemlerini kontrol et
@@ -392,6 +462,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['sil']) && is_numeric($_GET['sil'])) {
     $borsaTakip = new BorsaTakip();
     if ($borsaTakip->hisseSil($_GET['sil'])) {
+        echo 'success';
+    } else {
+        echo 'error';
+    }
+    exit;
+}
+
+// AJAX satış işlemi için
+if (isset($_GET['sat'], $_GET['id'], $_GET['adet'], $_GET['fiyat'])) {
+    $borsaTakip = new BorsaTakip();
+    if ($borsaTakip->hisseSat($_GET['id'], $_GET['adet'], $_GET['fiyat'])) {
         echo 'success';
     } else {
         echo 'error';
@@ -452,6 +533,7 @@ if (isset($_GET['liste'])) {
                 <th>Alış Fiyatı</th>
                 <th>Güncel Fiyat</th>
                 <th>Kar/Zarar</th>
+                <th>Satış Durumu</th>
                 <th>İşlem</th>
             </tr></thead><tbody>";
 
@@ -460,16 +542,62 @@ if (isset($_GET['liste'])) {
             $detay_kar_zarar_class = $detay_kar_zarar >= 0 ? 'kar' : 'zarar';
             $alis_tarihi = date('d.m.Y H:i', strtotime($detay['alis_tarihi']));
 
+            // Satış durumu ve kalan adet hesapla
+            $satis_durumu = '';
+            $kalan_adet = $detay['adet'];
+            if ($detay['durum'] == 'satildi') {
+                $satis_durumu = '<span class="badge bg-success">Satıldı</span>';
+                $kalan_adet = 0;
+            } elseif ($detay['durum'] == 'kismi_satildi') {
+                $satilan_adet = $detay['satis_adet'] ?? 0;
+                $kalan_adet = $detay['adet'] - $satilan_adet;
+                $satis_durumu = "<span class='badge bg-warning'>{$satilan_adet} Adet Satıldı</span>";
+            }
+
             $html_output .= "<tr>
                 <td>{$alis_tarihi}</td>
                 <td>{$detay['adet']}</td>
                 <td>{$detay['alis_fiyati']} ₺</td>
                 <td>{$anlik_fiyat} ₺</td>
                 <td class='{$detay_kar_zarar_class}'>" . number_format($detay_kar_zarar, 2) . " ₺</td>
-                <td>
-                    <button class='btn btn-danger btn-sm' onclick='hisseSil({$detay['id']})'>Sil</button>
-                </td>
-            </tr>";
+                <td>{$satis_durumu}</td>
+                <td>";
+
+            // Satış butonu ve formu (sadece aktif veya kısmi satılmış kayıtlar için)
+            if ($detay['durum'] != 'satildi' && $kalan_adet > 0) {
+                $html_output .= "
+                    <button class='btn btn-success btn-sm' onclick='satisFormunuGoster({$detay['id']}, {$kalan_adet}, {$anlik_fiyat})'>Sat</button>
+                    <button class='btn btn-danger btn-sm ms-1' onclick='hisseSil({$detay['id']})'>Sil</button>
+                    
+                    <div id='satis-form-{$detay['id']}' class='satis-form mt-2' style='display:none;'>
+                        <div class='input-group input-group-sm'>
+                            <input type='number' class='form-control' id='satis-adet-{$detay['id']}' 
+                                   placeholder='Adet' min='1' max='{$kalan_adet}' value='{$kalan_adet}'>
+                            <input type='number' class='form-control' id='satis-fiyat-{$detay['id']}' 
+                                   placeholder='Fiyat' step='0.01' value='{$anlik_fiyat}'>
+                            <button class='btn btn-primary' onclick='hisseSatisKaydet({$detay['id']})'>Kaydet</button>
+                            <button class='btn btn-secondary' onclick='satisFormunuGizle({$detay['id']})'>İptal</button>
+                        </div>
+                    </div>";
+            }
+
+            $html_output .= "</td></tr>";
+
+            // Satış detayları (eğer satış yapılmışsa)
+            if ($detay['durum'] != 'aktif' && isset($detay['satis_fiyati'])) {
+                $satis_tarihi = date('d.m.Y H:i', strtotime($detay['satis_tarihi']));
+                $satis_kar = $this->satisKariHesapla($detay);
+                $satis_kar_class = $satis_kar >= 0 ? 'kar' : 'zarar';
+                
+                $html_output .= "<tr class='table-light'>
+                    <td><small><i>Satış: {$satis_tarihi}</i></small></td>
+                    <td><small>{$detay['satis_adet']}</small></td>
+                    <td>-</td>
+                    <td><small>{$detay['satis_fiyati']} ₺</small></td>
+                    <td class='{$satis_kar_class}'><small>" . number_format($satis_kar, 2) . " ₺</small></td>
+                    <td colspan='2'></td>
+                </tr>";
+            }
         }
 
         $html_output .= "</tbody></table></div></td></tr>";
@@ -585,6 +713,50 @@ if (isset($_GET['ara'])) {
                     });
                 })
                 .catch(error => console.error('Hata:', error));
+        }
+
+        // Satış formunu göster
+        function satisFormunuGoster(id, maxAdet, guncelFiyat) {
+            const form = document.getElementById(`satis-form-${id}`);
+            if (form) {
+                form.style.display = 'block';
+                document.getElementById(`satis-adet-${id}`).value = maxAdet;
+                document.getElementById(`satis-fiyat-${id}`).value = guncelFiyat;
+            }
+        }
+
+        // Satış formunu gizle
+        function satisFormunuGizle(id) {
+            const form = document.getElementById(`satis-form-${id}`);
+            if (form) {
+                form.style.display = 'none';
+            }
+        }
+
+        // Satış kaydını kaydet
+        function hisseSatisKaydet(id) {
+            const adet = document.getElementById(`satis-adet-${id}`).value;
+            const fiyat = document.getElementById(`satis-fiyat-${id}`).value;
+
+            if (!adet || !fiyat) {
+                alert('Lütfen adet ve fiyat bilgilerini giriniz!');
+                return;
+            }
+
+            fetch(`borsa.php?sat=1&id=${id}&adet=${adet}&fiyat=${fiyat}`)
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'success') {
+                        satisFormunuGizle(id);
+                        portfoyGuncelle();
+                    } else {
+                        alert('Satış kaydı eklenirken bir hata oluştu!');
+                    }
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    alert('Satış kaydı eklenirken bir hata oluştu!');
+                });
         }
 
         // Hisse sil

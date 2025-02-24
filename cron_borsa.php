@@ -51,6 +51,44 @@ class BorsaCron
                 $this->db->exec($sql);
                 error_log("Hisse adı kolonu eklendi");
             }
+
+            // Satış bilgileri için yeni kolonlar
+            $sql = "SHOW COLUMNS FROM portfolio LIKE 'satis_fiyati'";
+            $stmt = $this->db->query($sql);
+
+            if ($stmt->rowCount() == 0) {
+                $sql = "ALTER TABLE portfolio ADD COLUMN satis_fiyati DECIMAL(10,2) DEFAULT NULL";
+                $this->db->exec($sql);
+                error_log("Satış fiyatı kolonu eklendi");
+            }
+
+            $sql = "SHOW COLUMNS FROM portfolio LIKE 'satis_tarihi'";
+            $stmt = $this->db->query($sql);
+
+            if ($stmt->rowCount() == 0) {
+                $sql = "ALTER TABLE portfolio ADD COLUMN satis_tarihi TIMESTAMP NULL DEFAULT NULL";
+                $this->db->exec($sql);
+                error_log("Satış tarihi kolonu eklendi");
+            }
+
+            $sql = "SHOW COLUMNS FROM portfolio LIKE 'satis_adet'";
+            $stmt = $this->db->query($sql);
+
+            if ($stmt->rowCount() == 0) {
+                $sql = "ALTER TABLE portfolio ADD COLUMN satis_adet INT DEFAULT NULL";
+                $this->db->exec($sql);
+                error_log("Satış adedi kolonu eklendi");
+            }
+
+            $sql = "SHOW COLUMNS FROM portfolio LIKE 'durum'";
+            $stmt = $this->db->query($sql);
+
+            if ($stmt->rowCount() == 0) {
+                $sql = "ALTER TABLE portfolio ADD COLUMN durum ENUM('aktif', 'satildi', 'kismi_satildi') DEFAULT 'aktif'";
+                $this->db->exec($sql);
+                error_log("Durum kolonu eklendi");
+            }
+
         } catch (PDOException $e) {
             error_log("Tablo güncelleme hatası: " . $e->getMessage());
         }
