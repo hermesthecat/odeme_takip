@@ -224,6 +224,16 @@ class BorsaTakip
     }
 
     /**
+     * Türkçe karakterleri İngilizce karakterlere çevirir
+     */
+    private function turkceKarakterleriCevir($str)
+    {
+        $turkce = array("ı", "ğ", "ü", "ş", "ö", "ç", "İ", "Ğ", "Ü", "Ş", "Ö", "Ç");
+        $ingilizce = array("i", "g", "u", "s", "o", "c", "I", "G", "U", "S", "O", "C");
+        return str_replace($turkce, $ingilizce, $str);
+    }
+
+    /**
      * Hisse senedi ara
      */
     public function hisseAra($aranan)
@@ -292,8 +302,8 @@ class BorsaTakip
             ];
         }
 
-        // Aranan metne göre filtrele
-        $aranan = mb_strtoupper($aranan, 'UTF-8');
+        // Aranan metni Türkçe karakterlerden arındır ve büyük harfe çevir
+        $aranan = mb_strtoupper($this->turkceKarakterleriCevir($aranan), 'UTF-8');
         $sonuclar = [];
         $limit = 10; // Maksimum 10 sonuç göster
         $count = 0;
@@ -304,9 +314,13 @@ class BorsaTakip
                 continue;
             }
 
+            // Hisse kodu ve adını Türkçe karakterlerden arındır
+            $hisse_kod = mb_strtoupper($this->turkceKarakterleriCevir($hisse['kod']), 'UTF-8');
+            $hisse_ad = mb_strtoupper($this->turkceKarakterleriCevir($hisse['ad']), 'UTF-8');
+
             if (
-                strpos(mb_strtoupper($hisse['kod'], 'UTF-8'), $aranan) !== false ||
-                strpos(mb_strtoupper($hisse['ad'], 'UTF-8'), $aranan) !== false
+                strpos($hisse_kod, $aranan) !== false ||
+                strpos($hisse_ad, $aranan) !== false
             ) {
                 // Hisse detayını çek
                 $curl = curl_init();
@@ -398,7 +412,7 @@ class BorsaTakip
             $kayitlar = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $kalan_satis_adet = $satis_adet;
-            
+
             foreach ($kayitlar as $kayit) {
                 // Her kayıt için satılabilecek maksimum adedi hesapla
                 $mevcut_satis = $kayit['satis_adet'] ? $kayit['satis_adet'] : 0;
@@ -408,7 +422,7 @@ class BorsaTakip
 
                 // Bu kayıttan satılacak adedi belirle
                 $bu_satis_adet = min($kalan_satis_adet, $satilabilir_adet);
-                
+
                 if ($bu_satis_adet <= 0) break;
 
                 // Satış durumunu belirle
@@ -431,9 +445,9 @@ class BorsaTakip
                 ]);
 
                 $kalan_satis_adet -= $bu_satis_adet;
-                
+
                 error_log("Satış kaydı eklendi - ID: {$kayit['id']}, Adet: $bu_satis_adet, Fiyat: $satis_fiyati");
-                
+
                 if ($kalan_satis_adet <= 0) break;
             }
 
@@ -443,7 +457,6 @@ class BorsaTakip
 
             $this->db->commit();
             return true;
-
         } catch (Exception $e) {
             $this->db->rollBack();
             error_log("Satış hatası: " . $e->getMessage());
@@ -820,7 +833,7 @@ if (isset($_GET['ara'])) {
             if (event) {
                 event.stopPropagation();
             }
-            
+
             const detayRow = document.querySelector(`.detay-satir[data-sembol="${sembol}"]`);
             if (detayRow) {
                 detayRow.style.display = 'table-row';
@@ -836,7 +849,7 @@ if (isset($_GET['ara'])) {
             if (form) {
                 form.style.display = 'block';
                 document.getElementById(`satis-fiyat-${sembol}`).value = guncelFiyat;
-                
+
                 // Toplam satış adedi inputunu dinle
                 const toplamAdetInput = document.getElementById(`toplam-satis-adet-${sembol}`);
                 if (toplamAdetInput) {
@@ -862,11 +875,11 @@ if (isset($_GET['ara'])) {
                 .sort((a, b) => new Date(a.dataset.alisTarihi) - new Date(b.dataset.alisTarihi));
 
             let kalanAdet = parseInt(toplamAdet) || 0;
-            
+
             satirlar.forEach(satir => {
                 const adetInput = satir.querySelector('.satis-adet');
                 const maxAdet = parseInt(adetInput.max);
-                
+
                 if (kalanAdet > 0) {
                     const dagitilacakAdet = Math.min(kalanAdet, maxAdet);
                     adetInput.value = dagitilacakAdet;
