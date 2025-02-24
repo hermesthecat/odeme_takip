@@ -535,7 +535,7 @@ if (isset($_GET['liste'])) {
                 <td class='{$satis_kar_class}'>" . number_format($toplam_satis_kari, 2) . " ₺</td>
                 <td>
                     <button class='btn btn-success btn-sm' onclick='topluSatisFormunuGoster(\"{$hisse['sembol']}\", {$anlik_fiyat}, event)'>Sat</button>
-                    <button class='btn btn-danger btn-sm ms-1' onclick='hisseSil(\"{$hisse['kayit_idler']}\")'>Tümünü Sil</button>
+                    <button class='btn btn-danger btn-sm ms-1' onclick='hisseSil(\"{$hisse['kayit_idler']}\", event)'>Tümünü Sil</button>
                 </td>
             </tr>";
 
@@ -645,7 +645,7 @@ if (isset($_GET['liste'])) {
                 <td class='{$detay_kar_zarar_class}'>" . number_format($detay_kar_zarar, 2) . " ₺</td>
                 <td>{$satis_durumu}</td>
                 <td>
-                    <button class='btn btn-danger btn-sm' onclick='hisseSil({$detay['id']})'>Sil</button>
+                    <button class='btn btn-danger btn-sm' onclick='hisseSil({$detay['id']}, event)'>Sil</button>
                 </td>
             </tr>";
 
@@ -942,7 +942,11 @@ if (isset($_GET['ara'])) {
         }
 
         // Hisse sil
-        function hisseSil(ids) {
+        function hisseSil(ids, event) {
+            if (event) {
+                event.stopPropagation(); // Event propagation'ı durdur
+            }
+            
             const idList = ids.split(',');
             const message = idList.length > 1 ?
                 'Bu hissenin tüm kayıtlarını silmek istediğinizden emin misiniz?' :
