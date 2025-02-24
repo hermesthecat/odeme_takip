@@ -762,27 +762,61 @@ if (isset($_GET['ara'])) {
 
         <!-- Yeni Hisse Ekleme Formu -->
         <div class="card mb-4">
-            <div class="card-header">Yeni Hisse Ekle</div>
-            <div class="card-body">
-                <form method="POST" action="" id="hisseForm">
-                    <div class="row">
-                        <div class="col-md-3 sembol-input-container">
-                            <input type="text" name="sembol" id="sembolInput" class="form-control"
-                                placeholder="Hisse Sembolü veya Adı" required autocomplete="off">
-                            <div id="sembolOnerileri" class="autocomplete-items"></div>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="number" name="adet" class="form-control" placeholder="Adet" required>
-                        </div>
-                        <div class="col-md-3">
-                            <input type="number" step="0.01" name="alis_fiyati" class="form-control" placeholder="Alış Fiyatı" required>
-                        </div>
-                        <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary">Ekle</button>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Yeni Hisse Ekle</span>
+                <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#yeniHisseForm">
+                    <i class="fas fa-plus me-1"></i> Yeni Ekle
+                </button>
+            </div>
+            <div class="collapse" id="yeniHisseForm">
+                <div class="card-body">
+                    <form method="POST" action="" id="hisseForm" class="needs-validation" novalidate>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating sembol-input-container">
+                                    <input type="text" name="sembol" id="sembolInput" class="form-control"
+                                        placeholder="Hisse Sembolü veya Adı" required autocomplete="off">
+                                    <label for="sembolInput">Hisse Sembolü veya Adı</label>
+                                    <div id="sembolOnerileri" class="autocomplete-items shadow-sm"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="number" name="adet" id="adetInput" class="form-control" 
+                                        placeholder="Adet" required min="1">
+                                    <label for="adetInput">Adet</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="number" step="0.01" name="alis_fiyati" id="alisFiyatiInput" 
+                                        class="form-control" placeholder="Alış Fiyatı" required min="0.01">
+                                    <label for="alisFiyatiInput">Alış Fiyatı (₺)</label>
+                                </div>
+                            </div>
                         </div>
                         <input type="hidden" name="hisse_adi" value="">
-                    </div>
-                </form>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="alert alert-info mb-0 d-flex align-items-center">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <div>
+                                        <strong>Tahmini Maliyet:</strong>
+                                        <span id="tahminiMaliyet">0.00 ₺</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-check me-1"></i> Hisseyi Ekle
+                                </button>
+                                <button type="reset" class="btn btn-secondary ms-2">
+                                    <i class="fas fa-undo me-1"></i> Temizle
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
 
@@ -839,7 +873,77 @@ if (isset($_GET['ara'])) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Form validasyonu için
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+
+        // Tahmini maliyet hesaplama
+        function tahminiMaliyetHesapla() {
+            const adet = parseFloat(document.getElementById('adetInput').value) || 0;
+            const fiyat = parseFloat(document.getElementById('alisFiyatiInput').value) || 0;
+            const maliyet = adet * fiyat;
+            document.getElementById('tahminiMaliyet').textContent = 
+                new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(maliyet);
+        }
+
+        // Input değişikliklerini dinle
+        document.getElementById('adetInput').addEventListener('input', tahminiMaliyetHesapla);
+        document.getElementById('alisFiyatiInput').addEventListener('input', tahminiMaliyetHesapla);
+
+        // Otomatik tamamlama stil güncellemesi
+        document.getElementById('sembolOnerileri').style.cssText = `
+            position: absolute;
+            width: 100%;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            background: white;
+            border-radius: 0.375rem;
+            border: 1px solid rgba(0,0,0,.125);
+            margin-top: 2px;
+        `;
+
+        // Öneri öğelerinin stilini güncelle
+        const style = document.createElement('style');
+        style.textContent = `
+            .autocomplete-items div {
+                padding: 10px 15px;
+                cursor: pointer;
+                border-bottom: 1px solid #eee;
+            }
+            .autocomplete-items div:hover {
+                background-color: #f8f9fa;
+            }
+            .autocomplete-items div:last-child {
+                border-bottom: none;
+            }
+            .fiyat-bilgisi {
+                float: right;
+                color: #6c757d;
+            }
+            .form-floating > .form-control::placeholder {
+                color: transparent;
+            }
+            .form-floating > .form-control:not(:placeholder-shown) ~ label {
+                opacity: .65;
+                transform: scale(.85) translateY(-.5rem) translateX(.15rem);
+            }
+        `;
+        document.head.appendChild(style);
+
         // Mevcut JavaScript kodları buraya gelecek
         
         // Mali durum grafiği için yeni fonksiyonlar
