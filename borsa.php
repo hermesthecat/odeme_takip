@@ -63,12 +63,14 @@ class BorsaTakip
         $sql = "SELECT 
                     sembol,
                     hisse_adi,
-                    SUM(adet) as toplam_adet,
+                    SUM(adet - IFNULL(satis_adet, 0)) as toplam_adet,
                     GROUP_CONCAT(id) as kayit_idler,
                     MAX(son_guncelleme) as son_guncelleme,
                     MAX(anlik_fiyat) as anlik_fiyat
                 FROM portfolio 
+                WHERE (durum = 'aktif' OR durum = 'kismi_satildi')
                 GROUP BY sembol, hisse_adi 
+                HAVING toplam_adet > 0
                 ORDER BY id DESC";
 
         $stmt = $this->db->query($sql);
