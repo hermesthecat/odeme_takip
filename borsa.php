@@ -160,7 +160,7 @@ class BorsaTakip
                 WHERE sembol = :sembol 
                 ORDER BY son_guncelleme DESC 
                 LIMIT 1";
-                
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute(['sembol' => $sembol]);
         $sonuc = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -278,7 +278,40 @@ class BorsaTakip
                 strpos(mb_strtoupper($hisse['ad'], 'UTF-8'), $aranan) !== false
             ) {
                 // Hisse detayını çek
-                $fiyat = $this->collectApiFiyatCek($hisse['kod']);
+                $curl = curl_init();
+                $url = "https://bigpara.hurriyet.com.tr/api/v1/borsa/hisseyuzeysel/" . urlencode($hisse['kod']);
+
+                curl_setopt_array($curl, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => "",
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 30,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => "GET",
+                    CURLOPT_SSL_VERIFYPEER => false,
+                    CURLOPT_SSL_VERIFYHOST => false,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTPHEADER => [
+                        "content-type: application/json",
+                        "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+                    ],
+                ]);
+
+                $response = curl_exec($curl);
+                $data_hisse = json_decode($response, true);
+                curl_close($curl);
+
+                $fiyat = 0;
+                if (isset($data_hisse['data']['hisseYuzeysel'])) {
+                    $detay = $data_hisse['data']['hisseYuzeysel'];
+                    if (isset($detay['alis'], $detay['satis']) && is_numeric($detay['alis']) && is_numeric($detay['satis'])) {
+                        $fiyat = ($detay['alis'] + $detay['satis']) / 2;
+                    } elseif (isset($detay['kapanis']) && is_numeric($detay['kapanis'])) {
+                        $fiyat = floatval($detay['kapanis']);
+                    }
+                }
+
                 $sonuclar[] = [
                     'code' => $hisse['kod'],
                     'title' => $hisse['ad'],
@@ -289,6 +322,9 @@ class BorsaTakip
                 if ($count >= $limit) {
                     break;
                 }
+
+                // API limitlerini aşmamak için kısa bir bekleme
+                usleep(200000); // 200ms bekle
             }
         }
 
