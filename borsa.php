@@ -1015,21 +1015,46 @@ if (isset($_GET['ara'])) {
 
         // Hisse arama ve otomatik tamamlama
         let typingTimer;
-        const doneTypingInterval = 300;
+        let lastSearchTerm = '';
+        const doneTypingInterval = 750; // 750ms bekleme süresi
+        const minSearchLength = 3; // Minimum 3 karakter
         const sembolInput = document.getElementById('sembolInput');
         const sembolOnerileri = document.getElementById('sembolOnerileri');
 
         sembolInput.addEventListener('input', function() {
             clearTimeout(typingTimer);
-            if (this.value.length > 1) {
-                typingTimer = setTimeout(hisseAra, doneTypingInterval);
-            } else {
+            const searchTerm = this.value.trim();
+
+            // Arama terimini temizle veya çok kısaysa önerileri gizle
+            if (searchTerm.length < minSearchLength) {
                 sembolOnerileri.innerHTML = '';
+                lastSearchTerm = '';
+                return;
             }
+
+            // Aynı terim için tekrar arama yapma
+            if (searchTerm === lastSearchTerm) {
+                return;
+            }
+
+            // Yeterli süre bekledikten sonra aramayı yap
+            typingTimer = setTimeout(() => {
+                lastSearchTerm = searchTerm;
+                hisseAra();
+            }, doneTypingInterval);
         });
 
         function hisseAra() {
-            const aranan = sembolInput.value;
+            const aranan = sembolInput.value.trim();
+            
+            // Minimum karakter kontrolü
+            if (aranan.length < minSearchLength) {
+                return;
+            }
+
+            // Arama yapılıyor göstergesi
+            sembolOnerileri.innerHTML = '<div class="text-muted"><small>Aranıyor...</small></div>';
+
             fetch('borsa.php?ara=' + encodeURIComponent(aranan))
                 .then(response => response.json())
                 .then(data => {
@@ -1052,6 +1077,7 @@ if (isset($_GET['ara'])) {
                                 document.getElementsByName('alis_fiyati')[0].value = hisse.price;
                                 document.getElementsByName('hisse_adi')[0].value = hisse.title;
                                 sembolOnerileri.innerHTML = '';
+                                lastSearchTerm = hisse.code; // Seçilen değeri son arama terimi olarak kaydet
                             });
                         }
                         sembolOnerileri.appendChild(div);
