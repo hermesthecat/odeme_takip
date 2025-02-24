@@ -63,7 +63,10 @@ class BorsaCron
     private function hisseFiyatiCek($sembol)
     {
         $curl = curl_init();
+
+        // BigPara hisse detay endpoint'i
         $url = "https://bigpara.hurriyet.com.tr/api/v1/borsa/hisseyuzeysel/" . urlencode($sembol);
+        error_log("API İsteği URL: " . $url);
 
         curl_setopt_array($curl, [
             CURLOPT_URL => $url,
@@ -87,32 +90,49 @@ class BorsaCron
         $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
 
-        if ($err || $httpcode !== 200) {
-            error_log("API Hatası - Hisse: $sembol, HTTP: $httpcode, Hata: $err");
+        // Debug bilgileri
+        error_log("BigPara API İstek - Hisse: " . $sembol);
+        error_log("BigPara API Yanıt Kodu: " . $httpcode);
+        error_log("BigPara API Hata: " . $err);
+        error_log("BigPara API Ham Yanıt: " . $response);
+
+        if ($err) {
+            error_log("BigPara API Curl Hatası: " . $err);
+            return 0;
+        }
+
+        if ($httpcode !== 200) {
+            error_log("BigPara API HTTP Hata Kodu: " . $httpcode);
             return 0;
         }
 
         $data = json_decode($response, true);
         if (!isset($data['data']['hisseYuzeysel'])) {
-            error_log("Geçersiz API yanıtı - Hisse: $sembol");
+            error_log("BigPara API Geçersiz Yanıt: " . print_r($data, true));
             return 0;
         }
 
         $hisse = $data['data']['hisseYuzeysel'];
+        error_log("İşlenen hisse verisi: " . print_r($hisse, true));
 
-        // Önce alış-satış ortalamasını dene
+        // Son işlem fiyatını al (alış-satış ortalaması)
         if (
-            isset($hisse['alis'], $hisse['satis']) &&
+            isset($hisse['alis']) && isset($hisse['satis']) &&
             is_numeric($hisse['alis']) && is_numeric($hisse['satis'])
         ) {
-            return ($hisse['alis'] + $hisse['satis']) / 2;
+            $fiyat = ($hisse['alis'] + $hisse['satis']) / 2;
+            error_log("Fiyat alış-satış ortalamasından alındı: " . $fiyat);
+            return $fiyat;
         }
 
-        // Yoksa kapanış fiyatını kullan
+        // Alternatif olarak son fiyatı kontrol et
         if (isset($hisse['kapanis']) && is_numeric($hisse['kapanis'])) {
-            return floatval($hisse['kapanis']);
+            $fiyat = floatval($hisse['kapanis']);
+            error_log("Fiyat kapanıştan alındı: " . $fiyat);
+            return $fiyat;
         }
 
+        error_log("Hisse fiyatı bulunamadı: " . $sembol);
         return 0;
     }
 
