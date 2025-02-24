@@ -603,7 +603,6 @@ if (isset($_GET['liste'])) {
                         <table class='table table-sm'>
                             <thead>
                                 <tr>
-                                    <th>Seç</th>
                                     <th>Alış Tarihi</th>
                                     <th>Alış Fiyatı</th>
                                     <th>Kalan Adet</th>
@@ -621,17 +620,13 @@ if (isset($_GET['liste'])) {
 
             if ($kalan_adet > 0) {
                 $alis_tarihi = date('d.m.Y H:i', strtotime($detay['alis_tarihi']));
-                $html_output .= "<tr data-alis-fiyati='{$detay['alis_fiyati']}' data-alis-tarihi='{$detay['alis_tarihi']}'>
-                    <td>
-                        <input type='checkbox' class='form-check-input satis-secim' 
-                               data-id='{$detay['id']}' data-max-adet='{$kalan_adet}' checked disabled>
-                    </td>
+                $html_output .= "<tr data-alis-fiyati='{$detay['alis_fiyati']}' data-alis-tarihi='{$detay['alis_tarihi']}' data-id='{$detay['id']}' data-max-adet='{$kalan_adet}'>
                     <td>{$alis_tarihi}</td>
                     <td>{$detay['alis_fiyati']} ₺</td>
                     <td>{$kalan_adet}</td>
                     <td>
                         <input type='number' class='form-control form-control-sm satis-adet' 
-                               min='0' max='{$kalan_adet}' value='0'>
+                               min='0' max='{$kalan_adet}' value='0' readonly>
                     </td>
                 </tr>";
             }
@@ -1150,21 +1145,34 @@ if (isset($_GET['ara'])) {
             const form = document.getElementById(`satis-form-${sembol}`);
             if (!form) return;
 
+            // Tüm satırları alış tarihine göre sırala (FIFO)
             const satirlar = Array.from(form.querySelectorAll('tr[data-alis-tarihi]'))
                 .sort((a, b) => new Date(a.dataset.alisTarihi) - new Date(b.dataset.alisTarihi));
 
             let kalanAdet = parseInt(toplamAdet) || 0;
 
+            // Tüm checkboxları seç ve disabled yap
+            satirlar.forEach(satir => {
+                const checkbox = satir.querySelector('.satis-secim');
+                if (checkbox) {
+                    checkbox.checked = true;
+                    checkbox.disabled = true;
+                }
+            });
+
+            // FIFO mantığına göre en eskiden başlayarak dağıt
             satirlar.forEach(satir => {
                 const adetInput = satir.querySelector('.satis-adet');
-                const maxAdet = parseInt(adetInput.max);
+                const maxAdet = parseInt(satir.dataset.maxAdet);
 
                 if (kalanAdet > 0) {
                     const dagitilacakAdet = Math.min(kalanAdet, maxAdet);
                     adetInput.value = dagitilacakAdet;
+                    adetInput.readOnly = true; // Kullanıcı değiştiremez
                     kalanAdet -= dagitilacakAdet;
                 } else {
                     adetInput.value = 0;
+                    adetInput.readOnly = true;
                 }
             });
 
@@ -1200,21 +1208,24 @@ if (isset($_GET['ara'])) {
             const satisFiyati = document.getElementById(`satis-fiyat-${sembol}`).value;
             const satislar = [];
 
-            form.querySelectorAll('.satis-secim:checked').forEach(checkbox => {
-                const adetInput = checkbox.closest('tr').querySelector('.satis-adet');
-                const adet = parseInt(adetInput.value);
-                const maxAdet = parseInt(checkbox.dataset.maxAdet);
+            // FIFO mantığına göre sıralanmış satırları al
+            const satirlar = Array.from(form.querySelectorAll('tr[data-alis-tarihi]'))
+                .sort((a, b) => new Date(a.dataset.alisTarihi) - new Date(b.dataset.alisTarihi));
 
-                if (adet > 0 && adet <= maxAdet) {
+            satirlar.forEach(satir => {
+                const adetInput = satir.querySelector('.satis-adet');
+                const adet = parseInt(adetInput.value);
+                
+                if (adet > 0) {
                     satislar.push({
-                        id: checkbox.dataset.id,
+                        id: satir.dataset.id,
                         adet: adet
                     });
                 }
             });
 
             if (satislar.length === 0) {
-                alert('Lütfen satılacak hisseleri seçin!');
+                alert('Satılacak hisse bulunmuyor!');
                 return;
             }
 
