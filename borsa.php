@@ -639,7 +639,7 @@ if (isset($_GET['liste'])) {
             // Satış detayları (eğer satış yapılmışsa)
             if ($detay['durum'] != 'aktif' && isset($detay['satis_fiyati'])) {
                 $satis_tarihi = date('d.m.Y H:i', strtotime($detay['satis_tarihi']));
-                $satis_kar = $this->satisKariHesapla($detay);
+                $satis_kar = ($detay['satis_fiyati'] - $detay['alis_fiyati']) * $detay['satis_adet'];
                 $satis_kar_class = $satis_kar >= 0 ? 'kar' : 'zarar';
                 
                 $html_output .= "<tr class='table-light'>
