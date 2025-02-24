@@ -1201,7 +1201,7 @@ if (isset($_GET['ara'])) {
             if (!anaSatir) return;
 
             const kayitIdler = anaSatir.querySelector('.btn-danger').getAttribute('onclick').match(/\d+/)[0];
-            
+
             // Satış işlemini gerçekleştir
             fetch(`borsa.php?sat=1&id=${kayitIdler}&adet=${toplamAdet}&fiyat=${satisFiyati}`)
                 .then(response => response.text())
