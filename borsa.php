@@ -104,7 +104,30 @@ if (isset($_GET['sil']) && is_numeric($_GET['sil'])) {
     exit;
 }
 
-// HTML Görünümü
+// Sayfa yüklendiğinde portföy listesini getir
+if (isset($_GET['liste'])) {
+    $borsaTakip = new BorsaTakip();
+    $portfoy = $borsaTakip->portfoyListele();
+    
+    foreach ($portfoy as $hisse) {
+        $anlik_fiyat = $borsaTakip->anlikFiyatGetir($hisse['sembol']);
+        $kar_zarar = $borsaTakip->karZararHesapla($hisse);
+        $kar_zarar_class = $kar_zarar >= 0 ? 'kar' : 'zarar';
+        
+        echo "<tr>
+                <td>{$hisse['sembol']}</td>
+                <td>{$hisse['adet']}</td>
+                <td>{$hisse['alis_fiyati']} ₺</td>
+                <td>{$anlik_fiyat} ₺</td>
+                <td class='{$kar_zarar_class}'>" . number_format($kar_zarar, 2) . " ₺</td>
+                <td>
+                    <button class='btn btn-danger btn-sm' onclick='hisseSil({$hisse['id']})'>Sil</button>
+                </td>
+            </tr>";
+    }
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -174,53 +197,38 @@ if (isset($_GET['sil']) && is_numeric($_GET['sil'])) {
         </div>
     </div>
 
-    <!-- jQuery -->
-    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js"></script>
-    <!-- Yedek jQuery -->
     <script>
-        if (typeof jQuery == 'undefined') {
-            document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"><\/script>');
+        // Portföy listesini güncelle
+        function portfoyGuncelle() {
+            fetch('borsa.php?liste=1')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('portfoyListesi').innerHTML = data;
+                })
+                .catch(error => console.error('Hata:', error));
         }
-    </script>
 
-    <script>
-        // jQuery yüklenene kadar bekle
-        window.onload = function() {
-            if (typeof jQuery == 'undefined') {
-                alert('jQuery yüklenemedi! Lütfen internet bağlantınızı kontrol edin.');
-                return;
-            }
-
-            function portfoyGuncelle() {
-                $.ajax({
-                    url: 'portfoy_api.php',
-                    method: 'GET',
-                    success: function(data) {
-                        $('#portfoyListesi').html(data);
-                    }
-                });
-            }
-
-            function hisseSil(id) {
-                if (confirm('Bu hisseyi silmek istediğinizden emin misiniz?')) {
-                    $.ajax({
-                        url: 'borsa.php?sil=' + id,
-                        method: 'GET',
-                        success: function(response) {
-                            if (response === 'success') {
-                                portfoyGuncelle();
-                            } else {
-                                alert('Hisse silinirken bir hata oluştu!');
-                            }
+        // Hisse sil
+        function hisseSil(id) {
+            if (confirm('Bu hisseyi silmek istediğinizden emin misiniz?')) {
+                fetch('borsa.php?sil=' + id)
+                    .then(response => response.text())
+                    .then(data => {
+                        if (data === 'success') {
+                            portfoyGuncelle();
+                        } else {
+                            alert('Hisse silinirken bir hata oluştu!');
                         }
-                    });
-                }
+                    })
+                    .catch(error => console.error('Hata:', error));
             }
-
-            // Her 5 dakikada bir güncelle
-            setInterval(portfoyGuncelle, 300000);
-            portfoyGuncelle();
         }
+
+        // Sayfa yüklendiğinde ve her 5 dakikada bir güncelle
+        window.onload = function() {
+            portfoyGuncelle();
+            setInterval(portfoyGuncelle, 300000);
+        };
     </script>
 </body>
 
