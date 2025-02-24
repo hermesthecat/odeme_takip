@@ -568,7 +568,18 @@ if (isset($_GET['liste'])) {
         $html_output = "<tr class='ana-satir' data-sembol='{$hisse['sembol']}' style='cursor: pointer;'>
                 <td class='sembol'><i class='fas fa-chevron-right me-2'></i>{$hisse_baslik}</td>
                 <td class='adet'>{$hisse['toplam_adet']}</td>
-                <td class='alis_fiyati'>Çeşitli</td>
+                <td class='alis_fiyati'>";
+
+        // Alış fiyatı kontrolü - tek alım varsa fiyatını göster, değilse "Çeşitli" yaz
+        $alim_sayisi = count($portfoy['detaylar'][$hisse['sembol']]);
+        if ($alim_sayisi == 1) {
+            $tek_alim = reset($portfoy['detaylar'][$hisse['sembol']]);
+            $html_output .= number_format($tek_alim['alis_fiyati'], 2) . " ₺";
+        } else {
+            $html_output .= "Çeşitli";
+        }
+
+        $html_output .= "</td>
                 <td class='anlik_fiyat'>{$anlik_fiyat} ₺{$guncelleme_bilgisi}</td>
                 <td class='{$kar_zarar_class}'>" . number_format($toplam_kar_zarar, 2) . " ₺</td>
                 <td class='{$satis_kar_class}'>" . number_format($toplam_satis_kari, 2) . " ₺</td>
