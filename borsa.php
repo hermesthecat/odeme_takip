@@ -499,12 +499,24 @@ if (isset($_GET['liste'])) {
             error_log("API'den Alınan Fiyat: " . $anlik_fiyat);
         }
 
-        // Toplam kar/zarar hesapla
+        // Toplam kar/zarar ve satış karı hesapla
         $toplam_kar_zarar = 0;
+        $toplam_satis_kari = 0;
         foreach ($portfoy['detaylar'][$hisse['sembol']] as $detay) {
-            $toplam_kar_zarar += ($anlik_fiyat - $detay['alis_fiyati']) * $detay['adet'];
+            $kalan_adet = $detay['adet'];
+            if (isset($detay['satis_adet']) && $detay['satis_adet'] > 0) {
+                $kalan_adet -= $detay['satis_adet'];
+                // Satış karı hesapla
+                $satis_kari = ($detay['satis_fiyati'] - $detay['alis_fiyati']) * $detay['satis_adet'];
+                $toplam_satis_kari += $satis_kari;
+            }
+            // Kalan hisselerin kar/zararı
+            if ($kalan_adet > 0) {
+                $toplam_kar_zarar += ($anlik_fiyat - $detay['alis_fiyati']) * $kalan_adet;
+            }
         }
         $kar_zarar_class = $toplam_kar_zarar >= 0 ? 'kar' : 'zarar';
+        $satis_kar_class = $toplam_satis_kari >= 0 ? 'kar' : 'zarar';
 
         // Son güncelleme zamanını al
         $son_guncelleme = isset($hisse['son_guncelleme']) ? date('H:i:s', strtotime($hisse['son_guncelleme'])) : '';
@@ -520,6 +532,7 @@ if (isset($_GET['liste'])) {
                 <td class='alis_fiyati'>Çeşitli</td>
                 <td class='anlik_fiyat'>{$anlik_fiyat} ₺{$guncelleme_bilgisi}</td>
                 <td class='{$kar_zarar_class}'>" . number_format($toplam_kar_zarar, 2) . " ₺</td>
+                <td class='{$satis_kar_class}'>" . number_format($toplam_satis_kari, 2) . " ₺</td>
                 <td>
                     <button class='btn btn-success btn-sm' onclick='topluSatisFormunuGoster(\"{$hisse['sembol']}\", {$anlik_fiyat}, event)'>Sat</button>
                     <button class='btn btn-danger btn-sm ms-1' onclick='hisseSil(\"{$hisse['kayit_idler']}\")'>Tümünü Sil</button>
@@ -527,7 +540,7 @@ if (isset($_GET['liste'])) {
             </tr>";
 
         // Detay satırları (başlangıçta gizli)
-        $html_output .= "<tr class='detay-satir' data-sembol='{$hisse['sembol']}' style='display: none; background-color: #f8f9fa;'><td colspan='6'><div class='p-3'>";
+        $html_output .= "<tr class='detay-satir' data-sembol='{$hisse['sembol']}' style='display: none; background-color: #f8f9fa;'><td colspan='7'><div class='p-3'>";
         
         // Satış formu
         $html_output .= "<div id='satis-form-{$hisse['sembol']}' class='satis-form mb-3' style='display:none;'>
@@ -728,6 +741,7 @@ if (isset($_GET['ara'])) {
                             <th>Alış Fiyatı</th>
                             <th>Güncel Fiyat</th>
                             <th>Kar/Zarar</th>
+                            <th>Satış Karı</th>
                             <th>İşlemler</th>
                         </tr>
                     </thead>
