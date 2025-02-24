@@ -42,3 +42,15 @@
     color: #666;
     margin-left: 10px;
 }
+
+.ana-satir:hover {
+    background-color: #f5f5f5;
+}
+
+.detay-satir .table {
+    margin-bottom: 0 !important;
+}
+
+.detay-satir td {
+    border-top: none !important;
+}

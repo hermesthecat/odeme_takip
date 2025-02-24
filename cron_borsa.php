@@ -157,7 +157,7 @@ class BorsaCron
         // Önce hisse listesini al
         $curl = curl_init();
         $url = "https://bigpara.hurriyet.com.tr/api/v1/hisse/list";
-        
+
         curl_setopt_array($curl, [
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,

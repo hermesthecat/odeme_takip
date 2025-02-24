@@ -45,9 +45,13 @@ class BorsaTakip
      */
     public function hisseSil($id)
     {
-        $sql = "DELETE FROM portfolio WHERE id = :id";
+        // Virgülle ayrılmış ID'leri diziye çevir
+        $ids = explode(',', $id);
+        $ids = array_map('intval', $ids);
+
+        $sql = "DELETE FROM portfolio WHERE id IN (" . implode(',', $ids) . ")";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute(['id' => $id]);
+        return $stmt->execute();
     }
 
     /**
@@ -55,9 +59,36 @@ class BorsaTakip
      */
     public function portfoyListele()
     {
+        // Önce özet bilgileri al
+        $sql = "SELECT 
+                    sembol,
+                    hisse_adi,
+                    SUM(adet) as toplam_adet,
+                    GROUP_CONCAT(id) as kayit_idler,
+                    MAX(son_guncelleme) as son_guncelleme,
+                    MAX(anlik_fiyat) as anlik_fiyat
+                FROM portfolio 
+                GROUP BY sembol, hisse_adi 
+                ORDER BY son_guncelleme DESC";
+
+        $stmt = $this->db->query($sql);
+        $ozet = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Sonra tüm kayıtları al
         $sql = "SELECT * FROM portfolio ORDER BY alis_tarihi DESC";
         $stmt = $this->db->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $detaylar = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Detayları sembol bazında grupla
+        $detay_grup = [];
+        foreach ($detaylar as $detay) {
+            $detay_grup[$detay['sembol']][] = $detay;
+        }
+
+        return [
+            'ozet' => $ozet,
+            'detaylar' => $detay_grup
+        ];
     }
 
     /**
@@ -373,7 +404,7 @@ if (isset($_GET['liste'])) {
     $borsaTakip = new BorsaTakip();
     $portfoy = $borsaTakip->portfoyListele();
 
-    foreach ($portfoy as $hisse) {
+    foreach ($portfoy['ozet'] as $hisse) {
         // Debug bilgileri
         error_log("Portföy Listesi - İşlenen Hisse: " . print_r($hisse, true));
 
@@ -387,8 +418,12 @@ if (isset($_GET['liste'])) {
             error_log("API'den Alınan Fiyat: " . $anlik_fiyat);
         }
 
-        $kar_zarar = $borsaTakip->karZararHesapla($hisse);
-        $kar_zarar_class = $kar_zarar >= 0 ? 'kar' : 'zarar';
+        // Toplam kar/zarar hesapla
+        $toplam_kar_zarar = 0;
+        foreach ($portfoy['detaylar'][$hisse['sembol']] as $detay) {
+            $toplam_kar_zarar += ($anlik_fiyat - $detay['alis_fiyati']) * $detay['adet'];
+        }
+        $kar_zarar_class = $toplam_kar_zarar >= 0 ? 'kar' : 'zarar';
 
         // Son güncelleme zamanını al
         $son_guncelleme = isset($hisse['son_guncelleme']) ? date('H:i:s', strtotime($hisse['son_guncelleme'])) : '';
@@ -397,17 +432,47 @@ if (isset($_GET['liste'])) {
         // Hisse adını ve sembolü birleştir
         $hisse_baslik = $hisse['hisse_adi'] ? $hisse['hisse_adi'] . " (" . $hisse['sembol'] . ")" : $hisse['sembol'];
 
-        // Debug için HTML çıktısı
-        $html_output = "<tr>
-                <td class='sembol'>{$hisse_baslik}</td>
-                <td class='adet'>{$hisse['adet']}</td>
-                <td class='alis_fiyati'>{$hisse['alis_fiyati']} ₺</td>
+        // Ana satır
+        $html_output = "<tr class='ana-satir' data-sembol='{$hisse['sembol']}' style='cursor: pointer;'>
+                <td class='sembol'><i class='fas fa-chevron-right me-2'></i>{$hisse_baslik}</td>
+                <td class='adet'>{$hisse['toplam_adet']}</td>
+                <td class='alis_fiyati'>Çeşitli</td>
                 <td class='anlik_fiyat'>{$anlik_fiyat} ₺{$guncelleme_bilgisi}</td>
-                <td class='{$kar_zarar_class}'>" . number_format($kar_zarar, 2) . " ₺</td>
+                <td class='{$kar_zarar_class}'>" . number_format($toplam_kar_zarar, 2) . " ₺</td>
                 <td>
-                    <button class='btn btn-danger btn-sm' onclick='hisseSil({$hisse['id']})'>Sil</button>
+                    <button class='btn btn-danger btn-sm' onclick='event.stopPropagation(); hisseSil(\"{$hisse['kayit_idler']}\")'>Tümünü Sil</button>
                 </td>
             </tr>";
+
+        // Detay satırları (başlangıçta gizli)
+        $html_output .= "<tr class='detay-satir' data-sembol='{$hisse['sembol']}' style='display: none; background-color: #f8f9fa;'><td colspan='6'><div class='p-3'>";
+        $html_output .= "<table class='table table-sm mb-0'><thead><tr>
+                <th>Alış Tarihi</th>
+                <th>Adet</th>
+                <th>Alış Fiyatı</th>
+                <th>Güncel Fiyat</th>
+                <th>Kar/Zarar</th>
+                <th>İşlem</th>
+            </tr></thead><tbody>";
+
+        foreach ($portfoy['detaylar'][$hisse['sembol']] as $detay) {
+            $detay_kar_zarar = ($anlik_fiyat - $detay['alis_fiyati']) * $detay['adet'];
+            $detay_kar_zarar_class = $detay_kar_zarar >= 0 ? 'kar' : 'zarar';
+            $alis_tarihi = date('d.m.Y H:i', strtotime($detay['alis_tarihi']));
+
+            $html_output .= "<tr>
+                <td>{$alis_tarihi}</td>
+                <td>{$detay['adet']}</td>
+                <td>{$detay['alis_fiyati']} ₺</td>
+                <td>{$anlik_fiyat} ₺</td>
+                <td class='{$detay_kar_zarar_class}'>" . number_format($detay_kar_zarar, 2) . " ₺</td>
+                <td>
+                    <button class='btn btn-danger btn-sm' onclick='hisseSil({$detay['id']})'>Sil</button>
+                </td>
+            </tr>";
+        }
+
+        $html_output .= "</tbody></table></div></td></tr>";
 
         error_log("Oluşturulan HTML: " . $html_output);
         echo $html_output;
@@ -436,6 +501,7 @@ if (isset($_GET['ara'])) {
     <meta charset="UTF-8">
     <title>Borsa Portföy Takip</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="borsa.css">
 </head>
 
@@ -499,14 +565,37 @@ if (isset($_GET['ara'])) {
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('portfoyListesi').innerHTML = data;
+                    // Tıklama olaylarını ekle
+                    document.querySelectorAll('.ana-satir').forEach(row => {
+                        row.addEventListener('click', function() {
+                            const sembol = this.dataset.sembol;
+                            const detayRow = document.querySelector(`.detay-satir[data-sembol="${sembol}"]`);
+                            const icon = this.querySelector('.fas');
+
+                            if (detayRow.style.display === 'none') {
+                                detayRow.style.display = 'table-row';
+                                icon.classList.remove('fa-chevron-right');
+                                icon.classList.add('fa-chevron-down');
+                            } else {
+                                detayRow.style.display = 'none';
+                                icon.classList.remove('fa-chevron-down');
+                                icon.classList.add('fa-chevron-right');
+                            }
+                        });
+                    });
                 })
                 .catch(error => console.error('Hata:', error));
         }
 
         // Hisse sil
-        function hisseSil(id) {
-            if (confirm('Bu hisseyi silmek istediğinizden emin misiniz?')) {
-                fetch('borsa.php?sil=' + id)
+        function hisseSil(ids) {
+            const idList = ids.split(',');
+            const message = idList.length > 1 ?
+                'Bu hissenin tüm kayıtlarını silmek istediğinizden emin misiniz?' :
+                'Bu hisse kaydını silmek istediğinizden emin misiniz?';
+
+            if (confirm(message)) {
+                fetch('borsa.php?sil=' + encodeURIComponent(ids))
                     .then(response => response.text())
                     .then(data => {
                         if (data === 'success') {
