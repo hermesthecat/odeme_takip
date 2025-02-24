@@ -69,7 +69,7 @@ class BorsaTakip
                     MAX(anlik_fiyat) as anlik_fiyat
                 FROM portfolio 
                 GROUP BY sembol, hisse_adi 
-                ORDER BY son_guncelleme DESC";
+                ORDER BY id DESC";
 
         $stmt = $this->db->query($sql);
         $ozet = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -782,14 +782,14 @@ if (isset($_GET['ara'])) {
                             </div>
                             <div class="col-md-3">
                                 <div class="form-floating">
-                                    <input type="number" name="adet" id="adetInput" class="form-control" 
+                                    <input type="number" name="adet" id="adetInput" class="form-control"
                                         placeholder="Adet" required min="1">
                                     <label for="adetInput">Adet</label>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-floating">
-                                    <input type="number" step="0.01" name="alis_fiyati" id="alisFiyatiInput" 
+                                    <input type="number" step="0.01" name="alis_fiyati" id="alisFiyatiInput"
                                         class="form-control" placeholder="Alış Fiyatı" required min="0.01">
                                     <label for="alisFiyatiInput">Alış Fiyatı (₺)</label>
                                 </div>
@@ -891,11 +891,11 @@ if (isset($_GET['ara'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Form validasyonu için
-        (function () {
+        (function() {
             'use strict'
             var forms = document.querySelectorAll('.needs-validation')
-            Array.prototype.slice.call(forms).forEach(function (form) {
-                form.addEventListener('submit', function (event) {
+            Array.prototype.slice.call(forms).forEach(function(form) {
+                form.addEventListener('submit', function(event) {
                     if (!form.checkValidity()) {
                         event.preventDefault()
                         event.stopPropagation()
@@ -910,8 +910,11 @@ if (isset($_GET['ara'])) {
             const adet = parseFloat(document.getElementById('adetInput').value) || 0;
             const fiyat = parseFloat(document.getElementById('alisFiyatiInput').value) || 0;
             const maliyet = adet * fiyat;
-            document.getElementById('tahminiMaliyet').textContent = 
-                new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(maliyet);
+            document.getElementById('tahminiMaliyet').textContent =
+                new Intl.NumberFormat('tr-TR', {
+                    style: 'currency',
+                    currency: 'TRY'
+                }).format(maliyet);
         }
 
         // Input değişikliklerini dinle
@@ -960,13 +963,13 @@ if (isset($_GET['ara'])) {
         document.head.appendChild(style);
 
         // Mevcut JavaScript kodları buraya gelecek
-        
+
         // Mali durum grafiği için yeni fonksiyonlar
         let maliDurumChart = null;
 
         function maliDurumGrafigiGuncelle(portfoyData) {
             const ctx = document.getElementById('maliDurumGrafik').getContext('2d');
-            
+
             // Eğer grafik zaten varsa yok et
             if (maliDurumChart) {
                 maliDurumChart.destroy();
@@ -983,12 +986,12 @@ if (isset($_GET['ara'])) {
             portfoyData.forEach(hisse => {
                 const guncelDeger = parseFloat(hisse.anlik_fiyat) * parseInt(hisse.toplam_adet);
                 toplamDeger += guncelDeger;
-                
+
                 if (guncelDeger > 0) {
                     hisseler.push(hisse.sembol);
                     degerler.push(guncelDeger);
                     // Rastgele renk üret
-                    renkler.push('#' + Math.floor(Math.random()*16777215).toString(16));
+                    renkler.push('#' + Math.floor(Math.random() * 16777215).toString(16));
                 }
             });
 
@@ -1018,24 +1021,27 @@ if (isset($_GET['ara'])) {
             });
 
             // Özet bilgileri güncelle
-            document.getElementById('toplamPortfoyDeger').textContent = 
-                new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(toplamDeger);
-            
+            document.getElementById('toplamPortfoyDeger').textContent =
+                new Intl.NumberFormat('tr-TR', {
+                    style: 'currency',
+                    currency: 'TRY'
+                }).format(toplamDeger);
+
             // Kar/zarar ve satış karı bilgilerini güncelle
             let totalKarZarar = 0;
             let totalSatisKar = 0;
-            
+
             portfoyData.forEach(hisse => {
                 const detaylar = document.querySelector(`.ana-satir[data-sembol="${hisse.sembol}"]`);
                 if (detaylar) {
                     const karZararElement = detaylar.querySelector('.kar, .zarar');
                     const satisKarElement = detaylar.querySelector('.kar:last-child, .zarar:last-child');
-                    
+
                     if (karZararElement) {
                         const karZararText = karZararElement.textContent;
                         totalKarZarar += parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
                     }
-                    
+
                     if (satisKarElement) {
                         const satisKarText = satisKarElement.textContent;
                         totalSatisKar += parseFloat(satisKarText.replace(/[^0-9.-]+/g, ""));
@@ -1043,10 +1049,16 @@ if (isset($_GET['ara'])) {
                 }
             });
 
-            document.getElementById('toplamKarZarar').textContent = 
-                new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalKarZarar);
-            document.getElementById('toplamSatisKar').textContent = 
-                new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(totalSatisKar);
+            document.getElementById('toplamKarZarar').textContent =
+                new Intl.NumberFormat('tr-TR', {
+                    style: 'currency',
+                    currency: 'TRY'
+                }).format(totalKarZarar);
+            document.getElementById('toplamSatisKar').textContent =
+                new Intl.NumberFormat('tr-TR', {
+                    style: 'currency',
+                    currency: 'TRY'
+                }).format(totalSatisKar);
 
             // Renk sınıflarını güncelle
             document.getElementById('toplamKarZarar').className = totalKarZarar >= 0 ? 'text-success' : 'text-danger';
@@ -1059,7 +1071,7 @@ if (isset($_GET['ara'])) {
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById('portfoyListesi').innerHTML = data;
-                    
+
                     // Portföy verilerini topla
                     const portfoyData = [];
                     document.querySelectorAll('.ana-satir').forEach(row => {
