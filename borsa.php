@@ -599,40 +599,10 @@ if (isset($_GET['liste'])) {
                     <h6 class='mb-0'>Satış Detayları</h6>
                 </div>
                 <div class='card-body'>
-                    <div class='table-responsive'>
-                        <table class='table table-sm'>
-                            <thead>
-                                <tr>
-                                    <th>Alış Tarihi</th>
-                                    <th>Alış Fiyatı</th>
-                                    <th>Kalan Adet</th>
-                                    <th>Satılacak Adet</th>
-                                </tr>
-                            </thead>
-                            <tbody>";
-
-        // Aktif alım kayıtlarını listele
-        foreach ($portfoy['detaylar'][$hisse['sembol']] as $detay) {
-            $kalan_adet = $detay['adet'];
-            if (isset($detay['satis_adet'])) {
-                $kalan_adet -= $detay['satis_adet'];
-            }
-
-            if ($kalan_adet > 0) {
-                $alis_tarihi = date('d.m.Y H:i', strtotime($detay['alis_tarihi']));
-                $html_output .= "<tr data-alis-fiyati='{$detay['alis_fiyati']}' data-alis-tarihi='{$detay['alis_tarihi']}' data-id='{$detay['id']}' data-max-adet='{$kalan_adet}'>
-                    <td>{$alis_tarihi}</td>
-                    <td>{$detay['alis_fiyati']} ₺</td>
-                    <td>{$kalan_adet}</td>
-                    <td>
-                        <input type='number' class='form-control form-control-sm satis-adet' 
-                               min='0' max='{$kalan_adet}' value='0' readonly>
-                    </td>
-                </tr>";
-            }
-        }
-
-        $html_output .= "</tbody></table>
+                    <div class='alert alert-info'>
+                        <i class='fas fa-info-circle me-2'></i>
+                        Satış işlemleri FIFO (First In First Out - İlk Giren İlk Çıkar) prensibine göre yapılmaktadır. 
+                        En eski alımdan başlayarak satış gerçekleştirilir.
                     </div>
                     <div class='row mt-3'>
                         <div class='col-md-4'>
@@ -1206,26 +1176,10 @@ if (isset($_GET['ara'])) {
         function topluSatisKaydet(sembol) {
             const form = document.getElementById(`satis-form-${sembol}`);
             const satisFiyati = document.getElementById(`satis-fiyat-${sembol}`).value;
-            const satislar = [];
+            const toplamAdet = parseInt(document.getElementById(`toplam-satis-adet-${sembol}`).value) || 0;
 
-            // FIFO mantığına göre sıralanmış satırları al
-            const satirlar = Array.from(form.querySelectorAll('tr[data-alis-tarihi]'))
-                .sort((a, b) => new Date(a.dataset.alisTarihi) - new Date(b.dataset.alisTarihi));
-
-            satirlar.forEach(satir => {
-                const adetInput = satir.querySelector('.satis-adet');
-                const adet = parseInt(adetInput.value);
-                
-                if (adet > 0) {
-                    satislar.push({
-                        id: satir.dataset.id,
-                        adet: adet
-                    });
-                }
-            });
-
-            if (satislar.length === 0) {
-                alert('Satılacak hisse bulunmuyor!');
+            if (toplamAdet <= 0) {
+                alert('Lütfen satılacak adet giriniz!');
                 return;
             }
 
@@ -1234,18 +1188,21 @@ if (isset($_GET['ara'])) {
                 return;
             }
 
-            // Her bir satış için ayrı istek gönder
-            Promise.all(satislar.map(satis =>
-                    fetch(`borsa.php?sat=1&id=${satis.id}&adet=${satis.adet}&fiyat=${satisFiyati}`)
-                    .then(response => response.text())
-                ))
-                .then(results => {
-                    const basarili = results.every(result => result === 'success');
-                    if (basarili) {
+            // İlk kayıt ID'sini al
+            const anaSatir = document.querySelector(`.ana-satir[data-sembol="${sembol}"]`);
+            if (!anaSatir) return;
+
+            const kayitIdler = anaSatir.querySelector('.btn-danger').getAttribute('onclick').match(/\d+/)[0];
+            
+            // Satış işlemini gerçekleştir
+            fetch(`borsa.php?sat=1&id=${kayitIdler}&adet=${toplamAdet}&fiyat=${satisFiyati}`)
+                .then(response => response.text())
+                .then(result => {
+                    if (result === 'success') {
                         topluSatisFormunuGizle(sembol);
                         portfoyGuncelle();
                     } else {
-                        alert('Bazı satış işlemleri başarısız oldu!');
+                        alert('Satış işlemi başarısız oldu!');
                     }
                 })
                 .catch(error => {
