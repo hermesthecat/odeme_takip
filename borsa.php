@@ -822,25 +822,40 @@ if (isset($_GET['ara'])) {
 
         <!-- Mali Durum Grafiği -->
         <div class="card mb-4">
-            <div class="card-header">Mali Durum Özeti</div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <canvas id="maliDurumGrafik"></canvas>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="list-group">
-                            <div class="list-group-item">
-                                <h6 class="mb-1">Toplam Portföy Değeri</h6>
-                                <h4 id="toplamPortfoyDeger">0.00 ₺</h4>
-                            </div>
-                            <div class="list-group-item">
-                                <h6 class="mb-1">Toplam Kar/Zarar</h6>
-                                <h4 id="toplamKarZarar">0.00 ₺</h4>
-                            </div>
-                            <div class="list-group-item">
-                                <h6 class="mb-1">Gerçekleşen Kar/Zarar</h6>
-                                <h4 id="toplamSatisKar">0.00 ₺</h4>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Mali Durum Özeti</span>
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary active" type="button" data-bs-toggle="collapse" data-bs-target="#maliDurumDetay">
+                        <i class="fas fa-chart-pie me-1"></i> Grafik
+                    </button>
+                </div>
+            </div>
+            <div class="collapse show" id="maliDurumDetay">
+                <div class="card-body py-2">
+                    <div class="row g-2">
+                        <div class="col-md-5">
+                            <canvas id="maliDurumGrafik" style="max-height: 200px;"></canvas>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="row row-cols-1 row-cols-md-3 g-2">
+                                <div class="col">
+                                    <div class="border rounded p-2 h-100">
+                                        <small class="text-muted d-block">Portföy Değeri</small>
+                                        <h5 id="toplamPortfoyDeger" class="mb-0 mt-1">0.00 ₺</h5>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="border rounded p-2 h-100">
+                                        <small class="text-muted d-block">Kar/Zarar</small>
+                                        <h5 id="toplamKarZarar" class="mb-0 mt-1">0.00 ₺</h5>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="border rounded p-2 h-100">
+                                        <small class="text-muted d-block">Gerçekleşen K/Z</small>
+                                        <h5 id="toplamSatisKar" class="mb-0 mt-1">0.00 ₺</h5>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
