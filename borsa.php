@@ -76,6 +76,34 @@ class BorsaTakip
     }
 }
 
+// POST işlemlerini kontrol et
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $borsaTakip = new BorsaTakip();
+    
+    if (isset($_POST['sembol'], $_POST['adet'], $_POST['alis_fiyati'])) {
+        $sembol = strtoupper(trim($_POST['sembol']));
+        $adet = intval($_POST['adet']);
+        $alis_fiyati = floatval($_POST['alis_fiyati']);
+        $alis_tarihi = date('Y-m-d H:i:s');
+        
+        if ($borsaTakip->hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi)) {
+            header('Location: ' . $_SERVER['PHP_SELF']);
+            exit;
+        }
+    }
+}
+
+// AJAX silme işlemi için
+if (isset($_GET['sil']) && is_numeric($_GET['sil'])) {
+    $borsaTakip = new BorsaTakip();
+    if ($borsaTakip->hisseSil($_GET['sil'])) {
+        echo 'success';
+    } else {
+        echo 'error';
+    }
+    exit;
+}
+
 // HTML Görünümü
 ?>
 <!DOCTYPE html>
@@ -146,21 +174,53 @@ class BorsaTakip
         </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.6.0.min.js"></script>
+    <!-- Yedek jQuery -->
     <script>
-        function portfoyGuncelle() {
-            $.ajax({
-                url: 'portfoy_api.php',
-                method: 'GET',
-                success: function(data) {
-                    $('#portfoyListesi').html(data);
-                }
-            });
+        if (typeof jQuery == 'undefined') {
+            document.write('<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"><\/script>');
         }
+    </script>
 
-        // Her 5 dakikada bir güncelle
-        setInterval(portfoyGuncelle, 300000);
-        portfoyGuncelle();
+    <script>
+        // jQuery yüklenene kadar bekle
+        window.onload = function() {
+            if (typeof jQuery == 'undefined') {
+                alert('jQuery yüklenemedi! Lütfen internet bağlantınızı kontrol edin.');
+                return;
+            }
+
+            function portfoyGuncelle() {
+                $.ajax({
+                    url: 'portfoy_api.php',
+                    method: 'GET',
+                    success: function(data) {
+                        $('#portfoyListesi').html(data);
+                    }
+                });
+            }
+
+            function hisseSil(id) {
+                if (confirm('Bu hisseyi silmek istediğinizden emin misiniz?')) {
+                    $.ajax({
+                        url: 'borsa.php?sil=' + id,
+                        method: 'GET',
+                        success: function(response) {
+                            if (response === 'success') {
+                                portfoyGuncelle();
+                            } else {
+                                alert('Hisse silinirken bir hata oluştu!');
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Her 5 dakikada bir güncelle
+            setInterval(portfoyGuncelle, 300000);
+            portfoyGuncelle();
+        }
     </script>
 </body>
 
