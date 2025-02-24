@@ -11,7 +11,6 @@ require_once 'config.php';
 class BorsaTakip
 {
     private $db;
-    private $api_key = 'apikey 16vg3zkaPI7Vk7n4rwhOuX:2RD33Qn1D266qIvlJshmKY';
 
     public function __construct()
     {
@@ -136,12 +135,37 @@ class BorsaTakip
 
     /**
      * Anlık fiyat bilgisini getirir
+     * @param string $sembol Hisse senedi sembolü
+     * @param bool $forceApi API'den zorla fiyat çek (arama için)
+     * @return float Hisse fiyatı
      */
-    public function anlikFiyatGetir($sembol)
+    public function anlikFiyatGetir($sembol, $forceApi = false)
     {
-        $fiyat = $this->collectApiFiyatCek($sembol);
-        error_log("Anlık fiyat alındı - Hisse: " . $sembol . ", Fiyat: " . $fiyat);
-        return $fiyat;
+        // Eğer API'den fiyat çekilmesi istendiyse (arama için)
+        if ($forceApi) {
+            $fiyat = $this->collectApiFiyatCek($sembol);
+            error_log("Anlık fiyat API'den alındı - Hisse: " . $sembol . ", Fiyat: " . $fiyat);
+            return $fiyat;
+        }
+
+        // Veritabanından anlık fiyatı al (hisse bazında son fiyat)
+        $sql = "SELECT DISTINCT anlik_fiyat, son_guncelleme 
+                FROM portfolio 
+                WHERE sembol = :sembol 
+                ORDER BY son_guncelleme DESC 
+                LIMIT 1";
+                
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute(['sembol' => $sembol]);
+        $sonuc = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($sonuc && $sonuc['anlik_fiyat'] > 0) {
+            error_log("Anlık fiyat DB'den alındı - Hisse: " . $sembol . ", Fiyat: " . $sonuc['anlik_fiyat'] . ", Son Güncelleme: " . $sonuc['son_guncelleme']);
+            return $sonuc['anlik_fiyat'];
+        }
+
+        error_log("Anlık fiyat DB'de bulunamadı - Hisse: " . $sembol);
+        return 0;
     }
 
     /**
@@ -155,14 +179,10 @@ class BorsaTakip
         error_log("Anlık Fiyat: " . $anlik_fiyat);
         error_log("Adet: " . $hisse['adet']);
 
-        $maliyet = $hisse['alis_fiyati'] * $hisse['adet'];
-        $guncel_deger = $anlik_fiyat * $hisse['adet'];
-        $kar_zarar = $guncel_deger - $maliyet;
+        // Kar/Zarar = (Güncel Fiyat - Alış Fiyatı) * Adet
+        $kar_zarar = ($anlik_fiyat - $hisse['alis_fiyati']) * $hisse['adet'];
 
-        error_log("Maliyet: " . $maliyet);
-        error_log("Güncel Değer: " . $guncel_deger);
         error_log("Kar/Zarar: " . $kar_zarar);
-
         return $kar_zarar;
     }
 
@@ -252,53 +272,11 @@ class BorsaTakip
                 strpos(mb_strtoupper($hisse['ad'], 'UTF-8'), $aranan) !== false
             ) {
                 // Hisse detayını çek
-                $detay_curl = curl_init();
-                $detay_url = "https://bigpara.hurriyet.com.tr/api/v1/borsa/hisseyuzeysel/" . $hisse['kod'];
-                error_log("Hisse Detay API İsteği URL: " . $detay_url);
-
-                curl_setopt_array($detay_curl, [
-                    CURLOPT_URL => $detay_url,
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 30,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "GET",
-                    CURLOPT_SSL_VERIFYPEER => false,
-                    CURLOPT_SSL_VERIFYHOST => false,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTPHEADER => [
-                        "content-type: application/json",
-                        "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-                    ],
-                ]);
-
-                $detay_response = curl_exec($detay_curl);
-                $detay_err = curl_error($detay_curl);
-                $detay_httpcode = curl_getinfo($detay_curl, CURLINFO_HTTP_CODE);
-                curl_close($detay_curl);
-
-                error_log("Hisse Detay API Yanıt Kodu: " . $detay_httpcode . " için " . $hisse['kod']);
-                error_log("Hisse Detay API Hata: " . $detay_err . " için " . $hisse['kod']);
-                error_log("Hisse Detay API Ham Yanıt: " . $detay_response . " için " . $hisse['kod']);
-
-                $fiyat = '0.00';
-                if ($detay_httpcode === 200) {
-                    $detay_data = json_decode($detay_response, true);
-                    if (isset($detay_data['data']['hisseYuzeysel'])) {
-                        $detay = $detay_data['data']['hisseYuzeysel'];
-                        if (isset($detay['alis']) && isset($detay['satis'])) {
-                            $fiyat = number_format(($detay['alis'] + $detay['satis']) / 2, 2, '.', '');
-                        } elseif (isset($detay['kapanis'])) {
-                            $fiyat = number_format($detay['kapanis'], 2, '.', '');
-                        }
-                    }
-                }
-
+                $fiyat = $this->collectApiFiyatCek($hisse['kod']);
                 $sonuclar[] = [
                     'code' => $hisse['kod'],
                     'title' => $hisse['ad'],
-                    'price' => $fiyat
+                    'price' => number_format($fiyat, 2, '.', '')
                 ];
 
                 $count++;
@@ -361,20 +339,24 @@ if (isset($_GET['liste'])) {
 
         if ($anlik_fiyat <= 0) {
             error_log("UYARI: Sıfır veya negatif fiyat tespit edildi: " . $hisse['sembol']);
-            // API'den tekrar dene
-            $anlik_fiyat = $borsaTakip->anlikFiyatGetir($hisse['sembol']);
-            error_log("Tekrar Deneme Sonrası Fiyat: " . $anlik_fiyat);
+            // Veritabanında fiyat yoksa API'den dene
+            $anlik_fiyat = $borsaTakip->anlikFiyatGetir($hisse['sembol'], true);
+            error_log("API'den Alınan Fiyat: " . $anlik_fiyat);
         }
 
         $kar_zarar = $borsaTakip->karZararHesapla($hisse);
         $kar_zarar_class = $kar_zarar >= 0 ? 'kar' : 'zarar';
+
+        // Son güncelleme zamanını al
+        $son_guncelleme = isset($hisse['son_guncelleme']) ? date('H:i:s', strtotime($hisse['son_guncelleme'])) : '';
+        $guncelleme_bilgisi = $son_guncelleme ? " <small class='text-muted'>($son_guncelleme)</small>" : '';
 
         // Debug için HTML çıktısı
         $html_output = "<tr>
                 <td class='sembol'>{$hisse['sembol']}</td>
                 <td class='adet'>{$hisse['adet']}</td>
                 <td class='alis_fiyati'>{$hisse['alis_fiyati']} ₺</td>
-                <td class='anlik_fiyat'>{$anlik_fiyat} ₺</td>
+                <td class='anlik_fiyat'>{$anlik_fiyat} ₺{$guncelleme_bilgisi}</td>
                 <td class='{$kar_zarar_class}'>" . number_format($kar_zarar, 2) . " ₺</td>
                 <td>
                     <button class='btn btn-danger btn-sm' onclick='hisseSil({$hisse['id']})'>Sil</button>
