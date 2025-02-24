@@ -371,10 +371,10 @@ if (isset($_GET['liste'])) {
 
         // Debug için HTML çıktısı
         $html_output = "<tr>
-                <td>{$hisse['sembol']}</td>
-                <td>{$hisse['adet']}</td>
-                <td>{$hisse['alis_fiyati']} ₺</td>
-                <td>{$anlik_fiyat} ₺</td>
+                <td class='sembol'>{$hisse['sembol']}</td>
+                <td class='adet'>{$hisse['adet']}</td>
+                <td class='alis_fiyati'>{$hisse['alis_fiyati']} ₺</td>
+                <td class='anlik_fiyat'>{$anlik_fiyat} ₺</td>
                 <td class='{$kar_zarar_class}'>" . number_format($kar_zarar, 2) . " ₺</td>
                 <td>
                     <button class='btn btn-danger btn-sm' onclick='hisseSil({$hisse['id']})'>Sil</button>
