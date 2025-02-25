@@ -115,7 +115,7 @@
                     </div>
                     <div class="mb-3" id="updateIncomeChildrenGroup" style="display: none;">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="update_income_children" name="update_children" checked>
+                            <input class="form-check-input" type="checkbox" id="update_income_children" name="update_children">
                             <label class="form-check-label" for="update_income_children">
                                 <?php echo t('income.update_children'); ?>
                             </label>
