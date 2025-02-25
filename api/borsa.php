@@ -16,18 +16,20 @@ function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi = '')
     global $pdo;
     // Önce anlık fiyatı API'den al
     $anlik_fiyat = collectApiFiyatCek($sembol);
+    $user_id = $_SESSION['user_id'];
+
     saveLog("Yeni hisse eklenirken anlık fiyat alındı - Hisse: $sembol, Fiyat: $anlik_fiyat", 'info', 'hisseEkle', $_SESSION['user_id']);
 
-    $sql = "INSERT INTO portfolio (sembol, adet, alis_fiyati, alis_tarihi, anlik_fiyat, son_guncelleme, hisse_adi) 
-                VALUES (:sembol, :adet, :alis_fiyati, :alis_tarihi, :anlik_fiyat, CURRENT_TIMESTAMP, :hisse_adi)";
+    $sql = "INSERT INTO portfolio (sembol, adet, alis_fiyati, alis_tarihi, anlik_fiyat, son_guncelleme, hisse_adi, user_id) 
+                VALUES (:sembol, :adet, :alis_fiyati, :alis_tarihi, :anlik_fiyat, :hisse_adi, :user_id)";
     $stmt = $pdo->prepare($sql);
     return $stmt->execute([
         'sembol' => $sembol,
         'adet' => $adet,
         'alis_fiyati' => $alis_fiyati,
-        'alis_tarihi' => $alis_tarihi,
         'anlik_fiyat' => $anlik_fiyat,
-        'hisse_adi' => $hisse_adi
+        'hisse_adi' => $hisse_adi,
+        'user_id' => $user_id
     ]);
 }
 
