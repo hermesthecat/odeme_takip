@@ -88,6 +88,9 @@ function updateSaving()
     // Create new saving record
     $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt->execute([$user_id, $saving['id'], $saving['name'], $saving['target_amount'], $current_amount, $saving['currency'], $saving['start_date'], $saving['target_date'], 'update'])) {
+        // Update original saving record
+        $stmt = $pdo->prepare("UPDATE savings SET current_amount = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$current_amount, $saving['id'], $user_id]);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
@@ -128,6 +131,9 @@ function updateFullSaving()
     // Create new saving record
     $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt->execute([$user_id, $saving['id'], $name, $target_amount, $current_amount, $currency, $start_date, $target_date, 'update'])) {
+        // Update original saving record
+        $stmt = $pdo->prepare("UPDATE savings SET current_amount = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$current_amount, $saving['id'], $user_id]);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
