@@ -422,7 +422,19 @@ function topluSatisKaydet(sembol) {
     const anaSatir = document.querySelector(`.ana-satir[data-sembol="${sembol}"]`);
     if (!anaSatir) return;
 
-    const kayitIdler = anaSatir.querySelector('.btn-danger').getAttribute('onclick').match(/\d+/)[0];
+    // Tümünü Sil butonundan ID'leri al
+    const silButonu = anaSatir.querySelector('.btn-danger');
+    if (!silButonu) return;
+    
+    const onclickAttr = silButonu.getAttribute('onclick');
+    const idMatch = onclickAttr.match(/hisseSil\('([^']+)'/);
+    
+    if (!idMatch || !idMatch[1]) {
+        console.error('Hisse ID bulunamadı');
+        return;
+    }
+    
+    const kayitIdler = idMatch[1];
 
     // Satış işlemini gerçekleştir
     fetch(`api/borsa.php?sat=1&id=${kayitIdler}&adet=${toplamAdet}&fiyat=${satisFiyati}`)

@@ -129,6 +129,46 @@ function portfoyListele()
         // Detay satırı
         $output .= '<tr class="detay-satir" data-sembol="' . $sembol . '" style="display: none;">';
         $output .= '<td colspan="7">';
+        
+        // Satış formu
+        $output .= "<div id='satis-form-{$sembol}' class='satis-form mb-3' style='display:none;'>
+            <div class='card'>
+                <div class='card-header'>
+                    <h6 class='mb-0'>Satış Detayları</h6>
+                </div>
+                <div class='card-body'>
+                    <div class='alert alert-info'>
+                        <i class='fa-solid fa-circle-info me-2'></i>
+                        Satış işlemleri FIFO (First In First Out - İlk Giren İlk Çıkar) prensibine göre yapılmaktadır. 
+                        En eski alımdan başlayarak satış gerçekleştirilir.
+                    </div>
+                    <div class='row mt-3'>
+                        <div class='col-md-4'>
+                            <div class='input-group input-group-sm'>
+                                <span class='input-group-text'>Satış Fiyatı</span>
+                                <input type='number' class='form-control' id='satis-fiyat-{$sembol}' 
+                                       step='0.01' value='{$anlik_fiyat}'>
+                            </div>
+                        </div>
+                        <div class='col-md-4'>
+                            <div class='input-group input-group-sm'>
+                                <span class='input-group-text'>Satılacak Lot</span>
+                                <input type='number' class='form-control' id='toplam-satis-adet-{$sembol}' 
+                                       min='0' max='{$toplam_adet}' value='0'>
+                            </div>
+                        </div>
+                        <div class='col-md-4'>
+                            <small class='text-muted'>Tahmini Kar/Zarar: <span id='kar-zarar-{$sembol}'>0.00 ₺</span></small>
+                        </div>
+                    </div>
+                    <div class='mt-3'>
+                        <button class='btn btn-primary btn-sm' onclick='topluSatisKaydet(\"{$sembol}\")'>Kaydet</button>
+                        <button class='btn btn-secondary btn-sm' onclick='topluSatisFormunuGizle(\"{$sembol}\", event)'>İptal</button>
+                    </div>
+                </div>
+            </div>
+        </div>";
+        
         $output .= '<table class="table table-sm">';
         $output .= '<thead class="table-light">';
         $output .= '<tr>';
@@ -149,14 +189,20 @@ function portfoyListele()
             $alis_kar_zarar = ($anlik_fiyat - $alis['alis_fiyati']) * $kalan_adet;
             $alis_kar_zarar_class = $alis_kar_zarar >= 0 ? 'kar' : 'zarar';
 
-            $output .= '<tr>';
+            $output .= '<tr data-alis-tarihi="' . $alis['alis_tarihi'] . '" data-alis-fiyati="' . $alis['alis_fiyati'] . '" data-max-adet="' . $kalan_adet . '">';
             $output .= '<td>' . date('d.m.Y H:i', strtotime($alis['alis_tarihi'])) . '</td>';
             $output .= '<td>' . $kalan_adet . '</td>';
             $output .= '<td>' . number_format($alis['alis_fiyati'], 2, '.', ',') . ' ₺</td>';
             $output .= '<td>' . number_format($anlik_fiyat, 2, '.', ',') . ' ₺</td>';
             $output .= '<td class="' . $alis_kar_zarar_class . '">' . number_format($alis_kar_zarar, 2, '.', ',') . ' ₺</td>';
             $output .= '<td>' . ($alis['durum'] == 'kismi_satildi' ? 'Kısmi Satış' : 'Aktif') . '</td>';
-            $output .= '<td><button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button></td>';
+            $output .= '<td>
+                <div class="d-flex align-items-center">
+                    <input type="checkbox" class="satis-secim form-check-input me-2" disabled>
+                    <input type="number" class="satis-adet form-control form-control-sm me-2" value="0" min="0" max="' . $kalan_adet . '" readonly style="width: 70px;">
+                    <button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button>
+                </div>
+            </td>';
             $output .= '</tr>';
         }
 
