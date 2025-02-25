@@ -241,14 +241,11 @@ function maliDurumGrafigiGuncelle(portfoyData) {
     });
 
     // Aktif hisselerin kar/zararını topla
-    document.querySelectorAll('.ana-satir').forEach(satir => {
-        const karZararHucresi = satir.querySelector('td.kar, td.zarar');
-        if (karZararHucresi && !karZararHucresi.classList.contains('satis-kar')) {
-            const karZararText = karZararHucresi.textContent.trim();
-            const karZararDeger = parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
-            if (!isNaN(karZararDeger)) {
-                totalKarZarar += karZararDeger;
-            }
+    document.querySelectorAll('.ana-satir td:nth-child(5)').forEach(hucre => {
+        const karZararText = hucre.textContent.trim();
+        const karZararDeger = parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
+        if (!isNaN(karZararDeger)) {
+            totalKarZarar += karZararDeger;
         }
     });
 
@@ -288,8 +285,38 @@ function portfoyGuncelle() {
             // Mali durum grafiğini güncelle
             maliDurumGrafigiGuncelle(portfoyData);
 
-            // Satış karı hücrelerinin renklerini düzenle
-            document.querySelectorAll('td.satis-kar').forEach(hucre => {
+            // Kar/Zarar hücrelerinin renklerini düzenle - Ana satırlardaki tüm kar/zarar hücreleri
+            document.querySelectorAll('.ana-satir td:nth-child(5)').forEach(hucre => {
+                const deger = parseFloat(hucre.textContent.replace(/[^0-9.-]+/g, ""));
+                if (!isNaN(deger)) {
+                    if (deger >= 0) {
+                        hucre.classList.add('kar');
+                        hucre.classList.remove('zarar');
+                    } else {
+                        hucre.classList.add('zarar');
+                        hucre.classList.remove('kar');
+                    }
+                }
+            });
+
+            // Satış karı hücrelerinin renklerini düzenle - Ana satırlardaki tüm satış karı hücreleri
+            document.querySelectorAll('.ana-satir td:nth-child(6)').forEach(hucre => {
+                const deger = parseFloat(hucre.textContent.replace(/[^0-9.-]+/g, ""));
+                if (!isNaN(deger)) {
+                    if (deger >= 0) {
+                        hucre.classList.add('kar');
+                        hucre.classList.add('satis-kar');
+                        hucre.classList.remove('zarar');
+                    } else {
+                        hucre.classList.add('zarar');
+                        hucre.classList.add('satis-kar');
+                        hucre.classList.remove('kar');
+                    }
+                }
+            });
+
+            // Detay satırlarındaki kar/zarar hücrelerini düzenle
+            document.querySelectorAll('.detay-satir td.kar, .detay-satir td.zarar').forEach(hucre => {
                 const deger = parseFloat(hucre.textContent.replace(/[^0-9.-]+/g, ""));
                 if (!isNaN(deger)) {
                     if (deger >= 0) {

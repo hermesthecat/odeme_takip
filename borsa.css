@@ -36,6 +36,43 @@ body {
     color: var(--zarar-color);
 }
 
+/* Kar/Zarar için özel stiller */
+td.kar {
+    color: var(--kar-color) !important;
+    font-weight: bold;
+}
+
+td.zarar {
+    color: var(--zarar-color) !important;
+    font-weight: bold;
+}
+
+/* Kar/Zarar hücreleri için özel stiller */
+.kar-zarar-hucre {
+    font-weight: bold;
+}
+
+.kar-zarar-hucre.kar {
+    color: var(--kar-color) !important;
+}
+
+.kar-zarar-hucre.zarar {
+    color: var(--zarar-color) !important;
+}
+
+/* Satış karı için özel stil */
+.satis-kar-hucre {
+    font-weight: bold;
+}
+
+.satis-kar-hucre.kar {
+    color: var(--kar-color) !important;
+}
+
+.satis-kar-hucre.zarar {
+    color: var(--zarar-color) !important;
+}
+
 /* Satış karı için özel stil */
 .satis-kar {
     font-weight: bold;
