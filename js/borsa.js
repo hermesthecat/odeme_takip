@@ -154,8 +154,6 @@ style.textContent = `
     `;
 document.head.appendChild(style);
 
-// Mevcut JavaScript kodları buraya gelecek
-
 // Mali durum grafiği için yeni fonksiyonlar
 let maliDurumChart = null;
 
@@ -286,28 +284,28 @@ function portfoyGuncelle() {
             maliDurumGrafigiGuncelle(portfoyData);
 
             // Koyu tema kontrolü
-            const isDarkMode = localStorage.getItem('theme') === 'dark' || 
-                               document.documentElement.getAttribute('data-theme') === 'dark';
-            
+            const isDarkMode = localStorage.getItem('theme') === 'dark' ||
+                document.documentElement.getAttribute('data-theme') === 'dark';
+
             if (isDarkMode) {
                 // Tablo başlıklarını güncelle
                 document.querySelectorAll('.table thead th').forEach(th => {
                     th.style.backgroundColor = '#2c3034';
                     th.style.color = '#e9ecef';
                 });
-                
+
                 // Ana satırları güncelle
                 document.querySelectorAll('.ana-satir').forEach(row => {
                     row.style.backgroundColor = '#343a40';
                     row.style.color = '#e9ecef';
                 });
-                
+
                 // Detay satırları güncelle
                 document.querySelectorAll('.detay-satir').forEach(row => {
                     row.style.backgroundColor = '#2c3034';
                     row.style.color = '#e9ecef';
                 });
-                
+
                 // Tablo hücrelerini güncelle
                 document.querySelectorAll('#portfoyListesi td').forEach(td => {
                     td.style.backgroundColor = '#343a40';
@@ -584,7 +582,7 @@ function hisseSil(ids, event) {
     const message = idList.length > 1 ?
         'Bu hissenin tüm kayıtlarını silmek istediğinizden emin misiniz?' :
         'Bu hisse kaydını silmek istediğinizden emin misiniz?';
-    
+
     Swal.fire({
         title: 'Emin misiniz?',
         text: message,
@@ -724,7 +722,7 @@ window.onload = function () {
         document.documentElement.setAttribute('data-theme', savedTheme);
         document.body.setAttribute('data-theme', savedTheme);
     }
-    
+
     portfoyGuncelle();
     setInterval(portfoyGuncelle, 300000);
 };
