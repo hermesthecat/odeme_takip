@@ -2,6 +2,7 @@
 require_once 'config.php';
 require_once 'classes/log.php';
 checkLogin();
+checkAdmin();
 
 // Sayfa başına gösterilecek log sayısı
 $logs_per_page = 50;
@@ -121,21 +122,27 @@ $log_type_bg_classes = [
         body .table tbody tr {
             background-color: white !important;
         }
+
         body .table tbody tr[data-type="info"] {
             background-color: #9fe5f7 !important;
         }
+
         body .table tbody tr[data-type="error"] {
             background-color: #f5c2c7 !important;
         }
+
         body .table tbody tr[data-type="warning"] {
             background-color: #ffe69c !important;
         }
+
         body .table tbody tr[data-type="success"] {
             background-color: #a3cfbb !important;
         }
+
         body .table tbody tr[data-type="debug"] {
             background-color: #c5c6c9 !important;
         }
+
         /* Hover ve zebra çizgilerini devre dışı bırak */
         body .table tr:hover,
         body .table tr:nth-child(even),
@@ -228,9 +235,9 @@ $log_type_bg_classes = [
                         <tbody>
                             <?php if (count($logs) > 0): ?>
                                 <?php foreach ($logs as $log): ?>
-                                    <?php 
+                                    <?php
                                     $bg_color = '';
-                                    switch($log['type']) {
+                                    switch ($log['type']) {
                                         case 'info':
                                             $bg_color = '#9fe5f7'; // Daha koyu bg-info
                                             break;
@@ -331,7 +338,7 @@ $log_type_bg_classes = [
                 var bgColor = $(this).css('background-color');
                 if (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
                     var type = $(this).find('td:eq(2) span').text().toLowerCase().trim();
-                    switch(type) {
+                    switch (type) {
                         case 'info':
                             $(this).css('background-color', '#9fe5f7');
                             break;
@@ -383,7 +390,7 @@ $log_type_bg_classes = [
             $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
                 $(this).val('');
             });
-            
+
             // Mesaj hücrelerine tıklandığında modal gösterme
             $('.message-cell').on('click', function() {
                 const message = $(this).data('message');

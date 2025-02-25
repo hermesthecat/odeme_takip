@@ -62,6 +62,14 @@ function checkLogin()
     }
 }
 
+function checkAdmin()
+{
+    if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
+        header("Location: login.php");
+        exit;
+    }
+}
+
 // supported currencies
 $supported_currencies = [
     'TRY' => 'TRY - ' . t('currencies.try'),
