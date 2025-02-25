@@ -167,15 +167,16 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
         </div>
 
+        <?php require_once __DIR__ . '/modals/user_settings_modal.php'; ?>
+
+
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script src="js/borsa.js"></script>
         <script src="js/utils.js"></script>
         <script src="js/theme.js"></script>
-        <script src="js/app.js"></script>
-        <script src="js/auth.js"></script>
+        <script src="js/borsa.js"></script>
 </body>
 
 </html>

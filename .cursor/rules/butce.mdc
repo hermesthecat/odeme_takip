@@ -1,6 +1,7 @@
 ---
 description: proje-yapisi
-globs: 
+globs: *
 ---
 bir işlem yapmadan önce her zaman proje-yapisi.md dosyasının içini kontrol et.
 yapilan bir değişiklik proje-yapisi.md dosyasında güncelleme gerektiriyorsa bunu uygula.
+Sana bir soru sorulduğunda istenen şey bilgi ise, sadece cevap ver. eğer istenen şey için düzenleme yapman gerekiyorsa bunun için onay iste.

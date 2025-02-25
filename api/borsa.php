@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/log.php';
 checkLogin();
 
 // get user default currency from session
@@ -15,7 +16,7 @@ function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi = '')
     global $pdo;
     // Önce anlık fiyatı API'den al
     $anlik_fiyat = collectApiFiyatCek($sembol);
-    error_log("Yeni hisse eklenirken anlık fiyat alındı - Hisse: $sembol, Fiyat: $anlik_fiyat");
+    saveLog("Yeni hisse eklenirken anlık fiyat alındı - Hisse: $sembol, Fiyat: $anlik_fiyat", 'info', 'hisseEkle', $_SESSION['user_id']);
 
     $sql = "INSERT INTO portfolio (sembol, adet, alis_fiyati, alis_tarihi, anlik_fiyat, son_guncelleme, hisse_adi) 
                 VALUES (:sembol, :adet, :alis_fiyati, :alis_tarihi, :anlik_fiyat, CURRENT_TIMESTAMP, :hisse_adi)";
@@ -94,7 +95,7 @@ function collectApiFiyatCek($sembol)
 
     // BigPara hisse detay endpoint'i
     $url = "https://bigpara.hurriyet.com.tr/api/v1/borsa/hisseyuzeysel/" . urlencode($sembol);
-    error_log("API İsteği URL: " . $url);
+    saveLog("API İsteği URL: " . $url, 'info', 'collectApiFiyatCek', $_SESSION['user_id']);
 
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
@@ -119,29 +120,28 @@ function collectApiFiyatCek($sembol)
     curl_close($curl);
 
     // Debug bilgileri
-    error_log("BigPara API İstek - Hisse: " . $sembol);
-    error_log("BigPara API Yanıt Kodu: " . $httpcode);
-    error_log("BigPara API Hata: " . $err);
-    error_log("BigPara API Ham Yanıt: " . $response);
+    saveLog("BigPara API İstek - Hisse: " . $sembol, 'info', 'collectApiFiyatCek', $_SESSION['user_id']);
+    saveLog("BigPara API Yanıt Kodu: " . $httpcode, 'info', 'collectApiFiyatCek', $_SESSION['user_id']);
+    saveLog("BigPara API Ham Yanıt: " . $response, 'info', 'collectApiFiyatCek', $_SESSION['user_id']);
 
     if ($err) {
-        error_log("BigPara API Curl Hatası: " . $err);
+        saveLog("BigPara API Curl Hatası: " . $err, 'error', 'collectApiFiyatCek', $_SESSION['user_id']);
         return 0;
     }
 
     if ($httpcode !== 200) {
-        error_log("BigPara API HTTP Hata Kodu: " . $httpcode);
+        saveLog("BigPara API HTTP Hata Kodu: " . $httpcode, 'error', 'collectApiFiyatCek', $_SESSION['user_id']);
         return 0;
     }
 
     $data = json_decode($response, true);
     if (!isset($data['data']['hisseYuzeysel'])) {
-        error_log("BigPara API Geçersiz Yanıt: " . print_r($data, true));
+        saveLog("BigPara API Geçersiz Yanıt: " . print_r($data, true), 'error', 'collectApiFiyatCek', $_SESSION['user_id']);
         return 0;
     }
 
     $hisse = $data['data']['hisseYuzeysel'];
-    error_log("İşlenen hisse verisi: " . print_r($hisse, true));
+    saveLog("İşlenen hisse verisi: " . print_r($hisse, true), 'info', 'collectApiFiyatCek', $_SESSION['user_id']);
 
     // Son işlem fiyatını al (alış-satış ortalaması)
     if (
@@ -149,18 +149,18 @@ function collectApiFiyatCek($sembol)
         is_numeric($hisse['alis']) && is_numeric($hisse['satis'])
     ) {
         $fiyat = ($hisse['alis'] + $hisse['satis']) / 2;
-        error_log("Fiyat alış-satış ortalamasından alındı: " . $fiyat);
+        saveLog("Fiyat alış-satış ortalamasından alındı: " . $fiyat, 'info', 'collectApiFiyatCek', $_SESSION['user_id']);
         return $fiyat;
     }
 
     // Alternatif olarak son fiyatı kontrol et
     if (isset($hisse['kapanis']) && is_numeric($hisse['kapanis'])) {
         $fiyat = floatval($hisse['kapanis']);
-        error_log("Fiyat kapanıştan alındı: " . $fiyat);
+        saveLog("Fiyat kapanıştan alındı: " . $fiyat, 'info', 'collectApiFiyatCek', $_SESSION['user_id']);
         return $fiyat;
     }
 
-    error_log("Hisse fiyatı bulunamadı: " . $sembol);
+    saveLog("Hisse fiyatı bulunamadı: " . $sembol, 'error', 'collectApiFiyatCek', $_SESSION['user_id']);
     return 0;
 }
 
@@ -176,7 +176,7 @@ function anlikFiyatGetir($sembol, $forceApi = false)
     // Eğer API'den fiyat çekilmesi istendiyse (arama için)
     if ($forceApi) {
         $fiyat = collectApiFiyatCek($sembol);
-        error_log("Anlık fiyat API'den alındı - Hisse: " . $sembol . ", Fiyat: " . $fiyat);
+        saveLog("Anlık fiyat API'den alındı - Hisse: " . $sembol . ", Fiyat: " . $fiyat, 'info', 'anlikFiyatGetir', $_SESSION['user_id']);
         return $fiyat;
     }
 
@@ -196,7 +196,7 @@ function anlikFiyatGetir($sembol, $forceApi = false)
         return $sonuc['anlik_fiyat'];
     }
 
-    error_log("Anlık fiyat DB'de bulunamadı - Hisse: " . $sembol);
+    saveLog("Anlık fiyat DB'de bulunamadı - Hisse: " . $sembol, 'error', 'anlikFiyatGetir', $_SESSION['user_id']);
     return 0;
 }
 
@@ -206,15 +206,14 @@ function anlikFiyatGetir($sembol, $forceApi = false)
 function karZararHesapla($hisse)
 {
     $anlik_fiyat = anlikFiyatGetir($hisse['sembol']);
-    error_log("Kar/Zarar Hesaplama - Hisse: " . $hisse['sembol']);
-    error_log("Alış Fiyatı: " . $hisse['alis_fiyati']);
-    error_log("Anlık Fiyat: " . $anlik_fiyat);
-    error_log("Adet: " . $hisse['adet']);
+
+    // merge error log to save log
+    saveLog("Kar/Zarar Hesaplama - Hisse: " . $hisse['sembol'] . " <br> Alış Fiyatı: " . $hisse['alis_fiyati'] . " <br> Anlık Fiyat: " . $anlik_fiyat . " <br> Adet: " . $hisse['adet'], 'info', 'karZararHesapla', $_SESSION['user_id']);
 
     // Kar/Zarar = (Güncel Fiyat - Alış Fiyatı) * Adet
     $kar_zarar = ($anlik_fiyat - $hisse['alis_fiyati']) * $hisse['adet'];
 
-    error_log("Kar/Zarar: " . $kar_zarar);
+    saveLog("Kar/Zarar: " . $kar_zarar, 'info', 'karZararHesapla', $_SESSION['user_id']);
     return $kar_zarar;
 }
 
@@ -262,20 +261,19 @@ function hisseAra($aranan)
     curl_close($curl);
 
     // Debug bilgileri
-    error_log("Hisse Listesi API Yanıt Kodu: " . $httpcode);
-    error_log("Hisse Listesi API Content-Type: " . $content_type);
-    error_log("Hisse Listesi API Hata: " . $err);
-    error_log("Hisse Listesi API Ham Yanıt: " . $response);
+    saveLog("Hisse Listesi API Yanıt Kodu: " . $httpcode, 'info', 'hisseAra', $_SESSION['user_id']);
+    saveLog("Hisse Listesi API Content-Type: " . $content_type, 'info', 'hisseAra', $_SESSION['user_id']);
+    saveLog("Hisse Listesi API Ham Yanıt: " . $response, 'info', 'hisseAra', $_SESSION['user_id']);
 
     if ($err) {
-        error_log("Hisse Listesi API Curl Hatası: " . $err);
+        saveLog("Hisse Listesi API Curl Hatası: " . $err, 'error', 'hisseAra', $_SESSION['user_id']);
         return [
             ['code' => 'ERROR', 'title' => 'API Hatası: ' . $err, 'price' => '0.00']
         ];
     }
 
     if ($httpcode !== 200) {
-        error_log("Hisse Listesi API HTTP Hata Kodu: " . $httpcode);
+        saveLog("Hisse Listesi API HTTP Hata Kodu: " . $httpcode, 'error', 'hisseAra', $_SESSION['user_id']);
         return [
             ['code' => 'ERROR', 'title' => 'API HTTP Hatası: ' . $httpcode, 'price' => '0.00']
         ];
@@ -283,15 +281,15 @@ function hisseAra($aranan)
 
     $data = json_decode($response, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("JSON Decode Hatası: " . json_last_error_msg());
-        error_log("Ham Yanıt: " . $response);
+        saveLog("JSON Decode Hatası: " . json_last_error_msg(), 'error', 'hisseAra', $_SESSION['user_id']);
+        saveLog("Ham Yanıt: " . $response, 'info', 'hisseAra', $_SESSION['user_id']);
         return [
             ['code' => 'ERROR', 'title' => 'JSON Parse Hatası: ' . json_last_error_msg(), 'price' => '0.00']
         ];
     }
 
     if (!isset($data['data']) || !is_array($data['data'])) {
-        error_log("Hisse Listesi API Geçersiz Yanıt: " . print_r($data, true));
+        saveLog("Hisse Listesi API Geçersiz Yanıt: " . print_r($data, true), 'error', 'hisseAra', $_SESSION['user_id']);
         return [
             ['code' => 'ERROR', 'title' => 'API Yanıt Formatı Hatası', 'price' => '0.00']
         ];
@@ -442,20 +440,21 @@ function hisseSat($id, $satis_adet, $satis_fiyati)
 
             $kalan_satis_adet -= $bu_satis_adet;
 
-            error_log("Satış kaydı eklendi - ID: {$kayit['id']}, Adet: $bu_satis_adet, Fiyat: $satis_fiyati");
+            saveLog("Satış kaydı eklendi - ID: {$kayit['id']} <br> Adet: $bu_satis_adet <br> Fiyat: $satis_fiyati", 'info', 'hisseSat', $_SESSION['user_id']);
 
             if ($kalan_satis_adet <= 0) break;
         }
 
         if ($kalan_satis_adet > 0) {
-            throw new Exception("Yeterli satılabilir hisse bulunamadı");
+            saveLog("Yeterli satılabilir hisse bulunamadı - Kalan adet: $kalan_satis_adet", 'error', 'hisseSat', $_SESSION['user_id']);
+            return false;
         }
 
         $pdo->commit();
         return true;
     } catch (Exception $e) {
         $pdo->rollBack();
-        error_log("Satış hatası: " . $e->getMessage());
+        saveLog("Satış hatası: " . $e->getMessage(), 'error', 'hisseSat', $_SESSION['user_id']);
         return false;
     }
 }
@@ -519,23 +518,26 @@ if (isset($_GET['liste'])) {
 
     foreach ($portfoy['ozet'] as $hisse) {
         // Debug bilgileri
-        error_log("Portföy Listesi - İşlenen Hisse: " . print_r($hisse, true));
+        saveLog("Portföy Listesi - İşlenen Hisse: " . print_r($hisse, true), 'info', 'portfoyListele', $_SESSION['user_id']);
 
         $anlik_fiyat = anlikFiyatGetir($hisse['sembol']);
-        error_log("Anlık Fiyat Alındı: " . $anlik_fiyat . " için " . $hisse['sembol']);
+        saveLog("Anlık Fiyat Alındı: " . $anlik_fiyat . " için " . $hisse['sembol'], 'info', 'portfoyListele', $_SESSION['user_id']);
 
         if ($anlik_fiyat <= 0) {
-            error_log("UYARI: Sıfır veya negatif fiyat tespit edildi: " . $hisse['sembol']);
+            saveLog("UYARI: Sıfır veya negatif fiyat tespit edildi: " . $hisse['sembol'], 'warning', 'portfoyListele', $_SESSION['user_id']);
             // Veritabanında fiyat yoksa API'den dene
             $anlik_fiyat = anlikFiyatGetir($hisse['sembol'], true);
-            error_log("API'den Alınan Fiyat: " . $anlik_fiyat);
+            saveLog("API'den Alınan Fiyat: " . $anlik_fiyat, 'info', 'portfoyListele', $_SESSION['user_id']);
         }
 
         // Toplam kar/zarar ve satış karı hesapla
         $toplam_kar_zarar = 0;
         $toplam_satis_kari = 0;
+
         foreach ($portfoy['detaylar'][$hisse['sembol']] as $detay) {
+
             $kalan_adet = $detay['adet'];
+
             if (isset($detay['satis_adet']) && $detay['satis_adet'] > 0) {
                 $kalan_adet -= $detay['satis_adet'];
                 // Satış karı hesapla
@@ -547,6 +549,7 @@ if (isset($_GET['liste'])) {
                 $toplam_kar_zarar += ($anlik_fiyat - $detay['alis_fiyati']) * $kalan_adet;
             }
         }
+
         $kar_zarar_class = $toplam_kar_zarar >= 0 ? 'kar' : 'zarar';
         $satis_kar_class = $toplam_satis_kari >= 0 ? 'kar' : 'zarar';
 
@@ -683,7 +686,6 @@ if (isset($_GET['liste'])) {
 
         $html_output .= "</tbody></table></div></td></tr>";
 
-        error_log("Oluşturulan HTML: " . $html_output);
         echo $html_output;
     }
     exit;
@@ -695,7 +697,7 @@ if (isset($_GET['ara'])) {
     $sonuclar = hisseAra($_GET['ara']);
 
     // Debug için API yanıtını logla
-    error_log("Search Results for '" . $_GET['ara'] . "': " . print_r($sonuclar, true));
+    saveLog("Aranan Hisse: '" . $_GET['ara'] . "': " . print_r($sonuclar, true), 'info', 'hisseAra', $_SESSION['user_id']);
 
     echo json_encode($sonuclar);
     exit;

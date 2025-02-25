@@ -513,3 +513,32 @@ document.addEventListener('click', function (e) {
         sembolOnerileri.innerHTML = '';
     }
 });
+
+// Kullanıcı temasını yükle
+ajaxRequest({
+    action: 'get_user_data'
+}).done(function (response) {
+    if (response.status === 'success') {
+        setTheme(response.data.theme_preference);
+    }
+});
+
+// Kullanıcı ayarları formu submit
+$('form[data-type="user_settings"]').on('submit', function (e) {
+    e.preventDefault();
+    const form = $(this);
+    const formData = form.serializeObject();
+
+    ajaxRequest({
+        action: 'update_user_settings',
+        ...formData
+    }).done(function (response) {
+        if (response.status === 'success') {
+            const modalElement = form.closest('.modal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+            setTheme(formData.theme_preference);
+            loadData();
+        }
+    });
+});
