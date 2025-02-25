@@ -144,7 +144,9 @@ function showSavingsHistory(savingId) {
             historyHtml += '<thead><tr><th>Date</th><th>Amount</th><th>Type</th></tr></thead>';
             historyHtml += '<tbody>';
             history.forEach(item => {
-                historyHtml += `<tr><td>${item.created_at}</td><td>${item.current_amount}</td><td>${item.update_type}</td></tr>`;
+                const formattedDate = new Date(item.created_at).toLocaleDateString();
+                const updateType = item.update_type === 'initial' ? 'Initial' : 'Update';
+                historyHtml += `<tr><td>${formattedDate}</td><td>${item.current_amount}</td><td>${updateType}</td></tr>`;
             });
             historyHtml += '</tbody></table>';
 
