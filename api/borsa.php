@@ -610,7 +610,7 @@ if (isset($_GET['liste'])) {
                         </div>
                         <div class='col-md-4'>
                             <div class='input-group input-group-sm'>
-                                <span class='input-group-text'>Toplam Satış Adedi</span>
+                                <span class='input-group-text'>Satılacak Lot</span>
                                 <input type='number' class='form-control' id='toplam-satis-adet-{$hisse['sembol']}' 
                                        min='0' max='{$hisse['toplam_adet']}' value='0'>
                             </div>
@@ -620,7 +620,7 @@ if (isset($_GET['liste'])) {
                         </div>
                     </div>
                     <div class='mt-3'>
-                        <button class='btn btn-primary btn-sm' onclick='topluSatisKaydet(\"{$hisse['sembol']}\")'>Satışı Onayla</button>
+                        <button class='btn btn-primary btn-sm' onclick='topluSatisKaydet(\"{$hisse['sembol']}\")'>Kaydet</button>
                         <button class='btn btn-secondary btn-sm' onclick='topluSatisFormunuGizle(\"{$hisse['sembol']}\", event)'>İptal</button>
                     </div>
                 </div>
@@ -630,7 +630,7 @@ if (isset($_GET['liste'])) {
         // Alım detayları tablosu
         $html_output .= "<table class='table table-sm mb-0'><thead><tr>
                 <th>Alış Tarihi</th>
-                <th>Adet</th>
+                <th>Lot</th>
                 <th>Alış Fiyatı</th>
                 <th>Güncel Fiyat</th>
                 <th>Kar/Zarar</th>

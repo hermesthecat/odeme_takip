@@ -43,9 +43,9 @@ $user_default_currency = $_SESSION['base_currency'];
             <!-- Yeni Hisse Ekleme Formu -->
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Yeni Hisse Ekle</span>
+                    <span>Hisse Ekle</span>
                     <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#yeniHisseForm">
-                        <i class="fas fa-plus me-1"></i> Yeni Ekle
+                        <i class="fas fa-plus me-1"></i> Ekle
                     </button>
                 </div>
                 <div class="collapse" id="yeniHisseForm">
@@ -64,7 +64,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                     <div class="form-floating">
                                         <input type="number" name="adet" id="adetInput" class="form-control"
                                             placeholder="Adet" required min="1">
-                                        <label for="adetInput">Adet</label>
+                                        <label for="adetInput">Lot</label>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -88,7 +88,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                 </div>
                                 <div class="col-md-6 text-end">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-check me-1"></i> Hisseyi Ekle
+                                        <i class="fas fa-check me-1"></i> Ekle
                                     </button>
                                     <button type="reset" class="btn btn-secondary ms-2">
                                         <i class="fas fa-undo me-1"></i> Temizle
@@ -104,11 +104,7 @@ $user_default_currency = $_SESSION['base_currency'];
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Mali Durum Özeti</span>
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-secondary active" type="button" data-bs-toggle="collapse" data-bs-target="#maliDurumDetay">
-                            <i class="fas fa-chart-pie me-1"></i> Grafik
-                        </button>
-                    </div>
+
                 </div>
                 <div class="collapse show" id="maliDurumDetay">
                     <div class="card-body py-2">
@@ -151,7 +147,7 @@ $user_default_currency = $_SESSION['base_currency'];
                         <thead>
                             <tr>
                                 <th>Hisse</th>
-                                <th>Adet</th>
+                                <th>Lot</th>
                                 <th>Alış Fiyatı</th>
                                 <th>Güncel Fiyat</th>
                                 <th>Kar/Zarar</th>
