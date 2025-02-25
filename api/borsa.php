@@ -118,7 +118,7 @@ function portfoyListele()
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
         $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small></td>';
         $output .= '<td class="adet">' . $toplam_adet . '</td>';
-        $output .= '<td>' . ($ortalama_alis > 0 ? number_format($ortalama_alis, 2, '.', ',') . ' ₺' : 'Çeşitli') . '</td>';
+        $output .= '<td>' . ($alis['alis_fiyati'] > 0 ? number_format($alis['alis_fiyati'], 2, '.', ',') . ' ₺' : 'Çeşitli') . '</td>';
         $output .= '<td class="anlik_fiyat">' . number_format($anlik_fiyat, 2, '.', ',') . ' ₺ <small class="text-muted">(' . date('H:i:s') . ')</small></td>';
         $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
@@ -205,7 +205,7 @@ function portfoyListele()
             </td>';
             $output .= '</tr>';
         }
-        
+
         // Satış kayıtlarını listele
         $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_tarihi, satis_adet, durum, alis_tarihi
                 FROM portfolio 
@@ -214,15 +214,15 @@ function portfoyListele()
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
         $satilmis_hisseler = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         if (count($satilmis_hisseler) > 0) {
             $output .= '<tr class="table-secondary"><td colspan="7" class="text-center fw-bold">Satılmış Hisseler</td></tr>';
-            
+
             foreach ($satilmis_hisseler as $satis) {
                 $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
                 $satis_kar_zarar = ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
                 $satis_kar_zarar_class = $satis_kar_zarar >= 0 ? 'kar' : 'zarar';
-                
+
                 $output .= '<tr class="table-light">';
                 $output .= '<td>' . date('d.m.Y H:i', strtotime($satis['alis_tarihi'])) . '</td>';
                 $output .= '<td>' . $satis_adedi . '</td>';
