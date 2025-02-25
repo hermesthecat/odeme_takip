@@ -144,7 +144,7 @@ $user_default_currency = $_SESSION['base_currency'];
             <div class="card">
                 <div class="card-header">Portföyüm</div>
                 <div class="card-body">
-                    <table class="table">
+                    <table class="table table-striped table-responsive">
                         <thead>
                             <tr>
                                 <th>Hisse</th>
