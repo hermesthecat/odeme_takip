@@ -29,11 +29,13 @@ body {
 }
 
 .kar {
-    color: var(--kar-color);
+    color: #28a745 !important;
+    font-weight: bold;
 }
 
 .zarar {
-    color: var(--zarar-color);
+    color: #dc3545 !important;
+    font-weight: bold;
 }
 
 /* Kar/Zarar için özel stiller */
@@ -53,11 +55,11 @@ td.zarar {
 }
 
 .kar-zarar-hucre.kar {
-    color: var(--kar-color) !important;
+    background-color: rgba(40, 167, 69, 0.1) !important;
 }
 
 .kar-zarar-hucre.zarar {
-    color: var(--zarar-color) !important;
+    background-color: rgba(220, 53, 69, 0.1) !important;
 }
 
 /* Satış karı için özel stil */
@@ -66,11 +68,11 @@ td.zarar {
 }
 
 .satis-kar-hucre.kar {
-    color: var(--kar-color) !important;
+    background-color: rgba(40, 167, 69, 0.1) !important;
 }
 
 .satis-kar-hucre.zarar {
-    color: var(--zarar-color) !important;
+    background-color: rgba(220, 53, 69, 0.1) !important;
 }
 
 /* Satış karı için özel stil */
@@ -378,4 +380,60 @@ td.zarar.satis-kar {
 /* Tablo hücreleri için ek stil */
 [data-theme="dark"] .table tbody td {
     color: var(--text-color);
+}
+
+/* Portföy tablosu için dönüşümlü satır renkleri */
+#portfoyListesi .ana-satir:nth-child(4n+1),
+#portfoyListesi .ana-satir:nth-child(4n+2) {
+    background-color: var(--bg-color);
+}
+
+#portfoyListesi .ana-satir:nth-child(4n+3),
+#portfoyListesi .ana-satir:nth-child(4n) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Koyu tema için dönüşümlü satır renkleri */
+[data-theme="dark"] #portfoyListesi .ana-satir:nth-child(4n+1),
+[data-theme="dark"] #portfoyListesi .ana-satir:nth-child(4n+2) {
+    background-color: #343a40 !important;
+}
+
+[data-theme="dark"] #portfoyListesi .ana-satir:nth-child(4n+3),
+[data-theme="dark"] #portfoyListesi .ana-satir:nth-child(4n) {
+    background-color: #2c3034 !important;
+}
+
+/* Hover efekti için güncelleme */
+#portfoyListesi .ana-satir:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+[data-theme="dark"] #portfoyListesi .ana-satir:hover {
+    background-color: #3e474f !important;
+}
+
+/* Koyu tema için kar/zarar hücreleri */
+[data-theme="dark"] .kar {
+    color: #5cb85c !important;
+}
+
+[data-theme="dark"] .zarar {
+    color: #d9534f !important;
+}
+
+[data-theme="dark"] .kar-zarar-hucre.kar {
+    background-color: rgba(92, 184, 92, 0.2) !important;
+}
+
+[data-theme="dark"] .kar-zarar-hucre.zarar {
+    background-color: rgba(217, 83, 79, 0.2) !important;
+}
+
+[data-theme="dark"] .satis-kar-hucre.kar {
+    background-color: rgba(92, 184, 92, 0.2) !important;
+}
+
+[data-theme="dark"] .satis-kar-hucre.zarar {
+    background-color: rgba(217, 83, 79, 0.2) !important;
 }

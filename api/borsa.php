@@ -52,38 +52,118 @@ function hisseSil($id)
 function portfoyListele()
 {
     global $pdo;
-    // Önce özet bilgileri al
-    $sql = "SELECT 
-                    sembol,
-                    hisse_adi,
-                    SUM(adet - IFNULL(satis_adet, 0)) as toplam_adet,
-                    GROUP_CONCAT(id) as kayit_idler,
-                    MAX(son_guncelleme) as son_guncelleme,
-                    MAX(anlik_fiyat) as anlik_fiyat
+    $user_id = $_SESSION['user_id'];
+
+    // Portföydeki benzersiz hisseleri getir
+    $sql = "SELECT sembol, GROUP_CONCAT(id) as ids, SUM(CASE WHEN durum != 'satildi' THEN adet ELSE 0 END) as toplam_adet, 
+            MAX(anlik_fiyat) as anlik_fiyat, MAX(hisse_adi) as hisse_adi
+            FROM portfolio 
+            WHERE user_id = :user_id 
+            GROUP BY sembol 
+            HAVING toplam_adet > 0
+            ORDER BY sembol ASC";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute(['user_id' => $user_id]);
+    $hisseler = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $output = '';
+    foreach ($hisseler as $hisse) {
+        $sembol = $hisse['sembol'];
+        $ids = $hisse['ids'];
+        $toplam_adet = $hisse['toplam_adet'];
+        $anlik_fiyat = $hisse['anlik_fiyat'];
+        $hisse_adi = $hisse['hisse_adi'] ?: $sembol;
+
+        // Hissenin tüm alış kayıtlarını getir
+        $sql = "SELECT id, adet, alis_fiyati, alis_tarihi, anlik_fiyat, durum, satis_fiyati, satis_tarihi, satis_adet
                 FROM portfolio 
-                WHERE (durum = 'aktif' OR durum = 'kismi_satildi')
-                GROUP BY sembol, hisse_adi 
-                HAVING toplam_adet > 0
-                ORDER BY id DESC";
+                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'aktif' OR durum = 'kismi_satildi')
+                ORDER BY alis_tarihi ASC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
+        $alislar = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->query($sql);
-    $ozet = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Ortalama alış fiyatını hesapla
+        $toplam_maliyet = 0;
+        foreach ($alislar as $alis) {
+            $kalan_adet = $alis['durum'] == 'kismi_satildi' ? $alis['adet'] - $alis['satis_adet'] : $alis['adet'];
+            $toplam_maliyet += $alis['alis_fiyati'] * $kalan_adet;
+        }
+        $ortalama_alis = $toplam_adet > 0 ? $toplam_maliyet / $toplam_adet : 0;
 
-    // Sonra tüm kayıtları al
-    $sql = "SELECT * FROM portfolio ORDER BY alis_tarihi DESC";
-    $stmt = $pdo->query($sql);
-    $detaylar = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Kar/zarar hesapla
+        $kar_zarar = ($anlik_fiyat - $ortalama_alis) * $toplam_adet;
+        $kar_zarar_class = $kar_zarar >= 0 ? 'kar' : 'zarar';
+        $kar_zarar_formatted = number_format($kar_zarar, 2, '.', ',') . ' ₺';
 
-    // Detayları sembol bazında grupla
-    $detay_grup = [];
-    foreach ($detaylar as $detay) {
-        $detay_grup[$detay['sembol']][] = $detay;
+        // Satış karı hesapla
+        $satis_kari = 0;
+        $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_adet
+                FROM portfolio 
+                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'satildi' OR durum = 'kismi_satildi')";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
+        $satislar = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($satislar as $satis) {
+            $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
+            $satis_kari += ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
+        }
+        $satis_kari_class = $satis_kari >= 0 ? 'kar' : 'zarar';
+        $satis_kari_formatted = number_format($satis_kari, 2, '.', ',') . ' ₺';
+
+        // Ana satır
+        $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
+        $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small></td>';
+        $output .= '<td class="adet">' . $toplam_adet . '</td>';
+        $output .= '<td>' . ($ortalama_alis > 0 ? number_format($ortalama_alis, 2, '.', ',') . ' ₺' : 'Çeşitli') . '</td>';
+        $output .= '<td class="anlik_fiyat">' . number_format($anlik_fiyat, 2, '.', ',') . ' ₺ <small class="text-muted">(' . date('H:i:s') . ')</small></td>';
+        $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
+        $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
+        $output .= '<td>';
+        $output .= '<button class="btn btn-sm btn-success me-1" onclick="topluSatisFormunuGoster(\'' . $sembol . '\', ' . $anlik_fiyat . ', event)">Sat</button>';
+        $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(\'' . $ids . '\', event)">Tümünü Sil</button>';
+        $output .= '</td>';
+        $output .= '</tr>';
+
+        // Detay satırı
+        $output .= '<tr class="detay-satir" data-sembol="' . $sembol . '" style="display: none;">';
+        $output .= '<td colspan="7">';
+        $output .= '<table class="table table-sm">';
+        $output .= '<thead class="table-light">';
+        $output .= '<tr>';
+        $output .= '<th>Alış Tarihi</th>';
+        $output .= '<th>Lot</th>';
+        $output .= '<th>Alış Fiyatı</th>';
+        $output .= '<th>Güncel Fiyat</th>';
+        $output .= '<th>Kar/Zarar</th>';
+        $output .= '<th>Satış Durumu</th>';
+        $output .= '<th>İşlem</th>';
+        $output .= '</tr>';
+        $output .= '</thead>';
+        $output .= '<tbody>';
+
+        // Alış kayıtları
+        foreach ($alislar as $alis) {
+            $kalan_adet = $alis['durum'] == 'kismi_satildi' ? $alis['adet'] - $alis['satis_adet'] : $alis['adet'];
+            $alis_kar_zarar = ($anlik_fiyat - $alis['alis_fiyati']) * $kalan_adet;
+            $alis_kar_zarar_class = $alis_kar_zarar >= 0 ? 'kar' : 'zarar';
+
+            $output .= '<tr>';
+            $output .= '<td>' . date('d.m.Y H:i', strtotime($alis['alis_tarihi'])) . '</td>';
+            $output .= '<td>' . $kalan_adet . '</td>';
+            $output .= '<td>' . number_format($alis['alis_fiyati'], 2, '.', ',') . ' ₺</td>';
+            $output .= '<td>' . number_format($anlik_fiyat, 2, '.', ',') . ' ₺</td>';
+            $output .= '<td class="' . $alis_kar_zarar_class . '">' . number_format($alis_kar_zarar, 2, '.', ',') . ' ₺</td>';
+            $output .= '<td>' . ($alis['durum'] == 'kismi_satildi' ? 'Kısmi Satış' : 'Aktif') . '</td>';
+            $output .= '<td><button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button></td>';
+            $output .= '</tr>';
+        }
+
+        $output .= '</tbody></table></td></tr>';
     }
 
-    return [
-        'ozet' => $ozet,
-        'detaylar' => $detay_grup
-    ];
+    return $output;
 }
 
 /**
@@ -559,184 +639,7 @@ if (isset($_GET['sat'], $_GET['id'], $_GET['adet'], $_GET['fiyat'])) {
 if (isset($_GET['liste'])) {
     $portfoy = portfoyListele();
 
-
-    foreach ($portfoy['ozet'] as $hisse) {
-        // Debug bilgileri
-        saveLog("Portföy Listesi - İşlenen Hisse: " . print_r($hisse, true), 'info', 'portfoyListele', $_SESSION['user_id']);
-
-        $anlik_fiyat = anlikFiyatGetir($hisse['sembol']);
-        saveLog("Anlık Fiyat Alındı: " . $anlik_fiyat . " için " . $hisse['sembol'], 'info', 'portfoyListele', $_SESSION['user_id']);
-
-        if ($anlik_fiyat <= 0) {
-            saveLog("UYARI: Sıfır veya negatif fiyat tespit edildi: " . $hisse['sembol'], 'warning', 'portfoyListele', $_SESSION['user_id']);
-            // Veritabanında fiyat yoksa API'den dene
-            $anlik_fiyat = anlikFiyatGetir($hisse['sembol'], true);
-            saveLog("API'den Alınan Fiyat: " . $anlik_fiyat, 'info', 'portfoyListele', $_SESSION['user_id']);
-        }
-
-        // Toplam kar/zarar ve satış karı hesapla
-        $toplam_kar_zarar = 0;
-        $toplam_satis_kari = 0;
-
-        foreach ($portfoy['detaylar'][$hisse['sembol']] as $detay) {
-
-            $kalan_adet = $detay['adet'];
-
-            if (isset($detay['satis_adet']) && $detay['satis_adet'] > 0) {
-                $kalan_adet -= $detay['satis_adet'];
-                // Satış karı hesapla
-                $satis_kari = ($detay['satis_fiyati'] - $detay['alis_fiyati']) * $detay['satis_adet'];
-                $toplam_satis_kari += $satis_kari;
-            }
-            // Kalan hisselerin kar/zararı
-            if ($kalan_adet > 0) {
-                $toplam_kar_zarar += ($anlik_fiyat - $detay['alis_fiyati']) * $kalan_adet;
-            }
-        }
-
-        // Kar/zarar ve satış karı sınıflarını belirle
-        $kar_zarar_class = $toplam_kar_zarar >= 0 ? 'kar-zarar-hucre kar' : 'kar-zarar-hucre zarar';
-        $satis_kar_class = $toplam_satis_kari >= 0 ? 'satis-kar-hucre kar' : 'satis-kar-hucre zarar';
-
-        // Son güncelleme zamanını al
-        $son_guncelleme = isset($hisse['son_guncelleme']) ? date('H:i:s', strtotime($hisse['son_guncelleme'])) : '';
-        $guncelleme_bilgisi = $son_guncelleme ? " <small class='text-muted'>($son_guncelleme)</small>" : '';
-
-        // Hisse adını ve sembolü birleştir
-        $hisse_baslik = $hisse['hisse_adi'] ? $hisse['hisse_adi'] . " (" . $hisse['sembol'] . ")" : $hisse['sembol'];
-
-        // Ana satır
-        $html_output = "<tr class='ana-satir' data-sembol='{$hisse['sembol']}'>
-                <td>
-                    <i class='fa-solid fa-chevron-right me-2'></i>
-                    <strong>{$hisse['sembol']}</strong>
-                    <small class='text-muted'>{$hisse['hisse_adi']}</small>
-                </td>
-                <td class='adet'>{$hisse['toplam_adet']}</td>
-                <td class='alis_fiyati'>";
-
-        // Alış fiyatı kontrolü - tek alım varsa fiyatını göster, değilse "Çeşitli" yaz
-        $alim_sayisi = count($portfoy['detaylar'][$hisse['sembol']]);
-        if ($alim_sayisi == 1) {
-            $tek_alim = reset($portfoy['detaylar'][$hisse['sembol']]);
-            $html_output .= number_format($tek_alim['alis_fiyati'], 2) . " ₺";
-        } else {
-            $html_output .= "Çeşitli";
-        }
-
-        $html_output .= "</td>
-                <td class='anlik_fiyat'>{$anlik_fiyat} ₺{$guncelleme_bilgisi}</td>
-                <td class='{$kar_zarar_class}'>" . number_format($toplam_kar_zarar, 2) . " ₺</td>
-                <td class='{$satis_kar_class}'>" . number_format($toplam_satis_kari, 2) . " ₺</td>
-                <td>
-                    <button class='btn btn-success btn-sm' onclick='topluSatisFormunuGoster(\"{$hisse['sembol']}\", {$anlik_fiyat}, event)'>Sat</button>
-                    <button class='btn btn-danger btn-sm ms-1' onclick='hisseSil(\"{$hisse['kayit_idler']}\", event)'>Tümünü Sil</button>
-                </td>
-            </tr>";
-
-        // Detay satırları (başlangıçta gizli)
-        $html_output .= "<tr class='detay-satir' data-sembol='{$hisse['sembol']}' style='display: none; background-color: #f8f9fa;'><td colspan='7'><div class='p-3'>";
-
-        // Satış formu
-        $html_output .= "<div id='satis-form-{$hisse['sembol']}' class='satis-form mb-3' style='display:none;'>
-            <div class='card'>
-                <div class='card-header'>
-                    <h6 class='mb-0'>Satış Detayları</h6>
-                </div>
-                <div class='card-body'>
-                    <div class='alert alert-info'>
-                        <i class='fa-solid fa-circle-info me-2'></i>
-                        Satış işlemleri FIFO (First In First Out - İlk Giren İlk Çıkar) prensibine göre yapılmaktadır. 
-                        En eski alımdan başlayarak satış gerçekleştirilir.
-                    </div>
-                    <div class='row mt-3'>
-                        <div class='col-md-4'>
-                            <div class='input-group input-group-sm'>
-                                <span class='input-group-text'>Satış Fiyatı</span>
-                                <input type='number' class='form-control' id='satis-fiyat-{$hisse['sembol']}' 
-                                       step='0.01' value='{$anlik_fiyat}'>
-                            </div>
-                        </div>
-                        <div class='col-md-4'>
-                            <div class='input-group input-group-sm'>
-                                <span class='input-group-text'>Satılacak Lot</span>
-                                <input type='number' class='form-control' id='toplam-satis-adet-{$hisse['sembol']}' 
-                                       min='0' max='{$hisse['toplam_adet']}' value='0'>
-                            </div>
-                        </div>
-                        <div class='col-md-4'>
-                            <small class='text-muted'>Tahmini Kar/Zarar: <span id='kar-zarar-{$hisse['sembol']}'>0.00 ₺</span></small>
-                        </div>
-                    </div>
-                    <div class='mt-3'>
-                        <button class='btn btn-primary btn-sm' onclick='topluSatisKaydet(\"{$hisse['sembol']}\")'>Kaydet</button>
-                        <button class='btn btn-secondary btn-sm' onclick='topluSatisFormunuGizle(\"{$hisse['sembol']}\", event)'>İptal</button>
-                    </div>
-                </div>
-            </div>
-        </div>";
-
-        // Alım detayları tablosu
-        $html_output .= "<table class='table table-sm mb-0'><thead><tr>
-                <th>Alış Tarihi</th>
-                <th>Lot</th>
-                <th>Alış Fiyatı</th>
-                <th>Güncel Fiyat</th>
-                <th>Kar/Zarar</th>
-                <th>Satış Durumu</th>
-                <th>İşlem</th>
-            </tr></thead><tbody>";
-
-        foreach ($portfoy['detaylar'][$hisse['sembol']] as $detay) {
-            $detay_kar_zarar = ($anlik_fiyat - $detay['alis_fiyati']) * $detay['adet'];
-            $detay_kar_zarar_class = $detay_kar_zarar >= 0 ? 'kar' : 'zarar';
-            $alis_tarihi = date('d.m.Y H:i', strtotime($detay['alis_tarihi']));
-
-            // Satış durumu ve kalan adet hesapla
-            $satis_durumu = '';
-            $kalan_adet = $detay['adet'];
-            if ($detay['durum'] == 'satildi') {
-                $satis_durumu = '<span class="badge bg-success">Satıldı</span>';
-                $kalan_adet = 0;
-            } elseif ($detay['durum'] == 'kismi_satildi') {
-                $satilan_adet = $detay['satis_adet'] ?? 0;
-                $kalan_adet = $detay['adet'] - $satilan_adet;
-                $satis_durumu = "<span class='badge bg-warning'>{$satilan_adet} Adet Satıldı</span>";
-            }
-
-            $html_output .= "<tr>
-                <td>{$alis_tarihi}</td>
-                <td>{$detay['adet']}</td>
-                <td>{$detay['alis_fiyati']} ₺</td>
-                <td>{$anlik_fiyat} ₺</td>
-                <td class='{$detay_kar_zarar_class}'>" . number_format($detay_kar_zarar, 2) . " ₺</td>
-                <td>{$satis_durumu}</td>
-                <td>
-                    <button class='btn btn-danger btn-sm' onclick='hisseSil({$detay['id']}, event)'>Sil</button>
-                </td>
-            </tr>";
-
-            // Satış detayları (eğer satış yapılmışsa)
-            if ($detay['durum'] != 'aktif' && isset($detay['satis_fiyati'])) {
-                $satis_tarihi = date('d.m.Y H:i', strtotime($detay['satis_tarihi']));
-                $satis_kar = ($detay['satis_fiyati'] - $detay['alis_fiyati']) * $detay['satis_adet'];
-                $satis_kar_class = $satis_kar >= 0 ? 'kar' : 'zarar';
-
-                $html_output .= "<tr class='table-light'>
-                    <td><small><i>Satış: {$satis_tarihi}</i></small></td>
-                    <td><small>{$detay['satis_adet']}</small></td>
-                    <td>-</td>
-                    <td><small>{$detay['satis_fiyati']} ₺</small></td>
-                    <td class='{$satis_kar_class}'><small>" . number_format($satis_kar, 2) . " ₺</small></td>
-                    <td colspan='2'></td>
-                </tr>";
-            }
-        }
-
-        $html_output .= "</tbody></table></div></td></tr>";
-
-        echo $html_output;
-    }
+    echo $portfoy;
     exit;
 }
 

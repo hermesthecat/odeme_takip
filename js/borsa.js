@@ -253,68 +253,18 @@ function portfoyGuncelle() {
                     th.style.color = '#e9ecef';
                 });
 
-                // Ana satırları güncelle
-                document.querySelectorAll('.ana-satir').forEach(row => {
-                    row.style.backgroundColor = '#343a40';
-                    row.style.color = '#e9ecef';
-                });
-
                 // Detay satırları güncelle
                 document.querySelectorAll('.detay-satir').forEach(row => {
                     row.style.backgroundColor = '#2c3034';
                     row.style.color = '#e9ecef';
                 });
 
-                // Tablo hücrelerini güncelle
-                document.querySelectorAll('#portfoyListesi td').forEach(td => {
-                    td.style.backgroundColor = '#343a40';
+                // Detay satırı hücrelerini güncelle
+                document.querySelectorAll('.detay-satir td').forEach(td => {
+                    td.style.backgroundColor = '#2c3034';
                     td.style.color = '#e9ecef';
                 });
             }
-
-            // Kar/Zarar hücrelerinin renklerini düzenle - Ana satırlardaki tüm kar/zarar hücreleri
-            document.querySelectorAll('.ana-satir td:nth-child(5)').forEach(hucre => {
-                const deger = parseFloat(hucre.textContent.replace(/[^0-9.-]+/g, ""));
-                if (!isNaN(deger)) {
-                    if (deger >= 0) {
-                        hucre.classList.add('kar');
-                        hucre.classList.remove('zarar');
-                    } else {
-                        hucre.classList.add('zarar');
-                        hucre.classList.remove('kar');
-                    }
-                }
-            });
-
-            // Satış karı hücrelerinin renklerini düzenle - Ana satırlardaki tüm satış karı hücreleri
-            document.querySelectorAll('.ana-satir td:nth-child(6)').forEach(hucre => {
-                const deger = parseFloat(hucre.textContent.replace(/[^0-9.-]+/g, ""));
-                if (!isNaN(deger)) {
-                    if (deger >= 0) {
-                        hucre.classList.add('kar');
-                        hucre.classList.add('satis-kar');
-                        hucre.classList.remove('zarar');
-                    } else {
-                        hucre.classList.add('zarar');
-                        hucre.classList.add('satis-kar');
-                        hucre.classList.remove('kar');
-                    }
-                }
-            });
-
-            // Detay satırlarındaki kar/zarar hücrelerini düzenle
-            document.querySelectorAll('.detay-satir td.kar, .detay-satir td.zarar').forEach(hucre => {
-                const deger = parseFloat(hucre.textContent.replace(/[^0-9.-]+/g, ""));
-                if (!isNaN(deger)) {
-                    if (deger >= 0) {
-                        hucre.classList.add('kar');
-                        hucre.classList.remove('zarar');
-                    } else {
-                        hucre.classList.add('zarar');
-                        hucre.classList.remove('kar');
-                    }
-                }
-            });
 
             // Tıklama olaylarını ekle
             document.querySelectorAll('.ana-satir').forEach(row => {
