@@ -296,6 +296,16 @@ function topluSatisFormunuGoster(sembol, guncelFiyat, event) {
         event.stopPropagation();
     }
 
+    const form = document.getElementById(`satis-form-${sembol}`);
+    if (!form) return;
+
+    // Form zaten açıksa kapat
+    if (form.style.display === 'block') {
+        topluSatisFormunuGizle(sembol);
+        return;
+    }
+
+    // Form kapalıysa aç
     const detayRow = document.querySelector(`.detay-satir[data-sembol="${sembol}"]`);
     if (detayRow) {
         detayRow.style.display = 'table-row';
@@ -309,24 +319,21 @@ function topluSatisFormunuGoster(sembol, guncelFiyat, event) {
         }
     }
 
-    const form = document.getElementById(`satis-form-${sembol}`);
-    if (form) {
-        form.style.display = 'block';
-        document.getElementById(`satis-fiyat-${sembol}`).value = guncelFiyat;
+    form.style.display = 'block';
+    document.getElementById(`satis-fiyat-${sembol}`).value = guncelFiyat;
 
-        // Toplam satış adedi inputunu dinle
-        const toplamAdetInput = document.getElementById(`toplam-satis-adet-${sembol}`);
-        if (toplamAdetInput) {
-            toplamAdetInput.addEventListener('input', function () {
-                dagitimYap(sembol, this.value);
-            });
-        }
+    // Toplam satış adedi inputunu dinle
+    const toplamAdetInput = document.getElementById(`toplam-satis-adet-${sembol}`);
+    if (toplamAdetInput) {
+        toplamAdetInput.addEventListener('input', function () {
+            dagitimYap(sembol, this.value);
+        });
+    }
 
-        // Fiyat inputunu dinle
-        const fiyatInput = document.getElementById(`satis-fiyat-${sembol}`);
-        if (fiyatInput) {
-            fiyatInput.addEventListener('input', () => karZararHesapla(sembol));
-        }
+    // Fiyat inputunu dinle
+    const fiyatInput = document.getElementById(`satis-fiyat-${sembol}`);
+    if (fiyatInput) {
+        fiyatInput.addEventListener('input', () => karZararHesapla(sembol));
     }
 }
 
