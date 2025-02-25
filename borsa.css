@@ -149,22 +149,79 @@ td.zarar.satis-kar {
     border-color: var(--border-color);
 }
 
-[data-theme="dark"] .table {
+[data-theme="dark"] .card .table {
+    color: var(--text-color);
+    background-color: #343a40;
+}
+
+[data-theme="dark"] .card .table thead th {
+    color: var(--text-color);
+    border-color: var(--border-color);
+    background-color: #2c3034 !important;
+}
+
+[data-theme="dark"] .card .table tbody td {
+    border-color: var(--border-color);
+    background-color: #343a40 !important;
     color: var(--text-color);
 }
 
+[data-theme="dark"] .card .table tbody tr {
+    background-color: #343a40 !important;
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .card .table tbody tr:hover {
+    background-color: #3e474f !important;
+}
+
+/* Portföy tablosu için özel stil */
+[data-theme="dark"] #portfoyListesi tr {
+    background-color: #343a40 !important;
+    color: var(--text-color);
+}
+
+[data-theme="dark"] #portfoyListesi td {
+    background-color: #343a40 !important;
+    color: var(--text-color);
+}
+
+[data-theme="dark"] #portfoyListesi .ana-satir:hover {
+    background-color: #3e474f !important;
+}
+
+[data-theme="dark"] .table {
+    color: var(--text-color);
+    background-color: #343a40;
+}
+
 [data-theme="dark"] .table-light td {
-    background-color: #2c3034;
+    background-color: #2c3034 !important;
     color: var(--text-color);
 }
 
 [data-theme="dark"] .table thead th {
     color: var(--text-color);
     border-color: var(--border-color);
+    background-color: #2c3034 !important;
 }
 
 [data-theme="dark"] .table td {
     border-color: var(--border-color);
+    background-color: #343a40 !important;
+}
+
+[data-theme="dark"] .table tr {
+    background-color: #343a40 !important;
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .table tbody tr:hover {
+    background-color: #3e474f !important;
+}
+
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #2c3034 !important;
 }
 
 [data-theme="dark"] .modal-content {
@@ -258,4 +315,39 @@ td.zarar.satis-kar {
 
 .theme-switch .form-check-input {
     cursor: pointer;
+}
+
+[data-theme="dark"] .ana-satir {
+    background-color: #343a40;
+}
+
+[data-theme="dark"] .ana-satir:hover {
+    background-color: #3e474f;
+}
+
+[data-theme="dark"] .detay-satir {
+    background-color: #2c3034;
+}
+
+[data-theme="dark"] .detay-satir td {
+    background-color: #2c3034;
+}
+
+[data-theme="dark"] .table-light {
+    background-color: #2c3034;
+}
+
+[data-theme="dark"] .table-light td {
+    background-color: #2c3034;
+    color: var(--text-color);
+}
+
+/* Tablo başlıkları için ek stil */
+[data-theme="dark"] .table thead {
+    background-color: #2c3034;
+}
+
+/* Tablo hücreleri için ek stil */
+[data-theme="dark"] .table tbody td {
+    color: var(--text-color);
 }

@@ -285,6 +285,36 @@ function portfoyGuncelle() {
             // Mali durum grafiğini güncelle
             maliDurumGrafigiGuncelle(portfoyData);
 
+            // Koyu tema kontrolü
+            const isDarkMode = localStorage.getItem('theme') === 'dark' || 
+                               document.documentElement.getAttribute('data-theme') === 'dark';
+            
+            if (isDarkMode) {
+                // Tablo başlıklarını güncelle
+                document.querySelectorAll('.table thead th').forEach(th => {
+                    th.style.backgroundColor = '#2c3034';
+                    th.style.color = '#e9ecef';
+                });
+                
+                // Ana satırları güncelle
+                document.querySelectorAll('.ana-satir').forEach(row => {
+                    row.style.backgroundColor = '#343a40';
+                    row.style.color = '#e9ecef';
+                });
+                
+                // Detay satırları güncelle
+                document.querySelectorAll('.detay-satir').forEach(row => {
+                    row.style.backgroundColor = '#2c3034';
+                    row.style.color = '#e9ecef';
+                });
+                
+                // Tablo hücrelerini güncelle
+                document.querySelectorAll('#portfoyListesi td').forEach(td => {
+                    td.style.backgroundColor = '#343a40';
+                    td.style.color = '#e9ecef';
+                });
+            }
+
             // Kar/Zarar hücrelerinin renklerini düzenle - Ana satırlardaki tüm kar/zarar hücreleri
             document.querySelectorAll('.ana-satir td:nth-child(5)').forEach(hucre => {
                 const deger = parseFloat(hucre.textContent.replace(/[^0-9.-]+/g, ""));
@@ -712,6 +742,8 @@ ajaxRequest({
 }).done(function (response) {
     if (response.status === 'success') {
         setTheme(response.data.theme_preference);
+        // Tema değişikliğinden sonra portföyü güncelle
+        portfoyGuncelle();
     }
 });
 
@@ -730,6 +762,8 @@ $('form[data-type="user_settings"]').on('submit', function (e) {
             const modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
             setTheme(formData.theme_preference);
+            // Tema değişikliğinden sonra portföyü güncelle
+            portfoyGuncelle();
             loadData();
         }
     });
