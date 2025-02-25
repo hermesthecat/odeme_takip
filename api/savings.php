@@ -50,6 +50,7 @@ function addSaving()
     }
 
     $stmt = $pdo->prepare("INSERT INTO savings (user_id, name, target_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, 'initial')");
+
     if ($stmt->execute([$user_id, $name, $target_amount, $currency, $start_date, $target_date, $exchange_rate])) {
         return true;
     } else {
@@ -109,6 +110,7 @@ function updateSaving()
     $current_amount = validateMinValue($current_amount, 0, t('saving.current_amount'));
 
     $currency = $saving['currency'];
+
     // Kur bilgisini al
     $exchange_rate = null;
     if ($currency !== $base_currency) {
@@ -120,31 +122,25 @@ function updateSaving()
 
     // Create new saving record
     $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
     if ($stmt->execute([$user_id, $saving['id'], $saving['name'], $saving['target_amount'], $current_amount, $saving['currency'], $saving['start_date'], $saving['target_date'], $exchange_rate, 'update'])) {
+
         // Update original saving record
-        $stmt = $pdo->prepare("UPDATE savings SET current_amount = 0, exchange_rate = ? WHERE id = ? AND user_id = ?");
-        $stmt->execute([$exchange_rate, $saving['id'], $user_id]);
+        $stmt = $pdo->prepare("UPDATE savings SET current_amount = ?, exchange_rate = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$current_amount, $exchange_rate, $saving['id'], $user_id]);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
     }
 
-    // Kur bilgisini al
-    $exchange_rate = null;
-    if ($currency !== $base_currency) {
-        $exchange_rate = getExchangeRate($currency, $base_currency);
-        if (!$exchange_rate) {
-            throw new Exception(t('income.rate_error'));
-        }
-    }
-
-
     // Create new saving record
     $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
     if ($stmt->execute([$user_id, $saving['id'], $saving['name'], $saving['target_amount'], $current_amount, $saving['currency'], $saving['start_date'], $saving['target_date'], $exchange_rate, 'update'])) {
+
         // Update original saving record
-        $stmt = $pdo->prepare("UPDATE savings SET current_amount = 0 WHERE id = ? AND user_id = ?");
-        $stmt->execute([$saving['id'], $user_id]);
+        $stmt = $pdo->prepare("UPDATE savings SET current_amount = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$current_amount, $saving['id'], $user_id]);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
@@ -202,8 +198,8 @@ function updateFullSaving()
     $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt->execute([$user_id, $saving['id'], $name, $target_amount, $current_amount, $currency, $start_date, $target_date, $exchange_rate, 'update'])) {
         // Update original saving record
-        $stmt = $pdo->prepare("UPDATE savings SET current_amount = 0, exchange_rate = ? WHERE id = ? AND user_id = ?");
-        $stmt->execute([$exchange_rate, $saving['id'], $user_id]);
+        $stmt = $pdo->prepare("UPDATE savings SET current_amount = ?, exchange_rate = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$current_amount, $exchange_rate, $saving['id'], $user_id]);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
