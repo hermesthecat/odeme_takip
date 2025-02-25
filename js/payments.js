@@ -511,6 +511,25 @@ function openUpdatePaymentModal(id) {
                     endDateInput.setAttribute('required', 'required');
                 }
 
+                // Eğer tekrarlı ödeme ise, bitiş tarihini otomatik ayarla
+                if (payment.frequency !== 'none') {
+                    // API'den son çocuk ödemenin tarihini al
+                    $.ajax({
+                        url: 'api.php',
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            action: 'get_last_child_payment_date',
+                            id: payment.id
+                        },
+                        success: function(response) {
+                            if (response.status === 'success' && response.last_date) {
+                                endDateInput.value = response.last_date;
+                            }
+                        }
+                    });
+                }
+
                 // Modalı göster
                 const modal = new bootstrap.Modal(document.getElementById('updatePaymentModal'));
                 modal.show();

@@ -287,7 +287,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$id) {
                     throw new Exception(t('income.not_found'));
                 }
-                
+
                 require_once __DIR__ . '/api/income.php';
                 $last_date = getLastChildIncomeDate($id);
                 $response = ['status' => 'success', 'last_date' => $last_date];
@@ -307,6 +307,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (isset($pdo) && $pdo->inTransaction()) {
                     $pdo->rollBack();
                 }
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
+            }
+            break;
+
+        case 'get_last_child_payment_date':
+            try {
+                $id = $_POST['id'] ?? null;
+                if (!$id) {
+                    throw new Exception(t('payment.not_found'));
+                }
+
+                require_once __DIR__ . '/api/payments.php';
+                $last_date = getLastChildPaymentDate($id);
+                $response = ['status' => 'success', 'last_date' => $last_date];
+            } catch (Exception $e) {
                 $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;

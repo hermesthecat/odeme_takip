@@ -381,3 +381,45 @@ function updatePayment()
         throw $e;
     }
 }
+
+function getLastChildPaymentDate($payment_id)
+{
+    global $pdo, $user_id;
+
+    // Ödeme bilgisini al
+    $stmt = $pdo->prepare("SELECT parent_id FROM payments WHERE id = ? AND user_id = ?");
+    $stmt->execute([$payment_id, $user_id]);
+    $payment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$payment) {
+        throw new Exception(t('payment.not_found'));
+    }
+
+    $parent_id = $payment['parent_id'] ?? $payment_id; // Eğer parent_id null ise, kendisi parent'tır
+
+    // Parent ID'ye sahip ödemenin son çocuk ödemesinin tarihini al
+    $stmt = $pdo->prepare("SELECT MAX(first_date) as last_date
+                          FROM payments
+                          WHERE parent_id = ? AND user_id = ?");
+
+    if (!$stmt->execute([$parent_id, $user_id])) {
+        throw new Exception(t('payment.not_found'));
+    }
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$result || !$result['last_date']) {
+        // Eğer çocuk ödeme yoksa, parent'ın ilk tarihini döndür
+        $stmt = $pdo->prepare("SELECT first_date FROM payments WHERE id = ? AND user_id = ?");
+        $stmt->execute([$parent_id, $user_id]);
+        $parent = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$parent) {
+            throw new Exception(t('payment.not_found'));
+        }
+
+        return $parent['first_date'];
+    }
+
+    return $result['last_date'];
+}
