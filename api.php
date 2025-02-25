@@ -325,6 +325,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;
+
+        case 'get_saving_details':
+            try {
+                $stmt = $pdo->prepare("SELECT * FROM savings WHERE id = ? AND user_id = ?");
+                $stmt->execute([$_POST['id'], $user_id]);
+                $saving = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($saving) {
+                    $response = [
+                        'status' => 'success',
+                        'data' => $saving
+                    ];
+                } else {
+                    $response = [
+                        'status' => 'error',
+                        'message' => t('saving.not_found')
+                    ];
+                }
+            } catch (Exception $e) {
+                $response = [
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ];
+            }
+            break;
+
+        case 'get_savings_history':
+            try {
+                require_once __DIR__ . '/api/savings.php';
+                $savings_history = getSavingsHistory($_POST['id']);
+                $response = ['status' => 'success', 'data' => $savings_history];
+            } catch (Exception $e) {
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
+            }
+            break;
     }
 
     // Response'u güvenli hale getir

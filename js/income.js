@@ -114,12 +114,12 @@ function openUpdateIncomeModal(id) {
                 // Parent/Child durumunu kontrol et
                 const isParent = income.parent_id === null;
                 $('#update_income_is_parent').val(isParent ? '1' : '0');
-                
+
                 // Güncelleme seçeneğini göster/gizle
                 const childrenGroup = document.getElementById('updateIncomeChildrenGroup');
                 if (income.frequency !== 'none') {
                     childrenGroup.style.display = 'block';
-                    
+
                     // Bilgi metnini güncelle
                     let infoText = '';
                     if (isParent) {
@@ -153,7 +153,7 @@ function openUpdateIncomeModal(id) {
                 } else {
                     endDateGroup.style.display = 'block';
                     endDateInput.setAttribute('required', 'required');
-                    
+
                     // Eğer tekrarlı gelir ise, bitiş tarihini otomatik ayarla
                     if (income.frequency !== 'none') {
                         // API'den son çocuk gelirin tarihini al
@@ -165,7 +165,7 @@ function openUpdateIncomeModal(id) {
                                 action: 'get_last_child_income_date',
                                 id: income.id
                             },
-                            success: function(response) {
+                            success: function (response) {
                                 if (response.status === 'success' && response.last_date) {
                                     endDateInput.value = response.last_date;
                                 }

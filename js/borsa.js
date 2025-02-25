@@ -425,15 +425,15 @@ function topluSatisKaydet(sembol) {
     // Tümünü Sil butonundan ID'leri al
     const silButonu = anaSatir.querySelector('.btn-danger');
     if (!silButonu) return;
-    
+
     const onclickAttr = silButonu.getAttribute('onclick');
     const idMatch = onclickAttr.match(/hisseSil\('([^']+)'/);
-    
+
     if (!idMatch || !idMatch[1]) {
         console.error('Hisse ID bulunamadı');
         return;
     }
-    
+
     const kayitIdler = idMatch[1];
 
     // Satış işlemini gerçekleştir

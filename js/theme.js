@@ -3,7 +3,7 @@ function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     document.body.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-    
+
     // Grafik renklerini güncelle
     if (typeof maliDurumChart !== 'undefined' && maliDurumChart !== null) {
         const isDarkMode = theme === 'dark';

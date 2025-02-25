@@ -306,7 +306,7 @@ function updateIncome()
                     currency = ?, 
                     exchange_rate = ?
                     WHERE parent_id = ? AND user_id = ?");
-                
+
                 if (!$stmt->execute([
                     $amount,
                     $currency,
@@ -316,7 +316,7 @@ function updateIncome()
                 ])) {
                     throw new Exception(t('income.update_children_error'));
                 }
-            } 
+            }
             // Child gelir ise, kendisi ve sonraki kayıtları güncelle
             else {
                 $stmt = $pdo->prepare("UPDATE income SET 
@@ -324,7 +324,7 @@ function updateIncome()
                     currency = ?, 
                     exchange_rate = ?
                     WHERE parent_id = ? AND first_date >= ? AND user_id = ?");
-                
+
                 if (!$stmt->execute([
                     $amount,
                     $currency,

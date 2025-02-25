@@ -522,7 +522,7 @@ function openUpdatePaymentModal(id) {
                             action: 'get_last_child_payment_date',
                             id: payment.id
                         },
-                        success: function(response) {
+                        success: function (response) {
                             if (response.status === 'success' && response.last_date) {
                                 endDateInput.value = response.last_date;
                             }

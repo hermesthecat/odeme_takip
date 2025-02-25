@@ -85,6 +85,8 @@ function loadSavingsData() {
             $('#savingsLoadingSpinner').hide();
             $('#savingList').closest('.table').show();
         }
+    }).fail(function (error) {
+        console.error("Error loading savings data:", error);
     });
 }
 
