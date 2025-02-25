@@ -98,4 +98,16 @@ function deleteSaving(id) {
             });
         }
     });
-} 
+}
+
+// Set default dates when the add saving modal is opened
+$('#savingModal').on('show.bs.modal', function (e) {
+    const today = new Date();
+    const nextYear = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
+
+    const todayFormatted = today.toISOString().slice(0, 10);
+    const nextYearFormatted = nextYear.toISOString().slice(0, 10);
+
+    $(this).find('input[name="start_date"]').val(todayFormatted);
+    $(this).find('input[name="target_date"]').val(nextYearFormatted);
+});
