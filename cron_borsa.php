@@ -133,7 +133,6 @@ function hisseFiyatiCek($sembol)
     // Debug bilgileri
     saveLog("BigPara API İstek - Hisse: " . $sembol, 'info', 'hisseFiyatiCek', 0);
     saveLog("BigPara API Yanıt Kodu: " . $httpcode, 'info', 'hisseFiyatiCek', 0);
-    saveLog("BigPara API Hata: " . $err, 'error', 'hisseFiyatiCek', 0);
     saveLog("BigPara API Ham Yanıt: " . $response, 'info', 'hisseFiyatiCek', 0);
 
     if ($err) {
@@ -281,3 +280,5 @@ saveLog(sprintf(
     $sonuc['basarisiz'],
     $sure
 ), 'info', 'fiyatlariGuncelle', 0);
+
+echo "Cron tamamlandı - Toplam: " . $sonuc['toplam'] . ", Güncellenen: " . $sonuc['guncellenen'] . ", Başarısız: " . $sonuc['basarisiz'] . ", Süre: " . $sure . " saniye";
