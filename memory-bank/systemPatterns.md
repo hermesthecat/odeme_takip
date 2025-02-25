@@ -10,86 +10,139 @@
 └── modals/      # Modal components
 ```
 
-## Identified Patterns
+## Frontend Architecture
 
-### 1. API Structure
-- RESTful endpoints in api/ directory
-- Dedicated files per resource type
-- Common utilities separated (utils.php, validate.php)
+### 1. Core Architecture Patterns
+- Modular JavaScript organization
+- jQuery-based implementation
+- Bootstrap for UI components
+- SweetAlert2 for notifications
+- Event-driven architecture
+- Lazy loading for performance optimization
 
-### 2. Frontend Organization
-- Module-based JS files
-- Separate files for different features:
-  - auth.js: Authentication handling
-  - borsa.js: Stock market functionality
-  - theme.js: Theme management
-  - utils.js: Common utilities
+### 2. Data Management
+a. Data Loading Pattern:
+```javascript
+- Initial page load fetches core data
+- Subsequent data loaded lazily per component
+- Centralized loadData() function coordinates updates
+- Component-specific loading functions
+```
 
-### 3. Multi-language Support
-- Dedicated language files in lang/
-- Supporting 20+ languages
-- Language selection mechanism
+b. State Management:
+- URL-based state for month/year
+- Window-level data store
+- Component-level state handling
 
-### 4. Modal Components
-- Separate directory for modal definitions
-- Feature-specific modals:
-  - income_modal.php
-  - payment_modal.php
-  - savings_modal.php
-  - user_settings_modal.php
+### 3. Frontend Component Structure
+a. Data Display Components:
+- Income list
+- Savings list
+- Payments list
+- Recurring payments list
+- Summary display
 
-### 5. Data Management
-- Recurring transaction pattern:
-  - Parent-child relationship
-  - Frequency-based scheduling
-  - Status tracking
+b. Interactive Components:
+- Month/Year selectors
+- Modal forms
+- Theme switcher
+- Loading spinners
 
-- Multi-currency support pattern:
-  - Base currency per user
-  - Exchange rate tracking
-  - Currency conversion handling
+### 4. Form Handling Pattern
+a. Form Submission:
+```javascript
+- Serialization to objects
+- Pre-submission validation
+- AJAX-based submission
+- Modal management
+- Automatic data refresh
+```
 
-### 6. Authentication
-- Session-based authentication
-- Remember-me functionality
-- Role-based access control
+b. Validation System:
+- Rule-based validation
+- Support for:
+  - Required fields
+  - Numeric values
+  - Date validation
+  - Currency validation
+  - Frequency validation
+  - Min/Max values
+  - Date ranges
 
-## Naming Conventions
-1. Files:
-   - Snake case for PHP files
-   - Camel case for JS files
-   - All lowercase for language files
+### 5. Security Patterns
+a. Input/Output Security:
+- HTML escaping for user input
+- XSS prevention
+- Safe HTML template system
+- Token validation
 
-2. Database:
-   - Snake case for table names
-   - Snake case for column names
-   - Explicit foreign key naming
+b. Session Management:
+- Token-based authentication
+- Session expiry handling
+- Auto-redirect on auth failure
 
-## Security Patterns
-1. Input Validation:
-   - Centralized validation (validate.php)
-   - XSS prevention (xss.php)
-   - Authentication checks (auth.php)
+### 6. Utility Patterns
+a. Data Formatting:
+- Number formatting with decimals
+- Date formatting
+- Currency handling
+- Frequency text localization
 
-2. Database:
-   - Prepared statements
-   - Foreign key constraints
-   - Proper indexing
+b. AJAX Handling:
+- Centralized request function
+- Standardized error handling
+- Promise-based implementation
+- Validation integration
 
-## UI Patterns
-1. Theme Support:
-   - Light/dark mode
-   - User preference storage
-   - Dynamic theme switching
+### 7. Internationalization
+- Translation system integration
+- Dynamic text loading
+- Format localization
+- Currency localization
 
-2. Modal Usage:
-   - Consistent modal structure
-   - Feature-specific implementations
-   - Reusable components
+### 8. UI/UX Patterns
+a. Loading States:
+- Component-specific spinners
+- Global loading management
+- Visibility toggles
 
-## Future Pattern Considerations
-1. Caching Strategy
-2. Error Handling
-3. Logging Standards
-4. API Response Format
-5. Performance Optimization
+b. Error Handling:
+- User-friendly error messages
+- Validation feedback
+- Session error handling
+- Network error handling
+
+c. Navigation:
+- URL-based state management
+- History API integration
+- Parameter management
+
+### 9. Code Style Conventions
+- Camel case for function names
+- Descriptive variable naming
+- jQuery prefix for DOM elements ($)
+- Component-based file organization
+- Consistent error handling
+
+## API Integration Pattern
+- RESTful endpoint structure
+- Standardized response format
+- Central API request handling
+- Error standardization
+- Authentication header handling
+
+## Future Considerations
+1. Performance Optimization:
+   - Bundle optimization
+   - Cache strategy
+   - Asset loading optimization
+
+2. Code Organization:
+   - Module bundling
+   - Dependency management
+   - Build process
+
+3. Testing Strategy:
+   - Unit testing setup
+   - Integration testing
+   - E2E testing consideration
