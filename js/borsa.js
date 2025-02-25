@@ -487,19 +487,49 @@ function hisseSil(ids, event) {
     const message = idList.length > 1 ?
         'Bu hissenin tüm kayıtlarını silmek istediğinizden emin misiniz?' :
         'Bu hisse kaydını silmek istediğinizden emin misiniz?';
-
-    if (confirm(message)) {
-        fetch('api/borsa.php?sil=' + encodeURIComponent(ids))
-            .then(response => response.text())
-            .then(data => {
-                if (data === 'success') {
-                    portfoyGuncelle();
-                } else {
-                    alert('Hisse silinirken bir hata oluştu!');
-                }
-            })
-            .catch(error => console.error('Hata:', error));
-    }
+    
+    Swal.fire({
+        title: 'Emin misiniz?',
+        text: message,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Evet, sil!',
+        cancelButtonText: 'İptal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch('api/borsa.php?sil=' + encodeURIComponent(ids))
+                .then(response => response.text())
+                .then(data => {
+                    if (data === 'success') {
+                        Swal.fire({
+                            title: 'Silindi!',
+                            text: 'Hisse başarıyla silindi.',
+                            icon: 'success',
+                            confirmButtonText: 'Tamam'
+                        });
+                        portfoyGuncelle();
+                    } else {
+                        Swal.fire({
+                            title: 'Hata!',
+                            text: 'Hisse silinirken bir hata oluştu!',
+                            icon: 'error',
+                            confirmButtonText: 'Tamam'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    Swal.fire({
+                        title: 'Hata!',
+                        text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                        icon: 'error',
+                        confirmButtonText: 'Tamam'
+                    });
+                });
+        }
+    });
 }
 
 // Hisse arama ve otomatik tamamlama
