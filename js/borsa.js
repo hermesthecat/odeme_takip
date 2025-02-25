@@ -288,6 +288,20 @@ function portfoyGuncelle() {
             // Mali durum grafiğini güncelle
             maliDurumGrafigiGuncelle(portfoyData);
 
+            // Satış karı hücrelerinin renklerini düzenle
+            document.querySelectorAll('td.satis-kar').forEach(hucre => {
+                const deger = parseFloat(hucre.textContent.replace(/[^0-9.-]+/g, ""));
+                if (!isNaN(deger)) {
+                    if (deger >= 0) {
+                        hucre.classList.add('kar');
+                        hucre.classList.remove('zarar');
+                    } else {
+                        hucre.classList.add('zarar');
+                        hucre.classList.remove('kar');
+                    }
+                }
+            });
+
             // Tıklama olaylarını ekle
             document.querySelectorAll('.ana-satir').forEach(row => {
                 row.addEventListener('click', function () {
@@ -421,12 +435,22 @@ function topluSatisKaydet(sembol) {
     const toplamAdet = parseInt(document.getElementById(`toplam-satis-adet-${sembol}`).value) || 0;
 
     if (toplamAdet <= 0) {
-        alert('Lütfen satılacak adet giriniz!');
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Lütfen satılacak adet giriniz!',
+            confirmButtonText: 'Tamam'
+        });
         return;
     }
 
     if (!satisFiyati || satisFiyati <= 0) {
-        alert('Lütfen geçerli bir satış fiyatı girin!');
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Lütfen geçerli bir satış fiyatı girin!',
+            confirmButtonText: 'Tamam'
+        });
         return;
     }
 
@@ -441,15 +465,31 @@ function topluSatisKaydet(sembol) {
         .then(response => response.text())
         .then(result => {
             if (result === 'success') {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Satış işlemi başarıyla gerçekleştirildi.',
+                    confirmButtonText: 'Tamam'
+                });
                 topluSatisFormunuGizle(sembol);
                 portfoyGuncelle();
             } else {
-                alert('Satış işlemi başarısız oldu!');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Satış işlemi başarısız oldu!',
+                    confirmButtonText: 'Tamam'
+                });
             }
         })
         .catch(error => {
             console.error('Hata:', error);
-            alert('Satış işlemi sırasında bir hata oluştu!');
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata!',
+                text: 'Satış işlemi sırasında bir hata oluştu!',
+                confirmButtonText: 'Tamam'
+            });
         });
 }
 

@@ -595,7 +595,7 @@ if (isset($_GET['liste'])) {
         }
 
         $kar_zarar_class = $toplam_kar_zarar >= 0 ? 'kar' : 'zarar';
-        $satis_kar_class = $toplam_satis_kari >= 0 ? 'kar' : 'zarar';
+        $satis_kar_class = $toplam_satis_kari >= 0 ? 'kar satis-kar' : 'zarar satis-kar';
 
         // Son güncelleme zamanını al
         $son_guncelleme = isset($hisse['son_guncelleme']) ? date('H:i:s', strtotime($hisse['son_guncelleme'])) : '';

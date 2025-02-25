@@ -36,6 +36,19 @@ body {
     color: var(--zarar-color);
 }
 
+/* Satış karı için özel stil */
+.satis-kar {
+    font-weight: bold;
+}
+
+td.kar.satis-kar {
+    color: var(--kar-color) !important;
+}
+
+td.zarar.satis-kar {
+    color: var(--zarar-color) !important;
+}
+
 /* Otomatik tamamlama stilleri */
 .autocomplete-items {
     position: absolute;
