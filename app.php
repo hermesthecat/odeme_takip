@@ -26,7 +26,7 @@ $user_default_currency = $_SESSION['base_currency'];
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="mb-0"><?php echo t('site_name'); ?></h1>
             <div class="d-flex align-items-center">
-                <?php if (checkAdmin()) : ?>
+                <?php if ($_SESSION['is_admin'] == 1) : ?>
                     <a href="log.php" class="btn btn-outline-secondary me-2">
                         <i class="bi bi-list-nested me-1"></i>Log
                     </a>

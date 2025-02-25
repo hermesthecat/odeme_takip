@@ -111,6 +111,27 @@ function openUpdateIncomeModal(id) {
                 $('#update_income_first_date').val(income.first_date);
                 $('#update_income_frequency').val(income.frequency);
 
+                // Parent/Child durumunu kontrol et
+                const isParent = income.parent_id === null;
+                $('#update_income_is_parent').val(isParent ? '1' : '0');
+                
+                // Güncelleme seçeneğini göster/gizle
+                const childrenGroup = document.getElementById('updateIncomeChildrenGroup');
+                if (income.frequency !== 'none') {
+                    childrenGroup.style.display = 'block';
+                    
+                    // Bilgi metnini güncelle
+                    let infoText = '';
+                    if (isParent) {
+                        infoText = translations.income.update_children_info_parent || 'Bu seçenek işaretlendiğinde, bu gelire bağlı tüm gelirler güncellenecektir.';
+                    } else {
+                        infoText = translations.income.update_children_info_child || 'Bu seçenek işaretlendiğinde, bu gelir ve sonraki gelirler güncellenecektir.';
+                    }
+                    $('#update_income_children_info').text(infoText);
+                } else {
+                    childrenGroup.style.display = 'none';
+                }
+
                 // Kur güncelleme seçeneğini göster/gizle
                 const exchangeRateGroup = document.getElementById('updateIncomeExchangeRateGroup');
                 if (income.currency !== data.user.base_currency) {
@@ -157,6 +178,13 @@ function updateIncome() {
     // Kur güncelleme seçeneğini kontrol et
     if ($('#update_income_exchange_rate').is(':checked')) {
         formData.update_exchange_rate = true;
+    }
+
+    // Child gelir güncelleme seçeneğini kontrol et
+    if ($('#update_income_children').is(':checked')) {
+        formData.update_children = true;
+    } else {
+        formData.update_children = false;
     }
 
     ajaxRequest(formData).done(function (response) {

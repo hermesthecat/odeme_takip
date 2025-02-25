@@ -297,6 +297,47 @@ function updateIncome()
             throw new Exception(t('income.update_error'));
         }
 
+        // Child kayıtları güncelleme
+        if (isset($_POST['update_children']) && $_POST['update_children'] === 'true') {
+            // Parent gelir ise, tüm child kayıtları güncelle
+            if ($income['parent_id'] === null) {
+                $stmt = $pdo->prepare("UPDATE income SET 
+                    amount = ?, 
+                    currency = ?, 
+                    exchange_rate = ?
+                    WHERE parent_id = ? AND user_id = ?");
+                
+                if (!$stmt->execute([
+                    $amount,
+                    $currency,
+                    $exchange_rate,
+                    $id,
+                    $user_id
+                ])) {
+                    throw new Exception(t('income.update_children_error'));
+                }
+            } 
+            // Child gelir ise, kendisi ve sonraki kayıtları güncelle
+            else {
+                $stmt = $pdo->prepare("UPDATE income SET 
+                    amount = ?, 
+                    currency = ?, 
+                    exchange_rate = ?
+                    WHERE parent_id = ? AND first_date >= ? AND user_id = ?");
+                
+                if (!$stmt->execute([
+                    $amount,
+                    $currency,
+                    $exchange_rate,
+                    $income['parent_id'],
+                    $first_date,
+                    $user_id
+                ])) {
+                    throw new Exception(t('income.update_children_error'));
+                }
+            }
+        }
+
         $pdo->commit();
         return true;
     } catch (Exception $e) {

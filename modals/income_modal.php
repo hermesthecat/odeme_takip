@@ -66,6 +66,7 @@
             <div class="modal-body">
                 <form id="updateIncomeForm">
                     <input type="hidden" id="update_income_id" name="id">
+                    <input type="hidden" id="update_income_is_parent" name="is_parent" value="0">
                     <div class="mb-3">
                         <label class="form-label"><?php echo t('income_name'); ?></label>
                         <input type="text" class="form-control" id="update_income_name" name="name" required>
@@ -111,6 +112,15 @@
                     <div class="mb-3" id="updateIncomeEndDateGroup" style="display: none;">
                         <label class="form-label"><?php echo t('income_end_date'); ?></label>
                         <input type="date" class="form-control" name="end_date">
+                    </div>
+                    <div class="mb-3" id="updateIncomeChildrenGroup" style="display: none;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="update_income_children" name="update_children" checked>
+                            <label class="form-check-label" for="update_income_children">
+                                <?php echo t('income.update_children'); ?>
+                            </label>
+                            <small class="text-muted d-block mt-1" id="update_income_children_info"></small>
+                        </div>
                     </div>
                 </form>
             </div>

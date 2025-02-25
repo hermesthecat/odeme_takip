@@ -86,6 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $_SESSION['base_currency'] = $row['base_currency'];
                             //$_SESSION['lang'] = $row['lang'];
                             $_SESSION['theme'] = $row['theme_preference'];
+                            $_SESSION['is_admin'] = $row['is_admin'];
 
                             if ($remember_me) {
                                 $token = bin2hex(random_bytes(32));

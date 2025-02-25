@@ -2,7 +2,11 @@
 require_once 'config.php';
 require_once 'classes/log.php';
 checkLogin();
-checkAdmin();
+
+if ($_SESSION['is_admin'] != 1) {
+    header("Location: app.php");
+    exit;
+}
 
 // Sayfa başına gösterilecek log sayısı
 $logs_per_page = 50;
