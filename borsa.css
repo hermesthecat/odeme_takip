@@ -101,8 +101,9 @@ td.zarar.satis-kar {
 }
 
 .autocomplete-items div {
-    padding: 10px;
+    padding: 10px 15px;
     cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
     color: var(--text-color);
 }
 
@@ -110,8 +111,35 @@ td.zarar.satis-kar {
     background-color: var(--autocomplete-hover);
 }
 
+.autocomplete-items div:last-child {
+    border-bottom: none;
+}
+
 .autocomplete-active {
     background-color: var(--autocomplete-hover) !important;
+}
+
+/* Sembol önerileri için stiller */
+#sembolOnerileri {
+    position: absolute;
+    width: 100%;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    background: var(--autocomplete-bg);
+    border-radius: 0.375rem;
+    border: 1px solid var(--border-color);
+    margin-top: 2px;
+}
+
+/* Form floating stiller */
+.form-floating > .form-control::placeholder {
+    color: transparent;
+}
+
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    opacity: .65;
+    transform: scale(.85) translateY(-.5rem) translateX(.15rem);
 }
 
 .sembol-input-container {

@@ -113,47 +113,6 @@ function tahminiMaliyetHesapla() {
 document.getElementById('adetInput').addEventListener('input', tahminiMaliyetHesapla);
 document.getElementById('alisFiyatiInput').addEventListener('input', tahminiMaliyetHesapla);
 
-// Otomatik tamamlama stil güncellemesi
-document.getElementById('sembolOnerileri').style.cssText = `
-        position: absolute;
-        width: 100%;
-        max-height: 300px;
-        overflow-y: auto;
-        z-index: 1000;
-        background: white;
-        border-radius: 0.375rem;
-        border: 1px solid rgba(0,0,0,.125);
-        margin-top: 2px;
-    `;
-
-// Öneri öğelerinin stilini güncelle
-const style = document.createElement('style');
-style.textContent = `
-        .autocomplete-items div {
-            padding: 10px 15px;
-            cursor: pointer;
-            border-bottom: 1px solid #eee;
-        }
-        .autocomplete-items div:hover {
-            background-color: #f8f9fa;
-        }
-        .autocomplete-items div:last-child {
-            border-bottom: none;
-        }
-        .fiyat-bilgisi {
-            float: right;
-            color: #6c757d;
-        }
-        .form-floating > .form-control::placeholder {
-            color: transparent;
-        }
-        .form-floating > .form-control:not(:placeholder-shown) ~ label {
-            opacity: .65;
-            transform: scale(.85) translateY(-.5rem) translateX(.15rem);
-        }
-    `;
-document.head.appendChild(style);
-
 // Mali durum grafiği için yeni fonksiyonlar
 let maliDurumChart = null;
 
