@@ -1,7 +1,16 @@
 // Tema değiştirme fonksiyonu
 function setTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
+    
+    // Grafik renklerini güncelle
+    if (typeof maliDurumChart !== 'undefined' && maliDurumChart !== null) {
+        const isDarkMode = theme === 'dark';
+        maliDurumChart.options.plugins.legend.labels.color = isDarkMode ? '#e9ecef' : '#212529';
+        maliDurumChart.options.plugins.title.color = isDarkMode ? '#e9ecef' : '#212529';
+        maliDurumChart.update();
+    }
 }
 
 // Kullanıcı ayarları modalını aç

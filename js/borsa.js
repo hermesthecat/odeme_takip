@@ -688,6 +688,13 @@ function hisseAra() {
 
 // Sayfa yüklendiğinde ve her 5 dakikada bir güncelle
 window.onload = function () {
+    // Tema ayarını uygula
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+        document.body.setAttribute('data-theme', savedTheme);
+    }
+    
     portfoyGuncelle();
     setInterval(portfoyGuncelle, 300000);
 };
