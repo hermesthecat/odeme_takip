@@ -8,6 +8,19 @@ checkLogin();
 $user_default_currency = $_SESSION['base_currency'];
 global $pdo;
 
+// convert currency to TRY
+function convertCurrencyToTRY($amount)
+{
+    // NOT : Türkiyede ondalık ayıracı VİRGÜL'dür. Binlik ayıracı NOKTA'dır. Fakat PHP İNGİLİZCE alt yapıya sahip olduğundan PHP içerisinde NOKTA ondalık ayıracıdır. VİRGÜL ise binlik ayıracıdır. Yani ondalıklı sayılar nokta ile gösterilir. 
+
+    // Tutar 1 350 TL. 556 Kuruş sayısnı Türkiye 1.350,25 yazılır. İngilizce de 1,350.25 yazılır.
+
+    // number_format(değişken,ondalık basamak sayısı, "ondalık ayıracı" , "binlik ayıracı");
+
+    // Ondalık ayıracı ve binlik ayıracı çift tırnaklar içine yazılacak.
+
+    return number_format($amount, 2, ",", ".");
+}
 /**
  * Yeni hisse senedi ekler
  */
@@ -119,10 +132,10 @@ function portfoyListele()
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
         $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small></td>';
         $output .= '<td class="adet">' . $toplam_adet . '</td>';
-        $output .= '<td>' . (count($alislar) > 0 ? number_format($alislar[0]['alis_fiyati'], 2, '.', ',') . ' ₺' : 'Çeşitli') . '</td>';
-        $output .= '<td class="anlik_fiyat">' . number_format($anlik_fiyat, 2, '.', ',') . ' ₺ <small class="text-muted">(' . date('H:i:s') . ')</small></td>';
-        $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
-        $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
+        $output .= '<td>' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
+        $output .= '<td class="anlik_fiyat">' . convertCurrencyToTRY($anlik_fiyat) . ' <small class="text-muted">(' . date('H:i:s') . ')</small></td>';
+        $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . convertCurrencyToTRY($kar_zarar) . '</td>';
+        $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . convertCurrencyToTRY($satis_kari) . '</td>';
         $output .= '<td>';
         $output .= '<button class="btn btn-sm btn-success me-1" onclick="topluSatisFormunuGoster(\'' . $sembol . '\', ' . $anlik_fiyat . ', event)">Sat</button>';
         $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(\'' . $ids . '\', event)">Tümünü Sil</button>';
@@ -195,9 +208,9 @@ function portfoyListele()
             $output .= '<tr data-alis-tarihi="' . $alis['alis_tarihi'] . '" data-alis-fiyati="' . $alis['alis_fiyati'] . '" data-max-adet="' . $kalan_adet . '">';
             $output .= '<td>' . date('d.m.Y H:i', strtotime($alis['alis_tarihi'])) . '</td>';
             $output .= '<td>' . $kalan_adet . '</td>';
-            $output .= '<td>' . number_format($alis['alis_fiyati'], 2, '.', ',') . ' ₺</td>';
-            $output .= '<td>' . number_format($anlik_fiyat, 2, '.', ',') . ' ₺</td>';
-            $output .= '<td class="' . $alis_kar_zarar_class . '">' . number_format($alis_kar_zarar, 2, '.', ',') . ' ₺</td>';
+            $output .= '<td>' . convertCurrencyToTRY($alis['alis_fiyati']) . '</td>';
+            $output .= '<td>' . convertCurrencyToTRY($anlik_fiyat) . '</td>';
+            $output .= '<td class="' . $alis_kar_zarar_class . '">' . convertCurrencyToTRY($alis_kar_zarar) . '</td>';
             $output .= '<td>' . ($alis['durum'] == 'kismi_satildi' ? 'Kısmi Satış' : 'Aktif') . '</td>';
             $output .= '<td>
                 <div class="d-flex align-items-center">
@@ -227,9 +240,9 @@ function portfoyListele()
                 $output .= '<tr class="table-light">';
                 $output .= '<td>' . date('d.m.Y H:i', strtotime($satis['alis_tarihi'])) . '</td>';
                 $output .= '<td>' . $satis_adedi . '</td>';
-                $output .= '<td>' . number_format($satis['alis_fiyati'], 2, '.', ',') . ' ₺</td>';
-                $output .= '<td>' . number_format($satis['satis_fiyati'], 2, '.', ',') . ' ₺</td>';
-                $output .= '<td class="' . $satis_kar_zarar_class . '">' . number_format($satis_kar_zarar, 2, '.', ',') . ' ₺</td>';
+                $output .= '<td>' . convertCurrencyToTRY($satis['alis_fiyati']) . '</td>';
+                $output .= '<td>' . convertCurrencyToTRY($satis['satis_fiyati']) . '</td>';
+                $output .= '<td class="' . $satis_kar_zarar_class . '">' . convertCurrencyToTRY($satis_kar_zarar) . '</td>';
                 $output .= '<td>Satıldı (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
                 $output .= '<td></td>';
                 $output .= '</tr>';
