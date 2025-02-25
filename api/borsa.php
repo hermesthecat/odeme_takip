@@ -118,7 +118,7 @@ function portfoyListele()
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
         $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small></td>';
         $output .= '<td class="adet">' . $toplam_adet . '</td>';
-        $output .= '<td>' . ($alis['alis_fiyati'] > 0 ? number_format($alis['alis_fiyati'], 2, '.', ',') . ' ₺' : 'Çeşitli') . '</td>';
+        $output .= '<td>' . ($ortalama_alis > 0 ? number_format($ortalama_alis, 2, '.', ',') . ' ₺' : 'Çeşitli') . '</td>';
         $output .= '<td class="anlik_fiyat">' . number_format($anlik_fiyat, 2, '.', ',') . ' ₺ <small class="text-muted">(' . date('H:i:s') . ')</small></td>';
         $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
