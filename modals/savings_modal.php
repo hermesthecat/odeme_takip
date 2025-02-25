@@ -17,7 +17,7 @@
                         <input type="number" step="0.01" class="form-control" name="target_amount" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><?php echo t('currency'); ?></label>
+                        <label class="form-label"><?php echo t('saving.currency'); ?></label>
                         <select class="form-select" name="currency" required>
                             <?php foreach ($supported_currencies as $code => $name) : ?>
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
@@ -66,7 +66,7 @@
                         <input type="number" step="0.01" class="form-control" name="current_amount" id="update_saving_current_amount" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><?php echo t('currency'); ?></label>
+                        <label class="form-label"><?php echo t('saving.currency'); ?></label>
                         <select class="form-select" name="currency" id="update_saving_currency" required>
                             <?php foreach ($supported_currencies as $code => $name) : ?>
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>

@@ -17,7 +17,7 @@
                         <input type="number" step="0.01" class="form-control" name="amount" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><?php echo t('currency'); ?></label>
+                        <label class="form-label"><?php echo t('payment.currency'); ?></label>
                         <select class="form-select" name="currency" required>
                             <?php foreach ($supported_currencies as $code => $name) : ?>
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
@@ -75,7 +75,7 @@
                         <input type="number" class="form-control" id="update_payment_amount" name="amount" step="0.01" min="0" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label"><?php echo t('currency'); ?></label>
+                        <label class="form-label"><?php echo t('payment.currency'); ?></label>
                         <select class="form-select" id="update_payment_currency" name="currency" required>
                             <?php foreach ($supported_currencies as $code => $name) : ?>
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>

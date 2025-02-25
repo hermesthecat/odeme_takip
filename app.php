@@ -279,6 +279,24 @@ $user_default_currency = $_SESSION['base_currency'];
         </div>
     </div>
 
+    <!-- Sorumluluk Reddi -->
+    <div class="container mt-5 mb-3">
+        <div class="card bg-light">
+            <div class="card-body">
+                <h5 class="card-title text-muted">Sorumluluk Reddi</h5>
+                <p class="card-text small text-muted">
+                    Bu uygulama sadece kişisel bütçe yönetimi amacıyla kullanılmaktadır. Burada sunulan bilgiler finansal tavsiye niteliği taşımamaktadır.
+                    Uygulama üzerinden yapılan işlemler ve alınan kararlardan doğabilecek sonuçlardan kullanıcı sorumludur.
+                    Döviz kurları ve finansal veriler bilgi amaçlı olup, gerçek zamanlı değişiklik gösterebilir.
+                    Tüm hakları saklıdır. &copy; <?php echo date('Y'); ?> - <?php echo t('site_name'); ?>
+                </p>
+                <p class="card-text small text-muted text-end">
+                    Geliştirici: A. Kerem Gök
+                </p>
+            </div>
+        </div>
+    </div>
+
     <!-- Modals -->
     <?php include 'modals.php'; ?>
 
@@ -445,6 +463,7 @@ $user_default_currency = $_SESSION['base_currency'];
     <script src="js/theme.js"></script>
     <script src="js/app.js"></script>
     <script src="js/auth.js"></script>
+
 </body>
 
 </html>
