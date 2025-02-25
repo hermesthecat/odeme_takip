@@ -1,191 +1,218 @@
 # System Patterns and Conventions
 
+## Backend Architecture
+
+### 1. API Structure Pattern
+```php
+// Central API Router (api.php)
+switch ($action) {
+    case 'action_name':
+        try {
+            if (actionHandler()) {
+                $response = ['status' => 'success', ...];
+            }
+        } catch (Exception $e) {
+            $response = ['status' => 'error', ...];
+        }
+        break;
+}
+```
+
+### 2. Feature Module Pattern
+```php
+// Feature-specific modules (api/*.php)
+function featureOperation() {
+    global $pdo, $user_id;
+    
+    // 1. Validation
+    // 2. Database operations
+    // 3. Transaction handling
+    // 4. Response formatting
+}
+```
+
+### 3. Data Access Patterns
+a. Database Operations:
+```php
+// Transaction Pattern
+$pdo->beginTransaction();
+try {
+    // Operations
+    $pdo->commit();
+} catch (Exception $e) {
+    $pdo->rollBack();
+    throw $e;
+}
+
+// Prepared Statements Pattern
+$stmt = $pdo->prepare("SQL_QUERY");
+$stmt->execute([params]);
+```
+
+b. Query Patterns:
+- Parent-child relationships
+- Aggregate calculations
+- Status tracking
+- Currency conversion handling
+
+### 4. Validation Pattern
+```php
+// Input validation chain
+$value = validateRequired($input, $fieldName);
+$value = validateNumeric($value, $fieldName);
+$value = validateMinValue($value, 0, $fieldName);
+```
+
+### 5. Security Patterns
+a. Authentication:
+```php
+function checkLogin() {
+    if (!isset($_SESSION['user_id'])) {
+        redirect('login.php');
+    }
+}
+```
+
+b. Data Sanitization:
+- Input validation
+- Output escaping
+- XSS prevention
+- CSRF protection
+
+### 6. Internationalization Pattern
+```php
+// Language Management
+$lang = Language::getInstance();
+$lang->setLanguage($language);
+
+// Translation Usage
+t('key.path', [params])
+```
+
+### 7. Configuration Management
+```php
+// Global Configuration
+define('CONSTANT_NAME', 'value');
+
+// Database Configuration
+$pdo = new PDO(connection_string);
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+```
+
+### 8. Error Handling Pattern
+```php
+try {
+    // Operation
+} catch (Exception $e) {
+    // 1. Rollback if in transaction
+    // 2. Log error
+    // 3. Format user-friendly response
+}
+```
+
+### 9. Response Format Pattern
+```php
+$response = [
+    'status' => 'success|error',
+    'message' => 'translated_message',
+    'data' => [
+        'formatted_data'
+    ]
+];
+```
+
+## Frontend Architecture
+[Previous Frontend Architecture Content...]
+
 ## Code Organization
 ```
 /
-├── api/          # API endpoints
+├── api/          # API endpoints and handlers
+│   ├── auth.php
+│   ├── payments.php
+│   ├── income.php
+│   ├── utils.php
+│   └── validate.php
 ├── classes/      # Core classes
+│   └── Language.php
 ├── js/          # Frontend JavaScript
 ├── lang/        # Language files
 └── modals/      # Modal components
 ```
 
-## Frontend Architecture
+## Database Schema Patterns
+1. Base Tables:
+   - users
+   - exchange_rates
+   - logs
 
-### 1. Component Architecture Pattern
+2. Feature Tables:
+   - payments
+   - income
+   - savings
+   - portfolio
+
+3. Common Patterns:
+   - user_id foreign key
+   - currency support
+   - created_at timestamp
+   - parent-child relationships
+   - status tracking
+
+## API Integration Patterns
+
+### 1. Request Pattern
 ```javascript
-// Data Display Pattern
-function updateComponentList(data) {
-    // 1. Clear existing content
-    // 2. Handle empty state
-    // 3. Iterate and render items
-    // 4. Handle state updates
-}
-
-// Interactive Element Pattern
-function handleComponentAction(id) {
-    // 1. Confirm if needed
-    // 2. Make API request
-    // 3. Handle response
-    // 4. Update UI
-}
-```
-
-### 2. Data Management Patterns
-a. Centralized Data Loading:
-```javascript
-// Root loading pattern
-function loadData() {
-    // 1. Show loading states
-    // 2. Load core data
-    // 3. Update summaries
-    // 4. Lazy load component data
-}
-
-// Component-specific loading
-function loadComponentData() {
-    // 1. Fetch specific data
-    // 2. Update component
-    // 3. Handle errors
-}
-```
-
-b. State Management:
-- URL-based state for navigation
-- Window-level data store
-- Component-level state
-- Progressive UI updates
-
-### 3. AJAX Communication Pattern
-```javascript
-function ajaxRequest(data) {
-    // 1. Input validation
-    // 2. Request preparation
-    // 3. Error handling
-    // 4. Response processing
-    // 5. Session management
-}
-```
-
-### 4. UI Patterns
-a. Progressive Loading:
-- Loading indicators per component
-- Lazy loading of secondary data
-- State-based UI updates
-
-b. Modal Management:
-```javascript
-function openUpdateModal(data) {
-    // 1. Populate form data
-    // 2. Configure validation
-    // 3. Setup event handlers
-    // 4. Show modal
-}
-```
-
-c. Progress Visualization:
-```javascript
-// Standard progress calculation
-const progress = (current / total) * 100;
-const progressClass = progress < 25 ? 'bg-danger' :
-    progress < 50 ? 'bg-warning' :
-    progress < 75 ? 'bg-info' : 'bg-success';
-```
-
-### 5. Form Handling Patterns
-a. Form Submission:
-```javascript
-$('.modal form').on('submit', function(e) {
-    // 1. Prevent default
-    // 2. Serialize data
-    // 3. Validate
-    // 4. Submit
-    // 5. Handle response
-    // 6. Update UI
-});
-```
-
-b. Data Validation:
-- Client-side validation rules
-- Server-side validation
-- Error message handling
-- Internationalized messages
-
-### 6. Error Handling Pattern
-```javascript
-// Consistent error display
-Swal.fire({
-    icon: 'error',
-    title: translations.error_title,
-    text: errorMessage
-});
-
-// API error handling
-ajaxRequest().fail(function(error) {
-    // 1. Log error
-    // 2. Show user-friendly message
-    // 3. Handle specific error types
-});
-```
-
-### 7. Internationalization Pattern
-- Translation key structure
-- Dynamic message loading
-- Formatted number/date handling
-- Currency formatting
-
-### 8. Security Patterns
-- XSS Prevention:
-  ```javascript
-  function escapeHtml(unsafe) {
-      return unsafe.replace(/[&<>"']/g, char => htmlEscapeMap[char]);
-  }
-  ```
-- CSRF Protection
-- Input Sanitization
-- Session Management
-
-### 9. Event Handling Patterns
-- Delegated Events
-- Event Bubbling Control
-- Custom Event Handling
-- Modal Event Management
-
-## API Integration
-1. Request Structure:
-```javascript
-{
+ajaxRequest({
     action: 'action_name',
-    ...parameters
-}
+    ...params
+})
 ```
 
-2. Response Format:
-```javascript
-{
-    status: 'success|error',
-    data: {},
-    message: 'optional message'
-}
+### 2. Response Pattern
+```php
+[
+    'status' => 'success|error',
+    'message' => 'translated_message',
+    'data' => []
+]
 ```
+
+## Security Patterns
+
+### 1. Authentication
+- Session-based authentication
+- Remember-me functionality
+- Login state verification
+
+### 2. Data Protection
+- Prepared statements
+- Input validation
+- Output sanitization
+- XSS prevention
+- CSRF protection
+
+### 3. Session Management
+- Secure session handling
+- Session validation
+- Token management
 
 ## Future Considerations
-1. State Management:
-   - Consider implementing a more robust state management solution
-   - Evaluate frontend framework adoption
 
-2. Build Process:
-   - Module bundling
-   - Asset optimization
-   - Code splitting
+### 1. Backend Evolution
+- API versioning
+- Rate limiting
+- Cache implementation
+- Background job handling
 
-3. Testing Strategy:
-   - Unit testing setup
-   - Integration testing
-   - E2E testing approach
+### 2. Database Optimization
+- Index optimization
+- Query optimization
+- Connection pooling
+- Sharding strategy
 
-4. Performance Optimization:
-   - Code splitting
-   - Lazy loading
-   - Cache strategy
-   - Asset optimization
+### 3. Security Enhancements
+- API authentication
+- Request signing
+- Rate limiting
+- IP filtering
