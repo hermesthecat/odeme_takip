@@ -77,6 +77,7 @@ let maliDurumChart = null;
 
 function maliDurumGrafigiGuncelle(portfoyData) {
     const ctx = document.getElementById('maliDurumGrafik').getContext('2d');
+    const isDarkMode = localStorage.getItem('theme') === 'dark';
 
     // Eğer grafik zaten varsa yok et
     if (maliDurumChart) {
@@ -119,10 +120,14 @@ function maliDurumGrafigiGuncelle(portfoyData) {
             plugins: {
                 legend: {
                     position: 'right',
+                    labels: {
+                        color: isDarkMode ? '#e9ecef' : '#212529'
+                    }
                 },
                 title: {
                     display: true,
-                    text: 'Portföy Dağılımı'
+                    text: 'Portföy Dağılımı',
+                    color: isDarkMode ? '#e9ecef' : '#212529'
                 }
             }
         }

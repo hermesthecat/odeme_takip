@@ -516,6 +516,7 @@ if (isset($_GET['sat'], $_GET['id'], $_GET['adet'], $_GET['fiyat'])) {
 if (isset($_GET['liste'])) {
     $portfoy = portfoyListele();
 
+
     foreach ($portfoy['ozet'] as $hisse) {
         // Debug bilgileri
         error_log("Portföy Listesi - İşlenen Hisse: " . print_r($hisse, true));
