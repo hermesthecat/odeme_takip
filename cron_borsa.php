@@ -24,7 +24,7 @@ function tabloyuGuncelle()
         if ($stmt->rowCount() == 0) {
             $sql = "ALTER TABLE portfolio ADD COLUMN anlik_fiyat DECIMAL(10,2) DEFAULT 0.00";
             $pdo->exec($sql);
-            var_dump("Anlik fiyat kolonu eklendi");
+            saveLog("Anlik fiyat kolonu eklendi", 'info', 'tabloyuGuncelle', 0);
         }
 
         $sql = "SHOW COLUMNS FROM portfolio LIKE 'son_guncelleme'";
@@ -33,7 +33,7 @@ function tabloyuGuncelle()
         if ($stmt->rowCount() == 0) {
             $sql = "ALTER TABLE portfolio ADD COLUMN son_guncelleme TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
             $pdo->exec($sql);
-            var_dump("Son güncelleme kolonu eklendi");
+            saveLog("Son güncelleme kolonu eklendi", 'info', 'tabloyuGuncelle', 0);
         }
 
         $sql = "SHOW COLUMNS FROM portfolio LIKE 'hisse_adi'";
@@ -42,7 +42,7 @@ function tabloyuGuncelle()
         if ($stmt->rowCount() == 0) {
             $sql = "ALTER TABLE portfolio ADD COLUMN hisse_adi VARCHAR(255) DEFAULT ''";
             $pdo->exec($sql);
-            var_dump("Hisse adı kolonu eklendi");
+            saveLog("Hisse adı kolonu eklendi", 'info', 'tabloyuGuncelle', 0);
         }
 
         // Satış bilgileri için yeni kolonlar
@@ -52,7 +52,7 @@ function tabloyuGuncelle()
         if ($stmt->rowCount() == 0) {
             $sql = "ALTER TABLE portfolio ADD COLUMN satis_fiyati DECIMAL(10,2) DEFAULT NULL";
             $pdo->exec($sql);
-            var_dump("Satış fiyatı kolonu eklendi");
+            saveLog("Satış fiyatı kolonu eklendi", 'info', 'tabloyuGuncelle', 0);
         }
 
         $sql = "SHOW COLUMNS FROM portfolio LIKE 'satis_tarihi'";
@@ -61,7 +61,7 @@ function tabloyuGuncelle()
         if ($stmt->rowCount() == 0) {
             $sql = "ALTER TABLE portfolio ADD COLUMN satis_tarihi TIMESTAMP NULL DEFAULT NULL";
             $pdo->exec($sql);
-            var_dump("Satış tarihi kolonu eklendi");
+            saveLog("Satış tarihi kolonu eklendi", 'info', 'tabloyuGuncelle', 0);
         }
 
         $sql = "SHOW COLUMNS FROM portfolio LIKE 'satis_adet'";
@@ -70,7 +70,7 @@ function tabloyuGuncelle()
         if ($stmt->rowCount() == 0) {
             $sql = "ALTER TABLE portfolio ADD COLUMN satis_adet INT DEFAULT NULL";
             $pdo->exec($sql);
-            var_dump("Satış adedi kolonu eklendi");
+            saveLog("Satış adedi kolonu eklendi", 'info', 'tabloyuGuncelle', 0);
         }
 
         $sql = "SHOW COLUMNS FROM portfolio LIKE 'durum'";
@@ -79,10 +79,10 @@ function tabloyuGuncelle()
         if ($stmt->rowCount() == 0) {
             $sql = "ALTER TABLE portfolio ADD COLUMN durum ENUM('aktif', 'satildi', 'kismi_satildi') DEFAULT 'aktif'";
             $pdo->exec($sql);
-            var_dump("Durum kolonu eklendi");
+            saveLog("Durum kolonu eklendi", 'info', 'tabloyuGuncelle', 0);
         }
     } catch (PDOException $e) {
-        var_dump("Tablo güncelleme hatası: " . $e->getMessage());
+        saveLog("Tablo güncelleme hatası: " . $e->getMessage(), 'error', 'tabloyuGuncelle', 0);
     }
 }
 
@@ -106,7 +106,7 @@ function hisseFiyatiCek($sembol)
 
     // BigPara hisse detay endpoint'i
     $url = "https://bigpara.hurriyet.com.tr/api/v1/borsa/hisseyuzeysel/" . urlencode($sembol);
-    var_dump("API İsteği URL: " . $url);
+    saveLog("API İsteği URL: " . $url, 'info', 'hisseFiyatiCek', 0);
 
     curl_setopt_array($curl, [
         CURLOPT_URL => $url,
@@ -131,29 +131,29 @@ function hisseFiyatiCek($sembol)
     curl_close($curl);
 
     // Debug bilgileri
-    var_dump("BigPara API İstek - Hisse: " . $sembol);
-    var_dump("BigPara API Yanıt Kodu: " . $httpcode);
-    var_dump("BigPara API Hata: " . $err);
-    var_dump("BigPara API Ham Yanıt: " . $response);
+    saveLog("BigPara API İstek - Hisse: " . $sembol, 'info', 'hisseFiyatiCek', 0);
+    saveLog("BigPara API Yanıt Kodu: " . $httpcode, 'info', 'hisseFiyatiCek', 0);
+    saveLog("BigPara API Hata: " . $err, 'error', 'hisseFiyatiCek', 0);
+    saveLog("BigPara API Ham Yanıt: " . $response, 'info', 'hisseFiyatiCek', 0);
 
     if ($err) {
-        var_dump("BigPara API Curl Hatası: " . $err);
+        saveLog("BigPara API Curl Hatası: " . $err, 'error', 'hisseFiyatiCek', 0);
         return 0;
     }
 
     if ($httpcode !== 200) {
-        var_dump("BigPara API HTTP Hata Kodu: " . $httpcode);
+        saveLog("BigPara API HTTP Hata Kodu: " . $httpcode, 'error', 'hisseFiyatiCek', 0);
         return 0;
     }
 
     $data = json_decode($response, true);
     if (!isset($data['data']['hisseYuzeysel'])) {
-        var_dump("BigPara API Geçersiz Yanıt: " . print_r($data, true));
+        saveLog("BigPara API Geçersiz Yanıt: " . print_r($data, true), 'error', 'hisseFiyatiCek', 0);
         return 0;
     }
 
     $hisse = $data['data']['hisseYuzeysel'];
-    var_dump("İşlenen hisse verisi: " . print_r($hisse, true));
+    saveLog("İşlenen hisse verisi: " . print_r($hisse, true), 'info', 'hisseFiyatiCek', 0);
 
     // Son işlem fiyatını al (alış-satış ortalaması)
     if (
@@ -161,18 +161,18 @@ function hisseFiyatiCek($sembol)
         is_numeric($hisse['alis']) && is_numeric($hisse['satis'])
     ) {
         $fiyat = ($hisse['alis'] + $hisse['satis']) / 2;
-        var_dump("Fiyat alış-satış ortalamasından alındı: " . $fiyat);
+        saveLog("Fiyat alış-satış ortalamasından alındı: " . $fiyat, 'info', 'hisseFiyatiCek', 0);
         return $fiyat;
     }
 
     // Alternatif olarak son fiyatı kontrol et
     if (isset($hisse['kapanis']) && is_numeric($hisse['kapanis'])) {
         $fiyat = floatval($hisse['kapanis']);
-        var_dump("Fiyat kapanıştan alındı: " . $fiyat);
+        saveLog("Fiyat kapanıştan alındı: " . $fiyat, 'info', 'hisseFiyatiCek', 0);
         return $fiyat;
     }
 
-    var_dump("Hisse fiyatı bulunamadı: " . $sembol);
+    saveLog("Hisse fiyatı bulunamadı: " . $sembol, 'error', 'hisseFiyatiCek', 0);
     return 0;
 }
 
@@ -241,13 +241,13 @@ function fiyatlariGuncelle()
                 ]);
 
                 $guncellenen++;
-                var_dump("Fiyat ve isim güncellendi - Hisse: $sembol, Ad: $hisse_adi, Fiyat: $fiyat");
+                saveLog("Fiyat ve isim güncellendi - Hisse: $sembol, Ad: $hisse_adi, Fiyat: $fiyat", 'info', 'fiyatlariGuncelle', 0);
             } catch (PDOException $e) {
-                var_dump("Veritabanı güncelleme hatası - Hisse: $sembol, Hata: " . $e->getMessage());
+                saveLog("Veritabanı güncelleme hatası - Hisse: $sembol, Hata: " . $e->getMessage(), 'error', 'fiyatlariGuncelle', 0);
                 $basarisiz++;
             }
         } else {
-            var_dump("Fiyat alınamadı - Hisse: $sembol");
+            saveLog("Fiyat alınamadı - Hisse: $sembol", 'error', 'fiyatlariGuncelle', 0);
             $basarisiz++;
         }
 
@@ -274,10 +274,10 @@ $bitis = microtime(true);
 $sure = round($bitis - $baslangic, 2);
 
 // Sonuçları logla
-var_dump(sprintf(
+saveLog(sprintf(
     "Cron tamamlandı - Toplam: %d, Güncellenen: %d, Başarısız: %d, Süre: %d saniye",
     $sonuc['toplam'],
     $sonuc['guncellenen'],
     $sonuc['basarisiz'],
     $sure
-));
+), 'info', 'fiyatlariGuncelle', 0);
