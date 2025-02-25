@@ -568,8 +568,8 @@ function deleteRecurringPayment(parentId) {
         title: translations.payment.delete.title,
         text: translations.payment.delete.confirm,
         showCancelButton: true,
-        confirmButtonText: translations.app.yes_delete,
-        cancelButtonText: translations.app.no_cancel,
+        confirmButtonText: translations.payment.delete.confirm,
+        cancelButtonText: translations.payment.delete.cancel,
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
