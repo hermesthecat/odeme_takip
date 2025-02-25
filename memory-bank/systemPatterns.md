@@ -12,137 +12,180 @@
 
 ## Frontend Architecture
 
-### 1. Core Architecture Patterns
-- Modular JavaScript organization
-- jQuery-based implementation
-- Bootstrap for UI components
-- SweetAlert2 for notifications
-- Event-driven architecture
-- Lazy loading for performance optimization
-
-### 2. Data Management
-a. Data Loading Pattern:
+### 1. Component Architecture Pattern
 ```javascript
-- Initial page load fetches core data
-- Subsequent data loaded lazily per component
-- Centralized loadData() function coordinates updates
-- Component-specific loading functions
+// Data Display Pattern
+function updateComponentList(data) {
+    // 1. Clear existing content
+    // 2. Handle empty state
+    // 3. Iterate and render items
+    // 4. Handle state updates
+}
+
+// Interactive Element Pattern
+function handleComponentAction(id) {
+    // 1. Confirm if needed
+    // 2. Make API request
+    // 3. Handle response
+    // 4. Update UI
+}
+```
+
+### 2. Data Management Patterns
+a. Centralized Data Loading:
+```javascript
+// Root loading pattern
+function loadData() {
+    // 1. Show loading states
+    // 2. Load core data
+    // 3. Update summaries
+    // 4. Lazy load component data
+}
+
+// Component-specific loading
+function loadComponentData() {
+    // 1. Fetch specific data
+    // 2. Update component
+    // 3. Handle errors
+}
 ```
 
 b. State Management:
-- URL-based state for month/year
+- URL-based state for navigation
 - Window-level data store
-- Component-level state handling
+- Component-level state
+- Progressive UI updates
 
-### 3. Frontend Component Structure
-a. Data Display Components:
-- Income list
-- Savings list
-- Payments list
-- Recurring payments list
-- Summary display
-
-b. Interactive Components:
-- Month/Year selectors
-- Modal forms
-- Theme switcher
-- Loading spinners
-
-### 4. Form Handling Pattern
-a. Form Submission:
+### 3. AJAX Communication Pattern
 ```javascript
-- Serialization to objects
-- Pre-submission validation
-- AJAX-based submission
-- Modal management
-- Automatic data refresh
+function ajaxRequest(data) {
+    // 1. Input validation
+    // 2. Request preparation
+    // 3. Error handling
+    // 4. Response processing
+    // 5. Session management
+}
 ```
 
-b. Validation System:
-- Rule-based validation
-- Support for:
-  - Required fields
-  - Numeric values
-  - Date validation
-  - Currency validation
-  - Frequency validation
-  - Min/Max values
-  - Date ranges
+### 4. UI Patterns
+a. Progressive Loading:
+- Loading indicators per component
+- Lazy loading of secondary data
+- State-based UI updates
 
-### 5. Security Patterns
-a. Input/Output Security:
-- HTML escaping for user input
-- XSS prevention
-- Safe HTML template system
-- Token validation
+b. Modal Management:
+```javascript
+function openUpdateModal(data) {
+    // 1. Populate form data
+    // 2. Configure validation
+    // 3. Setup event handlers
+    // 4. Show modal
+}
+```
 
-b. Session Management:
-- Token-based authentication
-- Session expiry handling
-- Auto-redirect on auth failure
+c. Progress Visualization:
+```javascript
+// Standard progress calculation
+const progress = (current / total) * 100;
+const progressClass = progress < 25 ? 'bg-danger' :
+    progress < 50 ? 'bg-warning' :
+    progress < 75 ? 'bg-info' : 'bg-success';
+```
 
-### 6. Utility Patterns
-a. Data Formatting:
-- Number formatting with decimals
-- Date formatting
-- Currency handling
-- Frequency text localization
+### 5. Form Handling Patterns
+a. Form Submission:
+```javascript
+$('.modal form').on('submit', function(e) {
+    // 1. Prevent default
+    // 2. Serialize data
+    // 3. Validate
+    // 4. Submit
+    // 5. Handle response
+    // 6. Update UI
+});
+```
 
-b. AJAX Handling:
-- Centralized request function
-- Standardized error handling
-- Promise-based implementation
-- Validation integration
+b. Data Validation:
+- Client-side validation rules
+- Server-side validation
+- Error message handling
+- Internationalized messages
 
-### 7. Internationalization
-- Translation system integration
-- Dynamic text loading
-- Format localization
-- Currency localization
+### 6. Error Handling Pattern
+```javascript
+// Consistent error display
+Swal.fire({
+    icon: 'error',
+    title: translations.error_title,
+    text: errorMessage
+});
 
-### 8. UI/UX Patterns
-a. Loading States:
-- Component-specific spinners
-- Global loading management
-- Visibility toggles
+// API error handling
+ajaxRequest().fail(function(error) {
+    // 1. Log error
+    // 2. Show user-friendly message
+    // 3. Handle specific error types
+});
+```
 
-b. Error Handling:
-- User-friendly error messages
-- Validation feedback
-- Session error handling
-- Network error handling
+### 7. Internationalization Pattern
+- Translation key structure
+- Dynamic message loading
+- Formatted number/date handling
+- Currency formatting
 
-c. Navigation:
-- URL-based state management
-- History API integration
-- Parameter management
+### 8. Security Patterns
+- XSS Prevention:
+  ```javascript
+  function escapeHtml(unsafe) {
+      return unsafe.replace(/[&<>"']/g, char => htmlEscapeMap[char]);
+  }
+  ```
+- CSRF Protection
+- Input Sanitization
+- Session Management
 
-### 9. Code Style Conventions
-- Camel case for function names
-- Descriptive variable naming
-- jQuery prefix for DOM elements ($)
-- Component-based file organization
-- Consistent error handling
+### 9. Event Handling Patterns
+- Delegated Events
+- Event Bubbling Control
+- Custom Event Handling
+- Modal Event Management
 
-## API Integration Pattern
-- RESTful endpoint structure
-- Standardized response format
-- Central API request handling
-- Error standardization
-- Authentication header handling
+## API Integration
+1. Request Structure:
+```javascript
+{
+    action: 'action_name',
+    ...parameters
+}
+```
+
+2. Response Format:
+```javascript
+{
+    status: 'success|error',
+    data: {},
+    message: 'optional message'
+}
+```
 
 ## Future Considerations
-1. Performance Optimization:
-   - Bundle optimization
-   - Cache strategy
-   - Asset loading optimization
+1. State Management:
+   - Consider implementing a more robust state management solution
+   - Evaluate frontend framework adoption
 
-2. Code Organization:
+2. Build Process:
    - Module bundling
-   - Dependency management
-   - Build process
+   - Asset optimization
+   - Code splitting
 
 3. Testing Strategy:
    - Unit testing setup
    - Integration testing
-   - E2E testing consideration
+   - E2E testing approach
+
+4. Performance Optimization:
+   - Code splitting
+   - Lazy loading
+   - Cache strategy
+   - Asset optimization
