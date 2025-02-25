@@ -41,7 +41,7 @@ if (!empty($date_range)) {
     if (count($dates) == 2) {
         $start_date = date('Y-m-d 00:00:00', strtotime(trim($dates[0])));
         $end_date = date('Y-m-d 23:59:59', strtotime(trim($dates[1])));
-        
+
         $where_conditions[] = "l.created_at BETWEEN :start_date AND :end_date";
         $params[':start_date'] = $start_date;
         $params[':end_date'] = $end_date;
@@ -93,6 +93,15 @@ $log_type_classes = [
     'debug' => 'text-secondary'
 ];
 
+// Log tipine göre arka plan renk sınıfları
+$log_type_bg_classes = [
+    'info' => 'bg-info bg-opacity-25',
+    'error' => 'bg-danger bg-opacity-25',
+    'warning' => 'bg-warning bg-opacity-25',
+    'success' => 'bg-success bg-opacity-25',
+    'debug' => 'bg-secondary bg-opacity-25'
+];
+
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo $lang->getCurrentLanguage(); ?>">
@@ -107,6 +116,33 @@ $log_type_classes = [
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <style>
+        /* Tablo satırları için güçlü stil kuralları */
+        body .table tbody tr {
+            background-color: white !important;
+        }
+        body .table tbody tr[data-type="info"] {
+            background-color: #9fe5f7 !important;
+        }
+        body .table tbody tr[data-type="error"] {
+            background-color: #f5c2c7 !important;
+        }
+        body .table tbody tr[data-type="warning"] {
+            background-color: #ffe69c !important;
+        }
+        body .table tbody tr[data-type="success"] {
+            background-color: #a3cfbb !important;
+        }
+        body .table tbody tr[data-type="debug"] {
+            background-color: #c5c6c9 !important;
+        }
+        /* Hover ve zebra çizgilerini devre dışı bırak */
+        body .table tr:hover,
+        body .table tr:nth-child(even),
+        body .table tr:nth-child(odd) {
+            background-color: inherit !important;
+        }
+    </style>
 
 </head>
 
@@ -178,12 +214,12 @@ $log_type_classes = [
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
+                    <table class="table table-responsive">
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Tarih</th>
-                                <th>Tip</th>
+                                <th>Tür</th>
                                 <th>Metod</th>
                                 <th>Kullanıcı</th>
                                 <th>Mesaj</th>
@@ -192,17 +228,39 @@ $log_type_classes = [
                         <tbody>
                             <?php if (count($logs) > 0): ?>
                                 <?php foreach ($logs as $log): ?>
+                                    <?php 
+                                    $bg_color = '';
+                                    switch($log['type']) {
+                                        case 'info':
+                                            $bg_color = '#9fe5f7'; // Daha koyu bg-info
+                                            break;
+                                        case 'error':
+                                            $bg_color = '#f5c2c7'; // Daha koyu bg-danger
+                                            break;
+                                        case 'warning':
+                                            $bg_color = '#ffe69c'; // Daha koyu bg-warning
+                                            break;
+                                        case 'success':
+                                            $bg_color = '#a3cfbb'; // Daha koyu bg-success
+                                            break;
+                                        case 'debug':
+                                            $bg_color = '#c5c6c9'; // Daha koyu bg-secondary
+                                            break;
+                                        default:
+                                            $bg_color = 'white';
+                                    }
+                                    ?>
                                     <tr>
-                                        <td><?php echo $log['id']; ?></td>
-                                        <td><?php echo date('d.m.Y H:i:s', strtotime($log['created_at'])); ?></td>
-                                        <td>
+                                        <td style="background-color: <?php echo $bg_color; ?> !important;"><?php echo $log['id']; ?></td>
+                                        <td style="background-color: <?php echo $bg_color; ?> !important;"><?php echo date('d.m.Y H:i:s', strtotime($log['created_at'])); ?></td>
+                                        <td style="background-color: <?php echo $bg_color; ?> !important;">
                                             <span class="badge <?php echo isset($log_type_classes[$log['type']]) ? 'bg-' . substr($log_type_classes[$log['type']], 5) : 'bg-secondary'; ?>">
                                                 <?php echo ucfirst($log['type']); ?>
                                             </span>
                                         </td>
-                                        <td><?php echo htmlspecialchars($log['log_method']); ?></td>
-                                        <td><?php echo htmlspecialchars($log['username'] ?? 'Sistem'); ?></td>
-                                        <td><?php echo htmlspecialchars($log['log_text']); ?></td>
+                                        <td style="background-color: <?php echo $bg_color; ?> !important;"><?php echo "<pre>" . htmlspecialchars($log['log_method']) . "</pre>"; ?></td>
+                                        <td style="background-color: <?php echo $bg_color; ?> !important;"><?php echo htmlspecialchars($log['username'] ?? 'Sistem'); ?></td>
+                                        <td style="background-color: <?php echo $bg_color; ?> !important; max-width: 300px; cursor: pointer;" class="text-truncate message-cell" data-message="<?php echo htmlspecialchars($log['log_text']); ?>"><?php echo htmlspecialchars(mb_substr($log['log_text'], 0, 50) . (mb_strlen($log['log_text']) > 50 ? '...' : '')); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
@@ -216,44 +274,44 @@ $log_type_classes = [
 
                 <!-- Sayfalama -->
                 <?php if ($total_pages > 1): ?>
-                <nav aria-label="Sayfalama">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item <?php echo ($current_page <= 1) ? 'disabled' : ''; ?>">
-                            <a class="page-link" href="?page=<?php echo $current_page - 1; ?><?php echo !empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : ''; ?>" aria-label="Önceki">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        
-                        <?php
-                        $start_page = max(1, $current_page - 2);
-                        $end_page = min($total_pages, $current_page + 2);
-                        
-                        if ($start_page > 1) {
-                            echo '<li class="page-item"><a class="page-link" href="?page=1' . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">1</a></li>';
-                            if ($start_page > 2) {
-                                echo '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
+                    <nav aria-label="Sayfalama">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item <?php echo ($current_page <= 1) ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="?page=<?php echo $current_page - 1; ?><?php echo !empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : ''; ?>" aria-label="Önceki">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            <?php
+                            $start_page = max(1, $current_page - 2);
+                            $end_page = min($total_pages, $current_page + 2);
+
+                            if ($start_page > 1) {
+                                echo '<li class="page-item"><a class="page-link" href="?page=1' . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">1</a></li>';
+                                if ($start_page > 2) {
+                                    echo '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
+                                }
                             }
-                        }
-                        
-                        for ($i = $start_page; $i <= $end_page; $i++) {
-                            echo '<li class="page-item ' . ($i == $current_page ? 'active' : '') . '"><a class="page-link" href="?page=' . $i . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">' . $i . '</a></li>';
-                        }
-                        
-                        if ($end_page < $total_pages) {
-                            if ($end_page < $total_pages - 1) {
-                                echo '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
+
+                            for ($i = $start_page; $i <= $end_page; $i++) {
+                                echo '<li class="page-item ' . ($i == $current_page ? 'active' : '') . '"><a class="page-link" href="?page=' . $i . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">' . $i . '</a></li>';
                             }
-                            echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">' . $total_pages . '</a></li>';
-                        }
-                        ?>
-                        
-                        <li class="page-item <?php echo ($current_page >= $total_pages) ? 'disabled' : ''; ?>">
-                            <a class="page-link" href="?page=<?php echo $current_page + 1; ?><?php echo !empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : ''; ?>" aria-label="Sonraki">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
+
+                            if ($end_page < $total_pages) {
+                                if ($end_page < $total_pages - 1) {
+                                    echo '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
+                                }
+                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">' . $total_pages . '</a></li>';
+                            }
+                            ?>
+
+                            <li class="page-item <?php echo ($current_page >= $total_pages) ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="?page=<?php echo $current_page + 1; ?><?php echo !empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : ''; ?>" aria-label="Sonraki">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
                 <?php endif; ?>
             </div>
         </div>
@@ -268,6 +326,31 @@ $log_type_classes = [
     <script>
         // Tarih aralığı seçici
         $(function() {
+            // Tablo satırlarının arka plan renklerini JavaScript ile ayarla
+            $('tr').each(function() {
+                var bgColor = $(this).css('background-color');
+                if (bgColor === 'rgba(0, 0, 0, 0)' || bgColor === 'transparent') {
+                    var type = $(this).find('td:eq(2) span').text().toLowerCase().trim();
+                    switch(type) {
+                        case 'info':
+                            $(this).css('background-color', '#9fe5f7');
+                            break;
+                        case 'error':
+                            $(this).css('background-color', '#f5c2c7');
+                            break;
+                        case 'warning':
+                            $(this).css('background-color', '#ffe69c');
+                            break;
+                        case 'success':
+                            $(this).css('background-color', '#a3cfbb');
+                            break;
+                        case 'debug':
+                            $(this).css('background-color', '#c5c6c9');
+                            break;
+                    }
+                }
+            });
+
             $('#date_range').daterangepicker({
                 locale: {
                     format: 'DD.MM.YYYY',
@@ -284,21 +367,32 @@ $log_type_classes = [
                 },
                 autoUpdateInput: false,
                 ranges: {
-                   'Bugün': [moment(), moment()],
-                   'Dün': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-                   'Son 7 Gün': [moment().subtract(6, 'days'), moment()],
-                   'Son 30 Gün': [moment().subtract(29, 'days'), moment()],
-                   'Bu Ay': [moment().startOf('month'), moment().endOf('month')],
-                   'Geçen Ay': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    'Bugün': [moment(), moment()],
+                    'Dün': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Son 7 Gün': [moment().subtract(6, 'days'), moment()],
+                    'Son 30 Gün': [moment().subtract(29, 'days'), moment()],
+                    'Bu Ay': [moment().startOf('month'), moment().endOf('month')],
+                    'Geçen Ay': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
                 }
             });
-            
+
             $('#date_range').on('apply.daterangepicker', function(ev, picker) {
                 $(this).val(picker.startDate.format('DD.MM.YYYY') + ' - ' + picker.endDate.format('DD.MM.YYYY'));
             });
-            
+
             $('#date_range').on('cancel.daterangepicker', function(ev, picker) {
                 $(this).val('');
+            });
+            
+            // Mesaj hücrelerine tıklandığında modal gösterme
+            $('.message-cell').on('click', function() {
+                const message = $(this).data('message');
+                Swal.fire({
+                    title: 'Log Mesajı',
+                    html: `<div class="text-start">${message}</div>`,
+                    width: '80%',
+                    confirmButtonText: 'Kapat'
+                });
             });
         });
 
@@ -319,4 +413,4 @@ $log_type_classes = [
     </script>
 </body>
 
-</html> 
+</html>
