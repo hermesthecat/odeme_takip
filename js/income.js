@@ -153,6 +153,25 @@ function openUpdateIncomeModal(id) {
                 } else {
                     endDateGroup.style.display = 'block';
                     endDateInput.setAttribute('required', 'required');
+                    
+                    // Eğer tekrarlı gelir ise ve son çocuk gelir tarihi varsa, bitiş tarihini otomatik ayarla
+                    if (income.parent_id === null && income.next_income_date) {
+                        // API'den son çocuk gelirin tarihini al
+                        $.ajax({
+                            url: 'api.php',
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {
+                                action: 'get_last_child_income_date',
+                                id: income.id
+                            },
+                            success: function(response) {
+                                if (response.status === 'success' && response.last_date) {
+                                    endDateInput.value = response.last_date;
+                                }
+                            }
+                        });
+                    }
                 }
 
                 // Modalı göster

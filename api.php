@@ -281,6 +281,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
+        case 'get_last_child_income_date':
+            try {
+                $id = $_POST['id'] ?? null;
+                if (!$id) {
+                    throw new Exception(t('income.not_found'));
+                }
+                
+                require_once __DIR__ . '/api/income.php';
+                $last_date = getLastChildIncomeDate($id);
+                $response = ['status' => 'success', 'last_date' => $last_date];
+            } catch (Exception $e) {
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
+            }
+            break;
+
         case 'update_payment':
             try {
                 if (updatePayment()) {

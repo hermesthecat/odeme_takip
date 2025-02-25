@@ -345,3 +345,25 @@ function updateIncome()
         throw $e;
     }
 }
+
+function getLastChildIncomeDate($parent_id)
+{
+    global $pdo, $user_id;
+
+    // Parent ID'ye sahip gelirin son çocuk gelirinin tarihini al
+    $stmt = $pdo->prepare("SELECT MAX(first_date) as last_date 
+                          FROM income 
+                          WHERE parent_id = ? AND user_id = ?");
+    
+    if (!$stmt->execute([$parent_id, $user_id])) {
+        throw new Exception(t('income.not_found'));
+    }
+    
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$result || !$result['last_date']) {
+        throw new Exception(t('income.not_found'));
+    }
+    
+    return $result['last_date'];
+}
