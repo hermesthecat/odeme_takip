@@ -94,7 +94,8 @@ function portfoyListele()
         $ortalama_alis = $toplam_adet > 0 ? $toplam_maliyet / $toplam_adet : 0;
 
         // Kar/zarar hesapla
-        $kar_zarar = ($anlik_fiyat - $ortalama_alis) * $toplam_adet;
+        $ilk_alis_fiyati = count($alislar) > 0 ? $alislar[0]['alis_fiyati'] : 0;
+        $kar_zarar = ($anlik_fiyat - $ilk_alis_fiyati) * $toplam_adet;
         $kar_zarar_class = $kar_zarar >= 0 ? 'kar' : 'zarar';
         $kar_zarar_formatted = number_format($kar_zarar, 2, '.', ',') . ' ₺';
 
@@ -118,7 +119,7 @@ function portfoyListele()
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
         $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small></td>';
         $output .= '<td class="adet">' . $toplam_adet . '</td>';
-        $output .= '<td>' . ($ortalama_alis > 0 ? number_format($ortalama_alis, 2, '.', ',') . ' ₺' : 'Çeşitli') . '</td>';
+        $output .= '<td>' . (count($alislar) > 0 ? number_format($alislar[0]['alis_fiyati'], 2, '.', ',') . ' ₺' : 'Çeşitli') . '</td>';
         $output .= '<td class="anlik_fiyat">' . number_format($anlik_fiyat, 2, '.', ',') . ' ₺ <small class="text-muted">(' . date('H:i:s') . ')</small></td>';
         $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
