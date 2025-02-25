@@ -163,6 +163,33 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
         </div>
 
+        <!-- Sorumluluk Reddi Metni -->
+        <div class="container mt-5 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <i class="bi bi-exclamation-triangle me-2"></i>Sorumluluk Reddi
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-0">
+                        Bu uygulama sadece kişisel portföy takibi amacıyla kullanılmaktadır ve herhangi bir yatırım tavsiyesi içermemektedir.
+                        Burada sunulan veriler ve bilgiler yalnızca bilgilendirme amaçlıdır ve doğruluğu, güncelliği veya eksiksizliği garanti edilmemektedir.
+                        Kullanıcılar, bu uygulamadaki bilgilere dayanarak yapacakları yatırım kararlarından kendileri sorumludur.
+                    </p>
+                    <p class="small text-muted mb-0">
+                        Hisse senedi fiyatları ve diğer finansal veriler, üçüncü taraf kaynaklardan alınmaktadır ve bu verilerin doğruluğu veya güncelliği
+                        garanti edilmemektedir. Piyasa koşulları hızla değişebilir ve burada gösterilen veriler gerçek zamanlı olmayabilir.
+                    </p>
+                    <p class="small text-muted mb-0">
+                        Yatırım kararları vermeden önce profesyonel finansal danışmanlık almanız ve kendi araştırmanızı yapmanız önerilir.
+                        Bu uygulamanın geliştiricisi ve sağlayıcısı, uygulamanın kullanımından kaynaklanan herhangi bir kayıp veya zarardan sorumlu tutulamaz.
+                    </p>
+                    <p class="small text-center text-muted mb-0 mt-3">
+                        &copy; <?php echo date('Y'); ?> <?php echo t('site_name'); ?> - Tüm hakları saklıdır.
+                    </p>
+                </div>
+            </div>
+        </div>
+
         <?php require_once __DIR__ . '/modals/user_settings_modal.php'; ?>
 
 
