@@ -346,24 +346,44 @@ function updateIncome()
     }
 }
 
-function getLastChildIncomeDate($parent_id)
+function getLastChildIncomeDate($income_id)
 {
     global $pdo, $user_id;
 
+    // Gelir bilgisini al
+    $stmt = $pdo->prepare("SELECT parent_id FROM income WHERE id = ? AND user_id = ?");
+    $stmt->execute([$income_id, $user_id]);
+    $income = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$income) {
+        throw new Exception(t('income.not_found'));
+    }
+
+    $parent_id = $income['parent_id'] ?? $income_id; // Eğer parent_id null ise, kendisi parent'tır
+
     // Parent ID'ye sahip gelirin son çocuk gelirinin tarihini al
-    $stmt = $pdo->prepare("SELECT MAX(first_date) as last_date 
-                          FROM income 
+    $stmt = $pdo->prepare("SELECT MAX(first_date) as last_date
+                          FROM income
                           WHERE parent_id = ? AND user_id = ?");
-    
+
     if (!$stmt->execute([$parent_id, $user_id])) {
         throw new Exception(t('income.not_found'));
     }
-    
+
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$result || !$result['last_date']) {
-        throw new Exception(t('income.not_found'));
+        // Eğer çocuk gelir yoksa, parent'ın ilk tarihini döndür
+        $stmt = $pdo->prepare("SELECT first_date FROM income WHERE id = ? AND user_id = ?");
+        $stmt->execute([$parent_id, $user_id]);
+        $parent = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$parent) {
+            throw new Exception(t('income.not_found'));
+        }
+
+        return $parent['first_date'];
     }
-    
+
     return $result['last_date'];
 }

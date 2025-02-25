@@ -154,8 +154,8 @@ function openUpdateIncomeModal(id) {
                     endDateGroup.style.display = 'block';
                     endDateInput.setAttribute('required', 'required');
                     
-                    // Eğer tekrarlı gelir ise ve son çocuk gelir tarihi varsa, bitiş tarihini otomatik ayarla
-                    if (income.parent_id === null && income.next_income_date) {
+                    // Eğer tekrarlı gelir ise, bitiş tarihini otomatik ayarla
+                    if (income.frequency !== 'none') {
                         // API'den son çocuk gelirin tarihini al
                         $.ajax({
                             url: 'api.php',
