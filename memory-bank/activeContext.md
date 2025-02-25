@@ -1,5 +1,5 @@
 ## Current Session Context
-2025-02-25 21:00:35
+2025-02-25 21:09:01
 
 ## Recent Changes
 - Added savings history feature:
@@ -13,8 +13,12 @@
   - Set original record's current amount to 0 after update
 
 ## Current Goals
-- Monitor the savings history feature for any issues
-- Ensure savings updates are working correctly
+- Add exchange rate functionality to savings feature similar to income feature:
+  - Add exchange_rate field to savings table
+  - Modify API endpoints to handle exchange rates
+  - Update frontend to display converted amounts
+  - Add currency conversion functionality to savings updates
 
 ## Open Questions
-- None
+- Should we display both original and converted amounts in the savings list?
+- Should we show exchange rate history alongside amount history?

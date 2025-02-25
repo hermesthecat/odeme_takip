@@ -23,9 +23,10 @@ function updateSavingsList(savings) {
         tbody.append(`
             <tr>
                 <td>${saving.name}</td>
-                <td>${saving.target_amount}</td>
-                <td>${saving.current_amount}</td>
-                <td>${saving.currency}</td>
+                <td>${saving.target_amount} ${saving.currency}</td>
+                <td>${saving.current_amount} ${saving.currency}</td>
+                <td>${saving.target_amount_tl} TL</td>
+                <td>${saving.current_amount_tl} TL</td>
                 <td>${saving.start_date}</td>
                 <td>${saving.target_date}</td>
                 <td>
@@ -146,7 +147,7 @@ function showSavingsHistory(savingId) {
             history.forEach(item => {
                 const formattedDate = new Date(item.created_at).toLocaleDateString();
                 const updateType = item.update_type === 'initial' ? 'Initial' : 'Update';
-                historyHtml += `<tr><td>${formattedDate}</td><td>${item.current_amount}</td><td>${updateType}</td></tr>`;
+                historyHtml += `<tr><td>${formattedDate}</td><td>${item.current_amount}</td><td>${item.exchange_rate}</td><td>${updateType}</td></tr>`;
             });
             historyHtml += '</tbody></table>';
 

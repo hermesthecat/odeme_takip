@@ -25,6 +25,9 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label"><?php echo t('start_date'); ?></label>
                         <input type="date" class="form-control" name="start_date" required>
                     </div>
@@ -72,6 +75,9 @@
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
                             <?php endforeach; ?>
                         </select>
+                    </div>
+                    <div class="mb-3">
+                        
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><?php echo t('start_date'); ?></label>

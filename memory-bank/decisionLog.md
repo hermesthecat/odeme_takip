@@ -1,5 +1,86 @@
 # Decision Log
 
+## 2025-02-25 - Adding Exchange Rate to Savings
+
+**Context:** The income feature has exchange rate functionality that converts amounts to the user's base currency. This functionality would be useful for the savings feature as well, especially for users tracking savings in multiple currencies.
+
+**Decision:** Implement exchange rate functionality for savings:
+
+1. Database Changes:
+   ```sql
+   ALTER TABLE `savings` 
+   ADD `exchange_rate` decimal(10,6) DEFAULT NULL AFTER `currency`;
+   ```
+
+2. API Changes:
+   - Modify `add_saving` to store exchange rate
+   - Update `update_saving` to handle exchange rate
+   - Modify savings loading to include converted amounts
+
+3. Frontend Changes:
+   - Add exchange rate handling to savings form
+   - Display converted amounts in savings list
+   - Include exchange rate in history view
+
+**Rationale:**
+- Provides consistency with income feature
+- Helps users track savings in different currencies
+- Makes total savings calculation more accurate
+- Enables better financial planning in user's base currency
+
+**Implementation Plan:**
+1. Database:
+   - Add exchange_rate column to savings table
+   - Update existing records with current exchange rates
+
+2. API:
+   - Add currency conversion logic to savings endpoints
+   - Include exchange rate in savings history
+   - Calculate totals in base currency
+
+3. Frontend:
+   - Update forms to handle exchange rates
+   - Show converted amounts in list view
+   - Include rate information in history display
+
+**Next Steps:**
+1. Update database schema
+2. Implement API changes
+3. Modify frontend code
+4. Test currency conversion accuracy
+
+## 2025-02-25 - Savings Update Functionality Improvements
+
+**Context:** Users reported issues with the savings update functionality, particularly with the current amount not updating correctly in the list and the edit button not working.
+
+**Decision:** Implement several improvements to the savings update system:
+
+1. API Changes:
+   - Added new `get_saving_details` endpoint for fetching detailed saving information
+   - Modified `update_saving` to set the original record's current_amount to 0
+   - Added `get_savings_history` endpoint for fetching the history of a saving
+
+2. Frontend Changes:
+   - Modified the edit button to use saving ID instead of passing the full saving object
+   - Improved history display with formatted dates and clearer update types
+   - Added proper error handling for failed API requests
+
+**Rationale:**
+- Passing saving ID instead of full object prevents JSON serialization issues
+- Setting original record's current_amount to 0 prevents confusion in the list view
+- Formatting dates and update types improves readability of the history
+
+**Implementation:**
+- Added new API endpoint for fetching saving details
+- Updated savings.js to use the new endpoints
+- Improved error handling and user feedback
+- Enhanced history display formatting
+
+**Next Steps:**
+1. Monitor the improved functionality for any issues
+2. Consider adding more detailed information to the history display
+3. Look for opportunities to improve the user interface
+
 ## 2025-02-25 - Savings History Implementation
 
 **Context:** Need to track savings updates over time with parent-child relationships, similar to how payments and income are tracked.
@@ -94,35 +175,3 @@
 2. Implement API changes
 3. Modify frontend code
 4. Add visualization features
-
-## 2025-02-25 - Savings Update Functionality Improvements
-
-**Context:** Users reported issues with the savings update functionality, particularly with the current amount not updating correctly in the list and the edit button not working.
-
-**Decision:** Implement several improvements to the savings update system:
-
-1. API Changes:
-   - Added new `get_saving_details` endpoint for fetching detailed saving information
-   - Modified `update_saving` to set the original record's current_amount to 0
-   - Added `get_savings_history` endpoint for fetching the history of a saving
-
-2. Frontend Changes:
-   - Modified the edit button to use saving ID instead of passing the full saving object
-   - Improved history display with formatted dates and clearer update types
-   - Added proper error handling for failed API requests
-
-**Rationale:**
-- Passing saving ID instead of full object prevents JSON serialization issues
-- Setting original record's current_amount to 0 prevents confusion in the list view
-- Formatting dates and update types improves readability of the history
-
-**Implementation:**
-- Added new API endpoint for fetching saving details
-- Updated savings.js to use the new endpoints
-- Improved error handling and user feedback
-- Enhanced history display formatting
-
-**Next Steps:**
-1. Monitor the improved functionality for any issues
-2. Consider adding more detailed information to the history display
-3. Look for opportunities to improve the user interface
