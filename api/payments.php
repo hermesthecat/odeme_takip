@@ -122,8 +122,14 @@ function deletePayment()
 
         if ($delete_children) {
             // Önce child kayıtları sil
-            $stmt = $pdo->prepare("DELETE FROM payments WHERE (parent_id = ? OR id = ?) AND user_id = ?");
-            if (!$stmt->execute([$id, $id, $user_id])) {
+            $stmt = $pdo->prepare("DELETE FROM payments WHERE (parent_id = ?) AND user_id = ?");
+            if (!$stmt->execute([$id, $user_id])) {
+                throw new Exception(t('payment.delete_error'));
+            }
+
+            // sonra parent kaydını sil
+            $stmt = $pdo->prepare("DELETE FROM payments WHERE id = ? AND user_id = ?");
+            if (!$stmt->execute([$id, $user_id])) {
                 throw new Exception(t('payment.delete_error'));
             }
         } else {
