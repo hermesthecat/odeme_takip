@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/log.php';
 checkLogin();
 
 
@@ -46,15 +47,18 @@ function addSaving()
         $exchange_rate = getExchangeRate($currency, $base_currency);
         if (!$exchange_rate) {
             throw new Exception(t('income.rate_error'));
+            saveLog("Hesap kuru hatası: " . $currency . " to " . $base_currency, 'error', 'addSaving', $_SESSION['user_id']);
         }
     }
 
     $stmt = $pdo->prepare("INSERT INTO savings (user_id, name, target_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, 'initial')");
 
     if ($stmt->execute([$user_id, $name, $target_amount, $currency, $start_date, $target_date, $exchange_rate])) {
+        saveLog("Birikim eklendi: " . $name, 'info', 'addSaving', $_SESSION['user_id']);
         return true;
     } else {
         throw new Exception(t('saving.add_error'));
+        saveLog("Birikim ekleme hatası: " . $e->getMessage(), 'error', 'addSaving', $_SESSION['user_id']);
     }
 }
 
@@ -64,9 +68,11 @@ function deleteSaving()
 
     $stmt = $pdo->prepare("DELETE FROM savings WHERE id = ? AND user_id = ?");
     if ($stmt->execute([$_POST['id'], $user_id])) {
+        saveLog("Birikim silindi: " . $_POST['id'], 'info', 'deleteSaving', $_SESSION['user_id']);
         return true;
     } else {
         throw new Exception(t('saving.delete_error'));
+        saveLog("Birikim silme hatası: " . $e->getMessage(), 'error', 'deleteSaving', $_SESSION['user_id']);
     }
 }
 
@@ -77,9 +83,10 @@ function loadSavings()
     $stmt = $pdo->prepare("SELECT * FROM savings WHERE user_id = ? AND parent_id IS NULL");
     if (!$stmt->execute([$user_id])) {
         throw new Exception(t('saving.load_error'));
+        saveLog("Birikim yükleme hatası: " . $e->getMessage(), 'error', 'loadSavings', $_SESSION['user_id']);
     }
     $savings = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    saveLog("Birikimler yüklendi: " . $user_id, 'info', 'loadSavings', $_SESSION['user_id']);
     return $savings;
 }
 
@@ -97,11 +104,13 @@ function updateSaving()
     $stmt = $pdo->prepare("SELECT * FROM savings WHERE id = ? AND user_id = ?");
     if (!$stmt->execute([$_POST['id'], $user_id])) {
         throw new Exception(t('saving.not_found'));
+        saveLog("Birikim bulunamadı: " . $_POST['id'], 'error', 'updateSaving', $_SESSION['user_id']);
     }
     $saving = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$saving) {
         throw new Exception(t('saving.not_found'));
+        saveLog("Birikim bulunamadı: " . $_POST['id'], 'error', 'updateSaving', $_SESSION['user_id']);
     }
 
     // Validate current amount
@@ -117,6 +126,7 @@ function updateSaving()
         $exchange_rate = getExchangeRate($currency, $base_currency);
         if (!$exchange_rate) {
             throw new Exception(t('income.rate_error'));
+            saveLog("Birikim kuru hatası: " . $currency . " to " . $base_currency, 'error', 'updateSaving', $_SESSION['user_id']);
         }
     }
 
@@ -128,9 +138,11 @@ function updateSaving()
         // Update original saving record
         $stmt = $pdo->prepare("UPDATE savings SET current_amount = ?, exchange_rate = ? WHERE id = ? AND user_id = ?");
         $stmt->execute([$current_amount, $exchange_rate, $saving['id'], $user_id]);
+        saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateSaving', $_SESSION['user_id']);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
+        saveLog("Birikim güncelleme hatası: " . $e->getMessage(), 'error', 'updateSaving', $_SESSION['user_id']);
     }
 
     // Create new saving record
@@ -141,9 +153,11 @@ function updateSaving()
         // Update original saving record
         $stmt = $pdo->prepare("UPDATE savings SET current_amount = ? WHERE id = ? AND user_id = ?");
         $stmt->execute([$current_amount, $saving['id'], $user_id]);
+        saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateSaving', $_SESSION['user_id']);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
+        saveLog("Birikim güncelleme hatası: " . $e->getMessage(), 'error', 'updateSaving', $_SESSION['user_id']);
     }
 }
 
@@ -162,11 +176,13 @@ function updateFullSaving()
     $stmt = $pdo->prepare("SELECT * FROM savings WHERE id = ? AND user_id = ?");
     if (!$stmt->execute([$_POST['id'], $user_id])) {
         throw new Exception(t('saving.not_found'));
+        saveLog("Birikim bulunamadı: " . $_POST['id'], 'error', 'updateFullSaving', $_SESSION['user_id']);
     }
     $saving = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$saving) {
         throw new Exception(t('saving.not_found'));
+        saveLog("Birikim bulunamadı: " . $_POST['id'], 'error', 'updateFullSaving', $_SESSION['user_id']);
     }
 
     // Validate data
@@ -191,6 +207,7 @@ function updateFullSaving()
         $exchange_rate = getExchangeRate($currency, $base_currency);
         if (!$exchange_rate) {
             throw new Exception(t('income.rate_error'));
+            saveLog("Birikim kuru hatası: " . $currency . " to " . $base_currency, 'error', 'updateFullSaving', $_SESSION['user_id']);
         }
     }
 
@@ -200,9 +217,11 @@ function updateFullSaving()
         // Update original saving record
         $stmt = $pdo->prepare("UPDATE savings SET current_amount = ?, exchange_rate = ? WHERE id = ? AND user_id = ?");
         $stmt->execute([$current_amount, $exchange_rate, $saving['id'], $user_id]);
+        saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateFullSaving', $_SESSION['user_id']);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
+        saveLog("Birikim güncelleme hatası: " . $e->getMessage(), 'error', 'updateFullSaving', $_SESSION['user_id']);
     }
 }
 
@@ -215,7 +234,10 @@ function getSavingsHistory($saving_id)
 
     if (!$stmt) {
         throw new Exception(t('saving.load_error'));
+        saveLog("Birikim geçmişi yükleme hatası: " . $e->getMessage(), 'error', 'getSavingsHistory', $_SESSION['user_id']);
     }
+
+    saveLog("Birikim geçmişi yüklendi: " . $saving_id, 'info', 'getSavingsHistory', $_SESSION['user_id']);
 
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
