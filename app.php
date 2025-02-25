@@ -373,7 +373,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 no_data: '<?php echo t('saving.not_found'); ?>',
                 delete: {
                     title: '<?php echo t('saving.delete_confirm'); ?>',
-                    confirm: '<?php echo t('yes_delete'); ?>',
+                    confirm: '<?php echo t('app.yes_delete'); ?>',
                     cancel: '<?php echo t('cancel'); ?>'
                 },
                 buttons: {
@@ -396,7 +396,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 },
                 delete: {
                     title: '<?php echo t('income.delete_confirm'); ?>',
-                    confirm: '<?php echo t('yes_delete'); ?>',
+                    confirm: '<?php echo t('app.yes_delete'); ?>',
                     cancel: '<?php echo t('cancel'); ?>'
                 },
                 buttons: {
@@ -423,7 +423,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 },
                 delete: {
                     title: '<?php echo t('payment.delete_confirm'); ?>',
-                    confirm: '<?php echo t('yes_delete'); ?>',
+                    confirm: '<?php echo t('app.yes_delete'); ?>',
                     cancel: '<?php echo t('cancel'); ?>'
                 },
                 buttons: {
