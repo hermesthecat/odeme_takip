@@ -129,7 +129,7 @@ function portfoyListele()
         // Detay satırı
         $output .= '<tr class="detay-satir" data-sembol="' . $sembol . '" style="display: none;">';
         $output .= '<td colspan="7">';
-        
+
         // Satış formu
         $output .= "<div id='satis-form-{$sembol}' class='satis-form mb-3' style='display:none;'>
             <div class='card'>
@@ -168,7 +168,7 @@ function portfoyListele()
                 </div>
             </div>
         </div>";
-        
+
         $output .= '<table class="table table-sm">';
         $output .= '<thead class="table-light">';
         $output .= '<tr>';
@@ -198,8 +198,6 @@ function portfoyListele()
             $output .= '<td>' . ($alis['durum'] == 'kismi_satildi' ? 'Kısmi Satış' : 'Aktif') . '</td>';
             $output .= '<td>
                 <div class="d-flex align-items-center">
-                    <input type="checkbox" class="satis-secim form-check-input me-2" disabled>
-                    <input type="number" class="satis-adet form-control form-control-sm me-2" value="0" min="0" max="' . $kalan_adet . '" readonly style="width: 70px;">
                     <button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button>
                 </div>
             </td>';
