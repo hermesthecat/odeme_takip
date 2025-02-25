@@ -203,11 +203,6 @@ function ajaxRequest(data) {
                 { type: 'numeric' },
                 { type: 'minValue', value: 0 }
             ],
-            current_amount: [
-                { type: 'required' },
-                { type: 'numeric' },
-                { type: 'minValue', value: 0 }
-            ],
             currency: [
                 { type: 'required' },
                 { type: 'currency' }
@@ -227,14 +222,13 @@ function ajaxRequest(data) {
     if (validationRules[data.action]) {
         const errors = validateForm(data, validationRules[data.action]);
         if (errors.length > 0) {
-            return new Promise((resolve, reject) => {
+            return $.Deferred().reject(new Error('Validasyon hatası')).always(() => {
                 Swal.fire({
                     icon: 'error',
                     title: translations.utils.validation.error_title,
                     html: errors.join('<br>'),
                     confirmButtonText: translations.utils.validation.confirm_button
                 });
-                reject(new Error('Validasyon hatası'));
             });
         }
     }
