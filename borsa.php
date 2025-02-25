@@ -16,6 +16,7 @@ $user_default_currency = $_SESSION['base_currency'];
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="borsa.css" />
 
 </head>
@@ -45,12 +46,12 @@ $user_default_currency = $_SESSION['base_currency'];
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Hisse Ekle</span>
                     <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#yeniHisseForm">
-                        <i class="fas fa-plus me-1"></i> Ekle
+                        <i class="fa-solid fa-plus me-1"></i> Ekle
                     </button>
                 </div>
                 <div class="collapse" id="yeniHisseForm">
                     <div class="card-body">
-                        <form method="POST" action="" id="hisseForm" class="needs-validation" novalidate>
+                        <form id="hisseForm" class="needs-validation" novalidate>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <div class="form-floating sembol-input-container">
@@ -79,7 +80,7 @@ $user_default_currency = $_SESSION['base_currency'];
                             <div class="row mt-3">
                                 <div class="col-md-6">
                                     <div class="alert alert-info mb-0 d-flex align-items-center">
-                                        <i class="fas fa-info-circle me-2"></i>
+                                        <i class="fa-solid fa-circle-info me-2"></i>
                                         <div>
                                             <strong>Tahmini Maliyet:</strong>
                                             <span id="tahminiMaliyet">0.00 ₺</span>
@@ -88,10 +89,10 @@ $user_default_currency = $_SESSION['base_currency'];
                                 </div>
                                 <div class="col-md-6 text-end">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-check me-1"></i> Ekle
+                                        <i class="fa-solid fa-check me-1"></i> Ekle
                                     </button>
                                     <button type="reset" class="btn btn-secondary ms-2">
-                                        <i class="fas fa-undo me-1"></i> Temizle
+                                        <i class="fa-solid fa-rotate me-1"></i> Temizle
                                     </button>
                                 </div>
                             </div>
@@ -192,14 +193,16 @@ $user_default_currency = $_SESSION['base_currency'];
 
         <?php require_once __DIR__ . '/modals/user_settings_modal.php'; ?>
 
-
-        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- JavaScript Kütüphaneleri -->
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
         <script src="js/utils.js"></script>
         <script src="js/theme.js"></script>
         <script src="js/borsa.js"></script>
+
 </body>
 
 </html>

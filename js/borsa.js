@@ -13,6 +13,90 @@
     })
 })()
 
+// Hisse ekleme formunu AJAX ile gönderme
+document.getElementById('hisseForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // Form validasyonu
+    if (!this.checkValidity()) {
+        this.classList.add('was-validated');
+        return;
+    }
+
+    // Form verilerini al
+    const sembol = document.getElementById('sembolInput').value.trim().toUpperCase();
+    const adet = document.getElementById('adetInput').value;
+    const alisFiyati = document.getElementById('alisFiyatiInput').value;
+    const hisseAdi = document.querySelector('input[name="hisse_adi"]').value;
+
+    // Tüm alanların dolu olduğunu kontrol et
+    if (!sembol || !adet || !alisFiyati) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Hata!',
+            text: 'Lütfen tüm alanları doldurun.',
+            confirmButtonText: 'Tamam'
+        });
+        return;
+    }
+
+    // AJAX isteği gönder
+    fetch('api/borsa.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            'action': 'addStock',
+            'sembol': sembol,
+            'adet': adet,
+            'alis_fiyati': alisFiyati,
+            'alis_tarihi': new Date().toISOString().split('T')[0], // Bugünün tarihi
+            'hisse_adi': hisseAdi
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Başarılı mesajı göster
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Başarılı!',
+                    text: 'Hisse başarıyla eklendi.',
+                    confirmButtonText: 'Tamam'
+                });
+
+                // Formu temizle
+                document.getElementById('hisseForm').reset();
+                document.getElementById('hisseForm').classList.remove('was-validated');
+
+                // Portföy listesini güncelle
+                portfoyGuncelle();
+
+                // Yeni hisse formunu kapat
+                const bsCollapse = new bootstrap.Collapse(document.getElementById('yeniHisseForm'));
+                bsCollapse.hide();
+            } else {
+                // Hata mesajı göster
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: data.message || 'Hisse eklenirken bir hata oluştu.',
+                    confirmButtonText: 'Tamam'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Hata:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Hata!',
+                text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                confirmButtonText: 'Tamam'
+            });
+        });
+});
+
 // Tahmini maliyet hesaplama
 function tahminiMaliyetHesapla() {
     const adet = parseFloat(document.getElementById('adetInput').value) || 0;
@@ -209,16 +293,18 @@ function portfoyGuncelle() {
                 row.addEventListener('click', function () {
                     const sembol = this.dataset.sembol;
                     const detayRow = document.querySelector(`.detay-satir[data-sembol="${sembol}"]`);
-                    const icon = this.querySelector('.fas');
+                    const icon = this.querySelector('.fa-chevron-right, .fa-chevron-down');
 
-                    if (detayRow.style.display === 'none') {
-                        detayRow.style.display = 'table-row';
-                        icon.classList.remove('fa-chevron-right');
-                        icon.classList.add('fa-chevron-down');
-                    } else {
-                        detayRow.style.display = 'none';
-                        icon.classList.remove('fa-chevron-down');
-                        icon.classList.add('fa-chevron-right');
+                    if (icon) {
+                        if (detayRow.style.display === 'none') {
+                            detayRow.style.display = 'table-row';
+                            icon.classList.remove('fa-chevron-right');
+                            icon.classList.add('fa-chevron-down');
+                        } else {
+                            detayRow.style.display = 'none';
+                            icon.classList.remove('fa-chevron-down');
+                            icon.classList.add('fa-chevron-right');
+                        }
                     }
                 });
             });
@@ -237,9 +323,11 @@ function topluSatisFormunuGoster(sembol, guncelFiyat, event) {
         detayRow.style.display = 'table-row';
         const anaSatir = document.querySelector(`.ana-satir[data-sembol="${sembol}"]`);
         if (anaSatir) {
-            const icon = anaSatir.querySelector('.fas');
-            icon.classList.remove('fa-chevron-right');
-            icon.classList.add('fa-chevron-down');
+            const icon = anaSatir.querySelector('.fa-chevron-right, .fa-chevron-down');
+            if (icon) {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-down');
+            }
         }
     }
 

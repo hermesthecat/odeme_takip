@@ -476,16 +476,60 @@ function satisKariHesapla($kayit)
 
 // POST işlemlerini kontrol et
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // JSON yanıtı için header ayarla
+    header('Content-Type: application/json');
 
-    if (isset($_POST['sembol'], $_POST['adet'], $_POST['alis_fiyati'], $_POST['hisse_adi'])) {
-        $sembol = strtoupper(trim($_POST['sembol']));
-        $adet = intval($_POST['adet']);
-        $alis_fiyati = floatval($_POST['alis_fiyati']);
-        $hisse_adi = trim($_POST['hisse_adi']);
-        $alis_tarihi = date('Y-m-d H:i:s');
+    // addStock aksiyonu için
+    if (isset($_POST['action']) && $_POST['action'] === 'addStock') {
+        // Gerekli parametreleri kontrol et
+        if (
+            isset($_POST['sembol']) &&
+            isset($_POST['adet']) &&
+            isset($_POST['alis_fiyati']) &&
+            isset($_POST['alis_tarihi'])
+        ) {
+            $sembol = trim(strtoupper($_POST['sembol']));
+            $adet = intval($_POST['adet']);
+            $alis_fiyati = floatval($_POST['alis_fiyati']);
+            $alis_tarihi = $_POST['alis_tarihi'];
+            $hisse_adi = isset($_POST['hisse_adi']) ? $_POST['hisse_adi'] : '';
 
-        if (hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi)) {
-            header('Location: ' . $_SERVER['PHP_SELF']);
+            // Parametrelerin geçerliliğini kontrol et
+            if (empty($sembol) || $adet <= 0 || $alis_fiyati <= 0) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Geçersiz parametreler. Lütfen tüm alanları doğru şekilde doldurun.'
+                ]);
+                exit;
+            }
+
+            try {
+                // Hisseyi ekle
+                $result = hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi);
+
+                if ($result) {
+                    echo json_encode([
+                        'success' => true,
+                        'message' => 'Hisse başarıyla eklendi.'
+                    ]);
+                } else {
+                    echo json_encode([
+                        'success' => false,
+                        'message' => 'Hisse eklenirken bir hata oluştu.'
+                    ]);
+                }
+            } catch (Exception $e) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Hata: ' . $e->getMessage()
+                ]);
+            }
+            exit;
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Eksik parametreler.'
+            ]);
             exit;
         }
     }
@@ -561,8 +605,12 @@ if (isset($_GET['liste'])) {
         $hisse_baslik = $hisse['hisse_adi'] ? $hisse['hisse_adi'] . " (" . $hisse['sembol'] . ")" : $hisse['sembol'];
 
         // Ana satır
-        $html_output = "<tr class='ana-satir' data-sembol='{$hisse['sembol']}' style='cursor: pointer;'>
-                <td class='sembol'><i class='fas fa-chevron-right me-2'></i>{$hisse_baslik}</td>
+        $html_output = "<tr class='ana-satir' data-sembol='{$hisse['sembol']}'>
+                <td>
+                    <i class='fa-solid fa-chevron-right me-2'></i>
+                    <strong>{$hisse['sembol']}</strong>
+                    <small class='text-muted'>{$hisse['hisse_adi']}</small>
+                </td>
                 <td class='adet'>{$hisse['toplam_adet']}</td>
                 <td class='alis_fiyati'>";
 
@@ -596,7 +644,7 @@ if (isset($_GET['liste'])) {
                 </div>
                 <div class='card-body'>
                     <div class='alert alert-info'>
-                        <i class='fas fa-info-circle me-2'></i>
+                        <i class='fa-solid fa-circle-info me-2'></i>
                         Satış işlemleri FIFO (First In First Out - İlk Giren İlk Çıkar) prensibine göre yapılmaktadır. 
                         En eski alımdan başlayarak satış gerçekleştirilir.
                     </div>
