@@ -66,7 +66,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
 
-            $sql = "SELECT * FROM users WHERE username = :username";
+            // check if user is active
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM users WHERE username = ? AND is_active = 1");
+            $stmt->execute([$username]);
+            if ($stmt->fetchColumn() == 0) {
+                $response = ['status' => 'error', 'message' => "Kullanıcı aktif değildir."];
+                break;
+            }
+
+            $sql = "SELECT * FROM users WHERE username = :username AND is_active = 1";
 
             try {
                 $stmt = $pdo->prepare($sql);
@@ -87,6 +95,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             //$_SESSION['lang'] = $row['lang'];
                             $_SESSION['theme'] = $row['theme_preference'];
                             $_SESSION['is_admin'] = $row['is_admin'];
+
+                            // update last login date
+                            $updateStmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+                            $updateStmt->execute([$row['id']]);
 
                             if ($remember_me) {
                                 $token = bin2hex(random_bytes(32));

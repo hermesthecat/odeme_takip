@@ -1,0 +1,473 @@
+<?php
+require_once 'config.php';
+require_once 'classes/log.php';
+checkLogin();
+
+if ($_SESSION['is_admin'] != 1) {
+    header("Location: app.php");
+    exit;
+}
+
+// Sayfa başına gösterilecek kullanıcı sayısı
+$users_per_page = 20;
+
+// Mevcut sayfa numarası
+$current_page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+if ($current_page < 1) $current_page = 1;
+
+// Filtreleme parametreleri
+$username_filter = isset($_GET['username']) ? $_GET['username'] : '';
+$is_admin_filter = isset($_GET['is_admin']) ? $_GET['is_admin'] : '';
+$is_active_filter = isset($_GET['is_active']) ? $_GET['is_active'] : '';
+
+// SQL sorgusu için WHERE koşulları
+$where_conditions = [];
+$params = [];
+
+if (!empty($username_filter)) {
+    $where_conditions[] = "username LIKE :username";
+    $params[':username'] = '%' . $username_filter . '%';
+}
+
+if ($is_admin_filter !== '') {
+    $where_conditions[] = "is_admin = :is_admin";
+    $params[':is_admin'] = $is_admin_filter;
+}
+
+if ($is_active_filter !== '') {
+    $where_conditions[] = "is_active = :is_active";
+    $params[':is_active'] = $is_active_filter;
+}
+
+// WHERE koşulunu oluştur
+$where_clause = '';
+if (!empty($where_conditions)) {
+    $where_clause = ' WHERE ' . implode(' AND ', $where_conditions);
+}
+
+// Toplam kullanıcı sayısını al
+global $pdo;
+$count_sql = "SELECT COUNT(*) FROM users" . $where_clause;
+$count_stmt = $pdo->prepare($count_sql);
+foreach ($params as $key => $value) {
+    $count_stmt->bindValue($key, $value);
+}
+$count_stmt->execute();
+$total_users = $count_stmt->fetchColumn();
+
+// Toplam sayfa sayısını hesapla
+$total_pages = ceil($total_users / $users_per_page);
+
+// Mevcut sayfanın kullanıcılarını al
+$offset = ($current_page - 1) * $users_per_page;
+$users_sql = "SELECT * FROM users $where_clause ORDER BY id DESC LIMIT :limit OFFSET :offset";
+$users_stmt = $pdo->prepare($users_sql);
+foreach ($params as $key => $value) {
+    $users_stmt->bindValue($key, $value);
+}
+$users_stmt->bindParam(':limit', $users_per_page, PDO::PARAM_INT);
+$users_stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
+$users_stmt->execute();
+$users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+?>
+<!DOCTYPE html>
+<html lang="<?php echo $lang->getCurrentLanguage(); ?>">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title><?php echo t('site_name'); ?> - Kullanıcı Yönetimi</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="container mt-4">
+        <!-- Başlık ve Kullanıcı Bilgisi -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">Kullanıcı Yönetimi</h1>
+            <div class="d-flex align-items-center">
+                <a href="log.php" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-list-nested me-1"></i>Log
+                </a>
+                <a href="app.php" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-house me-1"></i>Ana Sayfa
+                </a>
+                <a href="borsa.php" class="btn btn-outline-success me-2">
+                    <i class="bi bi-graph-up me-1"></i>Borsa
+                </a>
+                <button class="btn btn-outline-danger logout-btn">
+                    <?php echo htmlspecialchars($_SESSION['username']); ?> <i class="bi bi-box-arrow-right ms-1"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Kullanıcı Filtreleme -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary bg-opacity-25">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Kullanıcı Filtreleme</h2>
+                    <button class="btn btn-primary" onclick="showAddUserModal()">
+                        <i class="bi bi-person-plus me-1"></i>Yeni Kullanıcı
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="admin.php" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="username" class="form-label">Kullanıcı Adı</label>
+                        <input type="text" name="username" id="username" class="form-control" placeholder="Kullanıcı adı" value="<?php echo htmlspecialchars($username_filter); ?>">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="is_admin" class="form-label">Yönetici</label>
+                        <select name="is_admin" id="is_admin" class="form-select">
+                            <option value="">Tümü</option>
+                            <option value="1" <?php echo $is_admin_filter === '1' ? 'selected' : ''; ?>>Evet</option>
+                            <option value="0" <?php echo $is_admin_filter === '0' ? 'selected' : ''; ?>>Hayır</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="is_active" class="form-label">Durum</label>
+                        <select name="is_active" id="is_active" class="form-select">
+                            <option value="">Tümü</option>
+                            <option value="1" <?php echo $is_active_filter === '1' ? 'selected' : ''; ?>>Aktif</option>
+                            <option value="0" <?php echo $is_active_filter === '0' ? 'selected' : ''; ?>>Pasif</option>
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">Filtrele</button>
+                        <a href="admin.php" class="btn btn-secondary">Sıfırla</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Kullanıcılar Tablosu -->
+        <div class="card mb-4">
+            <div class="card-header bg-info bg-opacity-25">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Kullanıcı Listesi</h2>
+                    <span class="badge bg-primary"><?php echo $total_users; ?> kullanıcı</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Kullanıcı Adı</th>
+                                <th>Ana Para Birimi</th>
+                                <th>Tema</th>
+                                <th>Yönetici</th>
+                                <th>Durum</th>
+                                <th>Son Giriş</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (count($users) > 0): ?>
+                                <?php foreach ($users as $user): ?>
+                                    <tr>
+                                        <td><?php echo $user['id']; ?></td>
+                                        <td><?php echo htmlspecialchars($user['username']); ?></td>
+                                        <td><?php echo htmlspecialchars($user['base_currency']); ?></td>
+                                        <td><?php echo htmlspecialchars($user['theme_preference']); ?></td>
+                                        <td>
+                                            <span class="badge <?php echo $user['is_admin'] ? 'bg-success' : 'bg-secondary'; ?>">
+                                                <?php echo $user['is_admin'] ? 'Evet' : 'Hayır'; ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge <?php echo $user['is_active'] ? 'bg-success' : 'bg-danger'; ?>">
+                                                <?php echo $user['is_active'] ? 'Aktif' : 'Pasif'; ?>
+                                            </span>
+                                        </td>
+                                        <td><?php echo $user['last_login'] ? date('d.m.Y H:i:s', strtotime($user['last_login'])) : '-'; ?></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-primary" onclick="editUser(<?php echo $user['id']; ?>)">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <?php if ($user['id'] != $_SESSION['user_id']): ?>
+                                                    <button class="btn btn-sm btn-danger" onclick="deleteUser(<?php echo $user['id']; ?>)">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="8" class="text-center">Kullanıcı bulunamadı</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Sayfalama -->
+                <?php if ($total_pages > 1): ?>
+                    <nav aria-label="Sayfalama">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item <?php echo ($current_page <= 1) ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="?page=<?php echo $current_page - 1; ?><?php echo !empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : ''; ?>" aria-label="Önceki">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            <?php
+                            $start_page = max(1, $current_page - 2);
+                            $end_page = min($total_pages, $current_page + 2);
+
+                            if ($start_page > 1) {
+                                echo '<li class="page-item"><a class="page-link" href="?page=1' . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">1</a></li>';
+                                if ($start_page > 2) {
+                                    echo '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
+                                }
+                            }
+
+                            for ($i = $start_page; $i <= $end_page; $i++) {
+                                echo '<li class="page-item ' . ($i == $current_page ? 'active' : '') . '"><a class="page-link" href="?page=' . $i . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">' . $i . '</a></li>';
+                            }
+
+                            if ($end_page < $total_pages) {
+                                if ($end_page < $total_pages - 1) {
+                                    echo '<li class="page-item disabled"><a class="page-link" href="#">...</a></li>';
+                                }
+                                echo '<li class="page-item"><a class="page-link" href="?page=' . $total_pages . (!empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : '') . '">' . $total_pages . '</a></li>';
+                            }
+                            ?>
+
+                            <li class="page-item <?php echo ($current_page >= $total_pages) ? 'disabled' : ''; ?>">
+                                <a class="page-link" href="?page=<?php echo $current_page + 1; ?><?php echo !empty($_GET) ? '&' . http_build_query(array_diff_key($_GET, ['page' => ''])) : ''; ?>" aria-label="Sonraki">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kullanıcı Ekleme/Düzenleme Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalTitle">Kullanıcı Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="userForm">
+                        <input type="hidden" id="userId" name="id">
+                        <div class="mb-3">
+                            <label for="modalUsername" class="form-label">Kullanıcı Adı</label>
+                            <input type="text" class="form-control" id="modalUsername" name="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modalPassword" class="form-label">Şifre</label>
+                            <input type="password" class="form-control" id="modalPassword" name="password">
+                            <small class="text-muted">Düzenleme sırasında boş bırakılırsa şifre değişmez</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modalBaseCurrency" class="form-label">Ana Para Birimi</label>
+                            <select class="form-select" id="modalBaseCurrency" name="base_currency" required>
+                                <option value="TRY">Türk Lirası (TRY)</option>
+                                <option value="USD">Amerikan Doları (USD)</option>
+                                <option value="EUR">Euro (EUR)</option>
+                                <option value="GBP">İngiliz Sterlini (GBP)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modalTheme" class="form-label">Tema</label>
+                            <select class="form-select" id="modalTheme" name="theme_preference" required>
+                                <option value="light">Açık Tema</option>
+                                <option value="dark">Koyu Tema</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="modalIsAdmin" name="is_admin">
+                                <label class="form-check-label" for="modalIsAdmin">Yönetici</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="modalIsActive" name="is_active" checked>
+                                <label class="form-check-label" for="modalIsActive">Aktif</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary" onclick="saveUser()">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/theme.js"></script>
+    <script>
+        // Kullanıcı modalını göster
+        function showAddUserModal() {
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('userModalTitle').textContent = 'Yeni Kullanıcı Ekle';
+            document.getElementById('modalPassword').required = true;
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            modal.show();
+        }
+
+        // Kullanıcı düzenleme
+        function editUser(id) {
+            fetch(`api/admin.php?action=get_user&id=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        const user = data.user;
+                        document.getElementById('userId').value = user.id;
+                        document.getElementById('modalUsername').value = user.username;
+                        document.getElementById('modalPassword').value = '';
+                        document.getElementById('modalPassword').required = false;
+                        document.getElementById('modalBaseCurrency').value = user.base_currency;
+                        document.getElementById('modalTheme').value = user.theme_preference;
+                        document.getElementById('modalIsAdmin').checked = user.is_admin == 1;
+                        document.getElementById('modalIsActive').checked = user.is_active == 1;
+                        document.getElementById('userModalTitle').textContent = 'Kullanıcı Düzenle';
+                        const modal = new bootstrap.Modal(document.getElementById('userModal'));
+                        modal.show();
+                    } else {
+                        Swal.fire('Hata', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    Swal.fire('Hata', 'Kullanıcı bilgileri alınamadı', 'error');
+                });
+        }
+
+        // Kullanıcı kaydet
+        function saveUser() {
+            const formData = new FormData(document.getElementById('userForm'));
+            const userId = formData.get('id');
+            const action = userId ? 'update_user' : 'add_user';
+
+            fetch('api/admin.php', {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        action: action,
+                        ...Object.fromEntries(formData)
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Başarılı',
+                            text: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire('Hata', data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Hata:', error);
+                    Swal.fire('Hata', 'İşlem sırasında bir hata oluştu', 'error');
+                });
+        }
+
+        // Kullanıcı sil
+        function deleteUser(id) {
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: "Bu kullanıcı kalıcı olarak silinecek!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('api/admin.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({
+                                action: 'delete_user',
+                                id: id
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Başarılı',
+                                    text: data.message,
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Hata', data.message, 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Hata:', error);
+                            Swal.fire('Hata', 'Silme işlemi sırasında bir hata oluştu', 'error');
+                        });
+                }
+            });
+        }
+
+        // Çıkış işlemi
+        document.querySelector('.logout-btn').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Çıkış yapmak istediğinize emin misiniz?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Evet, çıkış yap',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: 'api/auth.php',
+                        type: 'POST',
+                        data: {
+                            action: 'logout'
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                window.location.href = 'index.php';
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

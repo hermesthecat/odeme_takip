@@ -417,7 +417,19 @@ $log_type_bg_classes = [
                 cancelButtonText: 'İptal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    window.location.href = 'logout.php';
+                    $.ajax({
+                        url: 'api/auth.php',
+                        type: 'POST',
+                        data: {
+                            action: 'logout'
+                        },
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                window.location.href = 'index.php';
+                            }
+                        }
+                    });
                 }
             });
         });

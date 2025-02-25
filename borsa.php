@@ -208,6 +208,35 @@ $user_default_currency = $_SESSION['base_currency'];
         <script src="js/theme.js"></script>
         <script src="js/borsa.js"></script>
 
+        <script>
+            // Çıkış işlemi
+            document.querySelector('.logout-btn').addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Çıkış yapmak istediğinize emin misiniz?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Evet, çıkış yap',
+                    cancelButtonText: 'İptal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: 'api/auth.php',
+                            type: 'POST',
+                            data: {
+                                action: 'logout'
+                            },
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.status === 'success') {
+                                    window.location.href = 'index.php';
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        </script>
+
 </body>
 
 </html>
