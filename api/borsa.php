@@ -98,7 +98,7 @@ function portfoyListele()
 
         // Satış karı hesapla
         $satis_kari = 0;
-        $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_adet
+        $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_adet, durum
                 FROM portfolio 
                 WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'satildi' OR durum = 'kismi_satildi')";
         $stmt = $pdo->prepare($sql);
