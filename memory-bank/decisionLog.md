@@ -94,3 +94,35 @@
 2. Implement API changes
 3. Modify frontend code
 4. Add visualization features
+
+## 2025-02-25 - Savings Update Functionality Improvements
+
+**Context:** Users reported issues with the savings update functionality, particularly with the current amount not updating correctly in the list and the edit button not working.
+
+**Decision:** Implement several improvements to the savings update system:
+
+1. API Changes:
+   - Added new `get_saving_details` endpoint for fetching detailed saving information
+   - Modified `update_saving` to set the original record's current_amount to 0
+   - Added `get_savings_history` endpoint for fetching the history of a saving
+
+2. Frontend Changes:
+   - Modified the edit button to use saving ID instead of passing the full saving object
+   - Improved history display with formatted dates and clearer update types
+   - Added proper error handling for failed API requests
+
+**Rationale:**
+- Passing saving ID instead of full object prevents JSON serialization issues
+- Setting original record's current_amount to 0 prevents confusion in the list view
+- Formatting dates and update types improves readability of the history
+
+**Implementation:**
+- Added new API endpoint for fetching saving details
+- Updated savings.js to use the new endpoints
+- Improved error handling and user feedback
+- Enhanced history display formatting
+
+**Next Steps:**
+1. Monitor the improved functionality for any issues
+2. Consider adding more detailed information to the history display
+3. Look for opportunities to improve the user interface
