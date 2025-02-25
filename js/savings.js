@@ -20,13 +20,19 @@ function updateSavingsList(savings) {
             progress < 50 ? 'bg-warning' :
                 progress < 75 ? 'bg-info' :
                     'bg-success';
+
+        // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
+        if (saving.currency !== data.user.base_currency && saving.exchange_rate) {
+            const convertedAmount = parseFloat(saving.amount) * parseFloat(saving.exchange_rate);
+            target_amountText += `${saving.target_amount} ${saving.currency} <br><small class="text-muted">(${convertedAmount.toFixed(2)} ${data.user.base_currency})</small>`;
+            current_amountText += `${saving.current_amount} ${saving.currency} <br><small class="text-muted">(${(parseFloat(saving.current_amount) * parseFloat(saving.exchange_rate)).toFixed(2)} ${data.user.base_currency})`;
+        }
+
         tbody.append(`
             <tr>
                 <td>${saving.name}</td>
-                <td>${saving.target_amount} ${saving.currency}</td>
-                <td>${saving.current_amount} ${saving.currency}</td>
-                <td>${saving.target_amount_tl} TL</td>
-                <td>${saving.current_amount_tl} TL</td>
+                <td>${target_amountText}</td>
+                <td>${current_amountText}</td>
                 <td>${saving.start_date}</td>
                 <td>${saving.target_date}</td>
                 <td>
@@ -147,7 +153,11 @@ function showSavingsHistory(savingId) {
             history.forEach(item => {
                 const formattedDate = new Date(item.created_at).toLocaleDateString();
                 const updateType = item.update_type === 'initial' ? 'Initial' : 'Update';
-                historyHtml += `<tr><td>${formattedDate}</td><td>${item.current_amount}</td><td>${item.exchange_rate}</td><td>${updateType}</td></tr>`;
+                historyHtml += `<tr>
+                <td>${formattedDate}</td>
+                <td>${item.current_amount}</td>
+                <td>${updateType}</td>
+                </tr>`;
             });
             historyHtml += '</tbody></table>';
 

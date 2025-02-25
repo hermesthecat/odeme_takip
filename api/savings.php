@@ -73,7 +73,7 @@ function loadSavings()
 {
     global $pdo, $user_id;
 
-    $stmt = $pdo->prepare("SELECT *, (target_amount * exchange_rate) AS target_amount_tl, (current_amount * exchange_rate) AS current_amount_tl FROM savings WHERE user_id = ? AND parent_id IS NULL");
+    $stmt = $pdo->prepare("SELECT * FROM savings WHERE user_id = ? AND parent_id IS NULL");
     if (!$stmt->execute([$user_id])) {
         throw new Exception(t('saving.load_error'));
     }
