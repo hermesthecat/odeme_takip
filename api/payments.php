@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/log.php';
 checkLogin();
 
 function addPayment()
@@ -53,6 +54,7 @@ function addPayment()
         $exchange_rate = getExchangeRate($currency, $base_currency);
         if (!$exchange_rate) {
             throw new Exception(t('payment.rate_error'));
+            saveLog("Ödeme kuru hatası: " . $currency . " to " . $base_currency, 'error', 'addPayment', $_SESSION['user_id']);
         }
     }
 
@@ -70,6 +72,9 @@ function addPayment()
         $exchange_rate
     ])) {
         throw new Exception(t('payment.add_error'));
+        saveLog("Ödeme ekleme hatası: " . $e->getMessage(), 'error', 'addPayment', $_SESSION['user_id']);
+    } else {
+        saveLog("Ödeme eklendi: " . $name, 'info', 'addPayment', $_SESSION['user_id']);
     }
 
     $parent_id = $pdo->lastInsertId();
@@ -100,6 +105,9 @@ function addPayment()
                         $exchange_rate
                     ])) {
                         throw new Exception(t('payment.add_recurring_error'));
+                        saveLog("Ödeme tekrarlı ekleme hatası: " . $e->getMessage(), 'error', 'addPayment', $_SESSION['user_id']);
+                    } else {
+                        saveLog("Ödeme tekrarlı eklendi: " . $name, 'info', 'addPayment', $_SESSION['user_id']);
                     }
                 }
             }
@@ -125,18 +133,21 @@ function deletePayment()
             $stmt = $pdo->prepare("DELETE FROM payments WHERE (parent_id = ?) AND user_id = ?");
             if (!$stmt->execute([$id, $user_id])) {
                 throw new Exception(t('payment.delete_error'));
+                saveLog("Ödeme silme hatası ($id): " . $e->getMessage(), 'error', 'deletePayment', $_SESSION['user_id']);
             }
 
             // sonra parent kaydını sil
             $stmt = $pdo->prepare("DELETE FROM payments WHERE id = ? AND user_id = ?");
             if (!$stmt->execute([$id, $user_id])) {
                 throw new Exception(t('payment.delete_error'));
+                saveLog("Ödeme silme hatası ($id): " . $e->getMessage(), 'error', 'deletePayment', $_SESSION['user_id']);
             }
         } else {
             // Sadece seçili kaydı sil
             $stmt = $pdo->prepare("DELETE FROM payments WHERE id = ? AND user_id = ?");
             if (!$stmt->execute([$id, $user_id])) {
                 throw new Exception(t('payment.delete_error'));
+                saveLog("Ödeme silme hatası ($id): " . $e->getMessage(), 'error', 'deletePayment', $_SESSION['user_id']);
             }
         }
 
@@ -178,6 +189,7 @@ function loadPayments()
     $stmt_payments = $pdo->prepare($sql_payments);
     $stmt_payments->execute([$user_id, $month, $year]);
     $payments = $stmt_payments->fetchAll(PDO::FETCH_ASSOC);
+    saveLog("Ödemeler alındı: " . $user_id . " " . $month . " " . $year, 'info', 'loadPayments', $_SESSION['user_id']);
     return $payments;
 }
 
@@ -230,6 +242,7 @@ function loadRecurringPayments()
     $stmt_recurring_payments = $pdo->prepare($sql_recurring_payments);
     $stmt_recurring_payments->execute([$user_id]);
     $recurring_payments = $stmt_recurring_payments->fetchAll(PDO::FETCH_ASSOC);
+    saveLog("Tekrarlayan ödemeler alındı: " . $user_id, 'info', 'loadRecurringPayments', $_SESSION['user_id']);
     return $recurring_payments;
 }
 
@@ -250,6 +263,7 @@ function markPaymentPaid()
 
     if (!$payment) {
         throw new Exception(t('payment.not_found'));
+        saveLog("Ödeme bulunamadı: " . $_POST['id'], 'error', 'markPaymentPaid', $_SESSION['user_id']);
     }
 
     $pdo->beginTransaction();
@@ -261,6 +275,7 @@ function markPaymentPaid()
             $exchange_rate = getExchangeRate($payment['currency'], $base_currency);
             if (!$exchange_rate) {
                 throw new Exception(t('payment.rate_error'));
+                saveLog("Ödeme kuru hatası: " . $payment['currency'] . " to " . $base_currency, 'error', 'markPaymentPaid', $_SESSION['user_id']);
             }
         }
 
@@ -272,9 +287,11 @@ function markPaymentPaid()
 
         if (!$stmt->execute([$exchange_rate, $_POST['id'], $user_id])) {
             throw new Exception(t('payment.update_error'));
+            saveLog("Ödeme güncelleme hatası ($id): " . $e->getMessage(), 'error', 'markPaymentPaid', $_SESSION['user_id']);
         }
 
         $pdo->commit();
+        saveLog("Ödeme güncellendi: " . $_POST['id'], 'info', 'markPaymentPaid', $_SESSION['user_id']);
         return true;
     } catch (Exception $e) {
         $pdo->rollBack();
@@ -326,11 +343,13 @@ function updatePayment()
     $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ? AND user_id = ?");
     if (!$stmt->execute([$id, $user_id])) {
         throw new Exception(t('payment.not_found'));
+        saveLog("Ödeme bulunamadı: " . $id, 'error', 'updatePayment', $_SESSION['user_id']);
     }
     $payment = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$payment) {
         throw new Exception(t('payment.not_found'));
+        saveLog("Ödeme bulunamadı: " . $id, 'error', 'updatePayment', $_SESSION['user_id']);
     }
 
     $pdo->beginTransaction();
@@ -344,6 +363,7 @@ function updatePayment()
                 $exchange_rate = getExchangeRate($currency, $base_currency);
                 if (!$exchange_rate) {
                     throw new Exception(t('payment.rate_error'));
+                    saveLog("Ödeme kuru hatası: " . $currency . " to " . $base_currency, 'error', 'updatePayment', $_SESSION['user_id']);
                 }
             } else {
                 // Mevcut kuru koru
@@ -372,9 +392,11 @@ function updatePayment()
             $user_id
         ])) {
             throw new Exception(t('payment.update_error'));
+            saveLog("Ödeme güncelleme hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
         }
 
         $pdo->commit();
+        saveLog("Ödeme güncellendi: " . $id, 'info', 'updatePayment', $_SESSION['user_id']);
         return true;
     } catch (Exception $e) {
         $pdo->rollBack();
@@ -393,6 +415,7 @@ function getLastChildPaymentDate($payment_id)
 
     if (!$payment) {
         throw new Exception(t('payment.not_found'));
+        saveLog("Ödeme bulunamadı: " . $payment_id, 'error', 'getLastChildPaymentDate', $_SESSION['user_id']);
     }
 
     $parent_id = $payment['parent_id'] ?? $payment_id; // Eğer parent_id null ise, kendisi parent'tır
@@ -404,6 +427,9 @@ function getLastChildPaymentDate($payment_id)
 
     if (!$stmt->execute([$parent_id, $user_id])) {
         throw new Exception(t('payment.not_found'));
+        saveLog("Ödeme bulunamadı: " . $parent_id, 'error', 'getLastChildPaymentDate', $_SESSION['user_id']);
+    } else {
+        saveLog("Ödeme bulundu: " . $parent_id, 'info', 'getLastChildPaymentDate', $_SESSION['user_id']);
     }
 
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -416,6 +442,9 @@ function getLastChildPaymentDate($payment_id)
 
         if (!$parent) {
             throw new Exception(t('payment.not_found'));
+            saveLog("Ödeme bulunamadı: " . $parent_id, 'error', 'getLastChildPaymentDate', $_SESSION['user_id']);
+        } else {
+            saveLog("Ödeme bulundu: " . $parent_id, 'info', 'getLastChildPaymentDate', $_SESSION['user_id']);
         }
 
         return $parent['first_date'];

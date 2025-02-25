@@ -1,5 +1,6 @@
 <?php
 require_once '../config.php';
+require_once '../classes/log.php';
 
 header('Content-Type: application/json');
 
@@ -48,11 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($stmt->execute([$username, $hashed_password, $base_currency])) {
                     $response = ['status' => 'success', 'message' => t('auth.register_success')];
+                    saveLog("Kullanıcı kayıt işlemi: " . $username, 'info', 'register', 0);
                 } else {
                     $response = ['status' => 'error', 'message' => t('auth.register_error')];
                 }
             } catch (PDOException $e) {
                 $response = ['status' => 'error', 'message' => t('auth.database_error')];
+                saveLog("Kullanıcı kayıt işlemi hatası: " . $e->getMessage(), 'error', 'register', 0);
             }
             break;
 
@@ -109,15 +112,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             }
 
                             $response = ['status' => 'success', 'message' => t('auth.login_success')];
+                            saveLog("Kullanıcı giriş işlemi: " . $username, 'info', 'login', $row['id']);
                         } else {
                             $response = ['status' => 'error', 'message' => t('auth.invalid_credentials')];
+                            saveLog("Kullanıcı şifre hatası: " . $username, 'error', 'login', $row['id']);
                         }
                     } else {
                         $response = ['status' => 'error', 'message' => t('auth.invalid_credentials')];
+                        saveLog("Kullanıcı bulunamadı : " . $username, 'error', 'login', 0);
                     }
                 }
             } catch (PDOException $e) {
                 $response = ['status' => 'error', 'message' => t('auth.database_error')];
+                saveLog("Kullanıcı giriş işlemi hatası: " . $e->getMessage(), 'error', 'login', 0);
             }
             break;
 
@@ -143,6 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             session_destroy();
             $response = ['status' => 'success', 'message' => t('auth.logout_success')];
+            saveLog("Kullanıcı çıkış işlemi: " . $_SESSION['username'], 'info', 'logout', 0);
             break;
     }
 }

@@ -70,6 +70,7 @@ function addIncome()
         $exchange_rate
     ])) {
         throw new Exception(t('income.add_error'));
+        saveLog("Gelir ekleme hatası ($name): " . $e->getMessage(), 'error', 'addIncome', $_SESSION['user_id']);
     }
 
     $parent_id = $pdo->lastInsertId();
@@ -100,6 +101,7 @@ function addIncome()
                         $exchange_rate
                     ])) {
                         throw new Exception(t('income.add_recurring_error'));
+                        saveLog("Tekrarlı gelir ekleme hatası ($name): " . $e->getMessage(), 'error', 'addIncome', $_SESSION['user_id']);
                     }
                 }
             }
@@ -114,11 +116,14 @@ function deleteIncome()
 {
     global $pdo, $user_id;
 
+    $id = $_POST['id'];
+
     $stmt = $pdo->prepare("DELETE FROM income WHERE id = ? AND user_id = ?");
     if ($stmt->execute([$_POST['id'], $user_id])) {
         return true;
     } else {
         throw new Exception(t('income.delete_error'));
+        saveLog("Gelir silme hatası ($id): " . $e->getMessage(), 'error', 'deleteIncome', $_SESSION['user_id']);
     }
 }
 
@@ -153,6 +158,8 @@ function loadIncomes()
     $stmt_incomes->execute([$user_id, $month, $year]);
     $incomes = $stmt_incomes->fetchAll(PDO::FETCH_ASSOC);
 
+    saveLog("Gelirler alındı: " . $user_id . " " . $month . " " . $year, 'info', 'loadIncomes', $_SESSION['user_id']);
+
     return $incomes;
 }
 
@@ -173,6 +180,7 @@ function markIncomeReceived()
 
     if (!$income) {
         throw new Exception(t('income.not_found'));
+        saveLog("Gelir bulunamadı: " . $_POST['id'], 'error', 'markIncomeReceived', $_SESSION['user_id']);
     }
 
     $pdo->beginTransaction();
@@ -184,6 +192,7 @@ function markIncomeReceived()
             $exchange_rate = getExchangeRate($income['currency'], $base_currency);
             if (!$exchange_rate) {
                 throw new Exception(t('income.rate_error'));
+                saveLog("Gelir kuru hatası: " . $_POST['id'], 'error', 'markIncomeReceived', $_SESSION['user_id']);
             }
         }
 
@@ -193,8 +202,13 @@ function markIncomeReceived()
             exchange_rate = ?
             WHERE id = ? AND user_id = ?");
 
-        if (!$stmt->execute([$exchange_rate, $_POST['id'], $user_id])) {
+        $id = $_POST['id']; // Gelir ID
+
+        if (!$stmt->execute([$exchange_rate, $id, $user_id])) {
             throw new Exception(t('income.update_error'));
+            saveLog("Gelir güncelleme hatası ($id): " . $e->getMessage(), 'error', 'markIncomeReceived', $_SESSION['user_id']);
+        } else {
+            saveLog("Gelir güncellendi: $id", 'info', 'markIncomeReceived', $_SESSION['user_id']);
         }
 
         $pdo->commit();
@@ -249,11 +263,13 @@ function updateIncome()
     $stmt = $pdo->prepare("SELECT * FROM income WHERE id = ? AND user_id = ?");
     if (!$stmt->execute([$id, $user_id])) {
         throw new Exception(t('income.not_found'));
+        saveLog("Gelir bulunamadı: " . $id, 'error', 'updateIncome', $_SESSION['user_id']); // Gelir ID
     }
     $income = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$income) {
         throw new Exception(t('income.not_found'));
+        saveLog("Gelir bulunamadı: " . $id, 'error', 'updateIncome', $_SESSION['user_id']); // Gelir ID
     }
 
     $pdo->beginTransaction();
@@ -267,6 +283,7 @@ function updateIncome()
                 $exchange_rate = getExchangeRate($currency, $base_currency);
                 if (!$exchange_rate) {
                     throw new Exception(t('income.rate_error'));
+                    saveLog("Gelir kuru hatası: " . $id, 'error', 'updateIncome', $_SESSION['user_id']); // Gelir ID
                 }
             } else {
                 // Mevcut kuru koru
@@ -295,6 +312,9 @@ function updateIncome()
             $user_id
         ])) {
             throw new Exception(t('income.update_error'));
+            saveLog("Gelir güncelleme hatası ($id): " . $e->getMessage(), 'error', 'updateIncome', $_SESSION['user_id']); // Gelir ID
+        } else {
+            saveLog("Gelir güncellendi: $id", 'info', 'updateIncome', $_SESSION['user_id']);
         }
 
         // Child kayıtları güncelleme
@@ -315,7 +335,10 @@ function updateIncome()
                     $user_id
                 ])) {
                     throw new Exception(t('income.update_children_error'));
+                    saveLog("Gelir çocuk güncelleme hatası ($id): " . $e->getMessage(), 'error', 'updateIncome', $_SESSION['user_id']); // Gelir ID
                 }
+
+                saveLog("Gelir çocuk güncellendi: $id", 'info', 'updateIncome', $_SESSION['user_id']);
             }
             // Child gelir ise, kendisi ve sonraki kayıtları güncelle
             else {
@@ -334,7 +357,10 @@ function updateIncome()
                     $user_id
                 ])) {
                     throw new Exception(t('income.update_children_error'));
+                    saveLog("Gelir çocuk güncelleme hatası ($id): " . $e->getMessage(), 'error', 'updateIncome', $_SESSION['user_id']); // Gelir ID
                 }
+
+                saveLog("Gelir çocuk güncellendi: $id", 'info', 'updateIncome', $_SESSION['user_id']);
             }
         }
 
@@ -357,6 +383,7 @@ function getLastChildIncomeDate($income_id)
 
     if (!$income) {
         throw new Exception(t('income.not_found'));
+        saveLog("Gelir bulunamadı: " . $income_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); // Gelir ID
     }
 
     $parent_id = $income['parent_id'] ?? $income_id; // Eğer parent_id null ise, kendisi parent'tır
@@ -368,6 +395,7 @@ function getLastChildIncomeDate($income_id)
 
     if (!$stmt->execute([$parent_id, $user_id])) {
         throw new Exception(t('income.not_found'));
+        saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); // Gelir ID
     }
 
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -380,6 +408,7 @@ function getLastChildIncomeDate($income_id)
 
         if (!$parent) {
             throw new Exception(t('income.not_found'));
+            saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); // Gelir ID
         }
 
         return $parent['first_date'];

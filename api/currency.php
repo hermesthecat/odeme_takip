@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/log.php';
 checkLogin();
 
 // Güncel kur bilgisini al
@@ -26,6 +27,7 @@ function getExchangeRate($from_currency, $to_currency)
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($result) {
+        saveLog("Para birimi kuru veritabanından alındı: " . $from_currency . " to " . $to_currency . " rate: " . $result['rate'], 'info', 'getExchangeRate', $_SESSION['user_id']);
         return $result['rate'];
     }
 
@@ -35,6 +37,7 @@ function getExchangeRate($from_currency, $to_currency)
         $response = @file_get_contents($api_url);
 
         if ($response === false) {
+            saveLog("Para birimi kuru api'den alınırken hata: " . $from_currency . " to " . $to_currency, 'error', 'getExchangeRate', $_SESSION['user_id']);
             throw new Exception(t('currency.rate_fetch_error'));
         }
 
@@ -48,6 +51,7 @@ function getExchangeRate($from_currency, $to_currency)
                                   VALUES (?, ?, ?, CURDATE())");
             $stmt->execute([$from_currency, $to_currency, $rate]);
 
+            saveLog("Para birimi kuru veritabanına kaydedildi: " . $from_currency . " to " . $to_currency . " rate: " . $rate, 'info', 'getExchangeRate', $_SESSION['user_id']);
             return $rate;
         }
     } catch (Exception $e) {
