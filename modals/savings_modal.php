@@ -25,7 +25,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        
+
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><?php echo t('start_date'); ?></label>
@@ -77,7 +77,7 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        
+
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><?php echo t('start_date'); ?></label>

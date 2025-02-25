@@ -16,12 +16,12 @@ function updateIncomeList(incomes) {
 
     incomes.forEach(function (income) {
         const isChild = income.parent_id !== null;
-        let amountText = `${parseFloat(income.amount).toFixed(2)}`;
+        let amountText = `${formatMyMoney(parseFloat(income.amount).toFixed(2))}`;
 
         // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
         if (income.currency !== data.user.base_currency && income.exchange_rate) {
             const convertedAmount = parseFloat(income.amount) * parseFloat(income.exchange_rate);
-            amountText += `<br><small class="text-muted">(${convertedAmount.toFixed(2)} ${data.user.base_currency})</small>`;
+            amountText += `<br><small class="text-muted">(${formatMyMoney(convertedAmount.toFixed(2))} ${data.user.base_currency})</small>`;
         }
 
         tbody.append(`

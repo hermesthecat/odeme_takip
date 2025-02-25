@@ -277,4 +277,17 @@ function updateUrl(month, year) {
     url.searchParams.set('month', month);
     url.searchParams.set('year', year);
     window.history.pushState({}, '', url);
-} 
+}
+
+function formatMyMoney(price) {
+
+    var currency_symbol = "₺"
+
+    var formattedOutput = new Intl.NumberFormat('tr-TR', {
+        style: 'currency',
+        currency: 'TRY',
+        minimumFractionDigits: 2,
+    });
+
+    return formattedOutput.format(price).replace(currency_symbol, '')
+}

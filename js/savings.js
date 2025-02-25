@@ -21,16 +21,16 @@ function updateSavingsList(savings) {
                 progress < 75 ? 'bg-info' :
                     'bg-success';
 
-        let target_amountText = `${parseFloat(saving.target_amount).toFixed(2)} ${saving.currency}`;
-        let current_amountText = `${parseFloat(saving.current_amount).toFixed(2)} ${saving.currency}`;
+        let target_amountText = `${formatMyMoney(parseFloat(saving.target_amount).toFixed(2))} ${saving.currency}`;
+        let current_amountText = `${formatMyMoney(parseFloat(saving.current_amount).toFixed(2))} ${saving.currency}`;
 
         // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
         if (saving.currency !== data.user.base_currency && saving.exchange_rate) {
             const converted_targetAmount = parseFloat(saving.target_amount) * parseFloat(saving.exchange_rate);
             const converted_currentAmount = parseFloat(saving.current_amount) * parseFloat(saving.exchange_rate
             );
-            target_amountText += `<br><small class="text-muted">(${converted_targetAmount.toFixed(2)} ${data.user.base_currency})</small>`;
-            current_amountText += `<br><small class="text-muted">(${converted_currentAmount.toFixed(2)} ${data.user.base_currency})</small>`;
+            target_amountText += `<br><small class="text-muted">(${formatMyMoney(converted_targetAmount.toFixed(2))} ${data.user.base_currency})</small>`;
+            current_amountText += `<br><small class="text-muted">(${formatMyMoney(converted_currentAmount.toFixed(2))} ${data.user.base_currency})</small>`;
         }
 
         tbody.append(`
@@ -158,13 +158,13 @@ function showSavingsHistory(savingId) {
             history.forEach(item => {
                 const formattedDate = new Date(item.created_at).toLocaleDateString();
                 const updateType = item.update_type === 'initial' ? 'Initial' : 'Update';
-                let current_amountText = `${parseFloat(item.current_amount).toFixed(2)} ${item.currency}`;
+                let current_amountText = `${formatMyMoney(parseFloat(item.current_amount).toFixed(2))} ${item.currency}`;
 
                 // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
                 if (item.currency !== data.user.base_currency && item.exchange_rate) {
                     const converted_currentAmount = parseFloat(item.current_amount) * parseFloat(item.exchange_rate
                     );
-                    current_amountText += `<br><small class="text-muted">(${converted_currentAmount.toFixed(2)} ${data.user.base_currency})</small>`;
+                    current_amountText += `<br><small class="text-muted">(${formatMyMoney(converted_currentAmount.toFixed(2))} ${data.user.base_currency})</small>`;
                 }
 
                 historyHtml += `<tr>

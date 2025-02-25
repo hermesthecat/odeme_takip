@@ -19,11 +19,11 @@ function updatePaymentsList(payments) {
 
     payments.forEach(function (payment) {
         const isChild = payment.parent_id !== null;
-        let amountText = `${parseFloat(payment.amount).toFixed(2)}`;
+        let amountText = `${formatMyMoney(parseFloat(payment.amount).toFixed(2))}`;
 
         if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
             const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
-            amountText += `<br><small class="text-muted">(${convertedAmount.toFixed(2)} ${data.user.base_currency})</small>`;
+            amountText += `<br><small class="text-muted">(${formatMyMoney(convertedAmount.toFixed(2))} ${data.user.base_currency})</small>`;
         }
 
         tbody.append(`
@@ -157,11 +157,11 @@ function markAsPaid(id) {
                                         tfoot.html(`
                                             <tr class="text-end">
                                                 <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.total_payment}:</td>
-                                                <td class="fw-bold">${totalYearlyPayment.toFixed(2)} ${data.user.base_currency}</td>
+                                                <td class="fw-bold">${formatMyMoney(totalYearlyPayment.toFixed(2))} ${data.user.base_currency}</td>
                                             </tr>
                                             <tr class="text-end">
                                                 <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.pending_payment}:</td>
-                                                <td class="fw-bold">${totalUnpaidPayment.toFixed(2)} ${data.user.base_currency}</td>
+                                                <td class="fw-bold">${formatMyMoney(totalUnpaidPayment.toFixed(2))} ${data.user.base_currency}</td>
                                             </tr>
                                         `);
 
@@ -318,7 +318,7 @@ function updateRecurringPaymentsList(recurring_payments) {
                     <i class="bi bi-chevron-right me-2 toggle-icon"></i>
                     ${payment.name}
                 </td>
-                <td>${parseFloat(payment.amount).toFixed(2)}</td>
+                <td>${formatMyMoney(parseFloat(payment.amount).toFixed(2))}</td>
                 <td>${payment.currency}</td>
                 <td>
                     <div class="progress mb-1">
@@ -329,7 +329,7 @@ function updateRecurringPaymentsList(recurring_payments) {
                     <small class="text-muted text-center d-block">${payment.payment_status}</small>
                 </td>
                 <td>
-                    ${parseFloat(payment.yearly_total).toFixed(2)}
+                    ${formatMyMoney(parseFloat(payment.yearly_total).toFixed(2))}
                 </td>
                 <td class="text-end">
                     <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${payment.id})" title="${translations.payment.buttons.delete}">
@@ -378,11 +378,11 @@ function updateRecurringPaymentsList(recurring_payments) {
     tfoot.html(`
         <tr class="text-end">
             <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.total_payment}:</td>
-            <td class="fw-bold">${totalYearlyPayment.toFixed(2)} ${data.user.base_currency}</td>
+            <td class="fw-bold">${formatMyMoney(totalYearlyPayment.toFixed(2))} ${data.user.base_currency}</td>
         </tr>
         <tr class="text-end">
             <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.pending_payment}:</td>
-            <td class="fw-bold">${totalUnpaidPayment.toFixed(2)} ${data.user.base_currency}</td>
+            <td class="fw-bold">${formatMyMoney(totalUnpaidPayment.toFixed(2))} ${data.user.base_currency}</td>
         </tr>
     `);
 
@@ -413,10 +413,10 @@ function loadChildPayments(parentId) {
             tbody.empty();
 
             // Ana kaydı ekle
-            let parentAmountText = `${parseFloat(parent.amount).toFixed(2)}`;
+            let parentAmountText = `${formatMyMoney(parseFloat(parent.amount).toFixed(2))}`;
             if (parent.currency !== data.user.base_currency && parent.exchange_rate) {
                 const convertedAmount = parseFloat(parent.amount) * parseFloat(parent.exchange_rate);
-                parentAmountText += `<br><small class="text-muted">(${convertedAmount.toFixed(2)} ${data.user.base_currency})</small>`;
+                parentAmountText += `<br><small class="text-muted">(${formatMyMoney(convertedAmount.toFixed(2))} ${data.user.base_currency})</small>`;
             }
 
             tbody.append(`
@@ -439,10 +439,10 @@ function loadChildPayments(parentId) {
 
             // Child kayıtları ekle
             children.forEach(function (payment) {
-                let amountText = `${parseFloat(payment.amount).toFixed(2)}`;
+                let amountText = `${formatMyMoney(parseFloat(payment.amount).toFixed(2))}`;
                 if (payment.currency !== data.user.base_currency && payment.exchange_rate) {
                     const convertedAmount = parseFloat(payment.amount) * parseFloat(payment.exchange_rate);
-                    amountText += `<br><small class="text-muted">(${convertedAmount.toFixed(2)} ${data.user.base_currency})</small>`;
+                    amountText += `<br><small class="text-muted">(${formatMyMoney(convertedAmount.toFixed(2))} ${data.user.base_currency})</small>`;
                 }
 
                 tbody.append(`
