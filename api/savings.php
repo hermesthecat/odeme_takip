@@ -18,12 +18,6 @@ function addSaving()
         $target_amount = validateMinValue($target_amount, 0, t('saving.target_amount'));
     }
 
-    if (isset($_POST['current_amount'])) {
-        $current_amount = validateRequired($_POST['current_amount'] ?? null, t('saving.current_amount'));
-        $current_amount = validateNumeric($current_amount, t('saving.current_amount'));
-        $current_amount = validateMinValue($current_amount, 0, t('saving.current_amount'));
-    }
-
     if (isset($_POST['currency'])) {
         $currency = validateRequired($_POST['currency'] ?? null, t('saving.currency'));
         $currency = validateCurrency($currency, t('saving.currency'));
