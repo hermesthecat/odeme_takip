@@ -52,33 +52,49 @@ function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi = '')
 function hisseSil($id)
 {
     global $pdo;
+    $user_id = $_SESSION['user_id'];
+    
     // Hata ayıklama için gelen ID'yi logla
-    saveLog("hisseSil fonksiyonu çağrıldı - Gelen ID: " . $id, 'info', 'hisseSil', $_SESSION['user_id']);
+    saveLog("hisseSil fonksiyonu çağrıldı - Gelen ID: " . $id, 'info', 'hisseSil', $user_id);
 
     // Tire ile ayrılmış ID'leri diziye çevir
     $ids = explode('-', $id);
     $ids = array_map('intval', $ids);
 
     // Dönüştürülen ID'leri logla
-    saveLog("ID'ler diziye çevrildi - ID'ler: " . implode(',', $ids), 'info', 'hisseSil', $_SESSION['user_id']);
+    saveLog("ID'ler diziye çevrildi - ID'ler: " . implode(',', $ids), 'info', 'hisseSil', $user_id);
 
     try {
+        // Önce bu ID'lerin kullanıcıya ait olup olmadığını kontrol et
+        $id_list = implode(',', $ids);
+        $sql = "SELECT COUNT(*) as count FROM portfolio WHERE id IN ({$id_list}) AND user_id = :user_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['user_id' => $user_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Eğer bulunan kayıt sayısı, silinmek istenen ID sayısına eşit değilse
+        // bu, bazı ID'lerin kullanıcıya ait olmadığı anlamına gelir
+        if ($result['count'] != count($ids)) {
+            saveLog("Güvenlik ihlali tespit edildi! Kullanıcı başkasının hisselerini silmeye çalışıyor - ID'ler: " . implode(',', $ids), 'error', 'hisseSil', $user_id);
+            return false;
+        }
+
         // İşlemi başlat
         $pdo->beginTransaction();
 
-        // Önce bu ID'lere bağlı tüm satış kayıtlarını bul ve sil
-        $sql = "DELETE FROM portfolio WHERE durum = 'satis_kaydi' AND referans_alis_id IN (" . implode(',', $ids) . ")";
+        // Önce bu ID'lere bağlı tüm satış kayıtlarını bul ve sil (sadece kullanıcıya ait olanları)
+        $sql = "DELETE FROM portfolio WHERE durum = 'satis_kaydi' AND referans_alis_id IN (" . implode(',', $ids) . ") AND user_id = :user_id";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute(['user_id' => $user_id]);
 
-        saveLog("Satış kayıtları silindi - ID'ler: " . implode('-', $ids), 'info', 'hisseSil', $_SESSION['user_id']);
+        saveLog("Satış kayıtları silindi - ID'ler: " . implode('-', $ids), 'info', 'hisseSil', $user_id);
 
-        // Şimdi ana kayıtları sil
-        $sql = "DELETE FROM portfolio WHERE id IN (" . implode(',', $ids) . ")";
+        // Şimdi ana kayıtları sil (sadece kullanıcıya ait olanları)
+        $sql = "DELETE FROM portfolio WHERE id IN (" . implode(',', $ids) . ") AND user_id = :user_id";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute();
+        $stmt->execute(['user_id' => $user_id]);
 
-        saveLog("Ana kayıtlar silindi - ID'ler: " . implode('-', $ids), 'info', 'hisseSil', $_SESSION['user_id']);
+        saveLog("Ana kayıtlar silindi - ID'ler: " . implode('-', $ids), 'info', 'hisseSil', $user_id);
 
         // İşlemi tamamla
         $pdo->commit();
@@ -86,7 +102,7 @@ function hisseSil($id)
     } catch (Exception $e) {
         // Hata durumunda işlemi geri al
         $pdo->rollBack();
-        saveLog("Hisse silme hatası: " . $e->getMessage(), 'error', 'hisseSil', $_SESSION['user_id']);
+        saveLog("Hisse silme hatası: " . $e->getMessage(), 'error', 'hisseSil', $user_id);
         return false;
     }
 }
