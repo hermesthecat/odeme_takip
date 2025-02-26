@@ -252,11 +252,11 @@ function portfoyListele()
         $output .= '<table class="table table-sm">';
         $output .= '<thead class="table-light">';
         $output .= '<tr>';
-        $output .= '<th>Alış Tarihi</th>';
+        $output .= '<th class="text-center">Alış Tarihi</th>';
         $output .= '<th>Lot</th>';
-        $output .= '<th>Alış Fiyatı</th>';
-        $output .= '<th>Kar/Zarar</th>';
-        $output .= '<th>Satış Durumu</th>';
+        $output .= '<th>Alış</th>';
+        $output .= '<th data-bs-toggle="tooltip" data-bs-placement="top" title="Kar/Zarar = (Güncel Fiyat - Alış Fiyatı) x Lot Sayısı">Kar/Zarar</th>';
+        $output .= '<th>Durum</th>';
         $output .= '<th>İşlem</th>';
         $output .= '</tr>';
         $output .= '</thead>';
@@ -289,8 +289,8 @@ function portfoyListele()
             }
 
             $output .= '<tr data-alis-tarihi="' . $alis['alis_tarihi'] . '" data-alis-fiyati="' . $alis['alis_fiyati'] . '" data-max-adet="' . $kalan_adet . '">';
-            $output .= '<td>' . date('d.m.Y H:i', strtotime($alis['alis_tarihi'])) . '</td>';
-            $output .= '<td>' . $alis['adet'] . ' <small class="text-muted">(' . $kalan_adet . ')</small></td>';
+            $output .= '<td class="text-center">' . date('d.m.Y H:i', strtotime($alis['alis_tarihi'])) . '</td>';
+            $output .= '<td>' . $kalan_adet . '/' . $alis['adet'] . '</td>';
             $output .= '<td>' . convertCurrencyToTRY($alis['alis_fiyati']) . '</td>';
             $output .= '<td class="' . $alis_kar_zarar_class . '">' . ($kalan_adet > 0 ? convertCurrencyToTRY($alis_kar_zarar) : '-') . '</td>';
             $output .= '<td>' . $durum_badge . '</td>';
@@ -311,16 +311,16 @@ function portfoyListele()
 
         // Satış kayıtları tablosu - sağ taraf
         $output .= '<div class="col-md-6">';
-        $output .= '<h6 class="mb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Bu tablo, satılan hisselerin alış ve satış bilgilerini gösterir">Satış Kayıtları</h6>';
+        $output .= '<h6 class="mb-2">Satış Kayıtları</h6>';
         $output .= '<table class="table table-sm">';
         $output .= '<thead class="table-light">';
         $output .= '<tr>';
-        $output .= '<th>Alış Tarihi</th>';
+        $output .= '<th class="text-center">Alış Tarihi</th>';
         $output .= '<th>Lot</th>';
-        $output .= '<th>Alış Fiyatı</th>';
-        $output .= '<th>Satış Fiyatı</th>';
+        $output .= '<th>Alış</th>';
+        $output .= '<th>Satış</th>';
         $output .= '<th data-bs-toggle="tooltip" data-bs-placement="top" title="Kar/Zarar = (Satış Fiyatı - Alış Fiyatı) x Satılan Lot Sayısı">Kar/Zarar</th>';
-        $output .= '<th>Satış Durumu</th>';
+        $output .= '<th class="text-center">Durum</th>';
         $output .= '</tr>';
         $output .= '</thead>';
         $output .= '<tbody>';
@@ -343,12 +343,12 @@ function portfoyListele()
                 $satis_kar_zarar_class = $satis_kar_zarar >= 0 ? 'kar' : 'zarar';
 
                 $output .= '<tr>';
-                $output .= '<td>' . date('d.m.Y H:i', strtotime($satis['alis_tarihi'])) . '</td>';
+                $output .= '<td class="text-center">' . date('d.m.Y H:i', strtotime($satis['alis_tarihi'])) . '</td>';
                 $output .= '<td>' . $satis_adedi . '</td>';
                 $output .= '<td>' . convertCurrencyToTRY($satis['alis_fiyati']) . '</td>';
                 $output .= '<td>' . convertCurrencyToTRY($satis['satis_fiyati']) . '</td>';
                 $output .= '<td class="' . $satis_kar_zarar_class . '">' . convertCurrencyToTRY($satis_kar_zarar) . '</td>';
-                $output .= '<td>Satıldı (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
+                $output .= '<td class="text-center">Satıldı (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
                 $output .= '</tr>';
             }
         } else {
