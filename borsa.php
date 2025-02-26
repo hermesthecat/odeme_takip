@@ -156,11 +156,11 @@ $user_default_currency = $_SESSION['base_currency'];
                                 <th>Lot</th>
                                 <th>Alış</th>
                                 <th class="text-center">Güncel</th>
-                                <th>Ort. Alış</th>
-                                <th class="text-center">Maliyet</th>
+                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Ortalama Alış Fiyatı = Toplam Alış Maliyeti / Toplam Alış Lot Sayısı">Ort. Alış</th>
+                                <th class="text-center" data-bs-toggle="tooltip" data-bs-placement="top" title="Maliyet = Kalan Adetlerin Toplam Maliyeti / Toplam Alış Maliyeti">Maliyet</th>
                                 <th>Güncel Değer</th>
-                                <th>Kar/Zarar</th>
-                                <th>Satış Karı</th>
+                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Kar/Zarar = (Güncel Fiyat - Ortalama Alış Fiyatı) × Lot Sayısı">Kar/Zarar</th>
+                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Satış Karı = (Satış Fiyatı - Alış Fiyatı) x Satılan Lot Sayısı">Satış Karı</th>
                                 <th>İşlemler</th>
                             </tr>
                         </thead>

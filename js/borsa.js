@@ -651,6 +651,12 @@ window.onload = function () {
         document.body.setAttribute('data-theme', savedTheme);
     }
 
+    // Bootstrap tooltip'lerini initialize et
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
     portfoyGuncelle();
     setInterval(portfoyGuncelle, 300000);
 };

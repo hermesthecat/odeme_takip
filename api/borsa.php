@@ -311,7 +311,7 @@ function portfoyListele()
 
         // Satış kayıtları tablosu - sağ taraf
         $output .= '<div class="col-md-6">';
-        $output .= '<h6 class="mb-2">Satış Kayıtları</h6>';
+        $output .= '<h6 class="mb-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Bu tablo, satılan hisselerin alış ve satış bilgilerini gösterir">Satış Kayıtları</h6>';
         $output .= '<table class="table table-sm">';
         $output .= '<thead class="table-light">';
         $output .= '<tr>';
@@ -319,7 +319,7 @@ function portfoyListele()
         $output .= '<th>Lot</th>';
         $output .= '<th>Alış Fiyatı</th>';
         $output .= '<th>Satış Fiyatı</th>';
-        $output .= '<th>Kar/Zarar</th>';
+        $output .= '<th data-bs-toggle="tooltip" data-bs-placement="top" title="Kar/Zarar = (Satış Fiyatı - Alış Fiyatı) x Satılan Lot Sayısı">Kar/Zarar</th>';
         $output .= '<th>Satış Durumu</th>';
         $output .= '</tr>';
         $output .= '</thead>';
