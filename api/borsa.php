@@ -657,125 +657,111 @@ function hisseAra($aranan)
 }
 
 /**
- * Hisse satış kaydı ekler (FIFO mantığı ile)
+ * Hisse satışı yapar
  */
-function hisseSat($id, $satis_adet, $satis_fiyati)
+function hisseSat($id, $adet, $fiyat)
 {
     global $pdo;
+    $user_id = $_SESSION['user_id'];
+
     try {
-        // İşlemi transaction içinde yap
+        // Satılacak hisseleri al
+        $ids = explode(',', $id);
+        $toplam_satilan_adet = 0;
+        $toplam_satis_kar = 0;
+
+        // İşlemi başlat
         $pdo->beginTransaction();
 
-        // Önce satılacak hissenin sembolünü bul
-        $sql = "SELECT sembol FROM portfolio WHERE id = :id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['id' => $id]);
-        $sembol = $stmt->fetchColumn();
+        foreach ($ids as $hisse_id) {
+            // Hisse bilgilerini al
+            $sql = "SELECT * FROM portfolio WHERE id = :id AND user_id = :user_id";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute(['id' => $hisse_id, 'user_id' => $user_id]);
+            $hisse = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$sembol) {
-            throw new Exception("Hisse bulunamadı");
-        }
+            if (!$hisse) {
+                continue;
+            }
 
-        // Bu sembole ait tüm aktif kayıtları alış tarihine göre sırala (FIFO)
-        $sql = "SELECT * FROM portfolio 
-                    WHERE sembol = :sembol 
-                    AND (durum = 'aktif' OR durum = 'kismi_satildi')
-                    ORDER BY alis_tarihi ASC";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['sembol' => $sembol]);
-        $kayitlar = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // Satılacak adet, kalan adetten fazla olamaz
+            $satilacak_adet = min($adet - $toplam_satilan_adet, $hisse['adet']);
+            if ($satilacak_adet <= 0) {
+                continue;
+            }
 
-        $kalan_satis_adet = $satis_adet;
+            // Satış karını hesapla
+            $satis_kar = ($fiyat - $hisse['alis_fiyati']) * $satilacak_adet;
+            $toplam_satis_kar += $satis_kar;
 
-        foreach ($kayitlar as $kayit) {
-            // Her kayıt için satılabilecek maksimum adedi hesapla
-            $mevcut_satis = $kayit['satis_adet'] ? $kayit['satis_adet'] : 0;
-            $satilabilir_adet = $kayit['adet'] - $mevcut_satis;
+            // Kalan adet
+            $kalan_adet = $hisse['adet'] - $satilacak_adet;
 
-            if ($satilabilir_adet <= 0) continue;
-
-            // Bu kayıttan satılacak adedi belirle
-            $bu_satis_adet = min($kalan_satis_adet, $satilabilir_adet);
-
-            if ($bu_satis_adet <= 0) break;
-
-            // Satış durumunu belirle
-            $yeni_durum = ($bu_satis_adet + $mevcut_satis == $kayit['adet']) ? 'satildi' : 'kismi_satildi';
-
-            // Satış kaydını güncelle
-            $sql = "UPDATE portfolio SET 
-                        satis_fiyati = :satis_fiyati,
-                        satis_tarihi = CURRENT_TIMESTAMP,
-                        satis_adet = IFNULL(satis_adet, 0) + :satis_adet,
-                        durum = :durum
+            if ($kalan_adet > 0) {
+                // Kısmi satış - mevcut kaydı güncelle
+                $sql = "UPDATE portfolio 
+                        SET adet = :kalan_adet, 
+                            durum = 'kismi_satis', 
+                            son_guncelleme = NOW() 
                         WHERE id = :id";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([
+                    'kalan_adet' => $kalan_adet,
+                    'id' => $hisse_id
+                ]);
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                'satis_fiyati' => $satis_fiyati,
-                'satis_adet' => $bu_satis_adet,
-                'durum' => $yeni_durum,
-                'id' => $kayit['id']
-            ]);
+                // Satış kaydı oluştur
+                $sql = "INSERT INTO portfolio 
+                        (user_id, sembol, hisse_adi, adet, alis_fiyati, alis_tarihi, satis_fiyati, satis_tarihi, durum, anlik_fiyat, son_guncelleme) 
+                        VALUES 
+                        (:user_id, :sembol, :hisse_adi, :adet, :alis_fiyati, :alis_tarihi, :satis_fiyati, NOW(), 'satis_kaydi', :anlik_fiyat, NOW())";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([
+                    'user_id' => $user_id,
+                    'sembol' => $hisse['sembol'],
+                    'hisse_adi' => $hisse['hisse_adi'],
+                    'adet' => $satilacak_adet,
+                    'alis_fiyati' => $hisse['alis_fiyati'],
+                    'alis_tarihi' => $hisse['alis_tarihi'],
+                    'satis_fiyati' => $fiyat,
+                    'anlik_fiyat' => $hisse['anlik_fiyat']
+                ]);
+            } else {
+                // Tam satış - durumu satıldı olarak güncelle
+                $sql = "UPDATE portfolio 
+                        SET adet = 0, 
+                            durum = 'satildi', 
+                            satis_fiyati = :satis_fiyati, 
+                            satis_tarihi = NOW(), 
+                            son_guncelleme = NOW() 
+                        WHERE id = :id";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([
+                    'satis_fiyati' => $fiyat,
+                    'id' => $hisse_id
+                ]);
+            }
 
-            // YENİ: Satış kaydını ayrı bir kayıt olarak ekle
-            $sql = "INSERT INTO portfolio (
-                        sembol, 
-                        adet, 
-                        alis_fiyati, 
-                        alis_tarihi,
-                        anlik_fiyat,
-                        hisse_adi,
-                        user_id,
-                        durum,
-                        satis_fiyati,
-                        satis_tarihi,
-                        satis_adet,
-                        referans_alis_id
-                    ) VALUES (
-                        :sembol,
-                        :adet,
-                        :alis_fiyati,
-                        :alis_tarihi,
-                        :anlik_fiyat,
-                        :hisse_adi,
-                        :user_id,
-                        'satis_kaydi',
-                        :satis_fiyati,
-                        CURRENT_TIMESTAMP,
-                        :satis_adet,
-                        :referans_alis_id
-                    )";
+            $toplam_satilan_adet += $satilacak_adet;
 
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([
-                'sembol' => $kayit['sembol'],
-                'adet' => $bu_satis_adet,
-                'alis_fiyati' => $kayit['alis_fiyati'],
-                'alis_tarihi' => $kayit['alis_tarihi'],
-                'anlik_fiyat' => $kayit['anlik_fiyat'],
-                'hisse_adi' => $kayit['hisse_adi'],
-                'user_id' => $kayit['user_id'],
-                'satis_fiyati' => $satis_fiyati,
-                'satis_adet' => $bu_satis_adet,
-                'referans_alis_id' => $kayit['id']
-            ]);
-
-            $kalan_satis_adet -= $bu_satis_adet;
-
-            saveLog("Satış kaydı eklendi - ID: {$kayit['id']} <br> Adet: $bu_satis_adet <br> Fiyat: $satis_fiyati", 'info', 'hisseSat', $_SESSION['user_id']);
-
-            if ($kalan_satis_adet <= 0) break;
+            // Tüm adet satıldıysa döngüden çık
+            if ($toplam_satilan_adet >= $adet) {
+                break;
+            }
         }
 
-        if ($kalan_satis_adet > 0) {
-            saveLog("Yeterli satılabilir hisse bulunamadı - Kalan adet: $kalan_satis_adet", 'error', 'hisseSat', $_SESSION['user_id']);
-            return false;
-        }
-
+        // İşlemi tamamla
         $pdo->commit();
+
+        // Log
+        saveLog("Hisse satışı başarılı - Toplam Satılan Adet: " . $toplam_satilan_adet . 
+                " | Satış Fiyatı: " . $fiyat . 
+                " | Toplam Satış Karı: " . $toplam_satis_kar, 
+                'info', 'hisseSat', $user_id);
+
         return true;
     } catch (Exception $e) {
+        // Hata durumunda işlemi geri al
         $pdo->rollBack();
         saveLog("Satış hatası: " . $e->getMessage(), 'error', 'hisseSat', $_SESSION['user_id']);
         return false;
@@ -791,8 +777,20 @@ function satisKariHesapla($kayit)
         return null;
     }
 
-    $satis_adet = $kayit['satis_adet'] ?? 0;
+    // Satış adedini doğru şekilde al
+    $satis_adet = $kayit['satis_adet'] ?? $kayit['adet'] ?? 0;
+    
+    // Kar hesaplaması: (Satış Fiyatı - Alış Fiyatı) * Satılan Lot Sayısı
     $kar = ($kayit['satis_fiyati'] - $kayit['alis_fiyati']) * $satis_adet;
+    
+    // Debug log
+    saveLog("Satış Karı Hesaplama - Hisse: " . $kayit['sembol'] . 
+            " | Alış Fiyatı: " . $kayit['alis_fiyati'] . 
+            " | Satış Fiyatı: " . $kayit['satis_fiyati'] . 
+            " | Satış Adedi: " . $satis_adet . 
+            " | Hesaplanan Kar: " . $kar, 
+            'info', 'satisKariHesapla', $_SESSION['user_id']);
+    
     return $kar;
 }
 

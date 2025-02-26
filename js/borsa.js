@@ -185,41 +185,89 @@ function maliDurumGrafigiGuncelle(portfoyData) {
     let totalKarZarar = 0;
     let totalSatisKar = 0;
 
-    // Tüm satış detaylarını topla
-    document.querySelectorAll('.table-light').forEach(satisDetay => {
-        const karZararHucresi = satisDetay.querySelector('td.kar, td.zarar');
-        if (karZararHucresi) {
-            const karZararText = karZararHucresi.textContent.trim();
-            const karZararDeger = parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
-            if (!isNaN(karZararDeger)) {
-                totalSatisKar += karZararDeger;
-            }
+    // Tüm satış detaylarını topla - Satış karı hesaplama yöntemini iyileştir
+    document.querySelectorAll('.detay-satir').forEach(detaySatir => {
+        // Satış kayıtları tablosunu bul
+        const satisKayitlariBaslik = detaySatir.querySelector('h6.mb-2');
+        if (satisKayitlariBaslik && satisKayitlariBaslik.textContent.includes('Satış Kayıtları')) {
+            // Satış kayıtları tablosundaki tüm satırları bul
+            const satisKayitlari = detaySatir.querySelectorAll('table tbody tr');
+            
+            satisKayitlari.forEach(satisKaydi => {
+                // Satış durumu "Satıldı" olan kayıtları kontrol et
+                const satisDurumu = satisKaydi.querySelector('td:nth-child(6)');
+                if (satisDurumu && satisDurumu.textContent.includes('Satıldı')) {
+                    // Kar/zarar hücresini bul (5. sütun)
+                    const karZararHucresi = satisKaydi.querySelector('td:nth-child(5)');
+                    if (karZararHucresi) {
+                        const karZararText = karZararHucresi.textContent.trim();
+                        // Sayısal değeri çıkar (₺ ve diğer karakterleri temizle)
+                        let karZararDeger = karZararText.replace(/[^0-9,.-]+/g, "").replace('.', '').replace(',', '.');
+                        karZararDeger = parseFloat(karZararDeger);
+                        console.log('Satış Karı Değeri:', karZararText, karZararDeger);
+                        if (!isNaN(karZararDeger)) {
+                            totalSatisKar += karZararDeger;
+                        }
+                    }
+                }
+            });
         }
     });
 
     // Aktif hisselerin kar/zararını topla
-    document.querySelectorAll('.ana-satir td:nth-child(5)').forEach(hucre => {
-        const karZararText = hucre.textContent.trim();
-        const karZararDeger = parseFloat(karZararText.replace(/[^0-9.-]+/g, ""));
-        if (!isNaN(karZararDeger)) {
-            totalKarZarar += karZararDeger;
+    document.querySelectorAll('.ana-satir').forEach(anaSatir => {
+        const karZararHucresi = anaSatir.querySelector('td:nth-child(8)'); // Kar/Zarar sütunu
+        if (karZararHucresi) {
+            const karZararText = karZararHucresi.textContent.trim();
+            // Türkçe para birimi formatını düzgün şekilde parse et
+            let karZararDeger = karZararText.replace(/[^0-9,.-]+/g, "").replace('.', '').replace(',', '.');
+            karZararDeger = parseFloat(karZararDeger);
+            console.log('Kar/Zarar Değeri:', karZararText, karZararDeger);
+            if (!isNaN(karZararDeger)) {
+                totalKarZarar += karZararDeger;
+            }
         }
     });
 
-    document.getElementById('toplamKarZarar').textContent =
-        new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: 'TRY'
-        }).format(totalKarZarar);
-    document.getElementById('toplamSatisKar').textContent =
-        new Intl.NumberFormat('tr-TR', {
-            style: 'currency',
-            currency: 'TRY'
-        }).format(totalSatisKar);
+    // Değerleri formatlayarak göster
+    const karZararElement = document.getElementById('toplamKarZarar');
+    const satisKarElement = document.getElementById('toplamSatisKar');
+
+    karZararElement.textContent = new Intl.NumberFormat('tr-TR', {
+        style: 'currency',
+        currency: 'TRY'
+    }).format(totalKarZarar);
+
+    satisKarElement.textContent = new Intl.NumberFormat('tr-TR', {
+        style: 'currency',
+        currency: 'TRY'
+    }).format(totalSatisKar);
 
     // Renk sınıflarını güncelle
-    document.getElementById('toplamKarZarar').className = totalKarZarar >= 0 ? 'text-success' : 'text-danger';
-    document.getElementById('toplamSatisKar').className = totalSatisKar >= 0 ? 'text-success' : 'text-danger';
+    karZararElement.className = totalKarZarar >= 0 ? 'text-success mb-0 mt-2' : 'text-danger mb-0 mt-2';
+    satisKarElement.className = totalSatisKar >= 0 ? 'text-success mb-0 mt-2' : 'text-danger mb-0 mt-2';
+
+    // Kar/zarar ikonlarını güncelle
+    const karZararIcon = document.querySelector('.mali-ozet-ikon .fa-chart-line');
+    const satisKarIcon = document.querySelector('.mali-ozet-ikon .fa-money-bill-wave');
+    const karZararIconContainer = karZararIcon.closest('.mali-ozet-ikon');
+    const satisKarIconContainer = satisKarIcon.closest('.mali-ozet-ikon');
+
+    if (totalKarZarar >= 0) {
+        karZararIcon.className = 'fas fa-chart-line text-success';
+        karZararIconContainer.className = 'mali-ozet-ikon bg-success bg-opacity-10 rounded-circle p-2 me-2';
+    } else {
+        karZararIcon.className = 'fas fa-chart-line text-danger';
+        karZararIconContainer.className = 'mali-ozet-ikon bg-danger bg-opacity-10 rounded-circle p-2 me-2';
+    }
+
+    if (totalSatisKar >= 0) {
+        satisKarIcon.className = 'fas fa-money-bill-wave text-success';
+        satisKarIconContainer.className = 'mali-ozet-ikon bg-success bg-opacity-10 rounded-circle p-2 me-2';
+    } else {
+        satisKarIcon.className = 'fas fa-money-bill-wave text-danger';
+        satisKarIconContainer.className = 'mali-ozet-ikon bg-danger bg-opacity-10 rounded-circle p-2 me-2';
+    }
 }
 
 // Portföy güncelleme fonksiyonunu güncelle

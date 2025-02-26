@@ -110,32 +110,49 @@ $user_default_currency = $_SESSION['base_currency'];
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Mali Durum Özeti</span>
-
                 </div>
                 <div class="collapse show" id="maliDurumDetay">
-                    <div class="card-body py-2">
-                        <div class="row g-2">
+                    <div class="card-body py-3">
+                        <div class="row g-3">
                             <div class="col-md-5">
-                                <canvas id="maliDurumGrafik" style="max-height: 200px;"></canvas>
+                                <canvas id="maliDurumGrafik" style="max-height: 220px;"></canvas>
                             </div>
                             <div class="col-md-7">
-                                <div class="row row-cols-1 row-cols-md-3 g-2">
+                                <div class="row row-cols-1 row-cols-md-3 g-3">
                                     <div class="col">
-                                        <div class="border rounded p-2 h-100">
-                                            <small class="text-muted d-block">Portföy Değeri</small>
-                                            <h5 id="toplamPortfoyDeger" class="mb-0 mt-1">0.00</h5>
+                                        <div class="mali-ozet-kart border rounded p-3 h-100 shadow-sm">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="mali-ozet-ikon bg-primary bg-opacity-10 rounded-circle p-2 me-2">
+                                                    <i class="fas fa-wallet text-primary"></i>
+                                                </div>
+                                                <h6 class="mb-0">Portföy Değeri</h6>
+                                            </div>
+                                            <h4 id="toplamPortfoyDeger" class="mb-0 mt-2">0.00</h4>
+                                            <small class="text-muted">Güncel piyasa değeri</small>
                                         </div>
                                     </div>
                                     <div class="col">
-                                        <div class="border rounded p-2 h-100">
-                                            <small class="text-muted d-block">Kar/Zarar</small>
-                                            <h5 id="toplamKarZarar" class="mb-0 mt-1">0.00</h5>
+                                        <div class="mali-ozet-kart border rounded p-3 h-100 shadow-sm">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="mali-ozet-ikon bg-info bg-opacity-10 rounded-circle p-2 me-2">
+                                                    <i class="fas fa-chart-line text-info"></i>
+                                                </div>
+                                                <h6 class="mb-0">Kar/Zarar</h6>
+                                            </div>
+                                            <h4 id="toplamKarZarar" class="mb-0 mt-2">0.00</h4>
+                                            <small class="text-muted">Güncel değere göre</small>
                                         </div>
                                     </div>
                                     <div class="col">
-                                        <div class="border rounded p-2 h-100">
-                                            <small class="text-muted d-block">Gerçekleşen K/Z</small>
-                                            <h5 id="toplamSatisKar" class="mb-0 mt-1">0.00</h5>
+                                        <div class="mali-ozet-kart border rounded p-3 h-100 shadow-sm">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <div class="mali-ozet-ikon bg-success bg-opacity-10 rounded-circle p-2 me-2">
+                                                    <i class="fas fa-money-bill-wave text-success"></i>
+                                                </div>
+                                                <h6 class="mb-0">Gerçekleşen K/Z</h6>
+                                            </div>
+                                            <h4 id="toplamSatisKar" class="mb-0 mt-2">0.00</h4>
+                                            <small class="text-muted">Satış işlemlerinden</small>
                                         </div>
                                     </div>
                                 </div>

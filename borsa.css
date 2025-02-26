@@ -581,3 +581,65 @@ td.zarar.satis-kar {
     border-color: #ff6b6b !important;
     color: #ffffff !important;
 }
+
+/* Mali durum özeti kartları için stiller */
+.mali-ozet-kart {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.mali-ozet-kart:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.mali-ozet-ikon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mali-ozet-ikon i {
+    font-size: 1.2rem;
+}
+
+/* Dark mode için mali durum özeti kartları */
+[data-theme="dark"] .mali-ozet-kart {
+    background-color: #343a40;
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .mali-ozet-ikon.bg-primary.bg-opacity-10 {
+    background-color: rgba(13, 110, 253, 0.2) !important;
+}
+
+[data-theme="dark"] .mali-ozet-ikon.bg-info.bg-opacity-10 {
+    background-color: rgba(13, 202, 240, 0.2) !important;
+}
+
+[data-theme="dark"] .mali-ozet-ikon.bg-success.bg-opacity-10 {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+}
+
+[data-theme="dark"] .mali-ozet-ikon.bg-danger.bg-opacity-10 {
+    background-color: rgba(220, 53, 69, 0.2) !important;
+}
+
+/* Mali durum özeti kartları için animasyon */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+    }
+}
+
+.mali-ozet-kart:hover .mali-ozet-ikon {
+    animation: pulse 1.5s infinite;
+}
