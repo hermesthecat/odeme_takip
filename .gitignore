@@ -4,7 +4,7 @@
 .roomodes
 memory-bank/
 projectBrief.md
-specstory/
+.specstory/
 .vscode/
 .idea/
 .env
