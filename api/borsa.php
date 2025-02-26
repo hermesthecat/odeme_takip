@@ -78,13 +78,14 @@ function portfoyListele()
                     WHEN durum = 'aktif' THEN adet 
                     WHEN durum = 'kismi_satildi' THEN (adet - satis_adet) 
                     ELSE 0 
-                END) as toplam_adet, 
+                END) as toplam_adet,
+                CASE WHEN SUM(CASE WHEN durum = 'satildi' OR durum = 'kismi_satildi' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END as has_sold,
                 MAX(anlik_fiyat) as anlik_fiyat, 
                 MAX(hisse_adi) as hisse_adi
             FROM portfolio 
             WHERE user_id = :user_id 
             GROUP BY sembol 
-            HAVING toplam_adet > 0
+            HAVING toplam_adet > 0 OR has_sold = 1
             ORDER BY sembol ASC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['user_id' => $user_id]);
@@ -95,6 +96,7 @@ function portfoyListele()
         $sembol = $hisse['sembol'];
         $ids = $hisse['ids'];
         $toplam_adet = $hisse['toplam_adet'];
+        $has_sold = $hisse['has_sold'];
         $anlik_fiyat = $hisse['anlik_fiyat'];
         $hisse_adi = $hisse['hisse_adi'] ?: $sembol;
         $son_guncelleme = $hisse['son_guncelleme'];
@@ -139,7 +141,14 @@ function portfoyListele()
 
         // Ana satır
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
-        $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small></td>';
+        $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small>';
+        
+        // Tamamen satılmış hisseler için etiket ekle
+        if ($toplam_adet == 0 && $has_sold == 1) {
+            $output .= ' <span class="badge bg-secondary">Tamamen Satıldı</span>';
+        }
+        
+        $output .= '</td>';
         $output .= '<td class="adet">' . $toplam_adet . '</td>';
         $output .= '<td class="alis-fiyat">' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
         $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
@@ -148,7 +157,12 @@ function portfoyListele()
         $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
         $output .= '<td>';
-        $output .= '<button class="btn btn-sm btn-success me-1" onclick="topluSatisFormunuGoster(\'' . $sembol . '\', ' . $anlik_fiyat . ', event)">Sat</button>';
+        
+        // Tamamen satılmış hisseler için satış butonunu gizle
+        if ($toplam_adet > 0) {
+            $output .= '<button class="btn btn-sm btn-success me-1" onclick="topluSatisFormunuGoster(\'' . $sembol . '\', ' . $anlik_fiyat . ', event)">Sat</button>';
+        }
+        
         $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(\'' . $ids . '\', event)">Tümünü Sil</button>';
         $output .= '</td>';
         $output .= '</tr>';
