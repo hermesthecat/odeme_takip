@@ -71,26 +71,33 @@ function portfoyListele()
 
     // Portföydeki benzersiz hisseleri getir
     $sql = "SELECT 
-                sembol, 
-                son_guncelleme, 
-                GROUP_CONCAT(id) as ids, 
+                p.sembol, 
+                p.son_guncelleme, 
+                GROUP_CONCAT(p.id) as ids, 
                 SUM(CASE 
-                    WHEN durum = 'aktif' THEN adet 
-                    WHEN durum = 'kismi_satildi' THEN (adet - satis_adet) 
+                    WHEN p.durum = 'aktif' THEN p.adet 
+                    WHEN p.durum = 'kismi_satildi' THEN (
+                        p.adet - IFNULL((
+                            SELECT SUM(s.adet) 
+                            FROM portfolio s 
+                            WHERE s.durum = 'satis_kaydi' 
+                            AND s.referans_alis_id = p.id
+                        ), 0)
+                    )
                     ELSE 0 
                 END) as toplam_adet,
                 SUM(CASE 
-                    WHEN durum != 'satis_kaydi' THEN adet 
+                    WHEN p.durum != 'satis_kaydi' THEN p.adet 
                     ELSE 0 
                 END) as toplam_alis_adet,
-                CASE WHEN SUM(CASE WHEN durum = 'satildi' OR durum = 'kismi_satildi' OR durum = 'satis_kaydi' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END as has_sold,
-                MAX(anlik_fiyat) as anlik_fiyat, 
-                MAX(hisse_adi) as hisse_adi
-            FROM portfolio 
-            WHERE user_id = :user_id 
-            GROUP BY sembol 
+                CASE WHEN SUM(CASE WHEN p.durum = 'satildi' OR p.durum = 'kismi_satildi' OR p.durum = 'satis_kaydi' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END as has_sold,
+                MAX(p.anlik_fiyat) as anlik_fiyat, 
+                MAX(p.hisse_adi) as hisse_adi
+            FROM portfolio p
+            WHERE p.user_id = :user_id 
+            GROUP BY p.sembol 
             HAVING toplam_adet > 0 OR has_sold = 1
-            ORDER BY sembol ASC";
+            ORDER BY p.sembol ASC";
     $stmt = $pdo->prepare($sql);
     $stmt->execute(['user_id' => $user_id]);
     $hisseler = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -124,7 +131,17 @@ function portfoyListele()
         foreach ($alislar as $alis) {
             // Aktif veya kısmen satılmış hisseler için mevcut değerleri hesapla
             if ($alis['durum'] == 'aktif' || $alis['durum'] == 'kismi_satildi') {
-                $kalan_adet = $alis['durum'] == 'kismi_satildi' ? $alis['adet'] - $alis['satis_adet'] : $alis['adet'];
+                // Satış kayıtlarından satılan adet miktarını hesapla
+                $sql = "SELECT IFNULL(SUM(adet), 0) as toplam_satilan
+                        FROM portfolio 
+                        WHERE durum = 'satis_kaydi' 
+                        AND referans_alis_id = :referans_id";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute(['referans_id' => $alis['id']]);
+                $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
+                $satilan_adet = $satilan['toplam_satilan'];
+                
+                $kalan_adet = $alis['adet'] - $satilan_adet;
                 $toplam_maliyet += $alis['alis_fiyati'] * $kalan_adet;
                 $toplam_aktif_adet += $kalan_adet;
             }
@@ -295,7 +312,17 @@ function portfoyListele()
                 $kalan_adet = $alis['adet'];
                 $durum_badge = '<span class="badge bg-success">Aktif</span>';
             } else if ($alis['durum'] == 'kismi_satildi') {
-                $kalan_adet = $alis['adet'] - $alis['satis_adet'];
+                // Satış kayıtlarından satılan adet miktarını hesapla
+                $sql = "SELECT IFNULL(SUM(adet), 0) as toplam_satilan
+                        FROM portfolio 
+                        WHERE durum = 'satis_kaydi' 
+                        AND referans_alis_id = :referans_id";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute(['referans_id' => $alis['id']]);
+                $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
+                $satilan_adet = $satilan['toplam_satilan'];
+                
+                $kalan_adet = $alis['adet'] - $satilan_adet;
                 $durum_badge = '<span class="badge bg-secondary">Kısmi Satış</span>';
             } else if ($alis['durum'] == 'satildi') {
                 $kalan_adet = 0;
@@ -723,12 +750,10 @@ function hisseSat($id, $adet, $fiyat)
             if ($kalan_adet > 0) {
                 // Kısmi satış - mevcut kaydı güncelle
                 $sql = "UPDATE portfolio 
-                        SET durum = 'kismi_satildi', 
-                            satis_adet = :satis_adet
+                        SET durum = 'kismi_satildi'
                         WHERE id = :id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
-                    'satis_adet' => $satilacak_adet,
                     'id' => $hisse_id
                 ]);
 
@@ -754,13 +779,11 @@ function hisseSat($id, $adet, $fiyat)
                 $sql = "UPDATE portfolio 
                         SET durum = 'satildi', 
                             satis_fiyati = :satis_fiyati, 
-                            satis_tarihi = NOW(),
-                            satis_adet = :satis_adet
+                            satis_tarihi = NOW()
                         WHERE id = :id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
                     'satis_fiyati' => $fiyat,
-                    'satis_adet' => $satilacak_adet,
                     'id' => $hisse_id
                 ]);
                 
