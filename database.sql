@@ -202,7 +202,12 @@ CREATE TABLE `portfolio` (
     `satis_fiyati` decimal(10, 2) DEFAULT NULL,
     `satis_tarihi` timestamp NULL DEFAULT NULL,
     `satis_adet` int(11) DEFAULT NULL,
-    `durum` enum('aktif', 'satildi', 'kismi_satildi', 'satis_kaydi') DEFAULT 'aktif',
+    `durum` enum(
+        'aktif',
+        'satildi',
+        'kismi_satildi',
+        'satis_kaydi'
+    ) DEFAULT 'aktif',
     `user_id` int(11) DEFAULT NULL,
     `referans_alis_id` int(11) DEFAULT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;

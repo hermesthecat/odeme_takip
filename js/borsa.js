@@ -210,7 +210,7 @@ function maliDurumGrafigiGuncelle(portfoyData) {
         if (satisKayitlariBaslik && satisKayitlariBaslik.textContent.includes('Satış Kayıtları')) {
             // Satış kayıtları tablosundaki tüm satırları bul
             const satisKayitlari = detaySatir.querySelectorAll('table tbody tr');
-            
+
             satisKayitlari.forEach(satisKaydi => {
                 // Satış durumu "Satıldı" olan kayıtları kontrol et
                 const satisDurumu = satisKaydi.querySelector('td:nth-child(6)');
@@ -314,7 +314,7 @@ function portfoyGuncelle() {
 
             // Mali durum grafiğini güncelle
             maliDurumGrafigiGuncelle(portfoyData);
-            
+
             // Tooltip'leri yeniden initialize et
             const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             tooltipTriggerList.map(function (tooltipTriggerEl) {

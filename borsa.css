@@ -590,7 +590,7 @@ td.zarar.satis-kar {
 
 .mali-ozet-kart:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
 .mali-ozet-ikon {
@@ -632,9 +632,11 @@ td.zarar.satis-kar {
     0% {
         box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.4);
     }
+
     70% {
         box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
     }
+
     100% {
         box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
     }

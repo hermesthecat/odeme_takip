@@ -53,7 +53,7 @@ function hisseSil($id)
 {
     global $pdo;
     $user_id = $_SESSION['user_id'];
-    
+
     // Hata ayıklama için gelen ID'yi logla
     saveLog("hisseSil fonksiyonu çağrıldı - Gelen ID: " . $id, 'info', 'hisseSil', $user_id);
 
@@ -71,7 +71,7 @@ function hisseSil($id)
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         // Eğer bulunan kayıt sayısı, silinmek istenen ID sayısına eşit değilse
         // bu, bazı ID'lerin kullanıcıya ait olmadığı anlamına gelir
         if ($result['count'] != count($ids)) {
@@ -775,7 +775,7 @@ function hisseSat($id, $adet, $fiyat)
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         // Eğer bulunan kayıt sayısı, satılmak istenen ID sayısına eşit değilse
         // bu, bazı ID'lerin kullanıcıya ait olmadığı anlamına gelir
         if ($result['count'] != count($ids)) {
