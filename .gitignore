@@ -5,3 +5,7 @@
 memory-bank/
 projectBrief.md
 specstory/
+.vscode/
+.idea/
+.env
+.env.local
