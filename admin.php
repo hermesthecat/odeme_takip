@@ -83,6 +83,57 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="style.css" />
+    <style>
+        /* Dark Mode Stilleri */
+        [data-theme="dark"] {
+            --bs-body-bg: #212529;
+            --bs-body-color: #f8f9fa;
+            --bs-card-bg: #343a40;
+            --bs-card-border-color: #495057;
+            --bs-table-color: #f8f9fa;
+            --bs-table-bg: #343a40;
+            --bs-table-border-color: #495057;
+            --bs-modal-bg: #343a40;
+            --bs-modal-border-color: #495057;
+            --bs-modal-color: #f8f9fa;
+        }
+
+        [data-theme="dark"] .card {
+            background-color: var(--bs-card-bg);
+            border-color: var(--bs-card-border-color);
+            color: var(--bs-body-color);
+        }
+
+        [data-theme="dark"] .table {
+            color: var(--bs-table-color);
+            background-color: var(--bs-table-bg);
+            border-color: var(--bs-table-border-color);
+        }
+
+        [data-theme="dark"] .modal-content {
+            background-color: var(--bs-modal-bg);
+            border-color: var(--bs-modal-border-color);
+            color: var(--bs-modal-color);
+        }
+
+        [data-theme="dark"] .form-control,
+        [data-theme="dark"] .form-select {
+            background-color: #495057;
+            border-color: #6c757d;
+            color: #f8f9fa;
+        }
+
+        [data-theme="dark"] .form-control:focus,
+        [data-theme="dark"] .form-select:focus {
+            background-color: #495057;
+            border-color: #0d6efd;
+            color: #f8f9fa;
+        }
+
+        [data-theme="dark"] .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+    </style>
 </head>
 
 <body>
@@ -328,16 +379,6 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="js/utils.js"></script>
     <script src="js/theme.js"></script>
     <script>
-        // Kullanıcı modalını göster
-        function showAddUserModal() {
-            document.getElementById('userForm').reset();
-            document.getElementById('userId').value = '';
-            document.getElementById('userModalTitle').textContent = 'Yeni Kullanıcı Ekle';
-            document.getElementById('modalPassword').required = true;
-            const modal = new bootstrap.Modal(document.getElementById('userModal'));
-            modal.show();
-        }
-
         // Kullanıcı düzenleme
         function editUser(id) {
             fetch(`api/admin.php?action=get_user&id=${id}`)
@@ -446,6 +487,13 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                         });
                 }
             });
+        }
+
+        // Tema ayarını uygula
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.body.setAttribute('data-theme', savedTheme);
         }
 
         // Çıkış işlemi
