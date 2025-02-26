@@ -54,6 +54,7 @@ b. Query Patterns:
 - Aggregate calculations
 - Status tracking
 - Currency conversion handling
+- History tracking with timestamps
 
 ### 4. Validation Pattern
 ```php
@@ -121,8 +122,67 @@ $response = [
 ];
 ```
 
+### 10. History Tracking Pattern
+```php
+// Save history record
+function saveHistory($table, $record_id, $action, $data) {
+    $stmt = $pdo->prepare("INSERT INTO {$table}_history (...) VALUES (...)");
+    $stmt->execute([...]);
+}
+
+// Retrieve history
+function getHistory($table, $record_id) {
+    $stmt = $pdo->prepare("SELECT * FROM {$table}_history WHERE record_id = ?");
+    return $stmt->execute([$record_id]);
+}
+```
+
 ## Frontend Architecture
-[Previous Frontend Architecture Content...]
+
+### 1. Module Organization
+```javascript
+// Feature modules
+const featureModule = {
+    init() {
+        this.bindEvents();
+        this.loadInitialData();
+    },
+    bindEvents() {
+        // Event handlers
+    },
+    loadInitialData() {
+        // Initial data loading
+    }
+};
+```
+
+### 2. API Integration
+```javascript
+// Standard API request
+ajaxRequest({
+    action: 'action_name',
+    data: requestData,
+    success: (response) => {
+        // Handle success
+    },
+    error: (error) => {
+        // Handle error
+    }
+});
+```
+
+### 3. UI Components
+```javascript
+// Modal management
+function showModal(modalId, data) {
+    // Populate and show modal
+}
+
+// Form handling
+function handleForm(formId, submitCallback) {
+    // Form validation and submission
+}
+```
 
 ## Code Organization
 ```
@@ -158,25 +218,7 @@ $response = [
    - created_at timestamp
    - parent-child relationships
    - status tracking
-
-## API Integration Patterns
-
-### 1. Request Pattern
-```javascript
-ajaxRequest({
-    action: 'action_name',
-    ...params
-})
-```
-
-### 2. Response Pattern
-```php
-[
-    'status' => 'success|error',
-    'message' => 'translated_message',
-    'data' => []
-]
-```
+   - history tracking
 
 ## Security Patterns
 
@@ -204,12 +246,14 @@ ajaxRequest({
 - Rate limiting
 - Cache implementation
 - Background job handling
+- Enhanced history tracking
 
 ### 2. Database Optimization
 - Index optimization
 - Query optimization
 - Connection pooling
 - Sharding strategy
+- History table partitioning
 
 ### 3. Security Enhancements
 - API authentication
