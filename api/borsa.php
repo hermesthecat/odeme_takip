@@ -79,6 +79,10 @@ function portfoyListele()
                     WHEN durum = 'kismi_satildi' THEN (adet - satis_adet) 
                     ELSE 0 
                 END) as toplam_adet,
+                SUM(CASE 
+                    WHEN durum != 'satis_kaydi' THEN adet 
+                    ELSE 0 
+                END) as toplam_alis_adet,
                 CASE WHEN SUM(CASE WHEN durum = 'satildi' OR durum = 'kismi_satildi' OR durum = 'satis_kaydi' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END as has_sold,
                 MAX(anlik_fiyat) as anlik_fiyat, 
                 MAX(hisse_adi) as hisse_adi
@@ -96,6 +100,7 @@ function portfoyListele()
         $sembol = $hisse['sembol'];
         $ids = $hisse['ids'];
         $toplam_adet = $hisse['toplam_adet'];
+        $toplam_alis_adet = $hisse['toplam_alis_adet'];
         $has_sold = $hisse['has_sold'];
         $anlik_fiyat = $hisse['anlik_fiyat'];
         $hisse_adi = $hisse['hisse_adi'] ?: $sembol;
@@ -158,7 +163,7 @@ function portfoyListele()
         }
 
         $output .= '</td>';
-        $output .= '<td class="adet">' . $toplam_adet . '</td>';
+        $output .= '<td class="adet">' . $toplam_adet . '/' . $toplam_alis_adet . '</td>';
         $output .= '<td class="alis-fiyat">' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
         $output .= '<td class="anlik_fiyat text-center">' . convertCurrencyToTRY($anlik_fiyat) . '<br><small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
         $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
