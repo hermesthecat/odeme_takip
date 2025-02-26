@@ -154,8 +154,10 @@ $user_default_currency = $_SESSION['base_currency'];
                             <tr>
                                 <th>Hisse</th>
                                 <th>Lot</th>
-                                <th>Alış Fiyatı</th>
-                                <th>Güncel Fiyat</th>
+                                <th>Alış</th>
+                                <th>Ort. Alış</th>
+                                <th>Değeri</th>
+                                <th class="text-center">Güncel</th>
                                 <th>Kar/Zarar</th>
                                 <th>Satış Karı</th>
                                 <th>İşlemler</th>

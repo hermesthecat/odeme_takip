@@ -111,7 +111,6 @@ function portfoyListele()
         $ilk_alis_fiyati = count($alislar) > 0 ? $alislar[0]['alis_fiyati'] : 0;
         $kar_zarar = ($anlik_fiyat - $ilk_alis_fiyati) * $toplam_adet;
         $kar_zarar_class = $kar_zarar >= 0 ? 'kar' : 'zarar';
-        $kar_zarar_formatted = convertCurrencyToTRY($kar_zarar);
 
         // Satış karı hesapla
         $satis_kari = 0;
@@ -127,14 +126,15 @@ function portfoyListele()
             $satis_kari += ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
         }
         $satis_kari_class = $satis_kari >= 0 ? 'kar' : 'zarar';
-        $satis_kari_formatted = convertCurrencyToTRY($satis_kari);
 
         // Ana satır
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
         $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small></td>';
         $output .= '<td class="adet">' . $toplam_adet . '</td>';
-        $output .= '<td>' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
-        $output .= '<td class="anlik_fiyat">' . convertCurrencyToTRY($anlik_fiyat) . ' <small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
+        $output .= '<td class="alis-fiyat">' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
+        $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
+        $output .= '<td class="deger">' . convertCurrencyToTRY($anlik_fiyat * $toplam_adet) . '</td>';
+        $output .= '<td class="anlik_fiyat text-center">' . convertCurrencyToTRY($anlik_fiyat) . '<br><small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
         $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . convertCurrencyToTRY($kar_zarar) . '</td>';
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . convertCurrencyToTRY($satis_kari) . '</td>';
         $output .= '<td>';
@@ -145,7 +145,7 @@ function portfoyListele()
 
         // Detay satırı
         $output .= '<tr class="detay-satir" data-sembol="' . $sembol . '" style="display: none;">';
-        $output .= '<td colspan="7">';
+        $output .= '<td colspan="9">';
 
         // Satış formu
         $output .= "<div id='satis-form-{$sembol}' class='satis-form mb-3' style='display:none;'>
@@ -188,7 +188,7 @@ function portfoyListele()
 
         // Alış ve satış tablolarını yan yana göstermek için row oluştur
         $output .= '<div class="row">';
-        
+
         // Alış kayıtları tablosu - sol taraf
         $output .= '<div class="col-md-6">';
         $output .= '<h6 class="mb-2">Alış Kayıtları</h6>';
@@ -272,10 +272,10 @@ function portfoyListele()
         }
 
         $output .= '</tbody></table></div>';
-        
+
         // Row'u kapat
         $output .= '</div>';
-        
+
         $output .= '</td></tr>';
     }
 
