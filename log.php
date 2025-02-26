@@ -212,26 +212,40 @@ $log_type_bg_classes = [
         /* Tablo satırları için güçlü stil kuralları */
         [data-theme="dark"] body .table tbody tr {
             background-color: #343a40 !important;
+            color: rgb(0, 0, 0) !important;
         }
 
         [data-theme="dark"] body .table tbody tr[data-type="info"] {
             background-color: #0d4c66 !important;
+            color: rgb(0, 0, 0) !important;
         }
 
         [data-theme="dark"] body .table tbody tr[data-type="error"] {
             background-color: #842029 !important;
+            color: rgb(0, 0, 0) !important;
         }
 
         [data-theme="dark"] body .table tbody tr[data-type="warning"] {
             background-color: #664d03 !important;
+            color: rgb(0, 0, 0) !important;
         }
 
         [data-theme="dark"] body .table tbody tr[data-type="success"] {
             background-color: #0f5132 !important;
+            color: rgb(0, 0, 0) !important;
         }
 
         [data-theme="dark"] body .table tbody tr[data-type="debug"] {
             background-color: #41464b !important;
+            color: rgb(0, 0, 0) !important;
+        }
+
+        [data-theme="dark"] body .table tbody tr td {
+            color: rgb(0, 0, 0) !important;
+        }
+
+        [data-theme="dark"] pre {
+            color: rgb(0, 0, 0) !important;
         }
 
         /* Tablo satırları için güçlü stil kuralları */
