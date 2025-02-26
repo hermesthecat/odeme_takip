@@ -464,6 +464,8 @@ $log_type_bg_classes = [
         </div>
     </div>
 
+    <?php require_once __DIR__ . '/modals/user_settings_modal.php'; ?>
+
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -473,6 +475,39 @@ $log_type_bg_classes = [
     <script src="js/utils.js"></script>
     <script src="js/theme.js"></script>
     <script>
+        // Kullanıcı temasını yükle
+        ajaxRequest({
+            action: 'get_user_data'
+        }).done(function(response) {
+            if (response.status === 'success') {
+                setTheme(response.data.theme_preference);
+                // Tema değişikliğinden sonra portföyü güncelle
+                portfoyGuncelle();
+            }
+        });
+
+        // Kullanıcı ayarları formu submit
+        $('form[data-type="user_settings"]').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const formData = form.serializeObject();
+
+            ajaxRequest({
+                action: 'update_user_settings',
+                ...formData
+            }).done(function(response) {
+                if (response.status === 'success') {
+                    const modalElement = form.closest('.modal');
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+                    setTheme(formData.theme_preference);
+                    // Tema değişikliğinden sonra portföyü güncelle
+                    portfoyGuncelle();
+                    loadData();
+                }
+            });
+        });
+
         // Tema ayarını uygula
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
