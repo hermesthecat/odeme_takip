@@ -273,10 +273,10 @@ function portfoyListele()
                 $durum_badge = '<span class="badge bg-success">Aktif</span>';
             } else if ($alis['durum'] == 'kismi_satildi') {
                 $kalan_adet = $alis['adet'] - $alis['satis_adet'];
-                $durum_badge = '<span class="badge bg-warning">Kısmi Satış</span>';
+                $durum_badge = '<span class="badge bg-secondary">Kısmi Satış</span>';
             } else if ($alis['durum'] == 'satildi') {
                 $kalan_adet = 0;
-                $durum_badge = '<span class="badge bg-secondary">Satıldı</span>';
+                $durum_badge = '<span class="badge bg-danger">Hepsi Satıldı</span>';
             }
 
             // Kar/zarar hesapla (sadece aktif veya kısmen satılmış hisseler için)
@@ -348,7 +348,7 @@ function portfoyListele()
                 $output .= '<td>' . convertCurrencyToTRY($satis['alis_fiyati']) . '</td>';
                 $output .= '<td>' . convertCurrencyToTRY($satis['satis_fiyati']) . '</td>';
                 $output .= '<td class="' . $satis_kar_zarar_class . '">' . convertCurrencyToTRY($satis_kar_zarar) . '</td>';
-                $output .= '<td class="text-center">Satıldı (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
+                $output .= '<td class="text-center"><span class="badge bg-danger">Satıldı</span> (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
                 $output .= '</tr>';
             }
         } else {

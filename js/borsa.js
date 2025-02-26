@@ -241,6 +241,12 @@ function portfoyGuncelle() {
 
             // Mali durum grafiğini güncelle
             maliDurumGrafigiGuncelle(portfoyData);
+            
+            // Tooltip'leri yeniden initialize et
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
 
             // Koyu tema kontrolü
             const isDarkMode = localStorage.getItem('theme') === 'dark' ||
