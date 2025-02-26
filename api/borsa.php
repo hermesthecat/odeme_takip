@@ -79,7 +79,7 @@ function portfoyListele()
                     WHEN durum = 'kismi_satildi' THEN (adet - satis_adet) 
                     ELSE 0 
                 END) as toplam_adet,
-                CASE WHEN SUM(CASE WHEN durum = 'satildi' OR durum = 'kismi_satildi' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END as has_sold,
+                CASE WHEN SUM(CASE WHEN durum = 'satildi' OR durum = 'kismi_satildi' OR durum = 'satis_kaydi' THEN 1 ELSE 0 END) > 0 THEN 1 ELSE 0 END as has_sold,
                 MAX(anlik_fiyat) as anlik_fiyat, 
                 MAX(hisse_adi) as hisse_adi
             FROM portfolio 
@@ -104,7 +104,7 @@ function portfoyListele()
         // Hissenin tüm alış kayıtlarını getir
         $sql = "SELECT id, adet, alis_fiyati, alis_tarihi, anlik_fiyat, durum, satis_fiyati, satis_tarihi, satis_adet
                 FROM portfolio 
-                WHERE user_id = :user_id AND sembol = :sembol
+                WHERE user_id = :user_id AND sembol = :sembol AND durum != 'satis_kaydi'
                 ORDER BY alis_tarihi ASC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
@@ -131,13 +131,18 @@ function portfoyListele()
         $satis_kari = 0;
         $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_adet, durum
                 FROM portfolio 
-                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'satildi' OR durum = 'kismi_satildi')";
+                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'satildi' OR durum = 'kismi_satildi' OR durum = 'satis_kaydi')";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
         $satislar = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($satislar as $satis) {
-            $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
+            $satis_adedi = 0;
+            if ($satis['durum'] == 'satis_kaydi') {
+                $satis_adedi = $satis['adet'];
+            } else {
+                $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
+            }
             $satis_kari += ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
         }
         $satis_kari_class = $satis_kari >= 0 ? 'kar' : 'zarar';
