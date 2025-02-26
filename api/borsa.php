@@ -118,14 +118,30 @@ function portfoyListele()
         // Ortalama alış fiyatını hesapla
         $toplam_maliyet = 0;
         $toplam_aktif_adet = 0;
+        $toplam_alis_maliyet = 0;
+        $toplam_alis_lot = 0;
+        
         foreach ($alislar as $alis) {
+            // Aktif veya kısmen satılmış hisseler için mevcut değerleri hesapla
             if ($alis['durum'] == 'aktif' || $alis['durum'] == 'kismi_satildi') {
                 $kalan_adet = $alis['durum'] == 'kismi_satildi' ? $alis['adet'] - $alis['satis_adet'] : $alis['adet'];
                 $toplam_maliyet += $alis['alis_fiyati'] * $kalan_adet;
                 $toplam_aktif_adet += $kalan_adet;
             }
+            
+            // Tüm hisseler için toplam alış maliyeti ve lot sayısını hesapla
+            $toplam_alis_maliyet += $alis['alis_fiyati'] * $alis['adet'];
+            $toplam_alis_lot += $alis['adet'];
         }
-        $ortalama_alis = $toplam_aktif_adet > 0 ? $toplam_maliyet / $toplam_aktif_adet : 0;
+        
+        // Aktif hisseler varsa onların ortalamasını, yoksa tüm alışların ortalamasını kullan
+        $ortalama_alis = $toplam_aktif_adet > 0 ? 
+                          $toplam_maliyet / $toplam_aktif_adet : 
+                          ($toplam_alis_lot > 0 ? $toplam_alis_maliyet / $toplam_alis_lot : 0);
+        
+        // Toplam maliyet, aktif hisseler varsa onların maliyeti, yoksa ve tamamen satılmışsa toplam alış maliyeti
+        $gosterilecek_toplam_maliyet = $toplam_aktif_adet > 0 ? $toplam_maliyet : 
+                                      ($toplam_adet == 0 && $has_sold == 1 ? $toplam_alis_maliyet : 0);
 
         // Kar/zarar hesapla - ortalama alış fiyatını kullan
         $kar_zarar = ($anlik_fiyat - $ortalama_alis) * $toplam_adet;
@@ -167,9 +183,17 @@ function portfoyListele()
         $output .= '<td class="alis-fiyat">' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
         $output .= '<td class="anlik_fiyat text-center">' . convertCurrencyToTRY($anlik_fiyat) . '<br><small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
         $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
-        $output .= '<td class="toplam-maliyet">' . convertCurrencyToTRY($toplam_maliyet) . '</td>';
-        $output .= '<td class="deger">' . convertCurrencyToTRY($anlik_fiyat * $toplam_adet) . '</td>';
-        $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
+        $output .= '<td class="toplam-maliyet">' . convertCurrencyToTRY($gosterilecek_toplam_maliyet) . '</td>';
+        
+        // Tamamen satılmış hisseler için değer sütununda "-" göster
+        if ($toplam_adet == 0 && $has_sold == 1) {
+            $output .= '<td class="deger">-</td>';
+            $output .= '<td class="kar-zarar-hucre">-</td>';
+        } else {
+            $output .= '<td class="deger">' . convertCurrencyToTRY($anlik_fiyat * $toplam_adet) . '</td>';
+            $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
+        }
+        
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
         $output .= '<td>';
 
@@ -272,7 +296,7 @@ function portfoyListele()
 
             $output .= '<tr data-alis-tarihi="' . $alis['alis_tarihi'] . '" data-alis-fiyati="' . $alis['alis_fiyati'] . '" data-max-adet="' . $kalan_adet . '">';
             $output .= '<td>' . date('d.m.Y H:i', strtotime($alis['alis_tarihi'])) . '</td>';
-            $output .= '<td>' . ($alis['durum'] == 'satildi' ? $alis['adet'] . ' <small class="text-muted">(0)</small>' : $kalan_adet) . '</td>';
+            $output .= '<td>' . $alis['adet'] . ' <small class="text-muted">(' . $kalan_adet . ')</small></td>';
             $output .= '<td>' . convertCurrencyToTRY($alis['alis_fiyati']) . '</td>';
             $output .= '<td class="' . $alis_kar_zarar_class . '">' . ($kalan_adet > 0 ? convertCurrencyToTRY($alis_kar_zarar) : '-') . '</td>';
             $output .= '<td>' . $durum_badge . '</td>';
