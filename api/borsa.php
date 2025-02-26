@@ -104,7 +104,7 @@ function portfoyListele()
         // Hissenin tüm alış kayıtlarını getir
         $sql = "SELECT id, adet, alis_fiyati, alis_tarihi, anlik_fiyat, durum, satis_fiyati, satis_tarihi, satis_adet
                 FROM portfolio 
-                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'aktif' OR durum = 'kismi_satildi')
+                WHERE user_id = :user_id AND sembol = :sembol
                 ORDER BY alis_tarihi ASC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
@@ -112,11 +112,15 @@ function portfoyListele()
 
         // Ortalama alış fiyatını hesapla
         $toplam_maliyet = 0;
+        $toplam_aktif_adet = 0;
         foreach ($alislar as $alis) {
-            $kalan_adet = $alis['durum'] == 'kismi_satildi' ? $alis['adet'] - $alis['satis_adet'] : $alis['adet'];
-            $toplam_maliyet += $alis['alis_fiyati'] * $kalan_adet;
+            if ($alis['durum'] == 'aktif' || $alis['durum'] == 'kismi_satildi') {
+                $kalan_adet = $alis['durum'] == 'kismi_satildi' ? $alis['adet'] - $alis['satis_adet'] : $alis['adet'];
+                $toplam_maliyet += $alis['alis_fiyati'] * $kalan_adet;
+                $toplam_aktif_adet += $kalan_adet;
+            }
         }
-        $ortalama_alis = $toplam_adet > 0 ? $toplam_maliyet / $toplam_adet : 0;
+        $ortalama_alis = $toplam_aktif_adet > 0 ? $toplam_maliyet / $toplam_aktif_adet : 0;
 
         // Kar/zarar hesapla - ortalama alış fiyatını kullan
         $kar_zarar = ($anlik_fiyat - $ortalama_alis) * $toplam_adet;
@@ -231,20 +235,45 @@ function portfoyListele()
 
         // Alış kayıtları
         foreach ($alislar as $alis) {
-            $kalan_adet = $alis['durum'] == 'kismi_satildi' ? $alis['adet'] - $alis['satis_adet'] : $alis['adet'];
-            $alis_kar_zarar = ($anlik_fiyat - $alis['alis_fiyati']) * $kalan_adet;
-            $alis_kar_zarar_class = $alis_kar_zarar >= 0 ? 'kar' : 'zarar';
+            // Kalan adet hesapla
+            $kalan_adet = 0;
+            $durum_badge = '';
+            
+            if ($alis['durum'] == 'aktif') {
+                $kalan_adet = $alis['adet'];
+                $durum_badge = '<span class="badge bg-success">Aktif</span>';
+            } else if ($alis['durum'] == 'kismi_satildi') {
+                $kalan_adet = $alis['adet'] - $alis['satis_adet'];
+                $durum_badge = '<span class="badge bg-warning">Kısmi Satış</span>';
+            } else if ($alis['durum'] == 'satildi') {
+                $kalan_adet = 0;
+                $durum_badge = '<span class="badge bg-secondary">Satıldı</span>';
+            }
+            
+            // Kar/zarar hesapla (sadece aktif veya kısmen satılmış hisseler için)
+            $alis_kar_zarar = 0;
+            $alis_kar_zarar_class = '';
+            
+            if ($kalan_adet > 0) {
+                $alis_kar_zarar = ($anlik_fiyat - $alis['alis_fiyati']) * $kalan_adet;
+                $alis_kar_zarar_class = $alis_kar_zarar >= 0 ? 'kar' : 'zarar';
+            }
 
             $output .= '<tr data-alis-tarihi="' . $alis['alis_tarihi'] . '" data-alis-fiyati="' . $alis['alis_fiyati'] . '" data-max-adet="' . $kalan_adet . '">';
             $output .= '<td>' . date('d.m.Y H:i', strtotime($alis['alis_tarihi'])) . '</td>';
-            $output .= '<td>' . $kalan_adet . '</td>';
+            $output .= '<td>' . ($alis['durum'] == 'satildi' ? $alis['adet'] . ' <small class="text-muted">(0)</small>' : $kalan_adet) . '</td>';
             $output .= '<td>' . convertCurrencyToTRY($alis['alis_fiyati']) . '</td>';
-            $output .= '<td class="' . $alis_kar_zarar_class . '">' . convertCurrencyToTRY($alis_kar_zarar) . '</td>';
-            $output .= '<td>' . ($alis['durum'] == 'kismi_satildi' ? '<span class="badge bg-warning">Kısmi Satış</span>' : '<span class="badge bg-success">Aktif</span>') . '</td>';
+            $output .= '<td class="' . $alis_kar_zarar_class . '">' . ($kalan_adet > 0 ? convertCurrencyToTRY($alis_kar_zarar) : '-') . '</td>';
+            $output .= '<td>' . $durum_badge . '</td>';
             $output .= '<td>
-                <div class="d-flex align-items-center">
-                    <button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button>
-                </div>
+                <div class="d-flex align-items-center">';
+            
+            // Sadece aktif veya kısmen satılmış hisseler için sil butonu göster
+            if ($alis['durum'] != 'satildi') {
+                $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button>';
+            }
+            
+            $output .= '</div>
             </td>';
             $output .= '</tr>';
         }
