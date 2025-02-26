@@ -70,8 +70,17 @@ function portfoyListele()
     $user_id = $_SESSION['user_id'];
 
     // Portföydeki benzersiz hisseleri getir
-    $sql = "SELECT sembol, son_guncelleme, GROUP_CONCAT(id) as ids, SUM(CASE WHEN durum != 'satildi' THEN adet ELSE 0 END) as toplam_adet, 
-            MAX(anlik_fiyat) as anlik_fiyat, MAX(hisse_adi) as hisse_adi
+    $sql = "SELECT 
+                sembol, 
+                son_guncelleme, 
+                GROUP_CONCAT(id) as ids, 
+                SUM(CASE 
+                    WHEN durum = 'aktif' THEN adet 
+                    WHEN durum = 'kismi_satildi' THEN (adet - satis_adet) 
+                    ELSE 0 
+                END) as toplam_adet, 
+                MAX(anlik_fiyat) as anlik_fiyat, 
+                MAX(hisse_adi) as hisse_adi
             FROM portfolio 
             WHERE user_id = :user_id 
             GROUP BY sembol 
@@ -107,10 +116,10 @@ function portfoyListele()
         }
         $ortalama_alis = $toplam_adet > 0 ? $toplam_maliyet / $toplam_adet : 0;
 
-        // Kar/zarar hesapla
-        $ilk_alis_fiyati = count($alislar) > 0 ? $alislar[0]['alis_fiyati'] : 0;
-        $kar_zarar = ($anlik_fiyat - $ilk_alis_fiyati) * $toplam_adet;
+        // Kar/zarar hesapla - ortalama alış fiyatını kullan
+        $kar_zarar = ($anlik_fiyat - $ortalama_alis) * $toplam_adet;
         $kar_zarar_class = $kar_zarar >= 0 ? 'kar' : 'zarar';
+        $kar_zarar_formatted = convertCurrencyToTRY($kar_zarar);
 
         // Satış karı hesapla
         $satis_kari = 0;
@@ -126,6 +135,7 @@ function portfoyListele()
             $satis_kari += ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
         }
         $satis_kari_class = $satis_kari >= 0 ? 'kar' : 'zarar';
+        $satis_kari_formatted = convertCurrencyToTRY($satis_kari);
 
         // Ana satır
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
@@ -135,8 +145,8 @@ function portfoyListele()
         $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
         $output .= '<td class="deger">' . convertCurrencyToTRY($anlik_fiyat * $toplam_adet) . '</td>';
         $output .= '<td class="anlik_fiyat text-center">' . convertCurrencyToTRY($anlik_fiyat) . '<br><small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
-        $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . convertCurrencyToTRY($kar_zarar) . '</td>';
-        $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . convertCurrencyToTRY($satis_kari) . '</td>';
+        $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
+        $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
         $output .= '<td>';
         $output .= '<button class="btn btn-sm btn-success me-1" onclick="topluSatisFormunuGoster(\'' . $sembol . '\', ' . $anlik_fiyat . ', event)">Sat</button>';
         $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(\'' . $ids . '\', event)">Tümünü Sil</button>';
@@ -216,7 +226,7 @@ function portfoyListele()
             $output .= '<td>' . $kalan_adet . '</td>';
             $output .= '<td>' . convertCurrencyToTRY($alis['alis_fiyati']) . '</td>';
             $output .= '<td class="' . $alis_kar_zarar_class . '">' . convertCurrencyToTRY($alis_kar_zarar) . '</td>';
-            $output .= '<td>' . ($alis['durum'] == 'kismi_satildi' ? 'Kısmi Satış' : 'Aktif') . '</td>';
+            $output .= '<td>' . ($alis['durum'] == 'kismi_satildi' ? '<span class="badge bg-warning">Kısmi Satış</span>' : '<span class="badge bg-success">Aktif</span>') . '</td>';
             $output .= '<td>
                 <div class="d-flex align-items-center">
                     <button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button>
