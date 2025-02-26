@@ -2,19 +2,49 @@
 require_once '../config.php';
 require_once '../classes/log.php';
 
+// Session güvenlik ayarları
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.use_only_cookies', 1);
+ini_set('session.cookie_samesite', 'Strict');
+
+// CSRF token kontrolü için fonksiyon
+function validateCSRFToken() {
+    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) ||
+        $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        return false;
+    }
+    return true;
+}
+
+// XSS koruma fonksiyonu
+function sanitizeInput($data) {
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+}
+
 header('Content-Type: application/json');
+header('X-Frame-Options: DENY');
+header('X-XSS-Protection: 1; mode=block');
+header('X-Content-Type-Options: nosniff');
 
 $response = ['status' => 'error', 'message' => t('auth.invalid_request')];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $action = $_POST['action'] ?? '';
+    // CSRF kontrolü
+    if (!validateCSRFToken()) {
+        $response = ['status' => 'error', 'message' => 'Invalid CSRF token'];
+        echo json_encode($response);
+        exit;
+    }
+
+    $action = sanitizeInput($_POST['action'] ?? '');
 
     switch ($action) {
         case 'register':
-            $username = trim($_POST['username'] ?? '');
+            $username = sanitizeInput(trim($_POST['username'] ?? ''));
             $password = trim($_POST['password'] ?? '');
             $password_confirm = trim($_POST['password_confirm'] ?? '');
-            $base_currency = trim($_POST['base_currency'] ?? 'TRY');
+            $base_currency = sanitizeInput(trim($_POST['base_currency'] ?? 'TRY'));
 
             // Validasyon
             $errors = [];
@@ -36,6 +66,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$username]);
             if ($stmt->fetchColumn() > 0) {
                 $errors[] = t('auth.username_taken');
+            }
+
+            // Güçlü şifre politikası
+            if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
+                $errors[] = t('auth.password_policy');
             }
 
             if (!empty($errors)) {
@@ -60,9 +95,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'login':
-            $username = trim($_POST['username'] ?? '');
+            $username = sanitizeInput(trim($_POST['username'] ?? ''));
             $password = trim($_POST['password'] ?? '');
             $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'true';
+
+            // Brute force koruması
+            if (isset($_SESSION['login_attempts'][$username]) && 
+                $_SESSION['login_attempts'][$username]['count'] >= 5 && 
+                time() - $_SESSION['login_attempts'][$username]['time'] < 900) {
+                $response = ['status' => 'error', 'message' => t('auth.too_many_attempts')];
+                break;
+            }
 
             if (empty($username) || empty($password)) {
                 $response = ['status' => 'error', 'message' => t('auth.credentials_required')];
@@ -87,10 +130,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($stmt->rowCount() == 1) {
                         $row = $stmt->fetch();
                         if (password_verify($password, $row['password'])) {
-                            // Session zaten başlatılmış mı kontrol et
-                            if (session_status() === PHP_SESSION_NONE) {
-                                session_start();
-                            }
+                            // Session yenileme
+                            session_regenerate_id(true);
+                            
+                            // Session timeout ayarı
+                            $_SESSION['last_activity'] = time();
+                            $_SESSION['expire_time'] = 30 * 60; // 30 dakika
+                            
+                            // Yeni CSRF token oluştur
+                            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
                             $_SESSION['user_id'] = $row['id'];
                             $_SESSION['username'] = $row['username'];
@@ -132,6 +180,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Session zaten başlatılmış mı kontrol et
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
+            }
+            
+            // Tüm session verilerini temizle
+            $_SESSION = array();
+            
+            // Session cookie'sini sil
+            if (isset($_COOKIE[session_name()])) {
+                setcookie(session_name(), '', time()-3600, '/');
             }
 
             // Remember token'ı temizle
