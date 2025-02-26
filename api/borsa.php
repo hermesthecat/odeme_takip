@@ -297,9 +297,9 @@ function portfoyListele()
         $output .= '<tbody>';
 
         // Satış kayıtlarını listele
-        $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_tarihi, satis_adet, durum, alis_tarihi
+        $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_tarihi, satis_adet, durum, alis_tarihi, referans_alis_id
                 FROM portfolio 
-                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'satildi' OR durum = 'kismi_satildi')
+                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'satildi' OR durum = 'kismi_satildi' OR durum = 'satis_kaydi')
                 ORDER BY satis_tarihi DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
@@ -307,9 +307,23 @@ function portfoyListele()
 
         if (count($satilmis_hisseler) > 0) {
             foreach ($satilmis_hisseler as $satis) {
-                $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
+                // Satış adedini belirle
+                if ($satis['durum'] == 'satis_kaydi') {
+                    // Yeni yapıda doğrudan adet kullanılır
+                    $satis_adedi = $satis['adet'];
+                } else {
+                    // Eski yapıda durum kontrolü yapılır
+                    $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
+                }
+                
                 $satis_kar_zarar = ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
                 $satis_kar_zarar_class = $satis_kar_zarar >= 0 ? 'kar' : 'zarar';
+                
+                // Satış durumunu belirle
+                $satis_durumu = 'Satıldı';
+                if ($satis['durum'] == 'kismi_satildi') {
+                    $satis_durumu = 'Kısmi Satış';
+                }
 
                 $output .= '<tr>';
                 $output .= '<td>' . date('d.m.Y H:i', strtotime($satis['alis_tarihi'])) . '</td>';
@@ -317,7 +331,7 @@ function portfoyListele()
                 $output .= '<td>' . convertCurrencyToTRY($satis['alis_fiyati']) . '</td>';
                 $output .= '<td>' . convertCurrencyToTRY($satis['satis_fiyati']) . '</td>';
                 $output .= '<td class="' . $satis_kar_zarar_class . '">' . convertCurrencyToTRY($satis_kar_zarar) . '</td>';
-                $output .= '<td>Satıldı (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
+                $output .= '<td>' . $satis_durumu . ' (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
                 $output .= '</tr>';
             }
         } else {
@@ -685,6 +699,49 @@ function hisseSat($id, $satis_adet, $satis_fiyati)
                 'satis_adet' => $bu_satis_adet,
                 'durum' => $yeni_durum,
                 'id' => $kayit['id']
+            ]);
+            
+            // YENİ: Satış kaydını ayrı bir kayıt olarak ekle
+            $sql = "INSERT INTO portfolio (
+                        sembol, 
+                        adet, 
+                        alis_fiyati, 
+                        alis_tarihi,
+                        anlik_fiyat,
+                        hisse_adi,
+                        user_id,
+                        durum,
+                        satis_fiyati,
+                        satis_tarihi,
+                        satis_adet,
+                        referans_alis_id
+                    ) VALUES (
+                        :sembol,
+                        :adet,
+                        :alis_fiyati,
+                        :alis_tarihi,
+                        :anlik_fiyat,
+                        :hisse_adi,
+                        :user_id,
+                        'satis_kaydi',
+                        :satis_fiyati,
+                        CURRENT_TIMESTAMP,
+                        :satis_adet,
+                        :referans_alis_id
+                    )";
+            
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                'sembol' => $kayit['sembol'],
+                'adet' => $bu_satis_adet,
+                'alis_fiyati' => $kayit['alis_fiyati'],
+                'alis_tarihi' => $kayit['alis_tarihi'],
+                'anlik_fiyat' => $kayit['anlik_fiyat'],
+                'hisse_adi' => $kayit['hisse_adi'],
+                'user_id' => $kayit['user_id'],
+                'satis_fiyati' => $satis_fiyati,
+                'satis_adet' => $bu_satis_adet,
+                'referans_alis_id' => $kayit['id']
             ]);
 
             $kalan_satis_adet -= $bu_satis_adet;
