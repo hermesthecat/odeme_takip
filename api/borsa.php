@@ -8,7 +8,6 @@ checkLogin();
 $user_default_currency = $_SESSION['base_currency'];
 global $pdo;
 
-// convert currency to TRY
 function convertCurrencyToTRY($amount)
 {
     // NOT : Türkiyede ondalık ayıracı VİRGÜL'dür. Binlik ayıracı NOKTA'dır. Fakat PHP İNGİLİZCE alt yapıya sahip olduğundan PHP içerisinde NOKTA ondalık ayıracıdır. VİRGÜL ise binlik ayıracıdır. Yani ondalıklı sayılar nokta ile gösterilir. 
@@ -21,6 +20,7 @@ function convertCurrencyToTRY($amount)
 
     return number_format($amount, 2, ",", ".");
 }
+
 /**
  * Yeni hisse senedi ekler
  */
@@ -70,7 +70,7 @@ function portfoyListele()
     $user_id = $_SESSION['user_id'];
 
     // Portföydeki benzersiz hisseleri getir
-    $sql = "SELECT sembol, GROUP_CONCAT(id) as ids, SUM(CASE WHEN durum != 'satildi' THEN adet ELSE 0 END) as toplam_adet, 
+    $sql = "SELECT sembol, son_guncelleme, GROUP_CONCAT(id) as ids, SUM(CASE WHEN durum != 'satildi' THEN adet ELSE 0 END) as toplam_adet, 
             MAX(anlik_fiyat) as anlik_fiyat, MAX(hisse_adi) as hisse_adi
             FROM portfolio 
             WHERE user_id = :user_id 
@@ -88,6 +88,7 @@ function portfoyListele()
         $toplam_adet = $hisse['toplam_adet'];
         $anlik_fiyat = $hisse['anlik_fiyat'];
         $hisse_adi = $hisse['hisse_adi'] ?: $sembol;
+        $son_guncelleme = $hisse['son_guncelleme'];
 
         // Hissenin tüm alış kayıtlarını getir
         $sql = "SELECT id, adet, alis_fiyati, alis_tarihi, anlik_fiyat, durum, satis_fiyati, satis_tarihi, satis_adet
@@ -110,7 +111,7 @@ function portfoyListele()
         $ilk_alis_fiyati = count($alislar) > 0 ? $alislar[0]['alis_fiyati'] : 0;
         $kar_zarar = ($anlik_fiyat - $ilk_alis_fiyati) * $toplam_adet;
         $kar_zarar_class = $kar_zarar >= 0 ? 'kar' : 'zarar';
-        $kar_zarar_formatted = number_format($kar_zarar, 2, '.', ',') . ' ₺';
+        $kar_zarar_formatted = convertCurrencyToTRY($kar_zarar);
 
         // Satış karı hesapla
         $satis_kari = 0;
@@ -126,14 +127,14 @@ function portfoyListele()
             $satis_kari += ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
         }
         $satis_kari_class = $satis_kari >= 0 ? 'kar' : 'zarar';
-        $satis_kari_formatted = number_format($satis_kari, 2, '.', ',') . ' ₺';
+        $satis_kari_formatted = convertCurrencyToTRY($satis_kari);
 
         // Ana satır
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
         $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small></td>';
         $output .= '<td class="adet">' . $toplam_adet . '</td>';
         $output .= '<td>' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
-        $output .= '<td class="anlik_fiyat">' . convertCurrencyToTRY($anlik_fiyat) . ' <small class="text-muted">(' . date('H:i:s') . ')</small></td>';
+        $output .= '<td class="anlik_fiyat">' . convertCurrencyToTRY($anlik_fiyat) . ' <small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
         $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . convertCurrencyToTRY($kar_zarar) . '</td>';
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . convertCurrencyToTRY($satis_kari) . '</td>';
         $output .= '<td>';
@@ -185,13 +186,18 @@ function portfoyListele()
             </div>
         </div>";
 
+        // Alış ve satış tablolarını yan yana göstermek için row oluştur
+        $output .= '<div class="row">';
+        
+        // Alış kayıtları tablosu - sol taraf
+        $output .= '<div class="col-md-6">';
+        $output .= '<h6 class="mb-2">Alış Kayıtları</h6>';
         $output .= '<table class="table table-sm">';
         $output .= '<thead class="table-light">';
         $output .= '<tr>';
         $output .= '<th>Alış Tarihi</th>';
         $output .= '<th>Lot</th>';
         $output .= '<th>Alış Fiyatı</th>';
-        $output .= '<th>Güncel Fiyat</th>';
         $output .= '<th>Kar/Zarar</th>';
         $output .= '<th>Satış Durumu</th>';
         $output .= '<th>İşlem</th>';
@@ -209,7 +215,6 @@ function portfoyListele()
             $output .= '<td>' . date('d.m.Y H:i', strtotime($alis['alis_tarihi'])) . '</td>';
             $output .= '<td>' . $kalan_adet . '</td>';
             $output .= '<td>' . convertCurrencyToTRY($alis['alis_fiyati']) . '</td>';
-            $output .= '<td>' . convertCurrencyToTRY($anlik_fiyat) . '</td>';
             $output .= '<td class="' . $alis_kar_zarar_class . '">' . convertCurrencyToTRY($alis_kar_zarar) . '</td>';
             $output .= '<td>' . ($alis['durum'] == 'kismi_satildi' ? 'Kısmi Satış' : 'Aktif') . '</td>';
             $output .= '<td>
@@ -219,6 +224,24 @@ function portfoyListele()
             </td>';
             $output .= '</tr>';
         }
+
+        $output .= '</tbody></table></div>';
+
+        // Satış kayıtları tablosu - sağ taraf
+        $output .= '<div class="col-md-6">';
+        $output .= '<h6 class="mb-2">Satış Kayıtları</h6>';
+        $output .= '<table class="table table-sm">';
+        $output .= '<thead class="table-light">';
+        $output .= '<tr>';
+        $output .= '<th>Alış Tarihi</th>';
+        $output .= '<th>Lot</th>';
+        $output .= '<th>Alış Fiyatı</th>';
+        $output .= '<th>Satış Fiyatı</th>';
+        $output .= '<th>Kar/Zarar</th>';
+        $output .= '<th>Satış Durumu</th>';
+        $output .= '</tr>';
+        $output .= '</thead>';
+        $output .= '<tbody>';
 
         // Satış kayıtlarını listele
         $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_tarihi, satis_adet, durum, alis_tarihi
@@ -230,26 +253,30 @@ function portfoyListele()
         $satilmis_hisseler = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($satilmis_hisseler) > 0) {
-            $output .= '<tr class="table-secondary"><td colspan="7" class="text-center fw-bold">Satılmış Hisseler</td></tr>';
-
             foreach ($satilmis_hisseler as $satis) {
                 $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
                 $satis_kar_zarar = ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
                 $satis_kar_zarar_class = $satis_kar_zarar >= 0 ? 'kar' : 'zarar';
 
-                $output .= '<tr class="table-light">';
+                $output .= '<tr>';
                 $output .= '<td>' . date('d.m.Y H:i', strtotime($satis['alis_tarihi'])) . '</td>';
                 $output .= '<td>' . $satis_adedi . '</td>';
                 $output .= '<td>' . convertCurrencyToTRY($satis['alis_fiyati']) . '</td>';
                 $output .= '<td>' . convertCurrencyToTRY($satis['satis_fiyati']) . '</td>';
                 $output .= '<td class="' . $satis_kar_zarar_class . '">' . convertCurrencyToTRY($satis_kar_zarar) . '</td>';
                 $output .= '<td>Satıldı (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
-                $output .= '<td></td>';
                 $output .= '</tr>';
             }
+        } else {
+            $output .= '<tr><td colspan="6" class="text-center">Henüz satış kaydı bulunmuyor</td></tr>';
         }
 
-        $output .= '</tbody></table></td></tr>';
+        $output .= '</tbody></table></div>';
+        
+        // Row'u kapat
+        $output .= '</div>';
+        
+        $output .= '</td></tr>';
     }
 
     return $output;

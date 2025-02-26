@@ -123,19 +123,19 @@ $user_default_currency = $_SESSION['base_currency'];
                                     <div class="col">
                                         <div class="border rounded p-2 h-100">
                                             <small class="text-muted d-block">Portföy Değeri</small>
-                                            <h5 id="toplamPortfoyDeger" class="mb-0 mt-1">0.00 ₺</h5>
+                                            <h5 id="toplamPortfoyDeger" class="mb-0 mt-1">0.00</h5>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="border rounded p-2 h-100">
                                             <small class="text-muted d-block">Kar/Zarar</small>
-                                            <h5 id="toplamKarZarar" class="mb-0 mt-1">0.00 ₺</h5>
+                                            <h5 id="toplamKarZarar" class="mb-0 mt-1">0.00</h5>
                                         </div>
                                     </div>
                                     <div class="col">
                                         <div class="border rounded p-2 h-100">
                                             <small class="text-muted d-block">Gerçekleşen K/Z</small>
-                                            <h5 id="toplamSatisKar" class="mb-0 mt-1">0.00 ₺</h5>
+                                            <h5 id="toplamSatisKar" class="mb-0 mt-1">0.00</h5>
                                         </div>
                                     </div>
                                 </div>
