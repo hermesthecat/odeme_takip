@@ -723,83 +723,85 @@ function hisseSat($id, $adet, $fiyat)
         // İşlemi başlat
         $pdo->beginTransaction();
 
-        foreach ($ids as $hisse_id) {
-            // Hisse bilgilerini al
-            $sql = "SELECT * FROM portfolio WHERE id = :id AND user_id = :user_id";
+        // FIFO prensibine göre en eski alış kaydından başlayarak satış yap
+        // Önce sembolü belirle
+        $sql = "SELECT sembol FROM portfolio WHERE id = :id AND user_id = :user_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['id' => $ids[0], 'user_id' => $user_id]);
+        $sembol_data = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$sembol_data) {
+            throw new Exception("Hisse bulunamadı");
+        }
+        
+        $sembol = $sembol_data['sembol'];
+        
+        // Bu sembole ait tüm aktif ve kısmi satılmış hisseleri alış tarihine göre sırala (FIFO)
+        $sql = "SELECT * FROM portfolio 
+                WHERE user_id = :user_id 
+                AND sembol = :sembol 
+                AND (durum = 'aktif' OR durum = 'kismi_satildi')
+                ORDER BY alis_tarihi ASC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
+        $fifo_hisseler = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        
+        if (empty($fifo_hisseler)) {
+            throw new Exception("Satılacak aktif hisse bulunamadı");
+        }
+        
+        saveLog("FIFO Satış Başlangıç - Sembol: " . $sembol . " - Satılacak Adet: " . $adet, 'info', 'hisseSat', $user_id);
+        
+        foreach ($fifo_hisseler as $hisse) {
+            // Satılacak adet kalmadıysa döngüden çık
+            if ($toplam_satilan_adet >= $adet) {
+                break;
+            }
+            
+            // Hissede kalan adeti hesapla
+            $sql = "SELECT IFNULL(SUM(adet), 0) as toplam_satilan
+                    FROM portfolio 
+                    WHERE durum = 'satis_kaydi' 
+                    AND referans_alis_id = :referans_id";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute(['id' => $hisse_id, 'user_id' => $user_id]);
-            $hisse = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$hisse) {
-                continue;
-            }
-
-            // Satılacak adet, kalan adetten fazla olamaz
-            $satilacak_adet = min($adet - $toplam_satilan_adet, $hisse['adet']);
+            $stmt->execute(['referans_id' => $hisse['id']]);
+            $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
+            $onceden_satilan_adet = $satilan['toplam_satilan'];
+            
+            $kalan_adet = $hisse['adet'] - $onceden_satilan_adet;
+            
+            // Bu hisseden satılacak adet
+            $satilacak_adet = min($adet - $toplam_satilan_adet, $kalan_adet);
+            
             if ($satilacak_adet <= 0) {
-                continue;
+                continue; // Bu hissede satılacak adet kalmamış, sonraki hisseye geç
             }
-
+            
             // Satış karını hesapla
             $satis_kar = ($fiyat - $hisse['alis_fiyati']) * $satilacak_adet;
             $toplam_satis_kar += $satis_kar;
-
-            // Kalan adet
-            $kalan_adet = $hisse['adet'] - $satilacak_adet;
-
-            if ($kalan_adet > 0) {
+            
+            // Satış sonrası kalan adet
+            $yeni_kalan_adet = $kalan_adet - $satilacak_adet;
+            
+            saveLog("FIFO Satış - Hisse ID: " . $hisse['id'] . 
+                    " - Alış Tarihi: " . $hisse['alis_tarihi'] . 
+                    " - Toplam Adet: " . $hisse['adet'] . 
+                    " - Önceden Satılan: " . $onceden_satilan_adet . 
+                    " - Kalan: " . $kalan_adet . 
+                    " - Şimdi Satılacak: " . $satilacak_adet . 
+                    " - Yeni Kalan: " . $yeni_kalan_adet, 
+                    'info', 'hisseSat', $user_id);
+            
+            if ($yeni_kalan_adet > 0) {
                 // Kısmi satış - mevcut kaydı güncelle
                 $sql = "UPDATE portfolio 
                         SET durum = 'kismi_satildi'
                         WHERE id = :id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
-                    'id' => $hisse_id
+                    'id' => $hisse['id']
                 ]);
-
-                // Satış kaydı oluştur
-                $sql = "INSERT INTO portfolio 
-                        (user_id, sembol, hisse_adi, adet, alis_fiyati, alis_tarihi, satis_fiyati, satis_tarihi, durum, anlik_fiyat, son_guncelleme, referans_alis_id) 
-                        VALUES 
-                        (:user_id, :sembol, :hisse_adi, :adet, :alis_fiyati, :alis_tarihi, :satis_fiyati, NOW(), 'satis_kaydi', :anlik_fiyat, NOW(), :referans_alis_id)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([
-                    'user_id' => $user_id,
-                    'sembol' => $hisse['sembol'],
-                    'hisse_adi' => $hisse['hisse_adi'],
-                    'adet' => $satilacak_adet,
-                    'alis_fiyati' => $hisse['alis_fiyati'],
-                    'alis_tarihi' => $hisse['alis_tarihi'],
-                    'satis_fiyati' => $fiyat,
-                    'anlik_fiyat' => $hisse['anlik_fiyat'],
-                    'referans_alis_id' => $hisse_id
-                ]);
-                
-                // Satış sonrası kalan adet kontrolü
-                $sql = "SELECT SUM(adet) as toplam_satilan 
-                        FROM portfolio 
-                        WHERE durum = 'satis_kaydi' 
-                        AND referans_alis_id = :referans_id";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute(['referans_id' => $hisse_id]);
-                $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
-                $toplam_satilan = $satilan['toplam_satilan'] ?? 0;
-                
-                // Eğer tüm hisseler satılmışsa durumu 'satildi' olarak güncelle
-                if ($toplam_satilan >= $hisse['adet']) {
-                    $sql = "UPDATE portfolio 
-                            SET durum = 'satildi', 
-                                satis_fiyati = :satis_fiyati, 
-                                satis_tarihi = NOW()
-                            WHERE id = :id";
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute([
-                        'satis_fiyati' => $fiyat,
-                        'id' => $hisse_id
-                    ]);
-                    
-                    saveLog("Kısmi satış sonrası tüm hisseler satıldı, durum 'satildi' olarak güncellendi - Hisse ID: " . $hisse_id, 'info', 'hisseSat', $user_id);
-                }
             } else {
                 // Tam satış - durumu satıldı olarak güncelle
                 $sql = "UPDATE portfolio 
@@ -810,34 +812,29 @@ function hisseSat($id, $adet, $fiyat)
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
                     'satis_fiyati' => $fiyat,
-                    'id' => $hisse_id
-                ]);
-                
-                // Tam satış için de satış kaydı oluştur
-                $sql = "INSERT INTO portfolio 
-                        (user_id, sembol, hisse_adi, adet, alis_fiyati, alis_tarihi, satis_fiyati, satis_tarihi, durum, anlik_fiyat, son_guncelleme, referans_alis_id) 
-                        VALUES 
-                        (:user_id, :sembol, :hisse_adi, :adet, :alis_fiyati, :alis_tarihi, :satis_fiyati, NOW(), 'satis_kaydi', :anlik_fiyat, NOW(), :referans_alis_id)";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute([
-                    'user_id' => $user_id,
-                    'sembol' => $hisse['sembol'],
-                    'hisse_adi' => $hisse['hisse_adi'],
-                    'adet' => $satilacak_adet,
-                    'alis_fiyati' => $hisse['alis_fiyati'],
-                    'alis_tarihi' => $hisse['alis_tarihi'],
-                    'satis_fiyati' => $fiyat,
-                    'anlik_fiyat' => $hisse['anlik_fiyat'],
-                    'referans_alis_id' => $hisse_id
+                    'id' => $hisse['id']
                 ]);
             }
-
+            
+            // Satış kaydı oluştur
+            $sql = "INSERT INTO portfolio 
+                    (user_id, sembol, hisse_adi, adet, alis_fiyati, alis_tarihi, satis_fiyati, satis_tarihi, durum, anlik_fiyat, son_guncelleme, referans_alis_id) 
+                    VALUES 
+                    (:user_id, :sembol, :hisse_adi, :adet, :alis_fiyati, :alis_tarihi, :satis_fiyati, NOW(), 'satis_kaydi', :anlik_fiyat, NOW(), :referans_alis_id)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([
+                'user_id' => $user_id,
+                'sembol' => $hisse['sembol'],
+                'hisse_adi' => $hisse['hisse_adi'],
+                'adet' => $satilacak_adet,
+                'alis_fiyati' => $hisse['alis_fiyati'],
+                'alis_tarihi' => $hisse['alis_tarihi'],
+                'satis_fiyati' => $fiyat,
+                'anlik_fiyat' => $hisse['anlik_fiyat'],
+                'referans_alis_id' => $hisse['id']
+            ]);
+            
             $toplam_satilan_adet += $satilacak_adet;
-
-            // Tüm adet satıldıysa döngüden çık
-            if ($toplam_satilan_adet >= $adet) {
-                break;
-            }
         }
 
         // İşlemi tamamla
