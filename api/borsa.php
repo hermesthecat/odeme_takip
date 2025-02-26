@@ -151,34 +151,35 @@ function portfoyListele()
         // Ana satır
         $output .= '<tr class="ana-satir" data-sembol="' . $sembol . '">';
         $output .= '<td><i class="fa-solid fa-chevron-right me-2"></i>' . $sembol . ' <small class="text-muted">' . $hisse_adi . '</small>';
-        
+
         // Tamamen satılmış hisseler için etiket ekle
         if ($toplam_adet == 0 && $has_sold == 1) {
             $output .= ' <span class="badge bg-secondary">Tamamen Satıldı</span>';
         }
-        
+
         $output .= '</td>';
         $output .= '<td class="adet">' . $toplam_adet . '</td>';
         $output .= '<td class="alis-fiyat">' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
-        $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
-        $output .= '<td class="deger">' . convertCurrencyToTRY($anlik_fiyat * $toplam_adet) . '</td>';
         $output .= '<td class="anlik_fiyat text-center">' . convertCurrencyToTRY($anlik_fiyat) . '<br><small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
+        $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
+        $output .= '<td class="toplam-maliyet">' . convertCurrencyToTRY($toplam_maliyet) . '</td>';
+        $output .= '<td class="deger">' . convertCurrencyToTRY($anlik_fiyat * $toplam_adet) . '</td>';
         $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
         $output .= '<td>';
-        
+
         // Tamamen satılmış hisseler için satış butonunu gizle
         if ($toplam_adet > 0) {
             $output .= '<button class="btn btn-sm btn-success me-1" onclick="topluSatisFormunuGoster(\'' . $sembol . '\', ' . $anlik_fiyat . ', event)">Sat</button>';
         }
-        
+
         $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(\'' . $ids . '\', event)">Tümünü Sil</button>';
         $output .= '</td>';
         $output .= '</tr>';
 
         // Detay satırı
         $output .= '<tr class="detay-satir" data-sembol="' . $sembol . '" style="display: none;">';
-        $output .= '<td colspan="9">';
+        $output .= '<td colspan="10">';
 
         // Satış formu
         $output .= "<div id='satis-form-{$sembol}' class='satis-form mb-3' style='display:none;'>
@@ -243,7 +244,7 @@ function portfoyListele()
             // Kalan adet hesapla
             $kalan_adet = 0;
             $durum_badge = '';
-            
+
             if ($alis['durum'] == 'aktif') {
                 $kalan_adet = $alis['adet'];
                 $durum_badge = '<span class="badge bg-success">Aktif</span>';
@@ -254,11 +255,11 @@ function portfoyListele()
                 $kalan_adet = 0;
                 $durum_badge = '<span class="badge bg-secondary">Satıldı</span>';
             }
-            
+
             // Kar/zarar hesapla (sadece aktif veya kısmen satılmış hisseler için)
             $alis_kar_zarar = 0;
             $alis_kar_zarar_class = '';
-            
+
             if ($kalan_adet > 0) {
                 $alis_kar_zarar = ($anlik_fiyat - $alis['alis_fiyati']) * $kalan_adet;
                 $alis_kar_zarar_class = $alis_kar_zarar >= 0 ? 'kar' : 'zarar';
@@ -272,12 +273,12 @@ function portfoyListele()
             $output .= '<td>' . $durum_badge . '</td>';
             $output .= '<td>
                 <div class="d-flex align-items-center">';
-            
+
             // Sadece aktif veya kısmen satılmış hisseler için sil butonu göster
             if ($alis['durum'] != 'satildi') {
                 $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button>';
             }
-            
+
             $output .= '</div>
             </td>';
             $output .= '</tr>';
@@ -320,10 +321,10 @@ function portfoyListele()
                     // Eski yapıda durum kontrolü yapılır
                     $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
                 }
-                
+
                 $satis_kar_zarar = ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
                 $satis_kar_zarar_class = $satis_kar_zarar >= 0 ? 'kar' : 'zarar';
-                
+
                 // Satış durumunu belirle
                 $satis_durumu = 'Satıldı';
                 if ($satis['durum'] == 'kismi_satildi') {
@@ -705,7 +706,7 @@ function hisseSat($id, $satis_adet, $satis_fiyati)
                 'durum' => $yeni_durum,
                 'id' => $kayit['id']
             ]);
-            
+
             // YENİ: Satış kaydını ayrı bir kayıt olarak ekle
             $sql = "INSERT INTO portfolio (
                         sembol, 
@@ -734,7 +735,7 @@ function hisseSat($id, $satis_adet, $satis_fiyati)
                         :satis_adet,
                         :referans_alis_id
                     )";
-            
+
             $stmt = $pdo->prepare($sql);
             $stmt->execute([
                 'sembol' => $kayit['sembol'],
