@@ -163,7 +163,7 @@ return [
         'amount' => 'Amount',
         'currency' => 'Currency',
         'date' => 'Date',
-        'frequency' => 'Frequency',
+        'frequency' => 'Repetition Frequency',
         'update_children' => 'Update related incomes',
         'update_children_info_parent' => 'When this option is checked, all incomes related to this income will be updated.',
         'update_children_info_child' => 'When this option is checked, this income and subsequent incomes will be updated.',
@@ -214,7 +214,9 @@ return [
         'delete_confirm' => 'Are you sure you want to delete this payment?',
         'mark_paid' => [
             'success' => 'Payment successfully marked as paid',
-            'error' => 'Payment could not be marked as paid'
+            'error' => 'Payment could not be marked as paid',
+            'mark_as_paid' => 'Mark as paid',
+            'mark_as_not_paid' => 'Mark as not paid'
         ],
         'mark_not_paid' => 'Mark as not paid',
         'not_found' => 'No payment has been added yet',
