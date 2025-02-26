@@ -774,6 +774,32 @@ function hisseSat($id, $adet, $fiyat)
                     'anlik_fiyat' => $hisse['anlik_fiyat'],
                     'referans_alis_id' => $hisse_id
                 ]);
+                
+                // Satış sonrası kalan adet kontrolü
+                $sql = "SELECT SUM(adet) as toplam_satilan 
+                        FROM portfolio 
+                        WHERE durum = 'satis_kaydi' 
+                        AND referans_alis_id = :referans_id";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute(['referans_id' => $hisse_id]);
+                $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
+                $toplam_satilan = $satilan['toplam_satilan'] ?? 0;
+                
+                // Eğer tüm hisseler satılmışsa durumu 'satildi' olarak güncelle
+                if ($toplam_satilan >= $hisse['adet']) {
+                    $sql = "UPDATE portfolio 
+                            SET durum = 'satildi', 
+                                satis_fiyati = :satis_fiyati, 
+                                satis_tarihi = NOW()
+                            WHERE id = :id";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute([
+                        'satis_fiyati' => $fiyat,
+                        'id' => $hisse_id
+                    ]);
+                    
+                    saveLog("Kısmi satış sonrası tüm hisseler satıldı, durum 'satildi' olarak güncellendi - Hisse ID: " . $hisse_id, 'info', 'hisseSat', $user_id);
+                }
             } else {
                 // Tam satış - durumu satıldı olarak güncelle
                 $sql = "UPDATE portfolio 
