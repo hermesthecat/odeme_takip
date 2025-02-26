@@ -120,7 +120,7 @@ function portfoyListele()
         $toplam_aktif_adet = 0;
         $toplam_alis_maliyet = 0;
         $toplam_alis_lot = 0;
-        
+
         foreach ($alislar as $alis) {
             // Aktif veya kısmen satılmış hisseler için mevcut değerleri hesapla
             if ($alis['durum'] == 'aktif' || $alis['durum'] == 'kismi_satildi') {
@@ -128,15 +128,15 @@ function portfoyListele()
                 $toplam_maliyet += $alis['alis_fiyati'] * $kalan_adet;
                 $toplam_aktif_adet += $kalan_adet;
             }
-            
+
             // Tüm hisseler için toplam alış maliyeti ve lot sayısını hesapla
             $toplam_alis_maliyet += $alis['alis_fiyati'] * $alis['adet'];
             $toplam_alis_lot += $alis['adet'];
         }
-        
+
         // Ortalama alış fiyatı her zaman toplam alış maliyeti / toplam alış lot sayısı olarak hesaplanacak
         $ortalama_alis = $toplam_alis_lot > 0 ? $toplam_alis_maliyet / $toplam_alis_lot : 0;
-        
+
         // Toplam maliyet her zaman toplam alış maliyeti olarak hesaplanacak
         $gosterilecek_toplam_maliyet = $toplam_alis_maliyet;
 
@@ -175,7 +175,7 @@ function portfoyListele()
         $output .= '<td class="anlik_fiyat text-center">' . convertCurrencyToTRY($anlik_fiyat) . '<br><small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
         $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
         $output .= '<td class="toplam-maliyet">' . convertCurrencyToTRY($gosterilecek_toplam_maliyet) . '</td>';
-        
+
         // Tamamen satılmış hisseler için değer sütununda "-" göster
         if ($toplam_adet == 0 && $has_sold == 1) {
             $output .= '<td class="deger">-</td>';
@@ -184,7 +184,7 @@ function portfoyListele()
             $output .= '<td class="deger">' . convertCurrencyToTRY($anlik_fiyat * $toplam_adet) . '</td>';
             $output .= '<td class="kar-zarar-hucre ' . $kar_zarar_class . '">' . $kar_zarar_formatted . '</td>';
         }
-        
+
         $output .= '<td class="satis-kar-hucre ' . $satis_kari_class . '">' . $satis_kari_formatted . '</td>';
         $output .= '<td>';
 
@@ -335,7 +335,7 @@ function portfoyListele()
             foreach ($satilmis_hisseler as $satis) {
                 // satis_kaydi durumunda doğrudan adet değerini kullan
                 $satis_adedi = $satis['adet'];
-                
+
                 $satis_kar_zarar = ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
                 $satis_kar_zarar_class = $satis_kar_zarar >= 0 ? 'kar' : 'zarar';
 
