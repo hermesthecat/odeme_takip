@@ -137,8 +137,11 @@ function portfoyListele()
         // Ortalama alış fiyatı her zaman toplam alış maliyeti / toplam alış lot sayısı olarak hesaplanacak
         $ortalama_alis = $toplam_alis_lot > 0 ? $toplam_alis_maliyet / $toplam_alis_lot : 0;
 
-        // Toplam maliyet her zaman toplam alış maliyeti olarak hesaplanacak
+        // Toplam maliyet her zaman tüm alımların toplam alış maliyeti olarak hesaplanacak
         $gosterilecek_toplam_maliyet = $toplam_alis_maliyet;
+
+        // Kalan adetlerin toplam alış maliyeti
+        $kalan_adetlerin_toplam_maliyet = $toplam_maliyet;
 
         // Kar/zarar hesapla - ortalama alış fiyatını kullan
         $kar_zarar = ($anlik_fiyat - $ortalama_alis) * $toplam_adet;
@@ -174,7 +177,7 @@ function portfoyListele()
         $output .= '<td class="alis-fiyat">' . (count($alislar) > 1 ? 'Çeşitli' : (count($alislar) == 1 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : '-')) . '</td>';
         $output .= '<td class="anlik_fiyat text-center">' . convertCurrencyToTRY($anlik_fiyat) . '<br><small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
         $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
-        $output .= '<td class="toplam-maliyet">' . convertCurrencyToTRY($gosterilecek_toplam_maliyet) . '</td>';
+        $output .= '<td class="toplam-maliyet">' . convertCurrencyToTRY($kalan_adetlerin_toplam_maliyet) . ' / ' . convertCurrencyToTRY($gosterilecek_toplam_maliyet) . '</td>';
 
         // Tamamen satılmış hisseler için değer sütununda "-" göster
         if ($toplam_adet == 0 && $has_sold == 1) {
