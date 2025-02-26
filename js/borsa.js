@@ -601,7 +601,7 @@ function hisseSil(ids, event) {
         cancelButtonText: 'İptal'
     }).then((result) => {
         if (result.isConfirmed) {
-            fetch('api/borsa.php?sil=' + encodeURIComponent(ids))
+            fetch('api/borsa.php?sil=' + encodeURIComponent(ids.replace(/,/g, '-')))
                 .then(response => response.text())
                 .then(data => {
                     if (data === 'success') {

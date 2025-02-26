@@ -52,28 +52,34 @@ function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi = '')
 function hisseSil($id)
 {
     global $pdo;
+    // Hata ayıklama için gelen ID'yi logla
+    saveLog("hisseSil fonksiyonu çağrıldı - Gelen ID: " . $id, 'info', 'hisseSil', $_SESSION['user_id']);
+
     // Tire ile ayrılmış ID'leri diziye çevir
     $ids = explode('-', $id);
     $ids = array_map('intval', $ids);
-    
+
+    // Dönüştürülen ID'leri logla
+    saveLog("ID'ler diziye çevrildi - ID'ler: " . implode(',', $ids), 'info', 'hisseSil', $_SESSION['user_id']);
+
     try {
         // İşlemi başlat
         $pdo->beginTransaction();
-        
+
         // Önce bu ID'lere bağlı tüm satış kayıtlarını bul ve sil
         $sql = "DELETE FROM portfolio WHERE durum = 'satis_kaydi' AND referans_alis_id IN (" . implode(',', $ids) . ")";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-        
+
         saveLog("Satış kayıtları silindi - ID'ler: " . implode('-', $ids), 'info', 'hisseSil', $_SESSION['user_id']);
-        
+
         // Şimdi ana kayıtları sil
         $sql = "DELETE FROM portfolio WHERE id IN (" . implode(',', $ids) . ")";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-        
+
         saveLog("Ana kayıtlar silindi - ID'ler: " . implode('-', $ids), 'info', 'hisseSil', $_SESSION['user_id']);
-        
+
         // İşlemi tamamla
         $pdo->commit();
         return true;
@@ -164,7 +170,7 @@ function portfoyListele()
                 $stmt->execute(['referans_id' => $alis['id']]);
                 $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
                 $satilan_adet = $satilan['toplam_satilan'];
-                
+
                 $kalan_adet = $alis['adet'] - $satilan_adet;
                 $toplam_maliyet += $alis['alis_fiyati'] * $kalan_adet;
                 $toplam_aktif_adet += $kalan_adet;
@@ -345,7 +351,7 @@ function portfoyListele()
                 $stmt->execute(['referans_id' => $alis['id']]);
                 $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
                 $satilan_adet = $satilan['toplam_satilan'];
-                
+
                 $kalan_adet = $alis['adet'] - $satilan_adet;
                 $durum_badge = '<span class="badge bg-secondary">Kısmi Satış</span>';
             } else if ($alis['durum'] == 'satildi') {
@@ -753,13 +759,13 @@ function hisseSat($id, $adet, $fiyat)
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['id' => $ids[0], 'user_id' => $user_id]);
         $sembol_data = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if (!$sembol_data) {
             throw new Exception("Hisse bulunamadı");
         }
-        
+
         $sembol = $sembol_data['sembol'];
-        
+
         // Bu sembole ait tüm aktif ve kısmi satılmış hisseleri alış tarihine göre sırala (FIFO)
         $sql = "SELECT * FROM portfolio 
                 WHERE user_id = :user_id 
@@ -769,19 +775,19 @@ function hisseSat($id, $adet, $fiyat)
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
         $fifo_hisseler = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         if (empty($fifo_hisseler)) {
             throw new Exception("Satılacak aktif hisse bulunamadı");
         }
-        
+
         saveLog("FIFO Satış Başlangıç - Sembol: " . $sembol . " - Satılacak Adet: " . $adet, 'info', 'hisseSat', $user_id);
-        
+
         foreach ($fifo_hisseler as $hisse) {
             // Satılacak adet kalmadıysa döngüden çık
             if ($toplam_satilan_adet >= $adet) {
                 break;
             }
-            
+
             // Hissede kalan adeti hesapla
             $sql = "SELECT IFNULL(SUM(adet), 0) as toplam_satilan
                     FROM portfolio 
@@ -791,32 +797,36 @@ function hisseSat($id, $adet, $fiyat)
             $stmt->execute(['referans_id' => $hisse['id']]);
             $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
             $onceden_satilan_adet = $satilan['toplam_satilan'];
-            
+
             $kalan_adet = $hisse['adet'] - $onceden_satilan_adet;
-            
+
             // Bu hisseden satılacak adet
             $satilacak_adet = min($adet - $toplam_satilan_adet, $kalan_adet);
-            
+
             if ($satilacak_adet <= 0) {
                 continue; // Bu hissede satılacak adet kalmamış, sonraki hisseye geç
             }
-            
+
             // Satış karını hesapla
             $satis_kar = ($fiyat - $hisse['alis_fiyati']) * $satilacak_adet;
             $toplam_satis_kar += $satis_kar;
-            
+
             // Satış sonrası kalan adet
             $yeni_kalan_adet = $kalan_adet - $satilacak_adet;
-            
-            saveLog("FIFO Satış - Hisse ID: " . $hisse['id'] . 
-                    " - Alış Tarihi: " . $hisse['alis_tarihi'] . 
-                    " - Toplam Adet: " . $hisse['adet'] . 
-                    " - Önceden Satılan: " . $onceden_satilan_adet . 
-                    " - Kalan: " . $kalan_adet . 
-                    " - Şimdi Satılacak: " . $satilacak_adet . 
-                    " - Yeni Kalan: " . $yeni_kalan_adet, 
-                    'info', 'hisseSat', $user_id);
-            
+
+            saveLog(
+                "FIFO Satış - Hisse ID: " . $hisse['id'] .
+                    " - Alış Tarihi: " . $hisse['alis_tarihi'] .
+                    " - Toplam Adet: " . $hisse['adet'] .
+                    " - Önceden Satılan: " . $onceden_satilan_adet .
+                    " - Kalan: " . $kalan_adet .
+                    " - Şimdi Satılacak: " . $satilacak_adet .
+                    " - Yeni Kalan: " . $yeni_kalan_adet,
+                'info',
+                'hisseSat',
+                $user_id
+            );
+
             if ($yeni_kalan_adet > 0) {
                 // Kısmi satış - mevcut kaydı güncelle
                 $sql = "UPDATE portfolio 
@@ -839,7 +849,7 @@ function hisseSat($id, $adet, $fiyat)
                     'id' => $hisse['id']
                 ]);
             }
-            
+
             // Satış kaydı oluştur
             $sql = "INSERT INTO portfolio 
                     (user_id, sembol, hisse_adi, adet, alis_fiyati, alis_tarihi, satis_fiyati, satis_tarihi, durum, anlik_fiyat, son_guncelleme, referans_alis_id) 
@@ -857,7 +867,7 @@ function hisseSat($id, $adet, $fiyat)
                 'anlik_fiyat' => $hisse['anlik_fiyat'],
                 'referans_alis_id' => $hisse['id']
             ]);
-            
+
             $toplam_satilan_adet += $satilacak_adet;
         }
 
@@ -924,12 +934,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql = "ALTER TABLE portfolio MODIFY COLUMN durum ENUM('aktif', 'satildi', 'kismi_satildi', 'satis_kaydi') DEFAULT 'aktif'";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-        
+
         // referans_alis_id sütununu ekle (eğer yoksa)
         $sql = "ALTER TABLE portfolio ADD COLUMN IF NOT EXISTS referans_alis_id int(11) DEFAULT NULL";
         $stmt = $pdo->prepare($sql);
         $stmt->execute();
-        
+
         saveLog("Veritabanı şeması güncellendi", 'info', 'schema_update', $_SESSION['user_id']);
     } catch (Exception $e) {
         saveLog("Veritabanı şeması güncelleme hatası: " . $e->getMessage(), 'error', 'schema_update', $_SESSION['user_id']);
@@ -992,7 +1002,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // AJAX silme işlemi için
-if (isset($_GET['sil']) && is_numeric($_GET['sil'])) {
+if (isset($_GET['sil'])) {
     if (hisseSil($_GET['sil'])) {
         echo 'success';
     } else {
