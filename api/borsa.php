@@ -134,14 +134,11 @@ function portfoyListele()
             $toplam_alis_lot += $alis['adet'];
         }
         
-        // Aktif hisseler varsa onların ortalamasını, yoksa tüm alışların ortalamasını kullan
-        $ortalama_alis = $toplam_aktif_adet > 0 ? 
-                          $toplam_maliyet / $toplam_aktif_adet : 
-                          ($toplam_alis_lot > 0 ? $toplam_alis_maliyet / $toplam_alis_lot : 0);
+        // Ortalama alış fiyatı her zaman toplam alış maliyeti / toplam alış lot sayısı olarak hesaplanacak
+        $ortalama_alis = $toplam_alis_lot > 0 ? $toplam_alis_maliyet / $toplam_alis_lot : 0;
         
-        // Toplam maliyet, aktif hisseler varsa onların maliyeti, yoksa ve tamamen satılmışsa toplam alış maliyeti
-        $gosterilecek_toplam_maliyet = $toplam_aktif_adet > 0 ? $toplam_maliyet : 
-                                      ($toplam_adet == 0 && $has_sold == 1 ? $toplam_alis_maliyet : 0);
+        // Toplam maliyet her zaman toplam alış maliyeti olarak hesaplanacak
+        $gosterilecek_toplam_maliyet = $toplam_alis_maliyet;
 
         // Kar/zarar hesapla - ortalama alış fiyatını kullan
         $kar_zarar = ($anlik_fiyat - $ortalama_alis) * $toplam_adet;
@@ -152,19 +149,13 @@ function portfoyListele()
         $satis_kari = 0;
         $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_adet, durum
                 FROM portfolio 
-                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'satildi' OR durum = 'kismi_satildi' OR durum = 'satis_kaydi')";
+                WHERE user_id = :user_id AND sembol = :sembol AND durum = 'satis_kaydi'";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
         $satislar = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($satislar as $satis) {
-            $satis_adedi = 0;
-            if ($satis['durum'] == 'satis_kaydi') {
-                $satis_adedi = $satis['adet'];
-            } else {
-                $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
-            }
-            $satis_kari += ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
+            $satis_kari += ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis['adet'];
         }
         $satis_kari_class = $satis_kari >= 0 ? 'kar' : 'zarar';
         $satis_kari_formatted = convertCurrencyToTRY($satis_kari);
@@ -331,10 +322,10 @@ function portfoyListele()
         $output .= '</thead>';
         $output .= '<tbody>';
 
-        // Satış kayıtlarını listele
+        // Satış kayıtlarını listele - SADECE satis_kaydi durumundaki kayıtları listele
         $sql = "SELECT id, adet, alis_fiyati, satis_fiyati, satis_tarihi, satis_adet, durum, alis_tarihi, referans_alis_id
                 FROM portfolio 
-                WHERE user_id = :user_id AND sembol = :sembol AND (durum = 'satildi' OR durum = 'kismi_satildi' OR durum = 'satis_kaydi')
+                WHERE user_id = :user_id AND sembol = :sembol AND durum = 'satis_kaydi'
                 ORDER BY satis_tarihi DESC";
         $stmt = $pdo->prepare($sql);
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
@@ -342,23 +333,11 @@ function portfoyListele()
 
         if (count($satilmis_hisseler) > 0) {
             foreach ($satilmis_hisseler as $satis) {
-                // Satış adedini belirle
-                if ($satis['durum'] == 'satis_kaydi') {
-                    // Yeni yapıda doğrudan adet kullanılır
-                    $satis_adedi = $satis['adet'];
-                } else {
-                    // Eski yapıda durum kontrolü yapılır
-                    $satis_adedi = $satis['durum'] == 'kismi_satildi' ? $satis['satis_adet'] : $satis['adet'];
-                }
-
+                // satis_kaydi durumunda doğrudan adet değerini kullan
+                $satis_adedi = $satis['adet'];
+                
                 $satis_kar_zarar = ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
                 $satis_kar_zarar_class = $satis_kar_zarar >= 0 ? 'kar' : 'zarar';
-
-                // Satış durumunu belirle
-                $satis_durumu = 'Satıldı';
-                if ($satis['durum'] == 'kismi_satildi') {
-                    $satis_durumu = 'Kısmi Satış';
-                }
 
                 $output .= '<tr>';
                 $output .= '<td>' . date('d.m.Y H:i', strtotime($satis['alis_tarihi'])) . '</td>';
@@ -366,7 +345,7 @@ function portfoyListele()
                 $output .= '<td>' . convertCurrencyToTRY($satis['alis_fiyati']) . '</td>';
                 $output .= '<td>' . convertCurrencyToTRY($satis['satis_fiyati']) . '</td>';
                 $output .= '<td class="' . $satis_kar_zarar_class . '">' . convertCurrencyToTRY($satis_kar_zarar) . '</td>';
-                $output .= '<td>' . $satis_durumu . ' (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
+                $output .= '<td>Satıldı (' . date('d.m.Y H:i', strtotime($satis['satis_tarihi'])) . ')</td>';
                 $output .= '</tr>';
             }
         } else {
