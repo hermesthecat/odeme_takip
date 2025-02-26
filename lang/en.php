@@ -152,6 +152,7 @@ return [
             'mark_as_received' => 'Mark as received',
             'mark_as_not_received' => 'Mark as not received'
         ],
+        'mark_not_received' => 'Mark as not received',
         'not_found' => 'No income has been added yet',
         'load_error' => 'An error occurred while loading incomes',
         'update_error' => 'An error occurred while updating income',
@@ -174,8 +175,6 @@ return [
             'error_message' => 'An error occurred while updating income',
             'error_not_found' => 'Income with ID :id not found'
         ],
-        'status' => 'Status',
-        'next_date' => 'Next Date',
         'total_amount' => 'Total Amount',
         'remaining_amount' => 'Remaining Amount',
         'received_amount' => 'Received Amount',
@@ -186,7 +185,9 @@ return [
         'recurring_remaining' => 'Remaining Repetition',
         'recurring_completed' => 'Completed Repetition',
         'recurring_next' => 'Next Repetition',
-        'recurring_last' => 'Last Repetition'
+        'recurring_last' => 'Last Repetition',
+        'status' => 'Status',
+        'next_date' => 'Next Date'
     ],
 
     // Ödemeler
