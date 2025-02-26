@@ -37,8 +37,8 @@ $user_default_currency = $_SESSION['base_currency'];
                         <i class="bi bi-list-nested me-1"></i>Log
                     </a>
                 <?php endif; ?>
-                <a href="borsa.php" class="btn btn-outline-success me-2">
-                    <i class="bi bi-graph-up me-1"></i>Borsa
+                <a href="app.php" class="btn btn-outline-success me-2">
+                    <i class="bi bi-graph-up me-1"></i>Bütçe
                 </a>
                 <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
                     <i class="bi bi-gear me-1"></i><?php echo t('settings.title'); ?>
