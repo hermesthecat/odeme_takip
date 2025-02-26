@@ -171,7 +171,7 @@ function portfoyListele()
 
         $output .= '</td>';
         $output .= '<td class="adet">' . $toplam_adet . '/' . $toplam_alis_adet . '</td>';
-        $output .= '<td class="alis-fiyat">' . (count($alislar) > 0 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : 'Çeşitli') . '</td>';
+        $output .= '<td class="alis-fiyat">' . (count($alislar) > 1 ? 'Çeşitli' : (count($alislar) == 1 ? convertCurrencyToTRY($alislar[0]['alis_fiyati']) : '-')) . '</td>';
         $output .= '<td class="anlik_fiyat text-center">' . convertCurrencyToTRY($anlik_fiyat) . '<br><small class="text-muted">(' . date('d.m.Y H:i:s', strtotime($son_guncelleme)) . ')</small></td>';
         $output .= '<td class="ortalama-alis">' . convertCurrencyToTRY($ortalama_alis) . '</td>';
         $output .= '<td class="toplam-maliyet">' . convertCurrencyToTRY($gosterilecek_toplam_maliyet) . '</td>';
