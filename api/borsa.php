@@ -157,9 +157,28 @@ function portfoyListele()
         $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
         $satislar = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        saveLog("Satış Karı Hesaplama Başlangıç - Hisse: " . $sembol . " - Satış Kayıtları Sayısı: " . count($satislar), 'info', 'portfoyListele', $user_id);
+
         foreach ($satislar as $satis) {
-            $satis_kari += ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis['adet'];
+            // Satış adedini doğru şekilde al
+            $satis_adedi = $satis['adet'];
+            
+            // Satış karını hesapla: (Satış Fiyatı - Alış Fiyatı) * Satılan Lot Sayısı
+            $satis_kar = ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
+            $satis_kari += $satis_kar;
+            
+            // Debug log
+            saveLog("Satış Karı Hesaplama (portfoyListele) - Hisse: " . $sembol . 
+                    " | Alış Fiyatı: " . $satis['alis_fiyati'] . 
+                    " | Satış Fiyatı: " . $satis['satis_fiyati'] . 
+                    " | Satış Adedi: " . $satis_adedi . 
+                    " | Hesaplanan Kar: " . $satis_kar . 
+                    " | Toplam Satış Karı: " . $satis_kari, 
+                    'info', 'portfoyListele', $user_id);
         }
+
+        saveLog("Satış Karı Hesaplama Sonuç - Hisse: " . $sembol . " - Toplam Satış Karı: " . $satis_kari, 'info', 'portfoyListele', $user_id);
+
         $satis_kari_class = $satis_kari >= 0 ? 'kar' : 'zarar';
         $satis_kari_formatted = convertCurrencyToTRY($satis_kari);
 
