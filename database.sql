@@ -202,8 +202,9 @@ CREATE TABLE `portfolio` (
     `satis_fiyati` decimal(10, 2) DEFAULT NULL,
     `satis_tarihi` timestamp NULL DEFAULT NULL,
     `satis_adet` int(11) DEFAULT NULL,
-    `durum` enum('aktif', 'satildi', 'kismi_satildi') DEFAULT 'aktif',
-    `user_id` int(11) DEFAULT NULL
+    `durum` enum('aktif', 'satildi', 'kismi_satildi', 'satis_kaydi') DEFAULT 'aktif',
+    `user_id` int(11) DEFAULT NULL,
+    `referans_alis_id` int(11) DEFAULT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
 --
 -- Dumping data for table `portfolio`
@@ -221,7 +222,8 @@ INSERT INTO `portfolio` (
         `satis_tarihi`,
         `satis_adet`,
         `durum`,
-        `user_id`
+        `user_id`,
+        `referans_alis_id`
     )
 VALUES (
         14,
@@ -236,7 +238,8 @@ VALUES (
         '2025-02-25 10:30:34',
         250,
         'satildi',
-        1
+        1,
+        NULL
     ),
     (
         15,
@@ -251,7 +254,8 @@ VALUES (
         '2025-02-25 10:46:39',
         5,
         'kismi_satildi',
-        1
+        1,
+        NULL
     ),
     (
         16,
@@ -266,7 +270,8 @@ VALUES (
         NULL,
         NULL,
         'aktif',
-        1
+        1,
+        NULL
     ),
     (
         17,
@@ -281,7 +286,8 @@ VALUES (
         NULL,
         NULL,
         'aktif',
-        1
+        1,
+        NULL
     );
 -- --------------------------------------------------------
 --

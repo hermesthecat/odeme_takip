@@ -162,19 +162,23 @@ function portfoyListele()
         foreach ($satislar as $satis) {
             // Satış adedini doğru şekilde al
             $satis_adedi = $satis['adet'];
-            
+
             // Satış karını hesapla: (Satış Fiyatı - Alış Fiyatı) * Satılan Lot Sayısı
             $satis_kar = ($satis['satis_fiyati'] - $satis['alis_fiyati']) * $satis_adedi;
             $satis_kari += $satis_kar;
-            
+
             // Debug log
-            saveLog("Satış Karı Hesaplama (portfoyListele) - Hisse: " . $sembol . 
-                    " | Alış Fiyatı: " . $satis['alis_fiyati'] . 
-                    " | Satış Fiyatı: " . $satis['satis_fiyati'] . 
-                    " | Satış Adedi: " . $satis_adedi . 
-                    " | Hesaplanan Kar: " . $satis_kar . 
-                    " | Toplam Satış Karı: " . $satis_kari, 
-                    'info', 'portfoyListele', $user_id);
+            saveLog(
+                "Satış Karı Hesaplama (portfoyListele) - Hisse: " . $sembol .
+                    " | Alış Fiyatı: " . $satis['alis_fiyati'] .
+                    " | Satış Fiyatı: " . $satis['satis_fiyati'] .
+                    " | Satış Adedi: " . $satis_adedi .
+                    " | Hesaplanan Kar: " . $satis_kar .
+                    " | Toplam Satış Karı: " . $satis_kari,
+                'info',
+                'portfoyListele',
+                $user_id
+            );
         }
 
         saveLog("Satış Karı Hesaplama Sonuç - Hisse: " . $sembol . " - Toplam Satış Karı: " . $satis_kari, 'info', 'portfoyListele', $user_id);
@@ -719,21 +723,20 @@ function hisseSat($id, $adet, $fiyat)
             if ($kalan_adet > 0) {
                 // Kısmi satış - mevcut kaydı güncelle
                 $sql = "UPDATE portfolio 
-                        SET adet = :kalan_adet, 
-                            durum = 'kismi_satis', 
-                            son_guncelleme = NOW() 
+                        SET durum = 'kismi_satildi', 
+                            satis_adet = :satis_adet
                         WHERE id = :id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
-                    'kalan_adet' => $kalan_adet,
+                    'satis_adet' => $satilacak_adet,
                     'id' => $hisse_id
                 ]);
 
                 // Satış kaydı oluştur
                 $sql = "INSERT INTO portfolio 
-                        (user_id, sembol, hisse_adi, adet, alis_fiyati, alis_tarihi, satis_fiyati, satis_tarihi, durum, anlik_fiyat, son_guncelleme) 
+                        (user_id, sembol, hisse_adi, adet, alis_fiyati, alis_tarihi, satis_fiyati, satis_tarihi, durum, anlik_fiyat, son_guncelleme, referans_alis_id) 
                         VALUES 
-                        (:user_id, :sembol, :hisse_adi, :adet, :alis_fiyati, :alis_tarihi, :satis_fiyati, NOW(), 'satis_kaydi', :anlik_fiyat, NOW())";
+                        (:user_id, :sembol, :hisse_adi, :adet, :alis_fiyati, :alis_tarihi, :satis_fiyati, NOW(), 'satis_kaydi', :anlik_fiyat, NOW(), :referans_alis_id)";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
                     'user_id' => $user_id,
@@ -743,21 +746,40 @@ function hisseSat($id, $adet, $fiyat)
                     'alis_fiyati' => $hisse['alis_fiyati'],
                     'alis_tarihi' => $hisse['alis_tarihi'],
                     'satis_fiyati' => $fiyat,
-                    'anlik_fiyat' => $hisse['anlik_fiyat']
+                    'anlik_fiyat' => $hisse['anlik_fiyat'],
+                    'referans_alis_id' => $hisse_id
                 ]);
             } else {
                 // Tam satış - durumu satıldı olarak güncelle
                 $sql = "UPDATE portfolio 
-                        SET adet = 0, 
-                            durum = 'satildi', 
+                        SET durum = 'satildi', 
                             satis_fiyati = :satis_fiyati, 
-                            satis_tarihi = NOW(), 
-                            son_guncelleme = NOW() 
+                            satis_tarihi = NOW(),
+                            satis_adet = :satis_adet
                         WHERE id = :id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
                     'satis_fiyati' => $fiyat,
+                    'satis_adet' => $satilacak_adet,
                     'id' => $hisse_id
+                ]);
+                
+                // Tam satış için de satış kaydı oluştur
+                $sql = "INSERT INTO portfolio 
+                        (user_id, sembol, hisse_adi, adet, alis_fiyati, alis_tarihi, satis_fiyati, satis_tarihi, durum, anlik_fiyat, son_guncelleme, referans_alis_id) 
+                        VALUES 
+                        (:user_id, :sembol, :hisse_adi, :adet, :alis_fiyati, :alis_tarihi, :satis_fiyati, NOW(), 'satis_kaydi', :anlik_fiyat, NOW(), :referans_alis_id)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([
+                    'user_id' => $user_id,
+                    'sembol' => $hisse['sembol'],
+                    'hisse_adi' => $hisse['hisse_adi'],
+                    'adet' => $satilacak_adet,
+                    'alis_fiyati' => $hisse['alis_fiyati'],
+                    'alis_tarihi' => $hisse['alis_tarihi'],
+                    'satis_fiyati' => $fiyat,
+                    'anlik_fiyat' => $hisse['anlik_fiyat'],
+                    'referans_alis_id' => $hisse_id
                 ]);
             }
 
@@ -773,10 +795,14 @@ function hisseSat($id, $adet, $fiyat)
         $pdo->commit();
 
         // Log
-        saveLog("Hisse satışı başarılı - Toplam Satılan Adet: " . $toplam_satilan_adet . 
-                " | Satış Fiyatı: " . $fiyat . 
-                " | Toplam Satış Karı: " . $toplam_satis_kar, 
-                'info', 'hisseSat', $user_id);
+        saveLog(
+            "Hisse satışı başarılı - Toplam Satılan Adet: " . $toplam_satilan_adet .
+                " | Satış Fiyatı: " . $fiyat .
+                " | Toplam Satış Karı: " . $toplam_satis_kar,
+            'info',
+            'hisseSat',
+            $user_id
+        );
 
         return true;
     } catch (Exception $e) {
@@ -798,18 +824,22 @@ function satisKariHesapla($kayit)
 
     // Satış adedini doğru şekilde al
     $satis_adet = $kayit['satis_adet'] ?? $kayit['adet'] ?? 0;
-    
+
     // Kar hesaplaması: (Satış Fiyatı - Alış Fiyatı) * Satılan Lot Sayısı
     $kar = ($kayit['satis_fiyati'] - $kayit['alis_fiyati']) * $satis_adet;
-    
+
     // Debug log
-    saveLog("Satış Karı Hesaplama - Hisse: " . $kayit['sembol'] . 
-            " | Alış Fiyatı: " . $kayit['alis_fiyati'] . 
-            " | Satış Fiyatı: " . $kayit['satis_fiyati'] . 
-            " | Satış Adedi: " . $satis_adet . 
-            " | Hesaplanan Kar: " . $kar, 
-            'info', 'satisKariHesapla', $_SESSION['user_id']);
-    
+    saveLog(
+        "Satış Karı Hesaplama - Hisse: " . $kayit['sembol'] .
+            " | Alış Fiyatı: " . $kayit['alis_fiyati'] .
+            " | Satış Fiyatı: " . $kayit['satis_fiyati'] .
+            " | Satış Adedi: " . $satis_adet .
+            " | Hesaplanan Kar: " . $kar,
+        'info',
+        'satisKariHesapla',
+        $_SESSION['user_id']
+    );
+
     return $kar;
 }
 
@@ -818,6 +848,22 @@ function satisKariHesapla($kayit)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // JSON yanıtı için header ayarla
     header('Content-Type: application/json');
+
+    // Veritabanı şemasını güncelle - durum enum değerine 'satis_kaydi' ekle
+    try {
+        $sql = "ALTER TABLE portfolio MODIFY COLUMN durum ENUM('aktif', 'satildi', 'kismi_satildi', 'satis_kaydi') DEFAULT 'aktif'";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        
+        // referans_alis_id sütununu ekle (eğer yoksa)
+        $sql = "ALTER TABLE portfolio ADD COLUMN IF NOT EXISTS referans_alis_id int(11) DEFAULT NULL";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        
+        saveLog("Veritabanı şeması güncellendi", 'info', 'schema_update', $_SESSION['user_id']);
+    } catch (Exception $e) {
+        saveLog("Veritabanı şeması güncelleme hatası: " . $e->getMessage(), 'error', 'schema_update', $_SESSION['user_id']);
+    }
 
     // addStock aksiyonu için
     if (isset($_POST['action']) && $_POST['action'] === 'addStock') {
