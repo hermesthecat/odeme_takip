@@ -769,6 +769,20 @@ function hisseSat($id, $adet, $fiyat)
         // İşlemi başlat
         $pdo->beginTransaction();
 
+        // Önce bu ID'lerin kullanıcıya ait olup olmadığını kontrol et
+        $id_list = implode(',', $ids);
+        $sql = "SELECT COUNT(*) as count FROM portfolio WHERE id IN ({$id_list}) AND user_id = :user_id";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute(['user_id' => $user_id]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        // Eğer bulunan kayıt sayısı, satılmak istenen ID sayısına eşit değilse
+        // bu, bazı ID'lerin kullanıcıya ait olmadığı anlamına gelir
+        if ($result['count'] != count($ids)) {
+            saveLog("Güvenlik ihlali tespit edildi! Kullanıcı başkasının hisselerini satmaya çalışıyor - ID'ler: " . implode(',', $ids), 'error', 'hisseSat', $user_id);
+            return false;
+        }
+
         // FIFO prensibine göre en eski alış kaydından başlayarak satış yap
         // Önce sembolü belirle
         $sql = "SELECT sembol FROM portfolio WHERE id = :id AND user_id = :user_id";
@@ -808,9 +822,10 @@ function hisseSat($id, $adet, $fiyat)
             $sql = "SELECT IFNULL(SUM(adet), 0) as toplam_satilan
                     FROM portfolio 
                     WHERE durum = 'satis_kaydi' 
-                    AND referans_alis_id = :referans_id";
+                    AND referans_alis_id = :referans_id
+                    AND user_id = :user_id";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute(['referans_id' => $hisse['id']]);
+            $stmt->execute(['referans_id' => $hisse['id'], 'user_id' => $user_id]);
             $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
             $onceden_satilan_adet = $satilan['toplam_satilan'];
 
@@ -847,10 +862,11 @@ function hisseSat($id, $adet, $fiyat)
                 // Kısmi satış - mevcut kaydı güncelle
                 $sql = "UPDATE portfolio 
                         SET durum = 'kismi_satildi'
-                        WHERE id = :id";
+                        WHERE id = :id AND user_id = :user_id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
-                    'id' => $hisse['id']
+                    'id' => $hisse['id'],
+                    'user_id' => $user_id
                 ]);
             } else {
                 // Tam satış - durumu satıldı olarak güncelle
@@ -858,11 +874,12 @@ function hisseSat($id, $adet, $fiyat)
                         SET durum = 'satildi', 
                             satis_fiyati = :satis_fiyati, 
                             satis_tarihi = NOW()
-                        WHERE id = :id";
+                        WHERE id = :id AND user_id = :user_id";
                 $stmt = $pdo->prepare($sql);
                 $stmt->execute([
                     'satis_fiyati' => $fiyat,
-                    'id' => $hisse['id']
+                    'id' => $hisse['id'],
+                    'user_id' => $user_id
                 ]);
             }
 
@@ -904,7 +921,7 @@ function hisseSat($id, $adet, $fiyat)
     } catch (Exception $e) {
         // Hata durumunda işlemi geri al
         $pdo->rollBack();
-        saveLog("Satış hatası: " . $e->getMessage(), 'error', 'hisseSat', $_SESSION['user_id']);
+        saveLog("Satış hatası: " . $e->getMessage(), 'error', 'hisseSat', $user_id);
         return false;
     }
 }
