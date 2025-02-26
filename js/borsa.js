@@ -585,7 +585,7 @@ function hisseSil(ids, event) {
     // ids'yi string'e çevir
     ids = ids.toString();
 
-    const idList = ids.split(',');
+    const idList = ids.split('-');
     const message = idList.length > 1 ?
         'Bu hissenin tüm kayıtlarını silmek istediğinizden emin misiniz?' :
         'Bu hisse kaydını silmek istediğinizden emin misiniz?';

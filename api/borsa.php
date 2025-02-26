@@ -52,13 +52,37 @@ function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi = '')
 function hisseSil($id)
 {
     global $pdo;
-    // Virgülle ayrılmış ID'leri diziye çevir
-    $ids = explode(',', $id);
+    // Tire ile ayrılmış ID'leri diziye çevir
+    $ids = explode('-', $id);
     $ids = array_map('intval', $ids);
-
-    $sql = "DELETE FROM portfolio WHERE id IN (" . implode(',', $ids) . ")";
-    $stmt = $pdo->prepare($sql);
-    return $stmt->execute();
+    
+    try {
+        // İşlemi başlat
+        $pdo->beginTransaction();
+        
+        // Önce bu ID'lere bağlı tüm satış kayıtlarını bul ve sil
+        $sql = "DELETE FROM portfolio WHERE durum = 'satis_kaydi' AND referans_alis_id IN (" . implode(',', $ids) . ")";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        
+        saveLog("Satış kayıtları silindi - ID'ler: " . implode('-', $ids), 'info', 'hisseSil', $_SESSION['user_id']);
+        
+        // Şimdi ana kayıtları sil
+        $sql = "DELETE FROM portfolio WHERE id IN (" . implode(',', $ids) . ")";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        
+        saveLog("Ana kayıtlar silindi - ID'ler: " . implode('-', $ids), 'info', 'hisseSil', $_SESSION['user_id']);
+        
+        // İşlemi tamamla
+        $pdo->commit();
+        return true;
+    } catch (Exception $e) {
+        // Hata durumunda işlemi geri al
+        $pdo->rollBack();
+        saveLog("Hisse silme hatası: " . $e->getMessage(), 'error', 'hisseSil', $_SESSION['user_id']);
+        return false;
+    }
 }
 
 /**
@@ -349,7 +373,7 @@ function portfoyListele()
 
             // Sadece aktif veya kısmen satılmış hisseler için sil butonu göster
             if ($alis['durum'] != 'satildi') {
-                $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(' . $alis['id'] . ', event)">Sil</button>';
+                $output .= '<button class="btn btn-sm btn-danger" onclick="hisseSil(\'' . $alis['id'] . '\', event)">Sil</button>';
             }
 
             $output .= '</div>
