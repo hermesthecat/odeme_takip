@@ -1,29 +1,75 @@
 const express = require('express');
 const router = express.Router();
+const Income = require('../models/Income'); // Assuming you have an Income model
 
 router.post('/addIncome', async (req, res) => {
-  // Implement add income logic here
-  res.send('Add income endpoint - Not implemented');
+  try {
+    const income = await Income.create(req.body);
+    res.status(201).send({ message: 'Income added successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error adding income' });
+  }
 });
 
 router.post('/deleteIncome', async (req, res) => {
-  // Implement delete income logic here
-  res.send('Delete income endpoint - Not implemented');
+  try {
+    await Income.destroy({
+      where: {
+        id: req.body.id
+      }
+    });
+    res.send({ message: 'Income deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error deleting income' });
+  }
 });
 
 router.get('/loadIncomes', async (req, res) => {
-  // Implement load incomes logic here
-  res.send('Load incomes endpoint - Not implemented');
+  try {
+    const incomes = await Income.findAll({
+      where: {
+        month: req.query.month,
+        year: req.query.year
+      }
+    });
+    res.send(incomes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error loading incomes' });
+  }
 });
 
 router.post('/markIncomeReceived', async (req, res) => {
-  // Implement mark income received logic here
-  res.send('Mark income received endpoint - Not implemented');
+  try {
+    await Income.update(
+      { received: true },
+      {
+        where: {
+          id: req.body.id
+        }
+      }
+    );
+    res.send({ message: 'Income marked as received successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error marking income as received' });
+  }
 });
 
 router.post('/updateIncome', async (req, res) => {
-  // Implement update income logic here
-  res.send('Update income endpoint - Not implemented');
+  try {
+    await Income.update(req.body, {
+      where: {
+        id: req.body.id
+      }
+    });
+    res.send({ message: 'Income updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error updating income' });
+  }
 });
 
 module.exports = router;
