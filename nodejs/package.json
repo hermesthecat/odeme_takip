@@ -1,0 +1,16 @@
+{
+  "name": "butce-takip-sistemi",
+  "version": "1.0.0",
+  "description": "A personal finance management application.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "Roo",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql2": "^3.12.0",
+    "sequelize": "^6.37.5"
+  }
+}
