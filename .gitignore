@@ -6,7 +6,8 @@ projectBrief.md
 .idea/*
 .env
 .env.local
-.clinerules-*
+.clinerules-debug
+.clinerules-code
+.clinerules-ask
+.clinerules-architect
 .roomodes
-nodejs/node_modules/*
-nodejs/package-lock.json
