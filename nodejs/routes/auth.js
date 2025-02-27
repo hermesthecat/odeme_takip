@@ -35,8 +35,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', async (req, res) => {
-  // Implement logout logic here
-  res.send('Logout endpoint - Not implemented');
+  res.send({ message: 'Logout endpoint - Not implemented' });
 });
 
 module.exports = router;
