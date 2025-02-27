@@ -14,6 +14,7 @@ const summaryRoutes = require('./routes/summary');
 const transferRoutes = require('./routes/transfer');
 
 app.use(express.json());
+app.use(express.static('public'));
 app.use('/auth', authRoutes);
 app.use('/admin', adminRoutes);
 app.use('/borsa', borsaRoutes);
