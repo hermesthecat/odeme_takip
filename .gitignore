@@ -8,3 +8,5 @@ projectBrief.md
 .env.local
 .clinerules-*
 .roomodes
+nodejs/node_modules/*
+nodejs/package-lock.json
