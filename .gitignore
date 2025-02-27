@@ -1,11 +1,14 @@
+// This file is used to ignore files and directories in the repository.
+memory-bank/*
+projectBrief.md
+.specstory/*
+.vscode/*
+.idea/*
+.env
+.env.local
+
 .clinerules-architect
 .clinerules-ask
 .clinerules-code
+.clinerules-debug
 .roomodes
-memory-bank/
-projectBrief.md
-.specstory/
-.vscode/
-.idea/
-.env
-.env.local
