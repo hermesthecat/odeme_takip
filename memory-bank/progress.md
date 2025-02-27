@@ -30,7 +30,26 @@ Priority Tasks:
    - Evaluate exchange rate history visualization
    - Consider additional history data points
    - Plan history feature for other modules
-3. Technical Improvements:
+3. Security Enhancements:
+   - Implement CSRF protection in `api/admin.php`
+   - Implement output sanitization in `api/admin.php`
+4. Authentication Enhancements:
+   - Implement encryption for remember-me tokens in `api/auth.php`
+   - Invalidate remember-me tokens on logout in `api/auth.php`
+5. Technical Improvements:
    - Identify optimization opportunities
    - Review database performance
    - Consider caching strategies
+5. Borsa Enhancements:
+   - Implement prepared statements for `hisseSil` function in `api/borsa.php`
+   - Secure API key storage for BigPara API in `api/borsa.php`
+   - Implement rate limiting for `hisseAra` function in `api/borsa.php`
+   - Implement output sanitization in `api/borsa.php`
+6. Currency Enhancements:
+   - Implement input validation for currencies in `api/currency.php`
+   - Secure API key storage for currency API (if possible) in `api/currency.php`
+   - Improve error handling in `api/currency.php`
+   - Implement output sanitization in `api/currency.php`
+7. Income Enhancements:
+   - Implement input validation for all parameters in `api/income.php`
+   - Implement output sanitization in `api/income.php`
