@@ -10,33 +10,50 @@ const Saving = sequelize.define('Saving', {
     primaryKey: true,
     autoIncrement: true
   },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
   name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(100),
     allowNull: false
   },
-  targetAmount: {
+  target_amount: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false
   },
-  currentAmount: {
+  current_amount: {
     type: DataTypes.DECIMAL(10, 2),
-    allowNull: false
+    defaultValue: 0.00
   },
   currency: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: DataTypes.STRING(3),
+    defaultValue: 'TRY'
   },
-  startDate: {
+  start_date: {
     type: DataTypes.DATE,
     allowNull: false
   },
-  targetDate: {
+  target_date: {
     type: DataTypes.DATE,
     allowNull: false
+  },
+  created_at: {
+    type: DataTypes.DATE
   }
 }, {
   tableName: 'savings',
-  timestamps: false
+  timestamps: false,
+  underscored: true,
+  indexes: [
+    {
+      fields: ['user_id']
+    }
+  ]
 });
 
 module.exports = Saving;

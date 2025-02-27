@@ -10,8 +10,24 @@ const Income = sequelize.define('Income', {
     primaryKey: true,
     autoIncrement: true
   },
+  user_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'users',
+      key: 'id'
+    }
+  },
+  parent_id: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+      model: 'income',
+      key: 'id'
+    }
+  },
   name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(100),
     allowNull: false
   },
   amount: {
@@ -19,24 +35,40 @@ const Income = sequelize.define('Income', {
     allowNull: false
   },
   currency: {
-    type: DataTypes.STRING,
-    allowNull: false
+    type: DataTypes.STRING(3),
+    defaultValue: 'TRY'
   },
-  date: {
+  first_date: {
     type: DataTypes.DATE,
     allowNull: false
   },
   frequency: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(20),
     allowNull: false
   },
-  received: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false
+  status: {
+    type: DataTypes.ENUM('pending', 'received'),
+    defaultValue: 'pending'
+  },
+  exchange_rate: {
+    type: DataTypes.DECIMAL(10, 4),
+    allowNull: true
+  },
+  created_at: {
+    type: DataTypes.DATE
   }
 }, {
-  tableName: 'incomes',
-  timestamps: false
+  tableName: 'income',
+  timestamps: false,
+  underscored: true,
+  indexes: [
+    {
+      fields: ['user_id']
+    },
+    {
+      fields: ['parent_id']
+    }
+  ]
 });
 
 module.exports = Income;
