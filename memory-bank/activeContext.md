@@ -212,7 +212,6 @@
     *   Global styles
 
 ## Architectural Analysis - Frontend Resource Management
-
 1.  Script Architecture
     *   External dependency management
     *   Version-specific loading
@@ -238,7 +237,6 @@
     *   Error handling
 
 ## Architectural Analysis - Frontend Components
-
 1.  Component Architecture
     *   Modular structure
     *   Bootstrap grid system
@@ -264,7 +262,6 @@
     *   Consistent spacing
 
 ## Architectural Analysis - Database System
-
 1.  Core Architecture
     *   Multi-currency support system
     *   Parent-child relationship handling
@@ -290,7 +287,6 @@
     *   Transaction support
 
 ## Architectural Analysis - Worker Process System
-
 1.  Worker Architecture
     *   Command-line interface
     *   Process isolation
@@ -316,7 +312,6 @@
     *   Status updates
 
 ## Architectural Analysis - Background Process System
-
 1.  Process Management
     *   Multi-threaded execution
     *   Process synchronization
@@ -342,7 +337,6 @@
     *   Status updates
 
 ## Architectural Analysis - Configuration System
-
 1.  Core Configuration
     *   Database connection management
     *   Session handling implementation
@@ -367,7 +361,6 @@
     *   Error handling setup
 
 ## Architectural Analysis - Main Application
-
 1.  Frontend Architecture
     *   Component-based layout structure
     *   Real-time data loading and updates
@@ -397,45 +390,17 @@
     *   Responsive design
 
 ## Architectural Analysis - API Structure
-
 1.  API Architecture Overview
-    *   Centralized routing system (api.php)
-    *   Modular endpoint organization
-    *   Consistent response format
-    *   Strong error handling patterns
-
 2.  Data Flow Architecture
-    *   Input validation and sanitization
-    *   Transaction management
-    *   Response formatting middleware
-    *   Multi-currency support
-
 3.  Security Implementation
-    *   Session-based authentication
-    *   XSS prevention through sanitization
-    *   SQL injection prevention
-    *   Error message sanitization
+4.  Security Concerns
+    *   Potential XSS vulnerabilities
+    *   Lack of CSRF protection
 
 ## Architectural Analysis - Admin Interface
-
 1.  Security Architecture
-    *   Layered security approach with session and role validation
-    *   Consistent access control implementation
-    *   Secure database operations with prepared statements
-    *   **Potential XSS vulnerabilities**
-    *   **Lack of CSRF protection**
-
 2.  User Interface Architecture
-    *   Responsive Bootstrap-based design
-    *   Modular component structure
-    *   Theme system integration
-    *   Consistent modal pattern for CRUD operations
-
 3.  Data Management
-    *   Efficient pagination implementation
-    *   Dynamic filtering system
-    *   Real-time data updates
-    *   Standardized error handling
 
 ## Recent Changes
 *   Completed exchange rate integration for savings feature:
@@ -456,28 +421,85 @@
 
 ## Architectural Analysis - Currency System
 1.  Security Architecture
-    *   Authentication: Checks if the user is logged in using `checkLogin()`.
-    *   Data Sanitization: Uses `strtolower()` for data sanitization.
-    *   Prepared Statements: Uses prepared statements to prevent SQL injection.
-    *   Error Handling: Implements error handling for API requests.
 2.  Security Concerns
-    *   **Lack of Input Validation:** The code does not validate the input currencies, which could lead to unexpected behavior or errors.
-    *   **API Request without API Key:** The code uses a third-party API without an API key, which could lead to rate limiting or service disruption.
-    *   **Error Handling:** The code returns 1 as the exchange rate if no rate is found, which could lead to incorrect calculations.
-    *   **Lack of Output Sanitization:** The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+    *   Lack of Input Validation: The code does not validate the input currencies, which could lead to unexpected behavior or errors.
+    *   API Request without API Key: The code uses a third-party API without an API key, which could lead to rate limiting or service disruption.
+    *   Error Handling: The code returns 1 as the exchange rate if no rate is found, which could lead to incorrect calculations.
+    *   Lack of Output Sanitization: The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
 
 ## Architectural Analysis - Income System
 1.  Security Architecture
-    *   Authentication: Checks if the user is logged in using `checkLogin()`.
-    *   Data Sanitization: Uses prepared statements to prevent SQL injection.
 2.  Security Concerns
-    *   **Lack of Input Validation:** The code does not validate all inputs, which could lead to unexpected behavior or errors.
-    *   **Lack of Output Sanitization:** The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+    *   Lack of Input Validation: The code does not validate all inputs, which could lead to unexpected behavior or errors.
+    *   Lack of Output Sanitization: The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
 
 ## Architectural Analysis - Payment System
 1.  Security Architecture
-    *   Authentication: Checks if the user is logged in using `checkLogin()`.
-    *   Data Sanitization: Uses prepared statements to prevent SQL injection.
 2.  Security Concerns
-    *   **Lack of Input Validation:** The code does not validate all inputs, which could lead to unexpected behavior or errors.
-    *   **Lack of Output Sanitization:** The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+    *   Lack of Input Validation: The code does not validate all inputs, which could lead to unexpected behavior or errors.
+    *   Lack of Output Sanitization: The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+
+## Architectural Analysis - Savings System
+1.  Security Architecture
+2.  Security Concerns
+    *   Lack of Input Validation: The code does not validate all inputs, which could lead to unexpected behavior or errors.
+    *   Lack of Output Sanitization: The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+
+## Architectural Analysis - Summary System
+1.  Security Architecture
+2.  Security Concerns
+    *   Lack of Input Validation: The code does not validate the month and year parameters, which could lead to unexpected behavior or errors.
+    *   Lack of Output Sanitization: The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+
+## Architectural Analysis - Transfer System
+1.  Security Architecture
+2.  Security Concerns
+    *   Lack of Input Validation: The code does not validate the `current_month` and `current_year` parameters, which could lead to unexpected behavior or errors.
+    *   Lack of Output Sanitization: The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+
+## Architectural Analysis - User System
+1.  Security Architecture
+2.  Security Concerns
+    *   Lack of Input Validation: The code does not validate the `base_currency` and `theme_preference` parameters, which could lead to unexpected behavior or errors.
+    *   Lack of Output Sanitization: The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+
+## Architectural Analysis - Utils System
+1.  Security Architecture
+2.  Security Concerns
+    *   Lack of Input Validation: The code does not validate the input parameters for the functions, which could lead to unexpected behavior or errors.
+    *   Lack of Output Sanitization: The code does not appear to have explicit output encoding, which could make it vulnerable to XSS attacks if user-provided data is displayed without proper sanitization.
+
+## Architectural Analysis - Validate System
+1.  Security Architecture
+2.  Security Concerns
+    *   N/A
+
+## Architectural Analysis - XSS System
+1.  Security Architecture
+2.  Security Concerns
+    *   N/A
+
+## Architectural Analysis - Language Class
+1.  Security Architecture
+2.  Security Concerns
+    *   None
+
+## Architectural Analysis - Log Class
+1.  Security Architecture
+2.  Security Concerns
+    *   None
+
+## Architectural Analysis - Income Modal
+1.  Security Architecture
+2.  Security Concerns
+    *   Lack of Output Sanitization: The code uses PHP to output translated strings and other data directly into the HTML. If the translations or other data contain malicious code, it could lead to XSS vulnerabilities.
+
+## Architectural Analysis - Payment Modal
+1.  Security Architecture
+2.  Security Concerns
+    *   Lack of Output Sanitization: The code uses PHP to output translated strings and other data directly into the HTML. If the translations or other data contain malicious code, it could lead to XSS vulnerabilities.
+
+## Architectural Analysis - Savings Modal
+1.  Security Architecture
+2.  Security Concerns
+    *   Lack of Output Sanitization: The code uses PHP to output translated strings and other data directly into the HTML. If the translations or other data contain malicious code, it could lead to XSS vulnerabilities.

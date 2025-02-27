@@ -494,3 +494,129 @@
 - Securely store the API key (if possible)
 - Improve error handling to avoid returning incorrect exchange rates
 - Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Payment System Security Analysis
+**Context:** Analysis of `api/payments.php` revealed potential security vulnerabilities
+**Decision:** Implement input validation and output sanitization in `api/payments.php`
+**Rationale:**
+- Prevent unexpected behavior and errors
+- Prevent XSS attacks
+**Implementation:**
+- Implement input validation for all parameters
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Savings System Security Analysis
+**Context:** Analysis of `api/savings.php` revealed potential security vulnerabilities
+**Decision:** Implement input validation and output sanitization in `api/savings.php`
+**Rationale:**
+- Prevent unexpected behavior and errors
+- Prevent XSS attacks
+**Implementation:**
+- Implement input validation for all parameters
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Summary System Security Analysis
+**Context:** Analysis of `api/summary.php` revealed potential security vulnerabilities
+**Decision:** Implement input validation and output sanitization in `api/summary.php`
+**Rationale:**
+- Prevent unexpected behavior and errors
+- Prevent XSS attacks
+**Implementation:**
+- Implement input validation for month and year parameters
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Transfer System Security Analysis
+**Context:** Analysis of `api/transfer.php` revealed potential security vulnerabilities
+**Decision:** Implement input validation and output sanitization in `api/transfer.php`
+**Rationale:**
+- Prevent unexpected behavior and errors
+- Prevent XSS attacks
+**Implementation:**
+- Implement input validation for month and year parameters
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - User System Security Analysis
+**Context:** Analysis of `api/user.php` revealed potential security vulnerabilities
+**Decision:** Implement input validation and output sanitization in `api/user.php`
+**Rationale:**
+- Prevent unexpected behavior and errors
+- Prevent XSS attacks
+**Implementation:**
+- Implement input validation for base_currency and theme_preference parameters
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Utils System Security Analysis
+**Context:** Analysis of `api/utils.php` revealed potential security vulnerabilities
+**Decision:** Implement input validation and output sanitization in `api/utils.php`
+**Rationale:**
+- Prevent unexpected behavior and errors
+- Prevent XSS attacks
+**Implementation:**
+- Implement input validation for all parameters
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Validate System Security Analysis
+**Context:** Analysis of `api/validate.php` revealed that it contains validation functions
+**Decision:** Document that `api/validate.php` contains validation functions
+**Rationale:**
+- To ensure that the system is protected against invalid data
+**Implementation:**
+- Document that `api/validate.php` contains validation functions
+
+## 2025-02-27 - XSS System Security Analysis
+**Context:** Analysis of `api/xss.php` revealed that it contains output sanitization functions
+**Decision:** Document that `api/xss.php` contains output sanitization functions
+**Rationale:**
+- To ensure that the system is protected against XSS attacks
+**Implementation:**
+- Document that `api/xss.php` contains output sanitization functions
+
+## 2025-02-27 - Language Class Security Analysis
+**Context:** Analysis of `classes/Language.php` revealed potential security vulnerabilities
+**Decision:** Implement output sanitization in `classes/Language.php`
+**Rationale:**
+- Prevent XSS attacks
+**Implementation:**
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Log Class Security Analysis
+**Context:** Analysis of `classes/log.php` revealed potential security vulnerabilities
+**Decision:** Implement input validation and output sanitization in `classes/log.php`
+**Rationale:**
+- Prevent unexpected behavior and errors
+- Prevent XSS attacks
+**Implementation:**
+- Implement input validation for all parameters
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Income Modal Security Analysis
+**Context:** Analysis of `modals/income_modal.php` revealed potential security vulnerabilities
+**Decision:** Implement output sanitization in `modals/income_modal.php`
+**Rationale:**
+- Prevent XSS attacks
+**Implementation:**
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Payment Modal Security Analysis
+**Context:** Analysis of `modals/payment_modal.php` revealed potential security vulnerabilities
+**Decision:** Implement output sanitization in `modals/payment_modal.php`
+**Rationale:**
+- Prevent XSS attacks
+**Implementation:**
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - Savings Modal Security Analysis
+**Context:** Analysis of `modals/savings_modal.php` revealed potential security vulnerabilities
+**Decision:** Implement output sanitization in `modals/savings_modal.php`
+**Rationale:**
+- Prevent XSS attacks
+**Implementation:**
+- Implement output sanitization using `htmlspecialchars()`
+
+## 2025-02-27 - User Settings Modal Security Analysis
+**Context:** Analysis of `modals/user_settings_modal.php` revealed potential security vulnerabilities
+**Decision:** Implement output sanitization in `modals/user_settings_modal.php`
+**Rationale:**
+- Prevent XSS attacks
+**Implementation:**
+- Implement output sanitization using `htmlspecialchars()`
