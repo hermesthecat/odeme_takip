@@ -6,9 +6,5 @@ projectBrief.md
 .idea/*
 .env
 .env.local
-
-.clinerules-architect
-.clinerules-ask
-.clinerules-code
-.clinerules-debug
+.clinerules-*
 .roomodes
