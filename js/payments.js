@@ -32,7 +32,7 @@ function updatePaymentsList(payments) {
                     <button
                         class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
                         onclick="markAsPaid(${payment.id})"
-                        title="${payment.status === 'paid' ? translations.payment.mark_paid.mark_as_paid : translations.payment.mark_paid.mark_as_not_paid}"
+                        title="${payment.status === 'paid' ? translations.payment.mark_paid.mark_as_not_paid : translations.payment.mark_paid.mark_as_paid}"
                     >
                         <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                     </button>
@@ -57,14 +57,14 @@ function updatePaymentsList(payments) {
         `);
     });
 
-    // Ödenmemiş ödeme varsa aktarma butonu satırını ekle
+    // Ödenmemiş ödeme varsa transfer butonunu ekle
     if (hasUnpaidPayments) {
         tbody.append(`
             <tr>
                 <td colspan="8" class="text-end">
                     <button class="btn btn-warning" onclick="transferUnpaidPayments()">
                         <i class="bi bi-arrow-right-circle me-1"></i>
-                        ${translations.payment.buttons.transfer}
+                        ${translations.payment.buttons.transfer || 'Sonraki Aya Transfer Et'}
                     </button>
                 </td>
             </tr>
@@ -93,6 +93,29 @@ function markAsPaid(id) {
                 button.removeClass('btn-outline-success').addClass('btn-success');
                 icon.removeClass('bi-check-circle').addClass('bi-check-circle-fill');
                 button.attr('title', translations.payment.mark_paid.mark_as_not_paid);
+            }
+
+            // Tüm ödemelerin durumunu kontrol et
+            const allPaymentButtons = $('#paymentList button[onclick^="markAsPaid"]');
+            const allPaid = Array.from(allPaymentButtons).every(btn => $(btn).hasClass('btn-success'));
+
+            // Transfer butonunu güncelle
+            const transferRow = $('#paymentList tr:last-child');
+            if (transferRow.find('.btn-warning').length > 0) {
+                if (allPaid) {
+                    transferRow.remove();
+                }
+            } else if (!allPaid) {
+                $('#paymentList').append(`
+                    <tr>
+                        <td colspan="8" class="text-end">
+                            <button class="btn btn-warning" onclick="transferUnpaidPayments()">
+                                <i class="bi bi-arrow-right-circle me-1"></i>
+                                ${translations.payment.buttons.transfer || 'Sonraki Aya Transfer Et'}
+                            </button>
+                        </td>
+                    </tr>
+                `);
             }
 
             // Eğer bu bir child ödeme ise parent'ın progress bar'ını güncelle
@@ -132,48 +155,6 @@ function markAsPaid(id) {
                                 .attr('aria-valuenow', progress);
 
                             statusText.text(`${paidCount}/${totalCount}`);
-
-                            // Tekrarlayan ödemeleri yeniden yükle ve toplam tutarları güncelle
-                            ajaxRequest({
-                                action: 'get_data',
-                                month: $('#monthSelect').val(),
-                                year: $('#yearSelect').val(),
-                                load_type: 'recurring_payments'
-                            }).done(function (response) {
-                                if (response.status === 'success' && response.data && response.data.recurring_payments) {
-                                    try {
-                                        let totalYearlyPayment = 0;
-                                        let totalUnpaidPayment = 0;
-
-                                        response.data.recurring_payments.forEach(payment => {
-                                            if (payment && payment.yearly_total) {
-                                                totalYearlyPayment += parseFloat(payment.yearly_total) || 0;
-                                                totalUnpaidPayment += parseFloat(payment.unpaid_total) || 0;
-                                            }
-                                        });
-
-                                        // Tablo altbilgisini güncelle
-                                        const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
-                                        tfoot.html(`
-                                            <tr class="text-end">
-                                                <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.total_payment}:</td>
-                                                <td class="fw-bold">${formatMyMoney(totalYearlyPayment.toFixed(2))} ${data.user.base_currency}</td>
-                                            </tr>
-                                            <tr class="text-end">
-                                                <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.pending_payment}:</td>
-                                                <td class="fw-bold">${formatMyMoney(totalUnpaidPayment.toFixed(2))} ${data.user.base_currency}</td>
-                                            </tr>
-                                        `);
-
-                                    } catch (error) {
-                                        console.error('Toplam tutarlar güncellenirken hata:', error);
-                                    }
-                                } else {
-                                    console.error('Recurring payments verisi alınamadı:', response);
-                                }
-                            }).fail(function (jqXHR, textStatus, errorThrown) {
-                                console.error('Ajax isteği başarısız:', textStatus, errorThrown);
-                            });
                         }
                     });
                 }
@@ -269,32 +250,52 @@ function deletePayment(id) {
 
 // Ödenmemiş ödemeleri sonraki aya aktar
 function transferUnpaidPayments() {
+    const currentMonth = parseInt($('#monthSelect').val());
+    const currentYear = parseInt($('#yearSelect').val());
+
+    // Sonraki ayı hesapla
+    let nextMonth = currentMonth + 1;
+    let nextYear = currentYear;
+    if (nextMonth > 12) {
+        nextMonth = 1;
+        nextYear++;
+    }
+
     Swal.fire({
+        title: translations.transfer.title || 'Ödemeleri Transfer Et',
+        text: translations.transfer.confirm || 'Ödenmemiş ödemeler sonraki aya transfer edilecek. Bu işlem geri alınamaz!',
         icon: 'warning',
-        title: translations.transfer.title,
-        text: translations.transfer.confirm,
         showCancelButton: true,
-        confirmButtonText: translations.transfer.transfer_button,
-        cancelButtonText: translations.transfer.cancel_button,
+        confirmButtonText: translations.transfer.transfer_button || 'Transfer Et',
+        cancelButtonText: translations.transfer.cancel_button || 'İptal',
     }).then((result) => {
         if (result.isConfirmed) {
-            const month = parseInt($('#monthSelect').val()) + 1;
-            const year = parseInt($('#yearSelect').val());
-
             ajaxRequest({
                 action: 'transfer_unpaid_payments',
-                current_month: month,
-                current_year: year
-            }).done(function (response) {
+                current_month: currentMonth,
+                current_year: currentYear,
+                next_month: nextMonth,
+                next_year: nextYear
+            }).done(function(response) {
                 if (response.status === 'success') {
-                    loadData();
-                    nextMonth();
+                    Swal.fire({
+                        icon: 'success',
+                        title: translations.transfer.success || 'Başarılı',
+                        text: translations.transfer.success_message || 'Ödemeler başarıyla transfer edildi',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        // Sonraki aya geç
+                        $('#monthSelect').val(nextMonth);
+                        $('#yearSelect').val(nextYear);
+                        updateUrl(nextMonth, nextYear);
+                        loadData();
+                    });
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: translations.error,
-                        text: response.message || translations.transfer.error,
-                        timer: 1500
+                        title: translations.error || 'Hata',
+                        text: response.message || translations.transfer.error || 'Transfer sırasında bir hata oluştu',
                     });
                 }
             });
