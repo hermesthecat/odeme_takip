@@ -247,7 +247,26 @@ function getSavingsHistory($saving_id)
         saveLog("Birikim geçmişi yükleme hatası: " . $e->getMessage(), 'error', 'getSavingsHistory', $_SESSION['user_id']);
     }
 
+    $savings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $previous_amount = null;
+
+    // check if the saving is a child
+    $is_child = $savings[0]['parent_id'] !== null;
+
+    foreach ($savings as &$saving) {
+        if ($previous_amount !== null) {
+            $difference = $saving['current_amount'] - $previous_amount;
+            $saving['amount_difference'] = $difference;
+            $saving['change_direction'] = $difference > 0 ? '+' : ($difference < 0 ? '-' : '--');
+        } else {
+            $saving['amount_difference'] = 0;
+            $saving['change_direction'] = '+';
+        }
+        $previous_amount = $saving['current_amount'];
+    }
+    unset($saving); // Referansı temizle
+
     saveLog("Birikim geçmişi yüklendi: " . $saving_id, 'info', 'getSavingsHistory', $_SESSION['user_id']);
 
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $savings;
 }

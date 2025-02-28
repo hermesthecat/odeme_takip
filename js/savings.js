@@ -169,7 +169,7 @@ function showSavingsHistory(savingId) {
 
                 historyHtml += `<tr>
                 <td>${formattedDate}</td>
-                <td>${current_amountText}</td>
+                <td>${current_amountText}<br><small class="text-muted">(${item.change_direction} ${item.amount_difference})</small></td>
                 <td>${updateType}</td>
                 </tr>`;
             });
