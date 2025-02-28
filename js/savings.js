@@ -33,6 +33,8 @@ function updateSavingsList(savings) {
             current_amountText += `<br><small class="text-muted">(${formatMyMoney(converted_currentAmount.toFixed(2))} ${data.user.base_currency})</small>`;
         }
 
+        let goalText = '';
+
         // check if the saving is a goal
         if (saving.goal) {
             goalText = '✔️';
@@ -42,18 +44,28 @@ function updateSavingsList(savings) {
 
         tbody.append(`
             <tr>
-                <td>${saving.name} ${goalText}</td>
+                <td>
+                ${progress === 100 ?
+                `${goalText} ${saving.name} ${goalText}`
+                :
+                `${saving.name}`
+            }
+                </td>
                 <td>${target_amountText}</td>
                 <td>${current_amountText}</td>
                 <td>${saving.start_date}</td>
                 <td>${saving.target_date}</td>
-                <td>
-                    <div class="progress mb-1">
-                        <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${progress}%" 
-                             aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
+                <td class="text-center">
+                    ${progress === 100 ?
+                `💯`
+                :
+                `<div class="progress mb-1">
+                            <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${progress}%" 
+                                 aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
                         </div>
-                    </div>
-                    <small class="text-muted text-center d-block">%${progress.toFixed(0)}</small>
+                        <small class="text-muted text-center d-block">%${progress.toFixed(0)}</small>`
+            }
                 </td>
                 <td class="text-end">
                     <div class="btn-group">

@@ -199,7 +199,6 @@ $user_default_currency = $_SESSION['base_currency'];
                                 <th><?php echo t('saving_name'); ?></th>
                                 <th><?php echo t('target_amount'); ?></th>
                                 <th><?php echo t('current_amount'); ?></th>
-                                <th><?php echo t('saving.currency'); ?></th>
                                 <th><?php echo t('start_date'); ?></th>
                                 <th><?php echo t('target_date'); ?></th>
                                 <th><?php echo t('saving.progress'); ?></th>
