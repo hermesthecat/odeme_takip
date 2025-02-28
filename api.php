@@ -339,6 +339,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $saving = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if ($saving) {
+                    // Eğer bu bir parent kayıt ise ve child'ları varsa
+                    if ($saving['parent_id'] === null) {
+                        $stmt = $pdo->prepare("SELECT current_amount FROM savings 
+                                             WHERE parent_id = ? AND user_id = ? 
+                                             ORDER BY created_at DESC LIMIT 1");
+                        $stmt->execute([$saving['id'], $user_id]);
+                        $last_child = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                        // Eğer child varsa onun current_amount'unu kullan
+                        if ($last_child) {
+                            $saving['current_amount'] = $last_child['current_amount'];
+                        }
+                    }
+
                     $response = [
                         'status' => 'success',
                         'data' => $saving

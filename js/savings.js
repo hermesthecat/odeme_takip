@@ -153,12 +153,11 @@ function showSavingsHistory(savingId) {
         if (response.status === 'success') {
             const history = response.data;
             let historyHtml = '<table class="table table-bordered">';
-            historyHtml += '<thead><tr><th>Date</th><th>Amount</th><th>Type</th></tr></thead>';
+            historyHtml += '<thead><tr><th>Date</th><th>Amount</th></tr></thead>';
             historyHtml += '<tbody>';
             history.forEach(item => {
                 const formattedDate = new Date(item.created_at).toLocaleDateString();
-                const updateType = item.update_type === 'initial' ? 'Initial' : 'Update';
-                let current_amountText = `${formatMyMoney(parseFloat(item.current_amount).toFixed(2))} ${item.currency}`;
+                let current_amountText = '';
 
                 // Eğer baz para biriminden farklıysa ve kur bilgisi varsa dönüştürülmüş tutarı ekle
                 if (item.currency !== data.user.base_currency && item.exchange_rate) {
@@ -167,10 +166,17 @@ function showSavingsHistory(savingId) {
                     current_amountText += `<br><small class="text-muted">(${formatMyMoney(converted_currentAmount.toFixed(2))} ${data.user.base_currency})</small>`;
                 }
 
+                // chck change_direction or amount_difference is null or not and create a current_amountText
+                if (item.change_direction === null || item.amount_difference === null) {
+                    current_amountText = `${formatMyMoney(parseFloat(item.current_amount).toFixed(2))} ${item.currency}`;
+                } else {
+                    current_amountText = `${formatMyMoney(parseFloat(item.current_amount).toFixed(2))}<br><small class="text-muted">${item.amount_difference} ${item.change_direction} </small>`;
+                }
+
+
                 historyHtml += `<tr>
                 <td>${formattedDate}</td>
-                <td>${current_amountText}<br><small class="text-muted">(${item.change_direction} ${item.amount_difference})</small></td>
-                <td>${updateType}</td>
+                <td>${current_amountText}</td>
                 </tr>`;
             });
             historyHtml += '</tbody></table>';

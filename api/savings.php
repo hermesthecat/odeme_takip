@@ -80,6 +80,7 @@ function loadSavings()
 {
     global $pdo, $user_id;
 
+    // Önce parent kayıtları al
     $stmt = $pdo->prepare("SELECT * FROM savings WHERE user_id = ? AND parent_id IS NULL");
 
     if (!$stmt->execute([$user_id])) {
@@ -90,10 +91,22 @@ function loadSavings()
     $savings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($savings as &$saving) {
+        // Her parent için son child'ı kontrol et
+        $stmt = $pdo->prepare("SELECT current_amount FROM savings 
+                              WHERE parent_id = ? AND user_id = ? 
+                              ORDER BY created_at DESC LIMIT 1");
+        $stmt->execute([$saving['id'], $user_id]);
+        $last_child = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Eğer child varsa onun current_amount'unu kullan
+        if ($last_child) {
+            $saving['current_amount'] = $last_child['current_amount'];
+        }
+
         $saving['formatted_start_date'] = formatDate($saving['start_date']);
         $saving['formatted_target_date'] = formatDate($saving['target_date']);
     }
-    unset($saving); // Referansı temizle
+    unset($saving);
 
     saveLog("Birikimler yüklendi: " . $user_id, 'info', 'loadSavings', $_SESSION['user_id']);
 
@@ -146,8 +159,8 @@ function updateSaving()
     if ($stmt->execute([$user_id, $saving['id'], $saving['name'], $saving['target_amount'], $current_amount, $saving['currency'], $saving['start_date'], $saving['target_date'], $exchange_rate, 'update'])) {
 
         // Update original saving record
-        $stmt = $pdo->prepare("UPDATE savings SET current_amount = ?, exchange_rate = ? WHERE id = ? AND user_id = ?");
-        $stmt->execute([$current_amount, $exchange_rate, $saving['id'], $user_id]);
+        $stmt = $pdo->prepare("UPDATE savings SET exchange_rate = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$exchange_rate, $saving['id'], $user_id]);
         saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateSaving', $_SESSION['user_id']);
         return true;
     } else {
@@ -160,10 +173,6 @@ function updateSaving()
 
     if ($stmt->execute([$user_id, $saving['id'], $saving['name'], $saving['target_amount'], $current_amount, $saving['currency'], $saving['start_date'], $saving['target_date'], $exchange_rate, 'update'])) {
 
-        // Update original saving record
-        $stmt = $pdo->prepare("UPDATE savings SET current_amount = ? WHERE id = ? AND user_id = ?");
-        $stmt->execute([$current_amount, $saving['id'], $user_id]);
-        saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateSaving', $_SESSION['user_id']);
         return true;
     } else {
         throw new Exception(t('saving.update_error'));
@@ -225,8 +234,8 @@ function updateFullSaving()
     $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt->execute([$user_id, $saving['id'], $name, $target_amount, $current_amount, $currency, $start_date, $target_date, $exchange_rate, 'update'])) {
         // Update original saving record
-        $stmt = $pdo->prepare("UPDATE savings SET current_amount = ?, exchange_rate = ? WHERE id = ? AND user_id = ?");
-        $stmt->execute([$current_amount, $exchange_rate, $saving['id'], $user_id]);
+        $stmt = $pdo->prepare("UPDATE savings SET  exchange_rate = ? WHERE id = ? AND user_id = ?");
+        $stmt->execute([$exchange_rate, $saving['id'], $user_id]);
         saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateFullSaving', $_SESSION['user_id']);
         return true;
     } else {
@@ -239,6 +248,12 @@ function getSavingsHistory($saving_id)
 {
     global $pdo, $user_id;
 
+    // kullanıcının ana para birimini al
+    $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
+    $stmt->execute([$user_id]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    $base_currency = $user['base_currency'];
+
     $stmt = $pdo->prepare("SELECT * FROM savings WHERE user_id = ? AND (id = ? OR parent_id = ?) ORDER BY created_at ASC");
     $stmt->execute([$user_id, $saving_id, $saving_id]);
 
@@ -250,23 +265,36 @@ function getSavingsHistory($saving_id)
     $savings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     $previous_amount = null;
 
-    // check if the saving is a child
-    $is_child = $savings[0]['parent_id'] !== null;
-
     foreach ($savings as &$saving) {
         if ($previous_amount !== null) {
+
             $difference = $saving['current_amount'] - $previous_amount;
+
+            // fark pozitf ise rakamın önüne + koy
+            if ($difference > 0) {
+                $difference = '+' . $difference . ' ' . $base_currency;
+            } else {
+                $difference = $difference . ' ' . $base_currency;
+            }
+
             $saving['amount_difference'] = $difference;
-            $saving['change_direction'] = $difference > 0 ? '+' : ($difference < 0 ? '-' : '--');
+
+            if ($difference > 0) {
+                $saving['change_direction'] = '😀';
+            } else if ($difference < 0) {
+                $saving['change_direction'] = '☹️';
+            } else {
+                $saving['change_direction'] = 'Değişmedi';
+            }
         } else {
-            $saving['amount_difference'] = 0;
-            $saving['change_direction'] = '+';
+            $saving['amount_difference'] = null;
+            $saving['change_direction'] = null;
         }
+
         $previous_amount = $saving['current_amount'];
     }
-    unset($saving); // Referansı temizle
+    unset($saving);
 
     saveLog("Birikim geçmişi yüklendi: " . $saving_id, 'info', 'getSavingsHistory', $_SESSION['user_id']);
-
     return $savings;
 }
