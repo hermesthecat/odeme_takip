@@ -226,6 +226,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                  ORDER BY first_date ASC");
             if ($stmt->execute([$_POST['parent_id'], $user_id])) {
                 $child_payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($child_payments as &$child_payment) {
+                    $child_payment['formatted_first_date'] = formatDate($child_payment['first_date']);
+                }
+                unset($child_payment); // Referansı temizle
+
                 $response = [
                     'status' => 'success',
                     'data' => [

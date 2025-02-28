@@ -187,9 +187,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+            saveLog("Kullanıcı çıkış işlemi: " . $_SESSION['username'], 'info', 'logout', 0);
             session_destroy();
             $response = ['status' => 'success', 'message' => t('auth.logout_success')];
-            saveLog("Kullanıcı çıkış işlemi: " . $_SESSION['username'], 'info', 'logout', 0);
+
             break;
     }
 }

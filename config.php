@@ -66,7 +66,13 @@ function checkLogin()
 // like 2025-02-25 to 25/02/2025
 function formatDate($date)
 {
-    return date('d/m/Y', strtotime($date));
+
+    // check session lang is turkish
+    if (isset($_SESSION['lang']) && $_SESSION['lang'] === 'tr') {
+        return date('d/m/Y', strtotime($date));
+    }
+
+    return date('Y-m-d', strtotime($date));
 }
 
 // supported currencies
