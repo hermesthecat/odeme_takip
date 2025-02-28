@@ -2,23 +2,10 @@
 require_once '../config.php';
 require_once '../classes/log.php';
 
-// Session güvenlik ayarları
-ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 1);
-ini_set('session.use_only_cookies', 1);
-ini_set('session.cookie_samesite', 'Strict');
-
-// CSRF token kontrolü için fonksiyon
-function validateCSRFToken() {
-    if (!isset($_POST['csrf_token']) || !isset($_SESSION['csrf_token']) ||
-        $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        return false;
-    }
-    return true;
-}
 
 // XSS koruma fonksiyonu
-function sanitizeInput($data) {
+function sanitizeInput($data)
+{
     return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
 }
 
@@ -30,12 +17,6 @@ header('X-Content-Type-Options: nosniff');
 $response = ['status' => 'error', 'message' => t('auth.invalid_request')];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // CSRF kontrolü
-    if (!validateCSRFToken()) {
-        $response = ['status' => 'error', 'message' => 'Invalid CSRF token'];
-        echo json_encode($response);
-        exit;
-    }
 
     $action = sanitizeInput($_POST['action'] ?? '');
 
@@ -100,9 +81,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'true';
 
             // Brute force koruması
-            if (isset($_SESSION['login_attempts'][$username]) && 
-                $_SESSION['login_attempts'][$username]['count'] >= 5 && 
-                time() - $_SESSION['login_attempts'][$username]['time'] < 900) {
+            if (
+                isset($_SESSION['login_attempts'][$username]) &&
+                $_SESSION['login_attempts'][$username]['count'] >= 5 &&
+                time() - $_SESSION['login_attempts'][$username]['time'] < 900
+            ) {
                 $response = ['status' => 'error', 'message' => t('auth.too_many_attempts')];
                 break;
             }
@@ -132,11 +115,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (password_verify($password, $row['password'])) {
                             // Session yenileme
                             session_regenerate_id(true);
-                            
+
                             // Session timeout ayarı
                             $_SESSION['last_activity'] = time();
                             $_SESSION['expire_time'] = 30 * 60; // 30 dakika
-                            
+
                             // Yeni CSRF token oluştur
                             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
@@ -181,13 +164,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (session_status() === PHP_SESSION_NONE) {
                 session_start();
             }
-            
+
             // Tüm session verilerini temizle
             $_SESSION = array();
-            
+
             // Session cookie'sini sil
             if (isset($_COOKIE[session_name()])) {
-                setcookie(session_name(), '', time()-3600, '/');
+                setcookie(session_name(), '', time() - 3600, '/');
             }
 
             // Remember token'ı temizle

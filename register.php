@@ -1,5 +1,10 @@
 <?php
 require_once __DIR__ . '/header.php';
+
+if (isset($_SESSION['user_id'])) {
+    header('Location: app.php');
+    exit;
+}
 ?>
 
 <body>
@@ -17,24 +22,24 @@ require_once __DIR__ . '/header.php';
             <div class="card-body">
                 <form id="registerForm" autocomplete="off" novalidate>
                     <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
-                    
+
                     <div class="mb-3">
                         <label class="form-label"><?php echo htmlspecialchars(t('username')); ?></label>
-                        <input type="text" class="form-control" name="username" required 
-                               minlength="3" pattern="[a-zA-Z0-9_]{3,}"
-                               title="<?php echo htmlspecialchars(t('auth.username_requirements')); ?>"
-                               autocomplete="username">
+                        <input type="text" class="form-control" name="username" required
+                            minlength="3" pattern="[a-zA-Z0-9_]{3,}"
+                            title="<?php echo htmlspecialchars(t('auth.username_requirements')); ?>"
+                            autocomplete="username">
                         <div class="form-text"><?php echo htmlspecialchars(t('min_length', ['min' => 3])); ?></div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label"><?php echo htmlspecialchars(t('password')); ?></label>
                         <div class="input-group">
-                            <input type="password" class="form-control" name="password" required 
-                                   minlength="8" 
-                                   pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                                   title="<?php echo htmlspecialchars(t('auth.password_requirements')); ?>"
-                                   autocomplete="new-password">
+                            <input type="password" class="form-control" name="password" required
+                                minlength="8"
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                                title="<?php echo htmlspecialchars(t('auth.password_requirements')); ?>"
+                                autocomplete="new-password">
                             <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                 <i class="bi bi-eye"></i>
                             </button>
@@ -53,7 +58,7 @@ require_once __DIR__ . '/header.php';
                     <div class="mb-3">
                         <label class="form-label"><?php echo htmlspecialchars(t('password_confirm')); ?></label>
                         <input type="password" class="form-control" name="password_confirm" required
-                               autocomplete="new-password">
+                            autocomplete="new-password">
                     </div>
 
                     <div class="mb-3">
@@ -83,90 +88,93 @@ require_once __DIR__ . '/header.php';
     ?>
 
     <script>
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const password = this.querySelector('input[name="password"]').value;
-        const confirmPassword = this.querySelector('input[name="password_confirm"]').value;
-        
-        if (password !== confirmPassword) {
-            alert('<?php echo htmlspecialchars(t('auth.password_mismatch')); ?>');
-            return;
-        }
-        
-        // Rate limiting kontrolü
-        if (sessionStorage.getItem('lastRegisterAttempt')) {
-            const lastAttempt = parseInt(sessionStorage.getItem('lastRegisterAttempt'));
-            if (Date.now() - lastAttempt < 2000) {
-                alert('<?php echo htmlspecialchars(t('auth.wait_before_retry')); ?>');
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const password = this.querySelector('input[name="password"]').value;
+            const confirmPassword = this.querySelector('input[name="password_confirm"]').value;
+
+            if (password !== confirmPassword) {
+                alert('<?php echo htmlspecialchars(t('auth.password_mismatch')); ?>');
                 return;
             }
-        }
-        sessionStorage.setItem('lastRegisterAttempt', Date.now());
 
-        const formData = new FormData(this);
-        fetch('api/auth.php', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                window.location.href = 'login.php';
-            } else {
-                alert(data.message);
+            // Rate limiting kontrolü
+            if (sessionStorage.getItem('lastRegisterAttempt')) {
+                const lastAttempt = parseInt(sessionStorage.getItem('lastRegisterAttempt'));
+                if (Date.now() - lastAttempt < 2000) {
+                    alert('<?php echo htmlspecialchars(t('auth.wait_before_retry')); ?>');
+                    return;
+                }
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('<?php echo htmlspecialchars(t('system_error')); ?>');
+            sessionStorage.setItem('lastRegisterAttempt', Date.now());
+
+            const formData = new FormData(this);
+            fetch('api/auth.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = 'login.php';
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('<?php echo htmlspecialchars(t('system_error')); ?>');
+                });
         });
-    });
 
-    // Şifre göster/gizle
-    document.getElementById('togglePassword').addEventListener('click', function() {
+        // Şifre göster/gizle
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.querySelector('input[name="password"]');
+            const icon = this.querySelector('i');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        });
+
+        // Şifre gereksinimleri kontrolü
         const passwordInput = document.querySelector('input[name="password"]');
-        const icon = this.querySelector('i');
-        
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('bi-eye');
-            icon.classList.add('bi-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('bi-eye-slash');
-            icon.classList.add('bi-eye');
-        }
-    });
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
 
-    // Şifre gereksinimleri kontrolü
-    const passwordInput = document.querySelector('input[name="password"]');
-    passwordInput.addEventListener('input', function() {
-        const password = this.value;
-        
-        document.querySelector('.length-check').classList.toggle('text-success', password.length >= 8);
-        document.querySelector('.uppercase-check').classList.toggle('text-success', /[A-Z]/.test(password));
-        document.querySelector('.lowercase-check').classList.toggle('text-success', /[a-z]/.test(password));
-        document.querySelector('.number-check').classList.toggle('text-success', /\d/.test(password));
-        document.querySelector('.special-check').classList.toggle('text-success', /[@$!%*?&]/.test(password));
-    });
+            document.querySelector('.length-check').classList.toggle('text-success', password.length >= 8);
+            document.querySelector('.uppercase-check').classList.toggle('text-success', /[A-Z]/.test(password));
+            document.querySelector('.lowercase-check').classList.toggle('text-success', /[a-z]/.test(password));
+            document.querySelector('.number-check').classList.toggle('text-success', /\d/.test(password));
+            document.querySelector('.special-check').classList.toggle('text-success', /[@$!%*?&]/.test(password));
+        });
     </script>
 
     <style>
-    .password-requirements {
-        font-size: 0.875em;
-    }
-    .password-requirements ul {
-        list-style: none;
-        padding-left: 0;
-    }
-    .password-requirements li::before {
-        content: '❌';
-        margin-right: 5px;
-    }
-    .password-requirements li.text-success::before {
-        content: '✅';
-    }
+        .password-requirements {
+            font-size: 0.875em;
+        }
+
+        .password-requirements ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .password-requirements li::before {
+            content: '❌';
+            margin-right: 5px;
+        }
+
+        .password-requirements li.text-success::before {
+            content: '✅';
+        }
     </style>
 </body>
 
