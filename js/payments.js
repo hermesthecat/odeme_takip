@@ -317,8 +317,10 @@ function updateRecurringPaymentsList(recurring_payments) {
     }
 
     recurring_payments.forEach(function (payment) {
+
         // Taksit bilgisini parçala (örn: "2/5" -> [2, 5])
         const [paid, total] = payment.payment_status.split('/').map(Number);
+
         const progress = (paid / total) * 100;
         const progressClass = progress < 25 ? 'bg-danger' :
             progress < 50 ? 'bg-warning' :

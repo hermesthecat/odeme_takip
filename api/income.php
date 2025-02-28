@@ -160,6 +160,12 @@ function loadIncomes()
 
     saveLog("Gelirler alındı: " . $user_id . " " . $month . " " . $year, 'info', 'loadIncomes', $_SESSION['user_id']);
 
+    foreach ($incomes as &$income) {
+        $income['formatted_first_date'] = formatDate($income['first_date']);
+        $income['formatted_next_income_date'] = $income['next_income_date'] ? formatDate($income['next_income_date']) : null;
+    }
+    unset($income); // Referansı temizle
+
     return $incomes;
 }
 

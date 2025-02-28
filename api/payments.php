@@ -48,74 +48,75 @@ function addPayment()
 
     $pdo->beginTransaction();
 
-    // Kur bilgisini al
-    $exchange_rate = null;
-    if ($currency !== $base_currency) {
-        $exchange_rate = getExchangeRate($currency, $base_currency);
-        if (!$exchange_rate) {
-            throw new Exception(t('payment.rate_error'));
-            saveLog("Ödeme kuru hatası: " . $currency . " to " . $base_currency, 'error', 'addPayment', $_SESSION['user_id']);
+    try {
+        // Kur bilgisini al
+        $exchange_rate = null;
+        if ($currency !== $base_currency) {
+            $exchange_rate = getExchangeRate($currency, $base_currency);
+            if (!$exchange_rate) {
+                throw new Exception(t('payment.rate_error'));
+            }
         }
-    }
 
-    // Ana kaydı ekle
-    $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate) 
-                         VALUES (?, NULL, ?, ?, ?, ?, ?, ?)");
+        // Ana kaydı ekle
+        $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate, status) 
+                             VALUES (?, NULL, ?, ?, ?, ?, ?, ?, 'pending')");
 
-    if (!$stmt->execute([
-        $user_id,
-        $name,
-        $amount,
-        $currency,
-        $first_date,
-        $frequency,
-        $exchange_rate
-    ])) {
-        throw new Exception(t('payment.add_error'));
-        saveLog("Ödeme ekleme hatası: " . $e->getMessage(), 'error', 'addPayment', $_SESSION['user_id']);
-    } else {
-        saveLog("Ödeme eklendi: " . $name, 'info', 'addPayment', $_SESSION['user_id']);
-    }
+        if (!$stmt->execute([
+            $user_id,
+            $name,
+            $amount,
+            $currency,
+            $first_date,
+            $frequency,
+            $exchange_rate
+        ])) {
+            throw new Exception(t('payment.add_error'));
+        }
 
-    $parent_id = $pdo->lastInsertId();
+        $parent_id = $pdo->lastInsertId();
+        saveLog("Ana ödeme eklendi: " . $name, 'info', 'addPayment', $_SESSION['user_id']);
 
-    // Tekrarlı kayıtlar için
-    if ($frequency !== 'none' && isset($end_date) && $end_date > $first_date) {
-        $month_interval = getMonthInterval($frequency);
-        $total_months = getMonthDifference($first_date, $end_date);
-        $repeat_count = floor($total_months / $month_interval);
+        // Tekrarlı kayıtlar için
+        if ($frequency !== 'none' && isset($end_date) && $end_date > $first_date) {
+            $month_interval = getMonthInterval($frequency);
+            $total_months = getMonthDifference($first_date, $end_date);
+            $repeat_count = floor($total_months / $month_interval);
 
-        // Child kayıtları ekle
-        if ($repeat_count > 0) {
-            $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            // Child kayıtları ekle
+            if ($repeat_count > 0) {
+                $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate, status) 
+                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
 
-            for ($i = 1; $i <= $repeat_count; $i++) {
-                $payment_date = calculateNextPaymentDate($first_date, $i * $month_interval);
+                for ($i = 1; $i <= $repeat_count; $i++) {
+                    $payment_date = calculateNextPaymentDate($first_date, $i * $month_interval);
 
-                // Bitiş tarihini geçmemesi için kontrol
-                if ($payment_date <= $end_date) {
-                    if (!$stmt->execute([
-                        $user_id,
-                        $parent_id,
-                        $name,
-                        $amount,
-                        $currency,
-                        $payment_date,
-                        $frequency,
-                        $exchange_rate
-                    ])) {
-                        throw new Exception(t('payment.add_recurring_error'));
-                        saveLog("Ödeme tekrarlı ekleme hatası: " . $e->getMessage(), 'error', 'addPayment', $_SESSION['user_id']);
-                    } else {
-                        saveLog("Ödeme tekrarlı eklendi: " . $name, 'info', 'addPayment', $_SESSION['user_id']);
+                    // Bitiş tarihini geçmemesi için kontrol
+                    if ($payment_date <= $end_date) {
+                        if (!$stmt->execute([
+                            $user_id,
+                            $parent_id,
+                            $name,
+                            $amount,
+                            $currency,
+                            $payment_date,
+                            $frequency,
+                            $exchange_rate
+                        ])) {
+                            throw new Exception(t('payment.add_recurring_error'));
+                        }
+                        saveLog("Tekrarlı ödeme eklendi: " . $name . " - " . $payment_date, 'info', 'addPayment', $_SESSION['user_id']);
                     }
                 }
             }
         }
-    }
 
-    $pdo->commit();
-    return true;
+        $pdo->commit();
+        return true;
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        throw $e;
+    }
 }
 
 function deletePayment()
@@ -189,7 +190,15 @@ function loadPayments()
     $stmt_payments = $pdo->prepare($sql_payments);
     $stmt_payments->execute([$user_id, $month, $year]);
     $payments = $stmt_payments->fetchAll(PDO::FETCH_ASSOC);
+
     saveLog("Ödemeler alındı: " . $user_id . " " . $month . " " . $year, 'info', 'loadPayments', $_SESSION['user_id']);
+
+    foreach ($payments as &$payment) {
+        $payment['formatted_first_date'] = formatDate($payment['first_date']);
+        $payment['formatted_next_payment_date'] = $payment['next_payment_date'] ? formatDate($payment['next_payment_date']) : null;
+    }
+    unset($payment); // Referansı temizle
+
     return $payments;
 }
 
@@ -242,7 +251,16 @@ function loadRecurringPayments()
     $stmt_recurring_payments = $pdo->prepare($sql_recurring_payments);
     $stmt_recurring_payments->execute([$user_id]);
     $recurring_payments = $stmt_recurring_payments->fetchAll(PDO::FETCH_ASSOC);
+
     saveLog("Tekrarlayan ödemeler alındı: " . $user_id, 'info', 'loadRecurringPayments', $_SESSION['user_id']);
+
+    foreach ($recurring_payments as &$recurring_payment) {
+        if (isset($recurring_payment['first_date'])) {
+            $recurring_payment['formatted_first_date'] = formatDate($recurring_payment['first_date']);
+        }
+    }
+    unset($recurring_payment); // Referansı temizle
+
     return $recurring_payments;
 }
 

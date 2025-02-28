@@ -62,6 +62,13 @@ function checkLogin()
     }
 }
 
+// convert date from english to turkish
+// like 2025-02-25 to 25/02/2025
+function formatDate($date)
+{
+    return date('d/m/Y', strtotime($date));
+}
+
 // supported currencies
 $supported_currencies = [
     'TRY' => 'TRY - ' . t('currencies.try'),

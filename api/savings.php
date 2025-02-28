@@ -81,12 +81,22 @@ function loadSavings()
     global $pdo, $user_id;
 
     $stmt = $pdo->prepare("SELECT * FROM savings WHERE user_id = ? AND parent_id IS NULL");
+
     if (!$stmt->execute([$user_id])) {
         throw new Exception(t('saving.load_error'));
         saveLog("Birikim yükleme hatası: " . $e->getMessage(), 'error', 'loadSavings', $_SESSION['user_id']);
     }
+
     $savings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach ($savings as &$saving) {
+        $saving['formatted_start_date'] = formatDate($saving['start_date']);
+        $saving['formatted_target_date'] = formatDate($saving['target_date']);
+    }
+    unset($saving); // Referansı temizle
+
     saveLog("Birikimler yüklendi: " . $user_id, 'info', 'loadSavings', $_SESSION['user_id']);
+
     return $savings;
 }
 
