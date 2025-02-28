@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 25, 2025 at 05:14 PM
+-- Generation Time: Feb 28, 2025 at 10:42 AM
 -- Server version: 10.11.11-MariaDB
 -- PHP Version: 7.4.33
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -44,14 +44,6 @@ INSERT INTO `exchange_rates` (
         `created_at`
     )
 VALUES (
-        1,
-        'usd',
-        'try',
-        36.2504,
-        '2025-02-19',
-        '2025-02-19 13:56:22'
-    ),
-    (
         2,
         'usd',
         'try',
@@ -105,87 +97,6 @@ CREATE TABLE `payments` (
     `exchange_rate` decimal(10, 4) DEFAULT NULL,
     `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
---
--- Dumping data for table `payments`
---
-INSERT INTO `payments` (
-        `id`,
-        `user_id`,
-        `parent_id`,
-        `name`,
-        `amount`,
-        `currency`,
-        `first_date`,
-        `frequency`,
-        `status`,
-        `exchange_rate`,
-        `created_at`
-    )
-VALUES (
-        29,
-        1,
-        NULL,
-        'sdsddssd',
-        150.00,
-        'TRY',
-        '2025-02-25',
-        'monthly',
-        'pending',
-        NULL,
-        '2025-02-25 13:51:47'
-    ),
-    (
-        30,
-        1,
-        29,
-        'sdsddssd',
-        150.00,
-        'TRY',
-        '2025-03-25',
-        'monthly',
-        'pending',
-        NULL,
-        '2025-02-25 13:51:47'
-    ),
-    (
-        31,
-        1,
-        29,
-        'sdsddssd',
-        150.00,
-        'TRY',
-        '2025-04-25',
-        'monthly',
-        'pending',
-        NULL,
-        '2025-02-25 13:51:47'
-    ),
-    (
-        32,
-        1,
-        29,
-        'sdsddssd',
-        150.00,
-        'TRY',
-        '2025-05-25',
-        'monthly',
-        'pending',
-        NULL,
-        '2025-02-25 13:51:47'
-    ),
-    (
-        33,
-        1,
-        29,
-        'sdsddssd',
-        150.00,
-        'TRY',
-        '2025-06-25',
-        'monthly',
-        'pending',
-        NULL,
-        '2025-02-25 13:51:47'
-    );
 -- --------------------------------------------------------
 --
 -- Table structure for table `portfolio`
@@ -211,89 +122,6 @@ CREATE TABLE `portfolio` (
     `user_id` int(11) DEFAULT NULL,
     `referans_alis_id` int(11) DEFAULT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
---
--- Dumping data for table `portfolio`
---
-INSERT INTO `portfolio` (
-        `id`,
-        `sembol`,
-        `adet`,
-        `alis_fiyati`,
-        `alis_tarihi`,
-        `anlik_fiyat`,
-        `son_guncelleme`,
-        `hisse_adi`,
-        `satis_fiyati`,
-        `satis_tarihi`,
-        `satis_adet`,
-        `durum`,
-        `user_id`,
-        `referans_alis_id`
-    )
-VALUES (
-        14,
-        'PGSUS',
-        250,
-        231.15,
-        '2025-02-25 09:00:00',
-        233.55,
-        '2025-02-25 10:29:53',
-        'PEGASUS',
-        233.55,
-        '2025-02-25 10:30:34',
-        250,
-        'satildi',
-        1,
-        NULL
-    ),
-    (
-        15,
-        'PGSUS',
-        250,
-        234.25,
-        '2025-02-25 10:00:00',
-        233.55,
-        '2025-02-25 10:29:53',
-        'PEGASUS',
-        233.55,
-        '2025-02-25 10:46:39',
-        5,
-        'kismi_satildi',
-        1,
-        NULL
-    ),
-    (
-        16,
-        'ISCTR',
-        500,
-        14.49,
-        '2025-02-25 10:00:00',
-        14.49,
-        '2025-02-25 10:29:53',
-        'IS BANKASI (C)',
-        NULL,
-        NULL,
-        NULL,
-        'aktif',
-        1,
-        NULL
-    ),
-    (
-        17,
-        'ASELS',
-        250,
-        81.88,
-        '2025-02-25 10:16:02',
-        81.83,
-        '2025-02-25 10:29:53',
-        'ASELSAN',
-        NULL,
-        NULL,
-        NULL,
-        'aktif',
-        1,
-        NULL
-    );
 -- --------------------------------------------------------
 --
 -- Table structure for table `savings`
@@ -301,10 +129,13 @@ VALUES (
 CREATE TABLE `savings` (
     `id` int(11) NOT NULL,
     `user_id` int(11) NOT NULL,
+    `parent_id` int(11) DEFAULT NULL,
+    `update_type` enum('initial', 'update') DEFAULT 'initial',
     `name` varchar(100) NOT NULL,
     `target_amount` decimal(10, 2) NOT NULL,
     `current_amount` decimal(10, 2) DEFAULT 0.00,
     `currency` varchar(3) DEFAULT 'TRY',
+    `exchange_rate` decimal(10, 4) DEFAULT NULL,
     `start_date` date NOT NULL,
     `target_date` date NOT NULL,
     `created_at` timestamp NULL DEFAULT current_timestamp()
@@ -321,7 +152,9 @@ CREATE TABLE `users` (
     `theme_preference` varchar(10) NOT NULL DEFAULT 'light',
     `created_at` timestamp NULL DEFAULT current_timestamp(),
     `remember_token` varchar(64) DEFAULT NULL,
-    `is_admin` int(11) DEFAULT NULL
+    `is_admin` int(11) DEFAULT NULL,
+    `is_active` int(11) NOT NULL DEFAULT 1,
+    `last_login` timestamp NULL DEFAULT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
 --
 -- Dumping data for table `users`
@@ -334,7 +167,9 @@ INSERT INTO `users` (
         `theme_preference`,
         `created_at`,
         `remember_token`,
-        `is_admin`
+        `is_admin`,
+        `is_active`,
+        `last_login`
     )
 VALUES (
         1,
@@ -343,8 +178,10 @@ VALUES (
         'TRY',
         'dark',
         '2025-02-19 11:55:56',
-        '0f00406e2806ffe53ab209d0ab1e42e4424aa99c29391182b8cc4133e5544be7',
-        1
+        '25e8e6950886f32f9af41233af993d7e18a51cdfdfdf0877f26023bdf3fa8587',
+        1,
+        1,
+        '2025-02-28 07:22:42'
     );
 --
 -- Indexes for dumped tables
@@ -385,7 +222,8 @@ ADD PRIMARY KEY (`id`);
 --
 ALTER TABLE `savings`
 ADD PRIMARY KEY (`id`),
-    ADD KEY `user_id` (`user_id`);
+    ADD KEY `user_id` (`user_id`),
+    ADD KEY `parent_id` (`parent_id`);
 --
 -- Indexes for table `users`
 --
@@ -406,13 +244,13 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
 --
 ALTER TABLE `income`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 33;
+    AUTO_INCREMENT = 49;
 --
 -- AUTO_INCREMENT for table `logs`
 --
 ALTER TABLE `logs`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 937;
+    AUTO_INCREMENT = 2109;
 --
 -- AUTO_INCREMENT for table `payments`
 --
@@ -424,13 +262,13 @@ MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
 --
 ALTER TABLE `portfolio`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 18;
+    AUTO_INCREMENT = 61;
 --
 -- AUTO_INCREMENT for table `savings`
 --
 ALTER TABLE `savings`
 MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 2;
+    AUTO_INCREMENT = 13;
 --
 -- AUTO_INCREMENT for table `users`
 --
@@ -456,7 +294,8 @@ ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id
 -- Constraints for table `savings`
 --
 ALTER TABLE `savings`
-ADD CONSTRAINT `savings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ADD CONSTRAINT `savings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+    ADD CONSTRAINT `savings_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `savings` (`id`) ON DELETE CASCADE;
 COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */
 ;

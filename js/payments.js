@@ -303,6 +303,19 @@ function updateRecurringPaymentsList(recurring_payments) {
     const tbody = $('#recurringPaymentsList');
     tbody.empty();
 
+    if (recurring_payments.length === 0) {
+        tbody.append(`
+            <tr>
+                <td colspan="6" class="text-center">
+                    <p class="text-muted">Hiç taksitli ödeme eklenmemiş</p>
+                </td>
+            </tr>
+        `);
+        // table-info gizle
+        $('#recurringPaymentsList').closest('table').find('tfoot').empty();
+        return;
+    }
+
     recurring_payments.forEach(function (payment) {
         // Taksit bilgisini parçala (örn: "2/5" -> [2, 5])
         const [paid, total] = payment.payment_status.split('/').map(Number);

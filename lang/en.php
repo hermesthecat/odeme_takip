@@ -207,12 +207,7 @@ return [
         'delete_success' => 'Payment deleted successfully',
         'delete_error' => 'An error occurred while deleting payment',
         'delete_confirm' => 'Are you sure you want to delete this payment?',
-        'mark_paid' => [
-            'success' => 'Payment successfully marked as paid',
-            'error' => 'Payment could not be marked as paid',
-            'mark_as_paid' => 'Mark as paid',
-            'mark_as_not_paid' => 'Mark as not paid'
-        ],
+        'mark_paid' => 'Mark as paid',
         'mark_not_paid' => 'Mark as not paid',
         'not_found' => 'No payment has been added yet',
         'load_error' => 'An error occurred while loading payments',

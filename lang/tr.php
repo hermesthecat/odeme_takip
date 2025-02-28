@@ -207,12 +207,7 @@ return [
         'delete_success' => 'Ödeme başarıyla silindi',
         'delete_error' => 'Ödeme silinirken bir hata oluştu',
         'delete_confirm' => 'Bu ödemeyi silmek istediğinize emin misiniz?',
-        'mark_paid' => [
-            'success' => 'Ödeme başarıyla ödendi olarak işaretlendi',
-            'error' => 'Ödeme ödendi olarak işaretlenemedi',
-            'mark_as_paid' => 'Ödendi olarak işaretle',
-            'mark_as_not_paid' => 'Ödenmedi olarak işaretle'
-        ],
+        'mark_paid' => 'Ödendi olarak işaretle',
         'mark_not_paid' => 'Ödenmedi olarak işaretle',
         'not_found' => 'Henüz bir ödeme eklenmemiş',
         'load_error' => 'Ödemeler yüklenirken bir hata oluştu',
