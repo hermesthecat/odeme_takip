@@ -1,9 +1,9 @@
-memory-bank/*
+memory-bank/
 projectBrief.md
 
-.specstory/*
-.vscode/*
-.idea/*
+.specstory/
+.vscode/
+.idea/
 
 .env
 .env.local
