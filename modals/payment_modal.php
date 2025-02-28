@@ -112,6 +112,15 @@
                         <label class="form-label"><?php echo t('payment_end_date'); ?></label>
                         <input type="date" class="form-control" name="end_date">
                     </div>
+                    <div class="mb-3" id="updatePaymentChildrenGroup" style="display: none;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="update_payment_children" name="update_children">
+                            <label class="form-check-label" for="update_payment_children">
+                                <?php echo t('income.update_children'); ?>
+                            </label>
+                            <small class="text-muted d-block mt-1" id="update_payment_children_info"></small>
+                        </div>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">

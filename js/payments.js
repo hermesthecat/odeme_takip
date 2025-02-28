@@ -503,6 +503,27 @@ function openUpdatePaymentModal(id) {
                 $('#update_payment_first_date').val(payment.first_date);
                 $('#update_payment_frequency').val(payment.frequency);
 
+                // Parent/Child durumunu kontrol et
+                const isParent = payment.parent_id === null;
+                $('#update_payment_is_parent').val(isParent ? '1' : '0');
+
+                // Güncelleme seçeneğini göster/gizle
+                const childrenGroup = document.getElementById('updatePaymentChildrenGroup');
+                if (payment.frequency !== 'none') {
+                    childrenGroup.style.display = 'block';
+
+                    // Bilgi metnini güncelle
+                    let infoText = '';
+                    if (isParent) {
+                        infoText = translations.payment.update_children_info_parent || 'Bu seçenek işaretlendiğinde, bu ödemeye bağlı tüm ödemeler güncellenecektir.';
+                    } else {
+                        infoText = translations.payment.update_children_info_child || 'Bu seçenek işaretlendiğinde, bu ödeme ve sonraki ödemeler güncellenecektir.';
+                    }
+                    $('#update_payment_children_info').text(infoText);
+                } else {
+                    childrenGroup.style.display = 'none';
+                }
+
                 // Kur güncelleme seçeneğini göster/gizle
                 const exchangeRateGroup = document.getElementById('updatePaymentExchangeRateGroup');
                 if (payment.currency !== data.user.base_currency) {

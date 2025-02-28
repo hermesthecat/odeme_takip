@@ -411,10 +411,58 @@ function updatePayment()
         ])) {
             throw new Exception(t('payment.update_error'));
             saveLog("Ödeme güncelleme hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
+        } else {
+            saveLog("Ödeme güncellendi: $id", 'info', 'updatePayment', $_SESSION['user_id']);
+        }
+
+        // Child kayıtları güncelleme
+        if (isset($_POST['update_children']) && $_POST['update_children'] === 'true') {
+            // Parent ödeme ise, tüm child kayıtları güncelle
+            if ($payment['parent_id'] === null) {
+                $stmt = $pdo->prepare("UPDATE payments SET 
+                    amount = ?, 
+                    currency = ?, 
+                    exchange_rate = ?
+                    WHERE parent_id = ? AND user_id = ?");
+
+                if (!$stmt->execute([
+                    $amount,
+                    $currency,
+                    $exchange_rate,
+                    $id,
+                    $user_id
+                ])) {
+                    throw new Exception(t('payment.update_children_error'));
+                    saveLog("Ödeme çocuk güncelleme hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
+                }
+
+                saveLog("Ödeme çocuk güncellendi: $id", 'info', 'updatePayment', $_SESSION['user_id']);
+            }
+            // Child ödeme ise, kendisi ve sonraki kayıtları güncelle
+            else {
+                $stmt = $pdo->prepare("UPDATE payments SET 
+                    amount = ?, 
+                    currency = ?, 
+                    exchange_rate = ?
+                    WHERE parent_id = ? AND first_date >= ? AND user_id = ?");
+
+                if (!$stmt->execute([
+                    $amount,
+                    $currency,
+                    $exchange_rate,
+                    $payment['parent_id'],
+                    $first_date,
+                    $user_id
+                ])) {
+                    throw new Exception(t('payment.update_children_error'));
+                    saveLog("Ödeme çocuk güncelleme hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
+                }
+
+                saveLog("Ödeme çocuk güncellendi: $id", 'info', 'updatePayment', $_SESSION['user_id']);
+            }
         }
 
         $pdo->commit();
-        saveLog("Ödeme güncellendi: " . $id, 'info', 'updatePayment', $_SESSION['user_id']);
         return true;
     } catch (Exception $e) {
         $pdo->rollBack();
