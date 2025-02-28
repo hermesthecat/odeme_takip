@@ -600,4 +600,16 @@ return [
         'update_success' => 'Kullanıcı bilgileri başarıyla güncellendi',
         'update_error' => 'Kullanıcı bilgileri güncellenemedi'
     ],
+
+    'settings.telegram_title' => 'Telegram Bağlantısı',
+    'settings.telegram_connected' => 'Telegram hesabınız bağlı.',
+    'settings.telegram_confirm_unlink' => 'Telegram bağlantısını kaldırmak istediğinize emin misiniz?',
+    'settings.telegram_unlink' => 'Bağlantıyı Kaldır',
+    'settings.telegram_info' => 'Telegram botunu kullanmak için hesabınızı bağlamanız gerekiyor.',
+    'settings.telegram_step1' => 'Telegram\'da botumuzla sohbet başlatın',
+    'settings.telegram_step2' => 'Bot size bir doğrulama kodu isteyecek',
+    'settings.telegram_step3' => 'Aşağıdaki butona tıklayarak yeni bir kod alın',
+    'settings.telegram_step4' => 'Aldığınız kodu bot\'a gönderin',
+    'settings.telegram_get_code' => 'Doğrulama Kodu Al',
+    'settings.telegram_current_code' => 'Mevcut doğrulama kodunuz'
 ];

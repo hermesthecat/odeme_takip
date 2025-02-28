@@ -190,17 +190,32 @@ CREATE TABLE `ai_analysis_temp` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `user_id` int(11) NOT NULL,
     `file_name` varchar(255) NOT NULL,
-    `file_type` enum('pdf','excel') NOT NULL,
+    `file_type` enum('pdf', 'excel') NOT NULL,
     `description` text NOT NULL,
     `amount` decimal(10, 2) NOT NULL,
     `currency` varchar(3) DEFAULT 'TRY',
-    `category` enum('income','expense') NOT NULL,
+    `category` enum('income', 'expense') NOT NULL,
     `suggested_name` varchar(100) NOT NULL,
     `is_approved` tinyint(1) DEFAULT 0,
     `created_at` timestamp NULL DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),
     KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+--
+-- Table structure for table `telegram_users`
+--
+CREATE TABLE `telegram_users` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `telegram_id` varchar(50) NOT NULL,
+    `is_verified` tinyint(1) DEFAULT 0,
+    `verification_code` varchar(6) DEFAULT NULL,
+    `created_at` timestamp NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `telegram_id` (`telegram_id`),
+    KEY `user_id` (`user_id`),
+    CONSTRAINT `telegram_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
 --
 -- Indexes for dumped tables
 --
