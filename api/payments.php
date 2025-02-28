@@ -144,11 +144,22 @@ function deletePayment()
                 saveLog("Ödeme silme hatası ($id): " . $e->getMessage(), 'error', 'deletePayment', $_SESSION['user_id']);
             }
         } else {
-            // Sadece seçili kaydı sil
-            $stmt = $pdo->prepare("DELETE FROM payments WHERE id = ? AND user_id = ?");
-            if (!$stmt->execute([$id, $user_id])) {
-                throw new Exception(t('payment.delete_error'));
-                saveLog("Ödeme silme hatası ($id): " . $e->getMessage(), 'error', 'deletePayment', $_SESSION['user_id']);
+
+            // check if the payment is a parent
+            $stmt = $pdo->prepare("SELECT parent_id FROM payments WHERE id = ? AND user_id = ?");
+            $stmt->execute([$id, $user_id]);
+            $payment = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // if the payment is not a parent, delete only the payment
+            if ($payment['parent_id'] !== null) {
+                // Sadece seçili kaydı sil
+                $stmt = $pdo->prepare("DELETE FROM payments WHERE id = ? AND user_id = ?");
+                if (!$stmt->execute([$id, $user_id])) {
+                    throw new Exception(t('payment.delete_error'));
+                    saveLog("Ödeme silme hatası ($id): " . $e->getMessage(), 'error', 'deletePayment', $_SESSION['user_id']);
+                }
+            } else {
+                return false;
             }
         }
 

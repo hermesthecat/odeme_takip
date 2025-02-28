@@ -257,7 +257,11 @@ function deletePayment(id) {
             }).done(function (response) {
                 if (response.status === 'success') {
                     loadData();
+                } else {
+                    alert(response.message);
                 }
+            }).fail(function (response) {
+                alert(response.message);
             });
         }
     });
@@ -621,7 +625,7 @@ function deleteRecurringPayment(parentId) {
     Swal.fire({
         icon: 'warning',
         title: translations.payment.delete.title,
-        text: translations.payment.delete.confirm,
+        text: translations.payment.delete.confirm_all,
         showCancelButton: true,
         confirmButtonText: translations.payment.delete.confirm,
         cancelButtonText: translations.payment.delete.cancel,

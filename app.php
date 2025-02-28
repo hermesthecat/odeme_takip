@@ -435,6 +435,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 delete: {
                     title: '<?php echo t('payment.delete_confirm'); ?>',
                     confirm: '<?php echo t('app.yes_delete'); ?>',
+                    confirm_all: '❗️ Bu seçenek işaretlendiğinde, bu ödemeye bağlı önceki ve sonrakitüm ödemeler silinecektir. ❗️',
                     cancel: '<?php echo t('cancel'); ?>'
                 },
                 buttons: {
