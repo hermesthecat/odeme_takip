@@ -118,6 +118,21 @@ function markAsPaid(id) {
                 `);
             }
 
+            // Özet bilgilerini güncelle
+            ajaxRequest({
+                action: 'get_data',
+                month: $('#monthSelect').val(),
+                year: $('#yearSelect').val(),
+                load_type: 'summary'
+            }).done(function(response) {
+                if (response.status === 'success') {
+                    // Global data değişkenini güncelle
+                    window.data = response.data;
+                    // Özet bilgileri güncelle
+                    updateSummary(response.data);
+                }
+            });
+
             // Eğer bu bir child ödeme ise parent'ın progress bar'ını güncelle
             ajaxRequest({
                 action: 'get_payment_details',
