@@ -120,9 +120,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             $_SESSION['last_activity'] = time();
                             $_SESSION['expire_time'] = 30 * 60; // 30 dakika
 
-                            // Yeni CSRF token oluştur
-                            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-
                             $_SESSION['user_id'] = $row['id'];
                             $_SESSION['username'] = $row['username'];
                             $_SESSION['base_currency'] = $row['base_currency'];
@@ -165,6 +162,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 session_start();
             }
 
+            saveLog("Kullanıcı çıkış işlemi: " . $_SESSION['username'], 'info', 'logout', 0);
+
             // Tüm session verilerini temizle
             $_SESSION = array();
 
@@ -187,7 +186,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            saveLog("Kullanıcı çıkış işlemi: " . $_SESSION['username'], 'info', 'logout', 0);
             session_destroy();
             $response = ['status' => 'success', 'message' => t('auth.logout_success')];
 
