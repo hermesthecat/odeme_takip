@@ -131,7 +131,7 @@ return [
     'edit_income' => 'Gelir Düzenle',
     'income_name' => 'Gelir İsmi',
     'income_amount' => 'Tutar',
-    'income_date' => 'İlk Gelir Tarihi',
+    'income_date' => 'Gelir Tarihi',
     'income_category' => 'Kategori',
     'income_note' => 'Not',
     'income_recurring' => 'Düzenli Gelir',

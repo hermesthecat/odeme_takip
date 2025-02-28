@@ -131,7 +131,7 @@ return [
     'edit_income' => 'Edit Income',
     'income_name' => 'Income Name',
     'income_amount' => 'Amount',
-    'income_date' => 'First Income Date',
+    'income_date' => 'Income Date',
     'income_category' => 'Category',
     'income_note' => 'Note',
     'income_recurring' => 'Recurring Income',
