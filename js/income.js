@@ -35,12 +35,12 @@ function updateIncomeList(incomes) {
                         <i class="bi ${income.status === 'received' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                     </button>
                 </td>
-                <td>${income.name}</td>
-                <td>${amountText}</td>
-                <td>${income.currency}</td>
-                <td>${income.first_date}</td>
-                <td>${getFrequencyText(income.frequency)}</td>
-                <td>${income.next_income_date || ''}</td>
+                <td class="text-center">${income.name}</td>
+                <td class="text-center">${amountText}</td>
+                <td class="text-center">${income.currency}</td>
+                <td class="text-center">${income.first_date}</td>
+                <td class="text-center">${getFrequencyText(income.frequency)}</td>
+                <td class="text-center">${income.next_income_date || ''}</td>
                 <td class="text-end">
                     <div class="btn-group">
                         <button class="btn btn-sm btn-primary" onclick="openUpdateIncomeModal(${income.id})" title="${translations.income.buttons.edit}">

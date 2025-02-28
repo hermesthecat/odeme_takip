@@ -160,12 +160,12 @@ $user_default_currency = $_SESSION['base_currency'];
                         <thead>
                             <tr>
                                 <th></th>
-                                <th><?php echo t('income_name'); ?></th>
-                                <th><?php echo t('income_amount'); ?></th>
-                                <th><?php echo t('income.currency'); ?></th>
-                                <th><?php echo t('income_date'); ?></th>
-                                <th><?php echo t('income_frequency'); ?></th>
-                                <th><?php echo t('app.next_income'); ?></th>
+                                <th class="text-center"><?php echo t('income_name'); ?></th>
+                                <th class="text-center"><?php echo t('income_amount'); ?></th>
+                                <th class="text-center"><?php echo t('income.currency'); ?></th>
+                                <th class="text-center"><?php echo t('income_date'); ?></th>
+                                <th class="text-center"><?php echo t('income_frequency'); ?></th>
+                                <th class="text-center"><?php echo t('app.next_income'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -196,12 +196,12 @@ $user_default_currency = $_SESSION['base_currency'];
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th><?php echo t('saving_name'); ?></th>
-                                <th><?php echo t('target_amount'); ?></th>
-                                <th><?php echo t('current_amount'); ?></th>
-                                <th><?php echo t('start_date'); ?></th>
-                                <th><?php echo t('target_date'); ?></th>
-                                <th><?php echo t('saving.progress'); ?></th>
+                                <th class="text-center"><?php echo t('saving_name'); ?></th>
+                                <th class="text-center"><?php echo t('target_amount'); ?></th>
+                                <th class="text-center"><?php echo t('current_amount'); ?></th>
+                                <th class="text-center"><?php echo t('start_date'); ?></th>
+                                <th class="text-center"><?php echo t('target_date'); ?></th>
+                                <th class="text-center"><?php echo t('saving.progress'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -233,12 +233,12 @@ $user_default_currency = $_SESSION['base_currency'];
                         <thead>
                             <tr>
                                 <th></th>
-                                <th><?php echo t('payment_name'); ?></th>
-                                <th><?php echo t('payment_amount'); ?></th>
-                                <th><?php echo t('payment.currency'); ?></th>
-                                <th><?php echo t('payment_date'); ?></th>
-                                <th><?php echo t('payment_frequency'); ?></th>
-                                <th><?php echo t('app.next_payment'); ?></th>
+                                <th class="text-center"><?php echo t('payment_name'); ?></th>
+                                <th class="text-center"><?php echo t('payment_amount'); ?></th>
+                                <th class="text-center"><?php echo t('payment.currency'); ?></th>
+                                <th class="text-center"><?php echo t('payment_date'); ?></th>
+                                <th class="text-center"><?php echo t('payment_frequency'); ?></th>
+                                <th class="text-center"><?php echo t('app.next_payment'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -268,10 +268,10 @@ $user_default_currency = $_SESSION['base_currency'];
                         <thead>
                             <tr>
                                 <th><?php echo t('payment_name'); ?></th>
-                                <th><?php echo t('payment_amount'); ?></th>
-                                <th><?php echo t('payment.currency'); ?></th>
-                                <th><?php echo t('app.installment_info'); ?></th>
-                                <th><?php echo t('app.total'); ?></th>
+                                <th class="text-center"><?php echo t('payment_amount'); ?></th>
+                                <th class="text-center"><?php echo t('payment.currency'); ?></th>
+                                <th class="text-center"><?php echo t('app.installment_info'); ?></th>
+                                <th class="text-center"><?php echo t('app.total'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>

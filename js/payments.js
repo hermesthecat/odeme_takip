@@ -37,12 +37,12 @@ function updatePaymentsList(payments) {
                         <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                     </button>
                 </td>
-                <td>${payment.name}</td>
-                <td>${amountText}</td>
-                <td>${payment.currency}</td>
-                <td>${payment.first_date}</td>
-                <td>${getFrequencyText(payment.frequency)}</td>
-                <td>${payment.next_payment_date || ''}</td>
+                <td class="text-center">${payment.name}</td>
+                <td class="text-center">${amountText}</td>
+                <td class="text-center">${payment.currency}</td>
+                <td class="text-center">${payment.first_date}</td>
+                <td class="text-center">${getFrequencyText(payment.frequency)}</td>
+                <td class="text-center">${payment.next_payment_date || ''}</td>
                 <td class="text-end">
                     <div class="btn-group">
                         <button class="btn btn-sm btn-primary" onclick="openUpdatePaymentModal(${payment.id})" title="${translations.payment.buttons.edit}">
@@ -206,9 +206,9 @@ function updateChildPayments(parentId, parent, children) {
                     <i class="bi ${parent.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                 </button>
             </td>
-            <td>${parent.first_date}</td>
-            <td>${parentAmountText}</td>
-            <td>${parent.currency}</td>
+            <td class="text-center">${parent.first_date}</td>
+            <td class="text-center">${parentAmountText}</td>
+            <td class="text-center">${parent.currency}</td>
             <td></td>
         </tr>
     `);
@@ -232,9 +232,9 @@ function updateChildPayments(parentId, parent, children) {
                         <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                     </button>
                 </td>
-                <td>${payment.first_date}</td>
-                <td>${amountText}</td>
-                <td>${payment.currency}</td>
+                <td class="text-center">${payment.first_date}</td>
+                <td class="text-center">${amountText}</td>
+                <td class="text-center">${payment.currency}</td>
                 <td></td>
             </tr>
         `);
@@ -337,9 +337,9 @@ function updateRecurringPaymentsList(recurring_payments) {
                     <i class="bi bi-chevron-right me-2 toggle-icon"></i>
                     ${payment.name}
                 </td>
-                <td>${formatMyMoney(parseFloat(payment.amount).toFixed(2))}</td>
-                <td>${payment.currency}</td>
-                <td>
+                <td class="text-center">${formatMyMoney(parseFloat(payment.amount).toFixed(2))}</td>
+                <td class="text-center">${payment.currency}</td>
+                <td class="text-center">
                     <div class="progress mb-1">
                         <div class="progress-bar ${progressClass}" role="progressbar" style="width: ${progress}%" 
                              aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100">
@@ -347,7 +347,7 @@ function updateRecurringPaymentsList(recurring_payments) {
                     </div>
                     <small class="text-muted text-center d-block">${payment.payment_status}</small>
                 </td>
-                <td>
+                <td class="text-center">
                     ${formatMyMoney(parseFloat(payment.yearly_total).toFixed(2))}
                 </td>
                 <td class="text-end">
@@ -364,9 +364,9 @@ function updateRecurringPaymentsList(recurring_payments) {
                                 <thead>
                                     <tr>
                                         <th style="width: 50px;"></th>
-                                        <th>${translations.payment.date}</th>
-                                        <th>${translations.payment.amount}</th>
-                                        <th>${translations.payment.currency}</th>
+                                        <th class="text-center">${translations.payment.date}</th>
+                                        <th class="text-center">${translations.payment.amount}</th>
+                                        <th class="text-center">${translations.payment.currency}</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -449,10 +449,14 @@ function loadChildPayments(parentId) {
                             <i class="bi ${parent.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                         </button>
                     </td>
-                    <td>${parent.first_date}</td>
-                    <td>${parentAmountText}</td>
-                    <td>${parent.currency}</td>
-                    <td></td>
+                    <td class="text-center">${parent.first_date}</td>
+                    <td class="text-center">${parentAmountText}</td>
+                    <td class="text-center">${parent.currency}</td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${parent.id})" title="${translations.payment.buttons.delete}">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
                 </tr>
             `);
 
@@ -475,10 +479,14 @@ function loadChildPayments(parentId) {
                                 <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                             </button>
                         </td>
-                        <td>${payment.first_date}</td>
-                        <td>${amountText}</td>
-                        <td>${payment.currency}</td>
-                        <td></td>
+                        <td class="text-center">${payment.first_date}</td>
+                        <td class="text-center">${amountText}</td>
+                        <td class="text-center">${payment.currency}</td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deletePayment(${payment.id})" title="${translations.payment.buttons.delete}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
                     </tr>
                 `);
             });

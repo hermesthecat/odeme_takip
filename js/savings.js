@@ -44,17 +44,17 @@ function updateSavingsList(savings) {
 
         tbody.append(`
             <tr>
-                <td>
+                <td class="text-center">
                 ${progress === 100 ?
                 `${goalText} ${saving.name} ${goalText}`
                 :
                 `${saving.name}`
             }
                 </td>
-                <td>${target_amountText}</td>
-                <td>${current_amountText}</td>
-                <td>${saving.start_date}</td>
-                <td>${saving.target_date}</td>
+                <td class="text-center">${target_amountText}</td>
+                <td class="text-center">${current_amountText}</td>
+                <td class="text-center">${saving.start_date}</td>
+                <td class="text-center">${saving.target_date}</td>
                 <td class="text-center">
                     ${progress === 100 ?
                 `💯`
@@ -194,14 +194,14 @@ function showSavingsHistory(savingId) {
 
 
                 historyHtml += `<tr>
-                <td>${formattedDate}</td>
-                <td>${current_amountText}</td>
+                <td class="text-center">${formattedDate}</td>
+                <td class="text-center">${current_amountText}</td>
                 </tr>`;
             });
             historyHtml += '</tbody></table>';
 
             Swal.fire({
-                title: 'Savings History',
+                title: 'Saving History',
                 html: historyHtml,
                 confirmButtonText: 'Close'
             });
