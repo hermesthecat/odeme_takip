@@ -144,7 +144,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="mb-0"><?php echo t('incomes'); ?></h2>
                     <button class="btn btn-success" data-action="add" data-type="income">
-                        <i class="bi bi-plus-lg me-1"></i><?php echo t('add_income'); ?>
+                        <i class="bi bi-plus-lg me-1"></i>
                     </button>
                 </div>
             </div>
@@ -181,7 +181,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="mb-0"><?php echo t('savings'); ?></h2>
                     <button class="btn btn-primary" data-action="add" data-type="saving">
-                        <i class="bi bi-plus-lg me-1"></i><?php echo t('add_saving'); ?>
+                        <i class="bi bi-plus-lg me-1"></i>
                     </button>
                 </div>
             </div>
@@ -218,7 +218,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="mb-0"><?php echo t('payments'); ?></h2>
                     <button class="btn btn-danger" data-action="add" data-type="payment">
-                        <i class="bi bi-plus-lg me-1"></i><?php echo t('add_payment'); ?>
+                        <i class="bi bi-plus-lg me-1"></i>
                     </button>
                 </div>
             </div>

@@ -23,6 +23,7 @@ function loadSummary()
                         END), 0)
                         FROM income i 
                         WHERE i.user_id = ? 
+                        AND i.status = 'received'
                         AND MONTH(i.first_date) = ? 
                         AND YEAR(i.first_date) = ?) as total_income,
                         
@@ -32,6 +33,7 @@ function loadSummary()
                         END), 0)
                         FROM payments p 
                         WHERE p.user_id = ? 
+                        AND p.status = 'paid'
                         AND MONTH(p.first_date) = ? 
                         AND YEAR(p.first_date) = ?) as total_expense";
 
