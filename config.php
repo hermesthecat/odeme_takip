@@ -5,13 +5,36 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', 'root');
-define('DB_NAME', 'odeme_takip');
+// .env dosyasını yükle
+if (file_exists(__DIR__ . '/.env')) {
+    $envFile = file_get_contents(__DIR__ . '/.env');
+    $lines = explode("\n", $envFile);
+    foreach ($lines as $line) {
+        if (empty(trim($line)) || strpos(trim($line), '#') === 0) {
+            continue;
+        }
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+        // Tırnak işaretlerini kaldır
+        $value = trim($value, '"');
+        $value = trim($value, "'");
+        putenv("$key=$value");
+        $_ENV[$key] = $value;
+    }
+} else {
+    echo "HATA: .env dosyası bulunamadı.";
+    exit;
+}
 
-// Gemini API Key
-define('GEMINI_API_KEY', 'YOUR_GEMINI_API_KEY_HERE');
+// Veritabanı bağlantı bilgileri
+define('DB_SERVER', getenv('DB_SERVER') ?: 'localhost');
+define('DB_USERNAME', getenv('DB_USERNAME') ?: 'root');
+define('DB_PASSWORD', getenv('DB_PASSWORD') ?: 'root');
+define('DB_NAME', getenv('DB_NAME') ?: 'odeme_takip');
+
+// API Anahtarları
+define('GEMINI_API_KEY', getenv('GEMINI_API_KEY'));
 
 // Composer autoload
 require_once __DIR__ . '/vendor/autoload.php';
@@ -72,12 +95,10 @@ function checkLogin()
 // like 2025-02-25 to 25/02/2025
 function formatDate($date)
 {
-
     // check session lang is turkish
     if (isset($_SESSION['lang']) && $_SESSION['lang'] === 'tr') {
         return date('d/m/Y', strtotime($date));
     }
-
     return date('Y-m-d', strtotime($date));
 }
 
@@ -89,8 +110,9 @@ $supported_currencies = [
     'GBP' => 'GBP - ' . t('currencies.gbp')
 ];
 
-$site_name = "Pecunia";
+// Site ayarları
+$site_name = getenv('SITE_NAME') ?: "Pecunia";
 $site_description = t('site_description');
-$site_keywords = 'bütçe, takip, kişisel, finans, yönetim';
-$site_author = 'A. Kerem Gök & Hermes';
+$site_keywords = "bütçe, takip, kişisel, finans, yönetim";
+$site_author = getenv('SITE_AUTHOR');
 $site_slogan = t('site_description');

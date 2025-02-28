@@ -5,8 +5,10 @@ projectBrief.md
 .vscode/
 .idea/
 
+# Environment variables
 .env
 .env.local
+.env.prod
 
 .clinerules-debug
 .clinerules-code
