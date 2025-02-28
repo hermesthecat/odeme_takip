@@ -1,0 +1,22 @@
+{
+    "name": "keremgok/butce-takip",
+    "description": "Kişisel Bütçe Takip Sistemi",
+    "type": "project",
+    "authors": [
+        {
+            "name": "A. Kerem Gök",
+            "email": "info@keremgok.tr"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "google/cloud": "^0.209.0",
+        "smalot/pdfparser": "^2.8",
+        "phpoffice/phpspreadsheet": "^1.29"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "classes/"
+        }
+    }
+}

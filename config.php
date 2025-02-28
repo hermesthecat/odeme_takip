@@ -10,6 +10,12 @@ define('DB_USERNAME', 'root');
 define('DB_PASSWORD', 'root');
 define('DB_NAME', 'odeme_takip');
 
+// Gemini API Key
+define('GEMINI_API_KEY', 'YOUR_GEMINI_API_KEY_HERE');
+
+// Composer autoload
+require_once __DIR__ . '/vendor/autoload.php';
+
 try {
     $pdo = new PDO("mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME, DB_USERNAME, DB_PASSWORD);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
