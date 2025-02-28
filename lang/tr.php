@@ -146,12 +146,7 @@ return [
         'delete_success' => 'Gelir başarıyla silindi',
         'delete_error' => 'Gelir silinirken bir hata oluştu',
         'delete_confirm' => 'Bu geliri silmek istediğinize emin misiniz?',
-        'mark_received' => [
-            'success' => 'Gelir başarıyla alındı olarak işaretlendi',
-            'error' => 'Gelir alındı olarak işaretlenemedi',
-            'mark_as_received' => 'Alındı olarak işaretle',
-            'mark_as_not_received' => 'Alınmadı olarak işaretle'
-        ],
+        'mark_as_received' => 'Alındı olarak işaretle',
         'mark_not_received' => 'Alınmadı olarak işaretle',
         'not_found' => 'Henüz bir gelir eklenmemiş',
         'load_error' => 'Gelirler yüklenirken bir hata oluştu',

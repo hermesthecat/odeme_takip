@@ -146,12 +146,7 @@ return [
         'delete_success' => 'Income deleted successfully',
         'delete_error' => 'An error occurred while deleting income',
         'delete_confirm' => 'Are you sure you want to delete this income?',
-        'mark_received' => [
-            'success' => 'Income successfully marked as received',
-            'error' => 'Income could not be marked as received',
-            'mark_as_received' => 'Mark as received',
-            'mark_as_not_received' => 'Mark as not received'
-        ],
+        'mark_as_received' => 'Mark as received',
         'mark_not_received' => 'Mark as not received',
         'not_found' => 'No income has been added yet',
         'load_error' => 'An error occurred while loading incomes',
