@@ -12,11 +12,13 @@
         "php": ">=7.4",
         "google/cloud": "^0.209.0",
         "smalot/pdfparser": "^2.8",
-        "phpoffice/phpspreadsheet": "^1.29"
+        "phpoffice/phpspreadsheet": "^1.29",
+        "longman/telegram-bot": "^0.80"
     },
     "autoload": {
         "psr-4": {
-            "App\\": "classes/"
+            "App\\": "classes/",
+            "Longman\\TelegramBot\\": "vendor/longman/telegram-bot/src"
         }
     }
 }
