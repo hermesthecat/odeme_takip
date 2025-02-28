@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AI Analiz Sayfası
  * @author A. Kerem Gök
@@ -22,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     $file = $_FILES['document'];
     $fileName = $file['name'];
     $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-    
+
     // Sadece PDF ve Excel dosyalarına izin ver
     if ($fileType != "pdf" && $fileType != "xlsx" && $fileType != "xls") {
         $_SESSION['error'] = "Sadece PDF ve Excel dosyaları yüklenebilir.";
@@ -31,17 +32,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
         if (!file_exists($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
-        
+
         $uniqueFileName = uniqid() . '_' . $fileName;
         $uploadPath = $uploadDir . $uniqueFileName;
-        
+
         if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
             // Google Gemini AI analizi burada yapılacak
             require_once 'vendor/autoload.php';
-            
+
             // Gemini API anahtarını config'den al
             $apiKey = GEMINI_API_KEY;
-            
+
             // Dosya içeriğini oku ve AI'ya gönder
             $fileContent = "";
             if ($fileType == "pdf") {
@@ -63,12 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
                     $fileContent .= "\n";
                 }
             }
-            
+
             // Gemini AI'ya istek gönder
             $client = new \Google\Client();
             $client->setApiKey($apiKey);
-            
-            $prompt = "Bu metin bir finansal döküman. Lütfen her satırı analiz et ve aşağıdaki bilgileri çıkar:
+
+            $prompt = "Bu metin bir finansal döküman (bankadan alınan hesap özeti ya da kredi kartı harcama listesi). Lütfen her satırı analiz et ve aşağıdaki bilgileri çıkar:
             1. Bu bir gelir mi yoksa gider mi?
             2. Tutarı ne kadar?
             3. Para birimi nedir?
@@ -77,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
             6. Hangi tarihte yapıldı?
             
             Lütfen her bulgu için JSON formatında yanıt ver.";
-            
+
             $data = [
                 'contents' => [
                     [
@@ -87,17 +88,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
                     ]
                 ]
             ];
-            
+
             $response = $client->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', [
                 'json' => $data
             ]);
-            
+
             $result = json_decode($response->getBody(), true);
-            
+
             // AI sonuçlarını geçici tabloya kaydet
             if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
                 $aiResults = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
-                
+
                 foreach ($aiResults as $item) {
                     $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, description, amount, currency, category, suggested_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([
@@ -111,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
                         $item['category_name']
                     ]);
                 }
-                
+
                 $_SESSION['success'] = "Dosya başarıyla yüklendi ve analiz edildi.";
             } else {
                 $_SESSION['error'] = "AI analizi sırasında bir hata oluştu.";
@@ -133,25 +134,25 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="row">
         <div class="col-12">
             <h1 class="mb-4">AI Destekli Gelir/Gider Analizi</h1>
-            
+
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="alert alert-danger">
-                    <?php 
+                    <?php
                     echo $_SESSION['error'];
                     unset($_SESSION['error']);
                     ?>
                 </div>
             <?php endif; ?>
-            
+
             <?php if (isset($_SESSION['success'])): ?>
                 <div class="alert alert-success">
-                    <?php 
+                    <?php
                     echo $_SESSION['success'];
                     unset($_SESSION['success']);
                     ?>
                 </div>
             <?php endif; ?>
-            
+
             <!-- Dosya Yükleme Formu -->
             <div class="card mb-4">
                 <div class="card-body">
@@ -165,7 +166,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </form>
                 </div>
             </div>
-            
+
             <!-- Analiz Sonuçları -->
             <?php if (!empty($results)): ?>
                 <div class="card">
@@ -205,9 +206,9 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 </div>
             <?php endif; ?>
-            
+
         </div>
     </div>
 </div>
 
-<?php require_once 'footer.php'; ?> 
+<?php require_once 'footer.php'; ?>
