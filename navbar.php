@@ -7,7 +7,7 @@ $is_logged_in = isset($_SESSION['user_id']);
     <div class="container">
         <a class="navbar-brand" href="index.php">
             <i class="bi bi-piggy-bank me-2"></i>
-            <?php echo t('site_name'); ?>
+            <?php echo $site_name; ?>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>

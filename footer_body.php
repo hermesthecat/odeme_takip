@@ -3,8 +3,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h5 class="text-white"><?php echo t('site_name'); ?></h5>
-                    <p class="text-white"><?php echo t('site_description'); ?></p>
+                    <h5 class="text-white"><?php echo $site_name; ?></h5>
+                    <p class="text-white"><?php echo $site_description; ?></p>
                 </div>
                 <div class="col-md-3">
                     <h5 class="text-white"><?php echo t('footer.links'); ?></h5>
@@ -25,7 +25,7 @@
             </div>
             <hr class="mt-4">
             <div class="text-center">
-                <p class="mb-0">&copy; <?php echo date('Y'); ?> <?php echo t('site_name'); ?>. <?php echo t('footer.copyright'); ?></p>
+                <p class="mb-0">&copy; <?php echo date('Y'); ?> <?php echo $site_name; ?>. <?php echo t('footer.copyright'); ?></p>
                 <small><?php echo $site_author; ?></small>
             </div>
         </div>

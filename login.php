@@ -15,7 +15,7 @@ if (isset($_SESSION['user_id'])) {
     <div class="container login-container">
         <div class="logo">
             <i class="bi bi-piggy-bank"></i>
-            <h2 class="mt-3"><?php echo t('site_name'); ?></h2>
+            <h2 class="mt-3"><?php echo $site_name; ?></h2>
             <p class="text-muted"><?php echo t('login.title'); ?></p>
         </div>
 

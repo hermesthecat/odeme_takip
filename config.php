@@ -83,7 +83,7 @@ $supported_currencies = [
     'GBP' => 'GBP - ' . t('currencies.gbp')
 ];
 
-$site_name = "Parendo";
+$site_name = "Pecunia";
 $site_description = t('site_description');
 $site_keywords = 'bütçe, takip, kişisel, finans, yönetim';
 $site_author = 'A. Kerem Gök & Hermes';

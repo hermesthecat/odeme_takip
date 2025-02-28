@@ -11,7 +11,7 @@ $user_default_currency = $_SESSION['base_currency'];
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title><?php echo t('site_name'); ?> - <?php echo t('site_description'); ?></title>
+    <title><?php echo $site_name; ?> - <?php echo $site_description; ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
@@ -24,7 +24,7 @@ $user_default_currency = $_SESSION['base_currency'];
     <div class="container mt-4">
         <!-- Başlık ve Kullanıcı Bilgisi -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="mb-0"><?php echo t('site_name'); ?></h1>
+            <h1 class="mb-0"><?php echo $site_name; ?></h1>
             <div class="d-flex align-items-center">
                 <?php if ($_SESSION['is_admin'] == 1) : ?>
                     <a href="admin.php" class="btn btn-outline-secondary me-2">
@@ -301,7 +301,7 @@ $user_default_currency = $_SESSION['base_currency'];
                     Döviz kurları ve finansal veriler bilgi amaçlı olup, gerçek zamanlı değişiklik gösterebilir.
                 </p>
                 <p class="small text-center text-muted mb-0 mt-3">
-                    &copy; <?php echo date('Y'); ?> <?php echo t('site_name'); ?> - Tüm hakları saklıdır.
+                    &copy; <?php echo date('Y'); ?> <?php echo $site_name; ?> - Tüm hakları saklıdır.
                 </p>
             </div>
         </div>
