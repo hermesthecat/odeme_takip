@@ -56,6 +56,7 @@ require_once __DIR__ . '/modals/user_settings_modal.php';
         paymentModal.addEventListener('show.bs.modal', function() {
             this.querySelector('input[name="first_date"]').value = getTodayDate();
         });
+
     });
 
     // Tekrarlama seçeneğine göre bitiş tarihi alanını göster/gizle (Ödeme güncelleme için)
