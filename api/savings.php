@@ -101,6 +101,11 @@ function loadSavings()
         // Eğer child varsa onun current_amount'unu kullan
         if ($last_child) {
             $saving['current_amount'] = $last_child['current_amount'];
+            // Hedef tutara ulaşılıp ulaşılmadığını kontrol et
+            $saving['goal'] = ($saving['target_amount'] == $last_child['current_amount']) ? 1 : 0;
+        } else {
+            // Child yoksa parent'ın kendi değerleriyle kontrol et
+            $saving['goal'] = ($saving['target_amount'] == $saving['current_amount']) ? 1 : 0;
         }
 
         $saving['formatted_start_date'] = formatDate($saving['start_date']);

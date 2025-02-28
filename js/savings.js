@@ -33,9 +33,16 @@ function updateSavingsList(savings) {
             current_amountText += `<br><small class="text-muted">(${formatMyMoney(converted_currentAmount.toFixed(2))} ${data.user.base_currency})</small>`;
         }
 
+        // check if the saving is a goal
+        if (saving.goal) {
+            goalText = '✔️';
+        } else {
+            goalText = '';
+        }
+
         tbody.append(`
             <tr>
-                <td>${saving.name}</td>
+                <td>${saving.name} ${goalText}</td>
                 <td>${target_amountText}</td>
                 <td>${current_amountText}</td>
                 <td>${saving.start_date}</td>
