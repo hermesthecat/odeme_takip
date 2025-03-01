@@ -60,7 +60,7 @@ class ReceiptCommand extends UserCommand
         }
 
         try {
-            // Google Cloud Vision API ile fotoğrafı analiz et
+            // Gemini API ile fotoğrafı analiz et
             $imageContent = base64_encode(file_get_contents($local_file));
 
             // Gemini API'ya gönder
