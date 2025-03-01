@@ -20,5 +20,8 @@
             "App\\": "classes/",
             "Longman\\TelegramBot\\": "vendor/longman/telegram-bot/src"
         }
+    },
+    "config": {
+        "process-timeout": 0
     }
 }
