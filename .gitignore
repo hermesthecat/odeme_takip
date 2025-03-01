@@ -21,3 +21,4 @@ output.txt
 vendor/
 composer.lock
 composer.phar
+.cursor/
