@@ -23,116 +23,168 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     $file = $_FILES['document'];
     $fileName = $file['name'];
     $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    $fileSize = $file['size'];
+    $fileMime = mime_content_type($file['tmp_name']);
 
-    // Sadece PDF ve Excel dosyalarına izin ver
-    if ($fileType != "pdf" && $fileType != "xlsx" && $fileType != "xls" && $fileType != "csv" && $fileType != "png" && $fileType != "jpg" && $fileType != "jpeg") {
-        $_SESSION['error'] = "Sadece PDF, Excel, CSV, PNG, JPG ve JPEG dosyaları yüklenebilir.";
-    } else {
-        $uploadDir = 'uploads/';
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
+    // Dosya boyutu kontrolü (max 10MB)
+    $maxFileSize = 10 * 1024 * 1024; // 10MB
+    if ($fileSize > $maxFileSize) {
+        $_SESSION['error'] = "Dosya boyutu çok büyük. Maksimum 10MB yükleyebilirsiniz.";
+        header('Location: ai_analysis.php');
+        exit;
+    }
+
+    // İzin verilen MIME tipleri
+    $allowedMimes = [
+        'application/pdf',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/csv',
+        'image/jpeg',
+        'image/png'
+    ];
+
+    if (!in_array($fileMime, $allowedMimes)) {
+        $_SESSION['error'] = "Geçersiz dosya türü. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.";
+        header('Location: ai_analysis.php');
+        exit;
+    }
+
+    // Dosya uzantısı kontrolü
+    $allowedExtensions = ['pdf', 'xlsx', 'xls', 'csv', 'png', 'jpg', 'jpeg'];
+    if (!in_array($fileType, $allowedExtensions)) {
+        $_SESSION['error'] = "Geçersiz dosya uzantısı. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.";
+        header('Location: ai_analysis.php');
+        exit;
+    }
+
+    // Dosya içeriği kontrolü
+    $handle = fopen($file['tmp_name'], 'r');
+    $header = fread($handle, 8);
+    fclose($handle);
+
+    // Zararlı içerik kontrolü
+    $maliciousPatterns = [
+        '<?php', '<?=', '<script', 'eval(', 'base64_decode(',
+        'system(', 'exec(', 'shell_exec(', 'passthru('
+    ];
+
+    $fileContent = file_get_contents($file['tmp_name']);
+    foreach ($maliciousPatterns as $pattern) {
+        if (stripos($fileContent, $pattern) !== false) {
+            $_SESSION['error'] = "Zararlı içerik tespit edildi. Dosya reddedildi.";
+            header('Location: ai_analysis.php');
+            exit;
+        }
+    }
+
+    // Dosya adı güvenliği
+    $safeFileName = preg_replace("/[^a-zA-Z0-9.-]/", "_", $fileName);
+    
+    $uploadDir = 'uploads/';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $uniqueFileName = uniqid() . '_' . $safeFileName;
+    $uploadPath = $uploadDir . $uniqueFileName;
+
+    if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+        // Google Gemini AI analizi burada yapılacak
+        require_once 'vendor/autoload.php';
+
+        // Gemini API anahtarını config'den al
+        $apiKey = GEMINI_API_KEY;
+
+        // Dosya içeriğini oku ve AI'ya gönder
+        $fileContent = "";
+        if ($fileType == "pdf") {
+            // PDF okuma işlemi
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf = $parser->parseFile($uploadPath);
+            $fileContent = $pdf->getText();
+        } else {
+            // Excel okuma işlemi
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($uploadPath);
+            $worksheet = $spreadsheet->getActiveSheet();
+            $fileContent = "";
+            foreach ($worksheet->getRowIterator() as $row) {
+                $cellIterator = $row->getCellIterator();
+                $cellIterator->setIterateOnlyExistingCells(false);
+                foreach ($cellIterator as $cell) {
+                    $fileContent .= $cell->getValue() . "\t";
+                }
+                $fileContent .= "\n";
+            }
         }
 
-        $uniqueFileName = uniqid() . '_' . $fileName;
-        $uploadPath = $uploadDir . $uniqueFileName;
+        // Gemini AI'ya istek gönder
+        $client = new \Google\Client();
+        $client->setApiKey($apiKey);
 
-        if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
-            // Google Gemini AI analizi burada yapılacak
-            require_once 'vendor/autoload.php';
+        $prompt = <<<EOD
+        Bu metin bir finansal döküman (bankadan alınan hesap özeti ya da kredi kartı harcama listesi). Lütfen her satırı analiz et ve aşağıdaki bilgileri çıkar:
 
-            // Gemini API anahtarını config'den al
-            $apiKey = GEMINI_API_KEY;
-
-            // Dosya içeriğini oku ve AI'ya gönder
-            $fileContent = "";
-            if ($fileType == "pdf") {
-                // PDF okuma işlemi
-                $parser = new \Smalot\PdfParser\Parser();
-                $pdf = $parser->parseFile($uploadPath);
-                $fileContent = $pdf->getText();
-            } else {
-                // Excel okuma işlemi
-                $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($uploadPath);
-                $worksheet = $spreadsheet->getActiveSheet();
-                $fileContent = "";
-                foreach ($worksheet->getRowIterator() as $row) {
-                    $cellIterator = $row->getCellIterator();
-                    $cellIterator->setIterateOnlyExistingCells(false);
-                    foreach ($cellIterator as $cell) {
-                        $fileContent .= $cell->getValue() . "\t";
-                    }
-                    $fileContent .= "\n";
-                }
-            }
-
-            // Gemini AI'ya istek gönder
-            $client = new \Google\Client();
-            $client->setApiKey($apiKey);
-
-            $prompt = <<<EOD
-            Bu metin bir finansal döküman (bankadan alınan hesap özeti ya da kredi kartı harcama listesi). Lütfen her satırı analiz et ve aşağıdaki bilgileri çıkar:
-
-            1. Bu bir gelir mi yoksa gider mi?
-            2. Tutarı ne kadar?
-            3. Para birimi nedir?
-            4. Kısa açıklama nedir?
-            5. Hangi tarihte yapıldı?
-            6. Hangi mağazada yapıldı?
-            
-            Lütfen her bulgu için JSON formatında yanıt ver.
-            
-            Örnek JSON formatı:
-            {
-                "type": "income/expense",
-                "amount": 100,
-                "currency": "USD",
-                "description": "Kısa açıklama",
-                "date": "2024-01-01",
-                "store_name": "Mağaza Adı"
-            }
+        1. Bu bir gelir mi yoksa gider mi?
+        2. Tutarı ne kadar?
+        3. Para birimi nedir?
+        4. Kısa açıklama nedir?
+        5. Hangi tarihte yapıldı?
+        6. Hangi mağazada yapıldı?
+        
+        Lütfen her bulgu için JSON formatında yanıt ver.
+        
+        Örnek JSON formatı:
+        {
+            "type": "income/expense",
+            "amount": 100,
+            "currency": "USD",
+            "description": "Kısa açıklama",
+            "date": "2024-01-01",
+            "store_name": "Mağaza Adı"
+        }
 EOD;
 
-            $data = [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt . "\n\n" . $fileContent]
-                        ]
+        $data = [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $prompt . "\n\n" . $fileContent]
                     ]
                 ]
-            ];
+            ]
+        ];
 
-            $response = $client->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', [
-                'json' => $data
-            ]);
+        $response = $client->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', [
+            'json' => $data
+        ]);
 
-            $result = json_decode($response->getBody(), true);
+        $result = json_decode($response->getBody(), true);
 
-            // AI sonuçlarını geçici tabloya kaydet
-            if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
-                $aiResults = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
+        // AI sonuçlarını geçici tabloya kaydet
+        if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
+            $aiResults = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
 
-                foreach ($aiResults as $item) {
-                    $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, description, amount, currency, category, suggested_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([
-                        $user_id,
-                        $fileName,
-                        $fileType,
-                        $item['description'],
-                        $item['amount'],
-                        $item['currency'],
-                        $item['type'], // gelir/gider
-                        $item['store_name'] . ' - ' . $item['date']
-                    ]);
-                }
-
-                $_SESSION['success'] = "Dosya başarıyla yüklendi ve analiz edildi.";
-            } else {
-                $_SESSION['error'] = "AI analizi sırasında bir hata oluştu.";
+            foreach ($aiResults as $item) {
+                $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, description, amount, currency, category, suggested_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt->execute([
+                    $user_id,
+                    $fileName,
+                    $fileType,
+                    $item['description'],
+                    $item['amount'],
+                    $item['currency'],
+                    $item['type'], // gelir/gider
+                    $item['store_name'] . ' - ' . $item['date']
+                ]);
             }
+
+            $_SESSION['success'] = "Dosya başarıyla yüklendi ve analiz edildi.";
         } else {
-            $_SESSION['error'] = "Dosya yükleme sırasında bir hata oluştu.";
+            $_SESSION['error'] = "AI analizi sırasında bir hata oluştu.";
         }
+    } else {
+        $_SESSION['error'] = "Dosya yükleme sırasında bir hata oluştu.";
     }
 }
 
