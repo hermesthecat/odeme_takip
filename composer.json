@@ -13,7 +13,8 @@
         "google/cloud": "^0.209.0",
         "smalot/pdfparser": "^2.8",
         "phpoffice/phpspreadsheet": "^1.29",
-        "longman/telegram-bot": "^0.80"
+        "longman/telegram-bot": "^0.80",
+        "google/apiclient": "^2.16"
     },
     "autoload": {
         "psr-4": {
