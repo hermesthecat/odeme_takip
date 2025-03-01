@@ -1,13 +1,27 @@
 <?php
 
+/**
+ * Gelir yönetimi API'si
+ * Income management API
+ * 
+ * @author A. Kerem Gök
+ */
+
 require_once __DIR__ . '/../config.php';
 checkLogin();
 
+/**
+ * Yeni gelir ekler
+ * Adds new income
+ * 
+ * @return bool - İşlem başarılı/başarısız / Operation success/failure
+ */
 function addIncome()
 {
     global $pdo, $user_id;
 
     // Kullanıcının ana para birimini al
+    // Get user's base currency
     $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -48,6 +62,7 @@ function addIncome()
     $pdo->beginTransaction();
 
     // Kur bilgisini al
+    // Get exchange rate
     $exchange_rate = null;
     if ($currency !== $base_currency) {
         $exchange_rate = getExchangeRate($currency, $base_currency);
@@ -57,6 +72,7 @@ function addIncome()
     }
 
     // Ana kaydı ekle
+    // Add main record
     $stmt = $pdo->prepare("INSERT INTO income (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate) 
                      VALUES (?, NULL, ?, ?, ?, ?, ?, ?)");
 
@@ -71,17 +87,20 @@ function addIncome()
     ])) {
         throw new Exception(t('income.add_error'));
         saveLog("Gelir ekleme hatası ($name): " . $e->getMessage(), 'error', 'addIncome', $_SESSION['user_id']);
+        // Income addition error
     }
 
     $parent_id = $pdo->lastInsertId();
 
     // Tekrarlı kayıtlar için
+    // For recurring records
     if ($frequency !== 'none' && isset($end_date) && $end_date > $first_date) {
         $month_interval = getMonthInterval($frequency);
         $total_months = getMonthDifference($first_date, $end_date);
         $repeat_count = floor($total_months / $month_interval);
 
         // Child kayıtları ekle
+        // Add child records
         if ($repeat_count > 0) {
             $stmt = $pdo->prepare("INSERT INTO income (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -89,6 +108,7 @@ function addIncome()
                 $income_date = calculateNextPaymentDate($first_date, $i * $month_interval);
 
                 // Bitiş tarihini geçmemesi için kontrol
+                // Check not to exceed end date
                 if ($income_date <= $end_date) {
                     if (!$stmt->execute([
                         $user_id,
@@ -102,6 +122,7 @@ function addIncome()
                     ])) {
                         throw new Exception(t('income.add_recurring_error'));
                         saveLog("Tekrarlı gelir ekleme hatası ($name): " . $e->getMessage(), 'error', 'addIncome', $_SESSION['user_id']);
+                        // Recurring income addition error
                     }
                 }
             }
@@ -112,6 +133,12 @@ function addIncome()
     return true;
 }
 
+/**
+ * Gelir kaydını siler
+ * Deletes income record
+ * 
+ * @return bool - İşlem başarılı/başarısız / Operation success/failure
+ */
 function deleteIncome()
 {
     global $pdo, $user_id;
@@ -124,14 +151,22 @@ function deleteIncome()
     } else {
         throw new Exception(t('income.delete_error'));
         saveLog("Gelir silme hatası ($id): " . $e->getMessage(), 'error', 'deleteIncome', $_SESSION['user_id']);
+        // Income deletion error
     }
 }
 
+/**
+ * Gelirleri listeler
+ * Lists incomes
+ * 
+ * @return array - Gelir listesi / Income list
+ */
 function loadIncomes()
 {
     global $pdo, $user_id, $month, $year;
 
     // Gelirleri al
+    // Get incomes
     $sql_incomes = "SELECT i.*, 
             CASE 
                 WHEN i.parent_id IS NULL THEN (
@@ -159,27 +194,38 @@ function loadIncomes()
     $incomes = $stmt_incomes->fetchAll(PDO::FETCH_ASSOC);
 
     saveLog("Gelirler alındı: " . $user_id . " " . $month . " " . $year, 'info', 'loadIncomes', $_SESSION['user_id']);
+    // Incomes retrieved
 
+    // Tarihleri formatla
+    // Format dates
     foreach ($incomes as &$income) {
         $income['formatted_first_date'] = formatDate($income['first_date']);
         $income['formatted_next_income_date'] = $income['next_income_date'] ? formatDate($income['next_income_date']) : null;
     }
-    unset($income); // Referansı temizle
+    unset($income); // Referansı temizle / Clear reference
 
     return $incomes;
 }
 
+/**
+ * Geliri alındı/alınmadı olarak işaretler
+ * Marks income as received/not received
+ * 
+ * @return bool - İşlem başarılı/başarısız / Operation success/failure
+ */
 function markIncomeReceived()
 {
     global $pdo, $user_id;
 
     // Kullanıcının ana para birimini al
+    // Get user's base currency
     $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     $base_currency = $user['base_currency'];
 
     // Gelir bilgilerini al
+    // Get income information
     $stmt = $pdo->prepare("SELECT * FROM income WHERE id = ? AND user_id = ?");
     $stmt->execute([$_POST['id'], $user_id]);
     $income = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -187,34 +233,40 @@ function markIncomeReceived()
     if (!$income) {
         throw new Exception(t('income.not_found'));
         saveLog("Gelir bulunamadı: " . $_POST['id'], 'error', 'markIncomeReceived', $_SESSION['user_id']);
+        // Income not found
     }
 
     $pdo->beginTransaction();
 
     try {
         // Kur bilgisini güncelle
+        // Update exchange rate
         $exchange_rate = null;
         if ($income['currency'] !== $base_currency) {
             $exchange_rate = getExchangeRate($income['currency'], $base_currency);
             if (!$exchange_rate) {
                 throw new Exception(t('income.rate_error'));
                 saveLog("Gelir kuru hatası: " . $_POST['id'], 'error', 'markIncomeReceived', $_SESSION['user_id']);
+                // Income exchange rate error
             }
         }
 
         // Gelir durumunu ve kur bilgisini güncelle
+        // Update income status and exchange rate
         $stmt = $pdo->prepare("UPDATE income SET 
             status = CASE WHEN status = 'received' THEN 'pending' ELSE 'received' END,
             exchange_rate = ?
             WHERE id = ? AND user_id = ?");
 
-        $id = $_POST['id']; // Gelir ID
+        $id = $_POST['id']; // Gelir ID / Income ID
 
         if (!$stmt->execute([$exchange_rate, $id, $user_id])) {
             throw new Exception(t('income.update_error'));
             saveLog("Gelir güncelleme hatası ($id): " . $e->getMessage(), 'error', 'markIncomeReceived', $_SESSION['user_id']);
+            // Income update error
         } else {
             saveLog("Gelir güncellendi: $id", 'info', 'markIncomeReceived', $_SESSION['user_id']);
+            // Income updated
         }
 
         $pdo->commit();
@@ -225,17 +277,25 @@ function markIncomeReceived()
     }
 }
 
+/**
+ * Gelir kaydını günceller
+ * Updates income record
+ * 
+ * @return bool - İşlem başarılı/başarısız / Operation success/failure
+ */
 function updateIncome()
 {
     global $pdo, $user_id;
 
     // Kullanıcının ana para birimini al
+    // Get user's base currency
     $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
     $base_currency = $user['base_currency'];
 
     // Gerekli alanları doğrula
+    // Validate required fields
     if (isset($_POST['id'])) {
         $id = validateRequired($_POST['id'] ?? null, t('income.id'));
     }
@@ -383,38 +443,46 @@ function getLastChildIncomeDate($income_id)
     global $pdo, $user_id;
 
     // Gelir bilgisini al
+    // Get income information
     $stmt = $pdo->prepare("SELECT parent_id FROM income WHERE id = ? AND user_id = ?");
     $stmt->execute([$income_id, $user_id]);
     $income = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$income) {
         throw new Exception(t('income.not_found'));
-        saveLog("Gelir bulunamadı: " . $income_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); // Gelir ID
+        saveLog("Gelir bulunamadı: " . $income_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); 
+        // Income not found
     }
 
-    $parent_id = $income['parent_id'] ?? $income_id; // Eğer parent_id null ise, kendisi parent'tır
+    // Eğer parent_id null ise, kendisi parent'tır
+    // If parent_id is null, it is the parent itself
+    $parent_id = $income['parent_id'] ?? $income_id; 
 
     // Parent ID'ye sahip gelirin son çocuk gelirinin tarihini al
+    // Get the date of the last child income with the parent ID
     $stmt = $pdo->prepare("SELECT MAX(first_date) as last_date
                           FROM income
                           WHERE parent_id = ? AND user_id = ?");
 
     if (!$stmt->execute([$parent_id, $user_id])) {
         throw new Exception(t('income.not_found'));
-        saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); // Gelir ID
+        saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); 
+        // Income not found
     }
 
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$result || !$result['last_date']) {
         // Eğer çocuk gelir yoksa, parent'ın ilk tarihini döndür
+        // If there is no child income, return the parent's first date
         $stmt = $pdo->prepare("SELECT first_date FROM income WHERE id = ? AND user_id = ?");
         $stmt->execute([$parent_id, $user_id]);
         $parent = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$parent) {
             throw new Exception(t('income.not_found'));
-            saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); // Gelir ID
+            saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); 
+            // Income not found
         }
 
         return $parent['first_date'];
