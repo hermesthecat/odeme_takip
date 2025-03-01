@@ -126,8 +126,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
         }
 
         // Gemini AI'ya istek gönder
-        $client = new \Google\Client();
-        $client->setApiKey($apiKey);
+        $client = new \GuzzleHttp\Client();
+        
+        $headers = [
+            'Content-Type' => 'application/json',
+            'x-goog-api-key' => $apiKey
+        ];
 
         $prompt = <<<EOD
         Bu metin bir finansal döküman (bankadan alınan hesap özeti ya da kredi kartı harcama listesi). Lütfen her satırı analiz et ve aşağıdaki bilgileri çıkar:
@@ -163,6 +167,7 @@ EOD;
         ];
 
         $response = $client->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent', [
+            'headers' => $headers,
             'json' => $data
         ]);
 

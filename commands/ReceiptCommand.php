@@ -11,6 +11,7 @@ namespace Longman\TelegramBot\Commands\UserCommands;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Exception;
 
 class ReceiptCommand extends UserCommand
 {
@@ -63,8 +64,12 @@ class ReceiptCommand extends UserCommand
             $imageContent = base64_encode(file_get_contents($local_file));
 
             // Gemini API'ya gönder
-            $client = new \Google\Client();
-            $client->setApiKey(getenv('GEMINI_API_KEY'));
+            $client = new \GuzzleHttp\Client();
+            
+            $headers = [
+                'Content-Type' => 'application/json',
+                'x-goog-api-key' => getenv('GEMINI_API_KEY')
+            ];
 
             $prompt = "Bu bir fiş fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
             1. Toplam tutar
@@ -92,6 +97,7 @@ class ReceiptCommand extends UserCommand
             ];
 
             $response = $client->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent', [
+                'headers' => $headers,
                 'json' => $data
             ]);
 

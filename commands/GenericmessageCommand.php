@@ -5,6 +5,7 @@ namespace Longman\TelegramBot\Commands\SystemCommands;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Exception;
 
 class GenericmessageCommand extends SystemCommand
 {
@@ -66,8 +67,12 @@ class GenericmessageCommand extends SystemCommand
                 $imageContent = base64_encode(file_get_contents($local_file));
 
                 // Gemini API'ya gönder
-                $client = new \Google\Client();
-                $client->setApiKey(getenv('GEMINI_API_KEY'));
+                $client = new \GuzzleHttp\Client();
+                
+                $headers = [
+                    'Content-Type' => 'application/json',
+                    'x-goog-api-key' => getenv('GEMINI_API_KEY')
+                ];
 
                 $prompt = <<<EOD
                 Bu bir fiş fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
@@ -105,6 +110,7 @@ EOD;
                 ];
 
                 $response = $client->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent', [
+                    'headers' => $headers,
                     'json' => $data
                 ]);
 
