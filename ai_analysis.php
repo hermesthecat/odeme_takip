@@ -65,8 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
 
     // Zararlı içerik kontrolü
     $maliciousPatterns = [
-        '<?php', '<?=', '<script', 'eval(', 'base64_decode(',
-        'system(', 'exec(', 'shell_exec(', 'passthru('
+        '<?php',
+        '<?=',
+        '<script',
+        'eval(',
+        'base64_decode(',
+        'system(',
+        'exec(',
+        'shell_exec(',
+        'passthru('
     ];
 
     $fileContent = file_get_contents($file['tmp_name']);
@@ -80,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
 
     // Dosya adı güvenliği
     $safeFileName = preg_replace("/[^a-zA-Z0-9.-]/", "_", $fileName);
-    
+
     $uploadDir = 'uploads/';
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);

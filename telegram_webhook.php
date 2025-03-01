@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Telegram Webhook İşleyici
  * @author A. Kerem Gök
@@ -15,11 +16,10 @@ use Longman\TelegramBot\Exception\TelegramException;
 try {
     // Telegram bot ayarları
     $telegram = new Telegram(getenv('TELEGRAM_BOT_TOKEN'), getenv('TELEGRAM_BOT_USERNAME'));
-    
+
     // Gelen mesajı işle
     $telegram->handle();
-    
 } catch (TelegramException $e) {
     // Hata logla
     error_log($e->getMessage());
-} 
+}

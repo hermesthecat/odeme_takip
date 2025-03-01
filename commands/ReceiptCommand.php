@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fiş Fotoğrafı İşleme Komutu
  * @author A. Kerem Gök
@@ -17,12 +18,12 @@ class ReceiptCommand extends UserCommand
     protected $description = 'Fiş fotoğrafını analiz et';
     protected $usage = '/receipt';
     protected $version = '1.0.0';
-    
+
     public function execute(): ServerResponse
     {
         $message = $this->getMessage();
         $chat_id = $message->getChat()->getId();
-        
+
         // Fotoğraf kontrolü
         $photo = $message->getPhoto();
         if (empty($photo)) {
@@ -31,11 +32,11 @@ class ReceiptCommand extends UserCommand
                 'text'    => 'Lütfen bir fiş fotoğrafı gönderin.',
             ]);
         }
-        
+
         // En yüksek çözünürlüklü fotoğrafı al
         $photo = end($photo);
         $file_id = $photo->getFileId();
-        
+
         // Fotoğrafı indir
         $file = Request::getFile(['file_id' => $file_id]);
         if (!$file->isOk()) {
@@ -44,10 +45,10 @@ class ReceiptCommand extends UserCommand
                 'text'    => 'Fotoğraf indirilemedi.',
             ]);
         }
-        
+
         $file_path = $file->getResult()->getFilePath();
         $local_file = 'uploads/' . uniqid() . '.jpg';
-        
+
         // Fotoğrafı kaydet
         $downloaded = Request::downloadFile($file->getResult(), $local_file);
         if (!$downloaded) {
@@ -56,15 +57,15 @@ class ReceiptCommand extends UserCommand
                 'text'    => 'Fotoğraf kaydedilemedi.',
             ]);
         }
-        
+
         try {
             // Google Cloud Vision API ile fotoğrafı analiz et
             $imageContent = base64_encode(file_get_contents($local_file));
-            
+
             // Gemini API'ya gönder
             $client = new \Google\Client();
             $client->setApiKey(getenv('GEMINI_API_KEY'));
-            
+
             $prompt = "Bu bir fiş fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
             1. Toplam tutar
             2. Para birimi
@@ -73,7 +74,7 @@ class ReceiptCommand extends UserCommand
             5. Harcama kategorisi
             
             Lütfen JSON formatında yanıt ver.";
-            
+
             $data = [
                 'contents' => [
                     [
@@ -89,16 +90,16 @@ class ReceiptCommand extends UserCommand
                     ]
                 ]
             ];
-            
+
             $response = $client->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent', [
                 'json' => $data
             ]);
-            
+
             $result = json_decode($response->getBody(), true);
-            
+
             if (isset($result['candidates'][0]['content']['parts'][0]['text'])) {
                 $analysis = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
-                
+
                 // Veritabanına kaydet
                 global $db;
                 $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, description, amount, currency, category, suggested_name) 
@@ -111,15 +112,15 @@ class ReceiptCommand extends UserCommand
                     $analysis['para_birimi'],
                     $analysis['kategori']
                 ]);
-                
+
                 return Request::sendMessage([
                     'chat_id' => $chat_id,
                     'text'    => "Fiş analiz edildi!\n\n" .
-                                "Mağaza: {$analysis['mağaza_adı']}\n" .
-                                "Tutar: {$analysis['toplam_tutar']} {$analysis['para_birimi']}\n" .
-                                "Tarih: {$analysis['tarih']}\n" .
-                                "Kategori: {$analysis['kategori']}\n\n" .
-                                "Web panelinden onaylayabilirsiniz: " . getenv('SITE_URL') . "/ai_analysis.php",
+                        "Mağaza: {$analysis['mağaza_adı']}\n" .
+                        "Tutar: {$analysis['toplam_tutar']} {$analysis['para_birimi']}\n" .
+                        "Tarih: {$analysis['tarih']}\n" .
+                        "Kategori: {$analysis['kategori']}\n\n" .
+                        "Web panelinden onaylayabilirsiniz: " . getenv('SITE_URL') . "/ai_analysis.php",
                 ]);
             } else {
                 return Request::sendMessage([
@@ -127,7 +128,6 @@ class ReceiptCommand extends UserCommand
                     'text'    => 'Fiş analizi başarısız oldu.',
                 ]);
             }
-            
         } catch (Exception $e) {
             return Request::sendMessage([
                 'chat_id' => $chat_id,
@@ -140,4 +140,4 @@ class ReceiptCommand extends UserCommand
             }
         }
     }
-} 
+}

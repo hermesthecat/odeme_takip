@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AI Analiz Sonuçlarını Kaydetme
  * @author A. Kerem Gök
@@ -17,16 +18,16 @@ $user_id = $_SESSION['user_id'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_array($_POST['approved'])) {
     $approved_ids = array_map('intval', $_POST['approved']);
-    
+
     // Onaylanan kayıtları getir
     $placeholders = str_repeat('?,', count($approved_ids) - 1) . '?';
     $stmt = $db->prepare("SELECT * FROM ai_analysis_temp WHERE id IN ($placeholders) AND user_id = ?");
     $params = array_merge($approved_ids, [$user_id]);
     $stmt->execute($params);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     $db->beginTransaction();
-    
+
     try {
         foreach ($items as $item) {
             if ($item['category'] === 'income') {
@@ -50,12 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_arr
                     $item['currency']
                 ]);
             }
-            
+
             // Geçici tablodan kaydı işaretleyelim
             $stmt = $db->prepare("UPDATE ai_analysis_temp SET is_approved = 1 WHERE id = ?");
             $stmt->execute([$item['id']]);
         }
-        
+
         $db->commit();
         $_SESSION['success'] = "Seçilen kayıtlar başarıyla eklendi.";
     } catch (Exception $e) {
@@ -68,4 +69,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_arr
 
 // Geri yönlendir
 header('Location: ai_analysis.php');
-exit; 
+exit;

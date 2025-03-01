@@ -124,7 +124,7 @@ function markAsPaid(id) {
                 month: $('#monthSelect').val(),
                 year: $('#yearSelect').val(),
                 load_type: 'summary'
-            }).done(function(response) {
+            }).done(function (response) {
                 if (response.status === 'success') {
                     // Global data değişkenini güncelle
                     window.data = response.data;
@@ -291,7 +291,7 @@ function transferUnpaidPayments() {
                 current_year: currentYear,
                 next_month: nextMonth,
                 next_year: nextYear
-            }).done(function(response) {
+            }).done(function (response) {
                 if (response.status === 'success') {
                     Swal.fire({
                         icon: 'success',
