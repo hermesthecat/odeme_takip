@@ -70,12 +70,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
             $client->setApiKey($apiKey);
 
             $prompt = "Bu metin bir finansal döküman (bankadan alınan hesap özeti ya da kredi kartı harcama listesi). Lütfen her satırı analiz et ve aşağıdaki bilgileri çıkar:
+            
             1. Bu bir gelir mi yoksa gider mi?
             2. Tutarı ne kadar?
             3. Para birimi nedir?
             4. Kısa açıklama nedir?
-            5. Önerilen kategori ismi nedir?
-            6. Hangi tarihte yapıldı?
+            5. Hangi tarihte yapıldı?
+            6. Hangi mağazada yapıldı?
             
             Lütfen her bulgu için JSON formatında yanıt ver.";
 
