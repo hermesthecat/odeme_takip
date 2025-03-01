@@ -25,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
     // Sadece PDF ve Excel dosyalarına izin ver
-    if ($fileType != "pdf" && $fileType != "xlsx" && $fileType != "xls") {
-        $_SESSION['error'] = "Sadece PDF ve Excel dosyaları yüklenebilir.";
+    if ($fileType != "pdf" && $fileType != "xlsx" && $fileType != "xls" && $fileType != "csv" && $fileType != "png" && $fileType != "jpg" && $fileType != "jpeg") {
+        $_SESSION['error'] = "Sadece PDF, Excel, CSV, PNG, JPG ve JPEG dosyaları yüklenebilir.";
     } else {
         $uploadDir = 'uploads/';
         if (!file_exists($uploadDir)) {
@@ -159,7 +159,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <h5 class="card-title">Dosya Yükle</h5>
                     <form action="" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <label for="document" class="form-label">PDF veya Excel Dosyası Seçin</label>
+                            <label for="document" class="form-label">PDF, Excel, CSV, PNG, JPG ve JPEG Dosyası Seçin</label>
                             <input type="file" class="form-control" id="document" name="document" accept=".pdf,.xlsx,.xls" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Yükle ve Analiz Et</button>
