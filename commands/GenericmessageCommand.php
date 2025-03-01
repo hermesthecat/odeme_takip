@@ -69,14 +69,24 @@ class GenericmessageCommand extends SystemCommand
                 $client = new \Google\Client();
                 $client->setApiKey(getenv('GEMINI_API_KEY'));
 
-                $prompt = "Bu bir fiş fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
+                $prompt = <<<EOD
+                Bu bir fiş fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
                 
                 1. Toplam tutar
                 2. Para birimi
                 3. Tarih
                 4. Mağaza/İşletme adı
                 
-                Lütfen JSON formatında yanıt ver.";
+                Lütfen JSON formatında yanıt ver.
+                
+                Örnek JSON formatı:
+                {
+                    "total_amount": 100,
+                    "currency": "USD",
+                    "date": "2024-01-01",
+                    "store_name": "Mağaza Adı"
+                }
+EOD;
 
                 $data = [
                     'contents' => [
@@ -112,7 +122,6 @@ class GenericmessageCommand extends SystemCommand
                         $analysis['mağaza_adı'] . ' - ' . $analysis['tarih'],
                         $analysis['toplam_tutar'],
                         $analysis['para_birimi'],
-                        $analysis['kategori']
                     ]);
 
                     return Request::sendMessage([
@@ -121,7 +130,6 @@ class GenericmessageCommand extends SystemCommand
                             "Mağaza: {$analysis['mağaza_adı']}\n" .
                             "Tutar: {$analysis['toplam_tutar']} {$analysis['para_birimi']}\n" .
                             "Tarih: {$analysis['tarih']}\n" .
-                            "Kategori: {$analysis['kategori']}\n\n" .
                             "Web panelinden onaylayabilirsiniz: " . getenv('SITE_URL') . "/ai_analysis.php",
                         'parse_mode' => 'HTML'
                     ]);

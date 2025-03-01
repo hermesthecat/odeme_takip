@@ -69,8 +69,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
             $client = new \Google\Client();
             $client->setApiKey($apiKey);
 
-            $prompt = "Bu metin bir finansal döküman (bankadan alınan hesap özeti ya da kredi kartı harcama listesi). Lütfen her satırı analiz et ve aşağıdaki bilgileri çıkar:
-            
+            $prompt = <<<EOD
+            Bu metin bir finansal döküman (bankadan alınan hesap özeti ya da kredi kartı harcama listesi). Lütfen her satırı analiz et ve aşağıdaki bilgileri çıkar:
+
             1. Bu bir gelir mi yoksa gider mi?
             2. Tutarı ne kadar?
             3. Para birimi nedir?
@@ -78,7 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
             5. Hangi tarihte yapıldı?
             6. Hangi mağazada yapıldı?
             
-            Lütfen her bulgu için JSON formatında yanıt ver.";
+            Lütfen her bulgu için JSON formatında yanıt ver.
+            
+            Örnek JSON formatı:
+            {
+                "type": "income/expense",
+                "amount": 100,
+                "currency": "USD",
+                "description": "Kısa açıklama",
+                "date": "2024-01-01",
+                "store_name": "Mağaza Adı"
+            }
+EOD;
 
             $data = [
                 'contents' => [
@@ -110,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
                         $item['amount'],
                         $item['currency'],
                         $item['type'], // gelir/gider
-                        $item['category_name']
+                        $item['store_name'] . ' - ' . $item['date']
                     ]);
                 }
 
