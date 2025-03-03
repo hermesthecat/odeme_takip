@@ -380,6 +380,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;
+
+        case 'generate_code':
+            require_once __DIR__ . '/api/telegram.php';
+            generate_telegram_code();
+            break;
+
+        case 'unlink_telegram':
+            require_once __DIR__ . '/api/telegram.php';
+            unlink_telegram();
+            break;
     }
 
     // Response'u güvenli hale getir
