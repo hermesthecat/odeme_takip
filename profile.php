@@ -10,10 +10,6 @@ $stmt = $pdo->prepare("SELECT * FROM telegram_users WHERE user_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $telegram_user = $stmt->fetch();
 
-// Telegram bağlantı durumunu kontrol et
-$stmt = $pdo->prepare("SELECT * FROM telegram_users WHERE user_id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$telegram_user = $stmt->fetch();
 
 // check post request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -31,6 +27,15 @@ function generate_telegram_code()
     // Rastgele 6 haneli kod oluştur
     $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
+    // üretilen rastgele kod veritabanında var mı kontrol et
+    // eğer varsa yeni bir kod üret
+    $stmt = $pdo->prepare("SELECT * FROM telegram_users WHERE verification_code = ? AND is_verified = 0");
+    $stmt->execute([$code]);
+    $user = $stmt->fetch();
+    if ($user) {
+        generate_telegram_code();
+    }
+
     if ($telegram_user) {
         // Mevcut kaydı güncelle
         $stmt = $pdo->prepare("UPDATE telegram_users SET verification_code = ?, is_verified = 0 WHERE user_id = ?");
@@ -41,7 +46,7 @@ function generate_telegram_code()
         $stmt->execute([$_SESSION['user_id'], $code, '']);
     }
 
-    $_SESSION['success'] = "Yeni doğrulama kodu oluşturuldu: " . $code;
+    //$_SESSION['success'] = "Yeni doğrulama kodu oluşturuldu: " . $code;
     header('Location: ' . $_SERVER['HTTP_REFERER']);
     exit;
 }
@@ -53,7 +58,7 @@ function unlink_telegram()
     $stmt = $pdo->prepare("DELETE FROM telegram_users WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
 
-    $_SESSION['success'] = "Telegram bağlantısı kaldırıldı.";
+    //$_SESSION['success'] = "Telegram bağlantısı kaldırıldı.";
     header('Location: ' . $_SERVER['HTTP_REFERER']);
     exit;
 }
