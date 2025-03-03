@@ -15,9 +15,9 @@ use Exception;
 
 class ReceiptCommand extends UserCommand
 {
-    protected $name = 'receipt';
-    protected $description = 'Fiş fotoğrafını analiz et';
-    protected $usage = '/receipt';
+    protected $name = 'fatura';
+    protected $description = 'Fatura fotoğrafını analiz et';
+    protected $usage = '/fatura';
     protected $version = '1.0.0';
 
     public function execute(): ServerResponse
@@ -30,7 +30,7 @@ class ReceiptCommand extends UserCommand
         if (empty($photo)) {
             return Request::sendMessage([
                 'chat_id' => $chat_id,
-                'text'    => 'Lütfen bir fiş fotoğrafı gönderin.',
+                'text'    => 'Lütfen bir fatura ve ya fiş fotoğrafı gönderin.',
             ]);
         }
 
@@ -60,25 +60,39 @@ class ReceiptCommand extends UserCommand
         }
 
         try {
+
+            // Gemini API anahtarını config'den al
+            $apiKey = GEMINI_API_KEY;
+
             // Gemini API ile fotoğrafı analiz et
             $imageContent = base64_encode(file_get_contents($local_file));
 
             // Gemini API'ya gönder
             $client = new \GuzzleHttp\Client();
-            
+
             $headers = [
                 'Content-Type' => 'application/json',
-                'x-goog-api-key' => getenv('GEMINI_API_KEY')
+                'x-goog-api-key' => $apiKey
             ];
 
-            $prompt = "Bu bir fiş fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
+            $prompt = <<<EOD
+            Bu bir fiş veya fatura fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
+            
             1. Toplam tutar
             2. Para birimi
             3. Tarih
             4. Mağaza/İşletme adı
-            5. Harcama kategorisi
             
-            Lütfen JSON formatında yanıt ver.";
+            Lütfen JSON formatında yanıt ver.
+            
+            Örnek JSON formatı:
+            {
+                "total_amount": 100,
+                "currency": "USD",
+                "date": "2024-01-01",
+                "store_name": "Mağaza Adı"
+            }
+EOD;
 
             $data = [
                 'contents' => [
@@ -108,30 +122,30 @@ class ReceiptCommand extends UserCommand
 
                 // Veritabanına kaydet
                 global $db;
-                $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, description, amount, currency, category, suggested_name) 
-                                    VALUES (?, ?, 'receipt', ?, ?, ?, 'expense', ?)");
+                $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, suggested_name, amount, currency, category) 
+                                    VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $chat_id,
                     basename($local_file),
-                    $analysis['mağaza_adı'] . ' - ' . $analysis['tarih'],
-                    $analysis['toplam_tutar'],
-                    $analysis['para_birimi'],
-                    $analysis['kategori']
+                    'receipt',
+                    $analysis['store_name'] . ' - ' . $analysis['date'],
+                    $analysis['total_amount'],
+                    $analysis['currency'],
+                    'expense'
                 ]);
 
                 return Request::sendMessage([
                     'chat_id' => $chat_id,
-                    'text'    => "Fiş analiz edildi!\n\n" .
-                        "Mağaza: {$analysis['mağaza_adı']}\n" .
-                        "Tutar: {$analysis['toplam_tutar']} {$analysis['para_birimi']}\n" .
-                        "Tarih: {$analysis['tarih']}\n" .
-                        "Kategori: {$analysis['kategori']}\n\n" .
+                    'text'    => "Fatura analiz edildi!\n\n" .
+                        "Mağaza: {$analysis['store_name']}\n" .
+                        "Tutar: {$analysis['total_amount']} {$analysis['currency']}\n" .
+                        "Tarih: {$analysis['date']}\n\n" .
                         "Web panelinden onaylayabilirsiniz: " . getenv('SITE_URL') . "/ai_analysis.php",
                 ]);
             } else {
                 return Request::sendMessage([
                     'chat_id' => $chat_id,
-                    'text'    => 'Fiş analizi başarısız oldu.',
+                    'text'    => 'Fatura analizi başarısız oldu.',
                 ]);
             }
         } catch (Exception $e) {

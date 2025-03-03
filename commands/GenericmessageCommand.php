@@ -63,19 +63,23 @@ class GenericmessageCommand extends SystemCommand
             }
 
             try {
+
+                // Gemini API anahtarını config'den al
+                $apiKey = GEMINI_API_KEY;
+
                 // Google Cloud Vision API ile fotoğrafı analiz et
                 $imageContent = base64_encode(file_get_contents($local_file));
 
                 // Gemini API'ya gönder
                 $client = new \GuzzleHttp\Client();
-                
+
                 $headers = [
                     'Content-Type' => 'application/json',
-                    'x-goog-api-key' => getenv('GEMINI_API_KEY')
+                    'x-goog-api-key' => $apiKey
                 ];
 
                 $prompt = <<<EOD
-                Bu bir fiş fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
+                Bu bir fatura veya fiş fotoğrafı. Lütfen aşağıdaki bilgileri çıkar:
                 
                 1. Toplam tutar
                 2. Para birimi
@@ -120,29 +124,31 @@ EOD;
                     $analysis = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
 
                     // Veritabanına kaydet
-                    $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, description, amount, currency, category, suggested_name) 
-                                        VALUES (?, ?, 'receipt', ?, ?, ?, 'expense', ?)");
+                    $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, suggested_name, amount, currency, category) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([
                         $user['user_id'],
                         basename($local_file),
-                        $analysis['mağaza_adı'] . ' - ' . $analysis['tarih'],
-                        $analysis['toplam_tutar'],
-                        $analysis['para_birimi'],
+                        'receipt',
+                        $analysis['store_name'] . ' - ' . $analysis['date'],
+                        $analysis['total_amount'],
+                        $analysis['currency'],
+                        'expense'
                     ]);
 
                     return Request::sendMessage([
                         'chat_id' => $chat_id,
-                        'text'    => "Fiş analiz edildi!\n\n" .
-                            "Mağaza: {$analysis['mağaza_adı']}\n" .
-                            "Tutar: {$analysis['toplam_tutar']} {$analysis['para_birimi']}\n" .
-                            "Tarih: {$analysis['tarih']}\n" .
+                        'text'    => "Fatura analiz edildi!\n\n" .
+                            "Mağaza: {$analysis['store_name']}\n" .
+                            "Tutar: {$analysis['total_amount']} {$analysis['currency']}\n" .
+                            "Tarih: {$analysis['date']}\n" .
                             "Web panelinden onaylayabilirsiniz: " . getenv('SITE_URL') . "/ai_analysis.php",
                         'parse_mode' => 'HTML'
                     ]);
                 } else {
                     return Request::sendMessage([
                         'chat_id' => $chat_id,
-                        'text'    => 'Fiş analizi başarısız oldu.',
+                        'text'    => 'Fatura analizi başarısız oldu.',
                     ]);
                 }
             } catch (Exception $e) {
@@ -161,7 +167,7 @@ EOD;
         // Diğer mesaj tipleri için yardım menüsünü göster
         return Request::sendMessage([
             'chat_id' => $chat_id,
-            'text'    => "Fiş fotoğrafı göndermek için fotoğrafı doğrudan gönderebilirsiniz.\n" .
+            'text'    => "Fatura veya fiş fotoğrafı göndermek için fotoğrafı doğrudan gönderebilirsiniz.\n" .
                 "Yardım için /help yazabilirsiniz.",
             'parse_mode' => 'HTML'
         ]);

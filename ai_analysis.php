@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
 
         // Gemini AI'ya istek gönder
         $client = new \GuzzleHttp\Client();
-        
+
         $headers = [
             'Content-Type' => 'application/json',
             'x-goog-api-key' => $apiKey
@@ -139,9 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
         1. Bu bir gelir mi yoksa gider mi?
         2. Tutarı ne kadar?
         3. Para birimi nedir?
-        4. Kısa açıklama nedir?
-        5. Hangi tarihte yapıldı?
-        6. Hangi mağazada yapıldı?
+        4. Hangi tarihte yapıldı?
+        5. Hangi mağazada yapıldı?
         
         Lütfen her bulgu için JSON formatında yanıt ver.
         
@@ -178,12 +177,11 @@ EOD;
             $aiResults = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
 
             foreach ($aiResults as $item) {
-                $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, description, amount, currency, category, suggested_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, amount, currency, category, suggested_name) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $user_id,
                     $fileName,
-                    $fileType,
-                    $item['description'],
+                    'ekstre',
                     $item['amount'],
                     $item['currency'],
                     $item['type'], // gelir/gider

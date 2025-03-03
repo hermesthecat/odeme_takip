@@ -51,10 +51,10 @@ class VerifyCommand extends UserCommand
         return Request::sendMessage([
             'chat_id' => $chat_id,
             'text'    => "✅ Hesabınız başarıyla doğrulandı!\n\n" .
-                "Artık fiş fotoğraflarınızı doğrudan gönderebilirsiniz. Ben analiz edip size sonuçları göstereceğim.\n\n" .
+                "Artık fatura veya fiş fotoğraflarınızı doğrudan gönderebilirsiniz. Ben analiz edip size sonuçları göstereceğim.\n\n" .
                 "📝 <b>Önemli Notlar:</b>\n" .
-                "- Fiş fotoğrafı net ve okunaklı olmalı\n" .
-                "- Fişin tamamı fotoğraf karesinde olmalı\n" .
+                "- Fatura veya fiş fotoğrafı net ve okunaklı olmalı\n" .
+                "- Fatura veya fişin tamamı fotoğraf karesinde olmalı\n" .
                 "- Mümkünse düz bir zeminde çekim yapın\n\n" .
                 "Yardım için /help yazabilirsiniz.",
             'parse_mode' => 'HTML'

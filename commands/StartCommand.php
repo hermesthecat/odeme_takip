@@ -28,7 +28,7 @@ class StartCommand extends SystemCommand
         if (!$telegram_user) {
             // Yeni kullanıcı
             $text = "Merhaba! 👋\n\n" .
-                "Ben sizin kişisel finans asistanınızım. Fiş fotoğraflarınızı analiz ederek giderlerinizi takip etmenize yardımcı oluyorum.\n\n" .
+                "Ben sizin kişisel finans asistanınızım. Fatura veya fiş fotoğraflarınızı analiz ederek giderlerinizi takip etmenize yardımcı oluyorum.\n\n" .
                 "Başlamak için önce web paneldeki hesabınızla giriş yapmanız gerekiyor.\n\n" .
                 "1. Web panele gidin: " . getenv('SITE_URL') . "\n" .
                 "2. Hesabınıza giriş yapın\n" .
@@ -55,10 +55,10 @@ class StartCommand extends SystemCommand
         } else {
             // Doğrulanmış kullanıcı
             $text = "Hoş geldiniz! 👋\n\n" .
-                "Fiş fotoğraflarınızı doğrudan gönderebilirsiniz. Ben analiz edip size sonuçları göstereceğim.\n\n" .
+                "Fatura veya fiş fotoğraflarınızı doğrudan gönderebilirsiniz. Ben analiz edip size sonuçları göstereceğim.\n\n" .
                 "📝 <b>Önemli Notlar:</b>\n" .
-                "- Fiş fotoğrafı net ve okunaklı olmalı\n" .
-                "- Fişin tamamı fotoğraf karesinde olmalı\n" .
+                "- Fatura veya fiş fotoğrafı net ve okunaklı olmalı\n" .
+                "- Fatura veya fişin tamamı fotoğraf karesinde olmalı\n" .
                 "- Mümkünse düz bir zeminde çekim yapın\n\n" .
                 "Yardım için /help yazabilirsiniz.";
 

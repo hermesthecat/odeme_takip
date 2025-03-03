@@ -191,7 +191,6 @@ CREATE TABLE `ai_analysis_temp` (
     `user_id` int(11) NOT NULL,
     `file_name` varchar(255) NOT NULL,
     `file_type` enum('pdf', 'excel') NOT NULL,
-    `description` text NOT NULL,
     `amount` decimal(10, 2) NOT NULL,
     `currency` varchar(3) DEFAULT 'TRY',
     `category` enum('income', 'expense') NOT NULL,
