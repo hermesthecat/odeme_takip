@@ -57,9 +57,17 @@ chmod 777 uploads
 
 6. Configure Telegram Bot
 ```bash
+# Create a bot via @BotFather on Telegram and get your token
 # Add these to your .env file:
 TELEGRAM_BOT_TOKEN=your_bot_token
 TELEGRAM_BOT_USERNAME=your_bot_username
+WEBHOOK_URL=https://your-domain.com
+
+# Set up the webhook by running
+php telegram_bot.php
+
+# Ensure your server is accessible via HTTPS
+# Telegram requires HTTPS for webhooks
 ```
 
 ### Usage
@@ -68,7 +76,12 @@ TELEGRAM_BOT_USERNAME=your_bot_username
 3. Upload financial documents for AI analysis
 4. Review and approve AI suggestions
 5. Monitor your financial health
-6. Connect your Telegram account to send receipt photos directly
+6. Connect your Telegram account:
+   - Go to your profile page
+   - Click "Get Verification Code"
+   - Start a chat with your bot on Telegram
+   - Send the verification code using the /verify command
+   - Now you can send receipt photos directly to the bot for analysis
 
 ---
 
@@ -126,9 +139,17 @@ chmod 777 uploads
 
 6. Telegram Bot Yapılandırması
 ```bash
-# .env dosyasına bunları ekleyin:
+# Telegram'da @BotFather üzerinden bir bot oluşturun ve token alın
+# .env dosyasına şunları ekleyin:
 TELEGRAM_BOT_TOKEN=bot_token
 TELEGRAM_BOT_USERNAME=bot_kullanici_adi
+WEBHOOK_URL=https://alan-adiniz.com
+
+# Webhook'u ayarlamak için şu komutu çalıştırın
+php telegram_bot.php
+
+# Sunucunuzun HTTPS üzerinden erişilebilir olduğundan emin olun
+# Telegram, webhook'lar için HTTPS gerektirir
 ```
 
 ### Kullanım
@@ -137,7 +158,12 @@ TELEGRAM_BOT_USERNAME=bot_kullanici_adi
 3. Yapay zeka analizi için finansal dökümanları yükleyin
 4. Yapay zeka önerilerini inceleyin ve onaylayın
 5. Finansal sağlığınızı izleyin
-6. Fiş fotoğraflarını doğrudan göndermek için Telegram hesabınızı bağlayın
+6. Telegram hesabınızı bağlayın:
+   - Profil sayfanıza gidin
+   - "Doğrulama Kodu Al" butonuna tıklayın
+   - Telegram'da botunuzla sohbet başlatın
+   - /verify komutunu kullanarak doğrulama kodunu gönderin
+   - Artık fiş fotoğraflarını doğrudan bota gönderebilirsiniz
 
 ---
 

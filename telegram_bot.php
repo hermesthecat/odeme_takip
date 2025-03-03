@@ -17,7 +17,7 @@ try {
     $telegram = new Telegram(getenv('TELEGRAM_BOT_TOKEN'), getenv('TELEGRAM_BOT_USERNAME'));
 
     // Webhook ayarla
-    $telegram->setWebhook(getenv('WEBHOOK_URL') . '/telegram_webhook.php');
+    $telegram->setWebhook(getenv('WEBHOOK_URL'));
 
     // Komutların bulunduğu dizini ayarla
     $telegram->addCommandsPath(__DIR__ . '/commands');
