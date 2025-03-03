@@ -30,8 +30,8 @@ class VerifyCommand extends UserCommand
         }
 
         // Kodu kontrol et
-        global $db;
-        $stmt = $db->prepare("SELECT * FROM telegram_users WHERE verification_code = ? AND is_verified = 0");
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT * FROM telegram_users WHERE verification_code = ? AND is_verified = 0");
         $stmt->execute([$text]);
         $user = $stmt->fetch();
 
@@ -45,7 +45,7 @@ class VerifyCommand extends UserCommand
         }
 
         // Telegram ID'yi güncelle ve hesabı doğrula
-        $stmt = $db->prepare("UPDATE telegram_users SET telegram_id = ?, is_verified = 1, verification_code = NULL WHERE id = ?");
+        $stmt = $pdo->prepare("UPDATE telegram_users SET telegram_id = ?, is_verified = 1, verification_code = NULL WHERE id = ?");
         $stmt->execute([$chat_id, $user['id']]);
 
         return Request::sendMessage([

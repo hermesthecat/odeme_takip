@@ -19,8 +19,8 @@ class GenericmessageCommand extends SystemCommand
         $chat_id = $message->getChat()->getId();
 
         // Kullanıcı doğrulama kontrolü
-        global $db;
-        $stmt = $db->prepare("SELECT tu.*, u.id as user_id FROM telegram_users tu 
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT tu.*, u.id as user_id FROM telegram_users tu 
                              INNER JOIN users u ON u.id = tu.user_id 
                              WHERE tu.telegram_id = ? AND tu.is_verified = 1");
         $stmt->execute([$chat_id]);
@@ -124,7 +124,7 @@ EOD;
                     $analysis = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
 
                     // Veritabanına kaydet
-                    $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, suggested_name, amount, currency, category) 
+                    $stmt = $pdo->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, suggested_name, amount, currency, category) 
                     VALUES (?, ?, ?, ?, ?, ?, ?)");
                     $stmt->execute([
                         $user['user_id'],

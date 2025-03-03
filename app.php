@@ -39,6 +39,9 @@ $user_default_currency = $_SESSION['base_currency'];
                 <a href="borsa.php" class="btn btn-outline-success me-2">
                     <i class="bi bi-graph-up me-1"></i>Borsa
                 </a>
+                <a href="profile.php" class="btn btn-outline-success me-2">
+                    <i class="bi bi-telegram me-1"></i>Telegram
+                </a>
                 <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
                     <i class="bi bi-gear me-1"></i><?php echo t('settings.title'); ?>
                 </button>

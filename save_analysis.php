@@ -21,18 +21,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_arr
 
     // Onaylanan kayıtları getir
     $placeholders = str_repeat('?,', count($approved_ids) - 1) . '?';
-    $stmt = $db->prepare("SELECT * FROM ai_analysis_temp WHERE id IN ($placeholders) AND user_id = ?");
+    $stmt = $pdo->prepare("SELECT * FROM ai_analysis_temp WHERE id IN ($placeholders) AND user_id = ?");
     $params = array_merge($approved_ids, [$user_id]);
     $stmt->execute($params);
     $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $db->beginTransaction();
+    $pdo->beginTransaction();
 
     try {
         foreach ($items as $item) {
             if ($item['category'] === 'income') {
                 // Gelir tablosuna ekle
-                $stmt = $db->prepare("INSERT INTO income (user_id, name, amount, currency, first_date, frequency, status) 
+                $stmt = $pdo->prepare("INSERT INTO income (user_id, name, amount, currency, first_date, frequency, status) 
                                     VALUES (?, ?, ?, ?, CURRENT_DATE, 'once', 'received')");
                 $stmt->execute([
                     $user_id,
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_arr
                 ]);
             } else {
                 // Gider tablosuna ekle
-                $stmt = $db->prepare("INSERT INTO payments (user_id, name, amount, currency, first_date, frequency, status) 
+                $stmt = $pdo->prepare("INSERT INTO payments (user_id, name, amount, currency, first_date, frequency, status) 
                                     VALUES (?, ?, ?, ?, CURRENT_DATE, 'once', 'paid')");
                 $stmt->execute([
                     $user_id,
@@ -53,14 +53,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_arr
             }
 
             // Geçici tablodan kaydı işaretleyelim
-            $stmt = $db->prepare("UPDATE ai_analysis_temp SET is_approved = 1 WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE ai_analysis_temp SET is_approved = 1 WHERE id = ?");
             $stmt->execute([$item['id']]);
         }
 
-        $db->commit();
+        $pdo->commit();
         $_SESSION['success'] = "Seçilen kayıtlar başarıyla eklendi.";
     } catch (Exception $e) {
-        $db->rollBack();
+        $pdo->rollBack();
         $_SESSION['error'] = "Kayıt sırasında bir hata oluştu: " . $e->getMessage();
     }
 } else {

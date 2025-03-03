@@ -177,7 +177,7 @@ EOD;
             $aiResults = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
 
             foreach ($aiResults as $item) {
-                $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, amount, currency, category, suggested_name) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, amount, currency, category, suggested_name) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $user_id,
                     $fileName,
@@ -199,7 +199,7 @@ EOD;
 }
 
 // Geçici tablodaki sonuçları getir
-$stmt = $db->prepare("SELECT * FROM ai_analysis_temp WHERE user_id = ? AND is_approved = 0 ORDER BY created_at DESC");
+$stmt = $pdo->prepare("SELECT * FROM ai_analysis_temp WHERE user_id = ? AND is_approved = 0 ORDER BY created_at DESC");
 $stmt->execute([$user_id]);
 $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

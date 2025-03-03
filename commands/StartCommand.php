@@ -20,8 +20,8 @@ class StartCommand extends SystemCommand
         $chat_id = $message->getChat()->getId();
 
         // Kullanıcının doğrulama durumunu kontrol et
-        global $db;
-        $stmt = $db->prepare("SELECT * FROM telegram_users WHERE telegram_id = ?");
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT * FROM telegram_users WHERE telegram_id = ?");
         $stmt->execute([$chat_id]);
         $telegram_user = $stmt->fetch();
 

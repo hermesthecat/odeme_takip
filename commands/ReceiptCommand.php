@@ -121,8 +121,8 @@ EOD;
                 $analysis = json_decode($result['candidates'][0]['content']['parts'][0]['text'], true);
 
                 // Veritabanına kaydet
-                global $db;
-                $stmt = $db->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, suggested_name, amount, currency, category) 
+                global $pdo;
+                $stmt = $pdo->prepare("INSERT INTO ai_analysis_temp (user_id, file_name, file_type, suggested_name, amount, currency, category) 
                                     VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $chat_id,
