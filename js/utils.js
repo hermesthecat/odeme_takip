@@ -242,7 +242,7 @@ function ajaxRequest(data) {
     }).then(function (response) {
         if (response.status === 'error') {
             // Token hatası kontrolü
-            if (response.message && response.message.includes(translations.utils.session.invalid_token)) {
+            if (response.message) {
                 Swal.fire({
                     icon: 'error',
                     title: translations.utils.session.error_title,
