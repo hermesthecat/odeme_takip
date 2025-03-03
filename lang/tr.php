@@ -396,7 +396,18 @@ return [
         'password_error' => 'Şifre değiştirilirken bir hata oluştu',
         'password_mismatch' => 'Mevcut şifre yanlış',
         'password_same' => 'Yeni şifre eskisiyle aynı olamaz',
-        'password_requirements' => 'Şifre en az 6 karakter olmalıdır'
+        'password_requirements' => 'Şifre en az 6 karakter olmalıdır',
+        'telegram_title' => 'Telegram Bağlantısı',
+        'telegram_connected' => 'Telegram hesabınız bağlı.',
+        'telegram_confirm_unlink' => 'Telegram bağlantısını kaldırmak istediğinize emin misiniz?',
+        'telegram_unlink' => 'Bağlantıyı Kaldır',
+        'telegram_info' => 'Telegram botunu kullanmak için hesabınızı bağlamanız gerekiyor.',
+        'telegram_step1' => 'Telegram\'da botumuzla sohbet başlatın',
+        'telegram_step2' => 'Bot size bir doğrulama kodu isteyecek',
+        'telegram_step3' => 'Aşağıdaki butona tıklayarak yeni bir kod alın',
+        'telegram_step4' => 'Aldığınız kodu bot\'a gönderin',
+        'telegram_get_code' => 'Doğrulama Kodu Al',
+        'telegram_current_code' => 'Mevcut doğrulama kodunuz'
     ],
 
     // Uygulama
@@ -599,17 +610,5 @@ return [
         'not_found' => 'Kullanıcı bilgileri bulunamadı',
         'update_success' => 'Kullanıcı bilgileri başarıyla güncellendi',
         'update_error' => 'Kullanıcı bilgileri güncellenemedi'
-    ],
-
-    'settings.telegram_title' => 'Telegram Bağlantısı',
-    'settings.telegram_connected' => 'Telegram hesabınız bağlı.',
-    'settings.telegram_confirm_unlink' => 'Telegram bağlantısını kaldırmak istediğinize emin misiniz?',
-    'settings.telegram_unlink' => 'Bağlantıyı Kaldır',
-    'settings.telegram_info' => 'Telegram botunu kullanmak için hesabınızı bağlamanız gerekiyor.',
-    'settings.telegram_step1' => 'Telegram\'da botumuzla sohbet başlatın',
-    'settings.telegram_step2' => 'Bot size bir doğrulama kodu isteyecek',
-    'settings.telegram_step3' => 'Aşağıdaki butona tıklayarak yeni bir kod alın',
-    'settings.telegram_step4' => 'Aldığınız kodu bot\'a gönderin',
-    'settings.telegram_get_code' => 'Doğrulama Kodu Al',
-    'settings.telegram_current_code' => 'Mevcut doğrulama kodunuz'
+    ]
 ];

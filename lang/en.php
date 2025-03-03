@@ -397,7 +397,18 @@ return [
         'password_error' => 'An error occurred while changing the password',
         'password_mismatch' => 'Current password is incorrect',
         'password_same' => 'New password cannot be the same as the old one',
-        'password_requirements' => 'Password must be at least 6 characters'
+        'password_requirements' => 'Password must be at least 6 characters',
+        'telegram_title' => 'Telegram Connection',
+        'telegram_connected' => 'Your Telegram account is connected.',
+        'telegram_confirm_unlink' => 'Are you sure you want to unlink your Telegram account?',
+        'telegram_unlink' => 'Unlink',
+        'telegram_info' => 'You need to connect your Telegram account to use the bot.',
+        'telegram_step1' => 'Start a chat with our bot on Telegram',
+        'telegram_step2' => 'The bot will ask you for a verification code',
+        'telegram_step3' => 'Aşağıdaki butona tıklayarak yeni bir kod alın',
+        'telegram_step4' => 'Send the code to the bot',
+        'telegram_get_code' => 'Get Verification Code',
+        'telegram_current_code' => 'Your current verification code'
     ],
 
     // Uygulama

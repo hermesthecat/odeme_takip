@@ -1,7 +1,9 @@
 <!-- Kullanıcı Ayarları Modal -->
 <?php
+require_once __DIR__ . '/../config.php';
+
 // Telegram bağlantı durumunu kontrol et
-$stmt = $db->prepare("SELECT * FROM telegram_users WHERE user_id = ?");
+$stmt = $pdo->prepare("SELECT * FROM telegram_users WHERE user_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $telegram_user = $stmt->fetch();
 
@@ -9,17 +11,17 @@ $telegram_user = $stmt->fetch();
 if (isset($_POST['generate_code'])) {
     // Rastgele 6 haneli kod oluştur
     $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
-    
+
     if ($telegram_user) {
         // Mevcut kaydı güncelle
-        $stmt = $db->prepare("UPDATE telegram_users SET verification_code = ?, is_verified = 0 WHERE user_id = ?");
+        $stmt = $pdo->prepare("UPDATE telegram_users SET verification_code = ?, is_verified = 0 WHERE user_id = ?");
         $stmt->execute([$code, $_SESSION['user_id']]);
     } else {
         // Yeni kayıt oluştur
-        $stmt = $db->prepare("INSERT INTO telegram_users (user_id, verification_code) VALUES (?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO telegram_users (user_id, verification_code) VALUES (?, ?)");
         $stmt->execute([$_SESSION['user_id'], $code]);
     }
-    
+
     $_SESSION['success'] = "Yeni doğrulama kodu oluşturuldu: " . $code;
     header('Location: ' . $_SERVER['HTTP_REFERER']);
     exit;
@@ -27,9 +29,9 @@ if (isset($_POST['generate_code'])) {
 
 // Telegram bağlantısını kaldır
 if (isset($_POST['unlink_telegram'])) {
-    $stmt = $db->prepare("DELETE FROM telegram_users WHERE user_id = ?");
+    $stmt = $pdo->prepare("DELETE FROM telegram_users WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
-    
+
     $_SESSION['success'] = "Telegram bağlantısı kaldırıldı.";
     header('Location: ' . $_SERVER['HTTP_REFERER']);
     exit;
@@ -70,7 +72,7 @@ if (isset($_POST['unlink_telegram'])) {
                 <!-- Telegram Bağlantısı -->
                 <div class="mt-4">
                     <h5><?php echo t('settings.telegram_title'); ?></h5>
-                    
+
                     <?php if ($telegram_user && $telegram_user['is_verified']): ?>
                         <p class="text-success">✅ <?php echo t('settings.telegram_connected'); ?></p>
                         <form method="post" class="d-inline">

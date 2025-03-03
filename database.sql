@@ -184,6 +184,21 @@ VALUES (
         '2025-02-28 07:22:42'
     );
 --
+-- Table structure for table `telegram_users`
+--
+DROP TABLE IF EXISTS `telegram_users`;
+CREATE TABLE `telegram_users` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL,
+    `telegram_id` varchar(50) NOT NULL,
+    `is_verified` tinyint(1) DEFAULT 0,
+    `verification_code` varchar(6) DEFAULT NULL,
+    `created_at` timestamp NULL DEFAULT current_timestamp(),
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `telegram_id` (`telegram_id`),
+    KEY `user_id` (`user_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+--
 -- Table structure for table `ai_analysis_temp`
 --
 CREATE TABLE `ai_analysis_temp` (
@@ -199,21 +214,6 @@ CREATE TABLE `ai_analysis_temp` (
     `created_at` timestamp NULL DEFAULT current_timestamp(),
     PRIMARY KEY (`id`),
     KEY `user_id` (`user_id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
---
--- Table structure for table `telegram_users`
---
-CREATE TABLE `telegram_users` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    `user_id` int(11) NOT NULL,
-    `telegram_id` varchar(50) NOT NULL,
-    `is_verified` tinyint(1) DEFAULT 0,
-    `verification_code` varchar(6) DEFAULT NULL,
-    `created_at` timestamp NULL DEFAULT current_timestamp(),
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `telegram_id` (`telegram_id`),
-    KEY `user_id` (`user_id`),
-    CONSTRAINT `telegram_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
 --
 -- Indexes for dumped tables
@@ -329,6 +329,12 @@ ALTER TABLE `savings`
 ADD CONSTRAINT `savings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
     ADD CONSTRAINT `savings_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `savings` (`id`) ON DELETE CASCADE;
 COMMIT;
+--
+-- Constraints for table `telegram_users`
+--
+ALTER TABLE `telegram_users`
+ADD CONSTRAINT `telegram_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+--
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */
 ;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */
