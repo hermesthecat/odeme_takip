@@ -149,6 +149,24 @@ function unlink_telegram()
     <script src="js/theme.js"></script>
 
     <script>
+        // Sayfa yüklendiğinde ve her 5 dakikada bir güncelle
+        window.onload = function() {
+            // Tema ayarını uygula
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.body.setAttribute('data-theme', savedTheme);
+            }
+        };
+
+        // Kullanıcı temasını yükle
+        ajaxRequest({
+            action: 'get_user_data'
+        }).done(function(response) {
+            if (response.status === 'success') {
+                setTheme(response.data.theme_preference);
+            }
+        });
         // Çıkış işlemi
         document.querySelector('.logout-btn').addEventListener('click', function() {
             Swal.fire({

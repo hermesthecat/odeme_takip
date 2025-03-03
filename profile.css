@@ -1,0 +1,139 @@
+/* Profile.css - A. Kerem Gök */
+
+:root {
+    --bg-color: #f8f9fa;
+    --text-color: #212529;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --secondary-color: #6c757d;
+    --link-color: #0d6efd;
+    --code-bg: #f8f9fa;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --bg-color: #212529;
+    --text-color: #e9ecef;
+    --card-bg: #343a40;
+    --border-color: #495057;
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --secondary-color: #adb5bd;
+    --link-color: #6ea8fe;
+    --code-bg: #2b3035;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* Başlık ve Kullanıcı Bilgisi */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-color);
+}
+
+/* Butonlar */
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-outline-success {
+    color: var(--success-color);
+    border-color: var(--success-color);
+}
+
+.btn-outline-success:hover {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.btn-outline-danger {
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-outline-secondary {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+/* Telegram Bağlantısı */
+.text-success {
+    color: var(--success-color) !important;
+}
+
+/* Linkler */
+a {
+    color: var(--link-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Doğrulama Kodu */
+.mt-3 strong {
+    color: var(--primary-color);
+    background-color: var(--code-bg);
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 1.2rem;
+}
+
+/* Kartlar ve Konteynırlar */
+.card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    box-shadow: 0 0.125rem 0.25rem var(--shadow-color);
+}
+
+/* Listeler */
+ol li {
+    margin-bottom: 0.75rem;
+}
+
+/* Responsive Ayarlar */
+@media (max-width: 768px) {
+    .d-flex.justify-content-between.align-items-center {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .d-flex.align-items-center {
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        margin-bottom: 0.5rem;
+    }
+} 
