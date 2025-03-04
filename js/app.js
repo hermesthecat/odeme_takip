@@ -179,7 +179,19 @@ $(document).ready(function () {
         const form = $(this);
         const formData = form.serializeObject();
         const type = form.data('type');
-        const action = type;
+        let action = '';
+
+        if (type === 'update_saving') {
+            action = 'update_saving';
+        } else if (type === 'update_full_saving') {
+            action = 'update_full_saving';
+        } else if (type === 'login') {
+            action = 'login';
+        } else if (type === 'register') {
+            action = 'register';
+        } else {
+            action = 'add_' + type;
+        }
 
         // next_date değerini kaldır çünkü API'de hesaplanacak
         if (formData.next_date) {
