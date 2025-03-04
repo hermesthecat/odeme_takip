@@ -179,7 +179,7 @@ $(document).ready(function () {
         const form = $(this);
         const formData = form.serializeObject();
         const type = form.data('type');
-        const action = type === 'update_saving' ? 'update_full_saving' : 'add_' + type;
+        const action = type;
 
         // next_date değerini kaldır çünkü API'de hesaplanacak
         if (formData.next_date) {
