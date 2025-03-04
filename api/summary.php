@@ -33,7 +33,6 @@ function loadSummary()
                         END), 0)
                         FROM payments p 
                         WHERE p.user_id = ? 
-                        AND p.status = 'paid'
                         AND MONTH(p.first_date) = ? 
                         AND YEAR(p.first_date) = ?) as total_expense";
 

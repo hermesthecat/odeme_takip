@@ -95,6 +95,9 @@ function unlink_telegram()
                         <i class="bi bi-list-nested me-1"></i>Log
                     </a>
                 <?php endif; ?>
+                <a href="borsa.php" class="btn btn-outline-success me-2">
+                    <i class="bi bi-graph-up me-1"></i>Borsa
+                </a>
                 <a href="app.php" class="btn btn-outline-success me-2">
                     <i class="bi bi-graph-up me-1"></i>Bütçe
                 </a>
