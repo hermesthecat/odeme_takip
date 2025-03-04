@@ -21,7 +21,6 @@ if (isset($_SESSION['user_id'])) {
         <div class="card shadow">
             <div class="card-body">
                 <form id="registerForm" autocomplete="off" novalidate>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 
                     <div class="mb-3">
                         <label class="form-label"><?php echo htmlspecialchars(t('username')); ?></label>
@@ -99,33 +98,6 @@ if (isset($_SESSION['user_id'])) {
                 return;
             }
 
-            // Rate limiting kontrolü
-            if (sessionStorage.getItem('lastRegisterAttempt')) {
-                const lastAttempt = parseInt(sessionStorage.getItem('lastRegisterAttempt'));
-                if (Date.now() - lastAttempt < 2000) {
-                    alert('<?php echo htmlspecialchars(t('auth.wait_before_retry')); ?>');
-                    return;
-                }
-            }
-            sessionStorage.setItem('lastRegisterAttempt', Date.now());
-
-            const formData = new FormData(this);
-            fetch('api/auth.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        window.location.href = 'login.php';
-                    } else {
-                        alert(data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('<?php echo htmlspecialchars(t('system_error')); ?>');
-                });
         });
 
         // Şifre göster/gizle
