@@ -23,7 +23,6 @@ function loadSummary()
                         END), 0)
                         FROM income i 
                         WHERE i.user_id = ? 
-                        AND i.status = 'received'
                         AND MONTH(i.first_date) = ? 
                         AND YEAR(i.first_date) = ?) as total_income,
                         
