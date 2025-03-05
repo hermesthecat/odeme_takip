@@ -384,7 +384,7 @@ function updateIncome()
         }
 
         // Child kayıtları güncelleme
-        if (isset($_POST['update_children']) && $_POST['update_children'] === 'true') {
+        if (isset($_POST['update_children']) && ($_POST['update_children'] === 'true' || $_POST['update_children'] === 'on')) {
             // Parent gelir ise, tüm child kayıtları güncelle
             if ($income['parent_id'] === null) {
                 $stmt = $pdo->prepare("UPDATE income SET 

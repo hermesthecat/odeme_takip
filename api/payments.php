@@ -427,7 +427,7 @@ function updatePayment()
         }
 
         // Child kayıtları güncelleme
-        if (isset($_POST['update_children']) && $_POST['update_children'] === 'true') {
+        if (isset($_POST['update_children']) && ($_POST['update_children'] === 'true' || $_POST['update_children'] === 'on')) {
             // Parent ödeme ise, tüm child kayıtları güncelle
             if ($payment['parent_id'] === null) {
                 $stmt = $pdo->prepare("UPDATE payments SET 
