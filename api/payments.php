@@ -431,12 +431,14 @@ function updatePayment()
             // Parent ödeme ise, tüm child kayıtları güncelle
             if ($payment['parent_id'] === null) {
                 $stmt = $pdo->prepare("UPDATE payments SET 
+                    name = ?,
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?
                     WHERE parent_id = ? AND user_id = ?");
 
                 if (!$stmt->execute([
+                    $name,
                     $amount,
                     $currency,
                     $exchange_rate,
@@ -452,12 +454,14 @@ function updatePayment()
             // Child ödeme ise, kendisi ve sonraki kayıtları güncelle
             else {
                 $stmt = $pdo->prepare("UPDATE payments SET 
+                    name = ?,
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?
                     WHERE parent_id = ? AND first_date >= ? AND user_id = ?");
 
                 if (!$stmt->execute([
+                    $name,
                     $amount,
                     $currency,
                     $exchange_rate,

@@ -388,12 +388,14 @@ function updateIncome()
             // Parent gelir ise, tüm child kayıtları güncelle
             if ($income['parent_id'] === null) {
                 $stmt = $pdo->prepare("UPDATE income SET 
+                    name = ?,
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?
                     WHERE parent_id = ? AND user_id = ?");
 
                 if (!$stmt->execute([
+                    $name,
                     $amount,
                     $currency,
                     $exchange_rate,
@@ -409,12 +411,14 @@ function updateIncome()
             // Child gelir ise, kendisi ve sonraki kayıtları güncelle
             else {
                 $stmt = $pdo->prepare("UPDATE income SET 
+                    name = ?,
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?
                     WHERE parent_id = ? AND first_date >= ? AND user_id = ?");
 
                 if (!$stmt->execute([
+                    $name,
                     $amount,
                     $currency,
                     $exchange_rate,
@@ -450,13 +454,13 @@ function getLastChildIncomeDate($income_id)
 
     if (!$income) {
         throw new Exception(t('income.not_found'));
-        saveLog("Gelir bulunamadı: " . $income_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); 
+        saveLog("Gelir bulunamadı: " . $income_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']);
         // Income not found
     }
 
     // Eğer parent_id null ise, kendisi parent'tır
     // If parent_id is null, it is the parent itself
-    $parent_id = $income['parent_id'] ?? $income_id; 
+    $parent_id = $income['parent_id'] ?? $income_id;
 
     // Parent ID'ye sahip gelirin son çocuk gelirinin tarihini al
     // Get the date of the last child income with the parent ID
@@ -466,7 +470,7 @@ function getLastChildIncomeDate($income_id)
 
     if (!$stmt->execute([$parent_id, $user_id])) {
         throw new Exception(t('income.not_found'));
-        saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); 
+        saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']);
         // Income not found
     }
 
@@ -481,7 +485,7 @@ function getLastChildIncomeDate($income_id)
 
         if (!$parent) {
             throw new Exception(t('income.not_found'));
-            saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']); 
+            saveLog("Gelir bulunamadı: " . $parent_id, 'error', 'getLastChildIncomeDate', $_SESSION['user_id']);
             // Income not found
         }
 
