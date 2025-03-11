@@ -257,6 +257,7 @@ function loadRecurringPayments()
     WHERE p1.user_id = ? 
     AND p1.frequency != 'none'
     AND p1.parent_id IS NULL
+    AND p1.payment_power = 1
     ORDER BY yearly_total DESC";
 
     $stmt_recurring_payments = $pdo->prepare($sql_recurring_payments);
@@ -400,6 +401,9 @@ function updatePayment()
             }
         }
 
+        // get payment power from POST
+        $payment_power = isset($_POST['update_payment_power']) && ($_POST['update_payment_power'] === 'on' || $_POST['update_payment_power'] === 'true') ? 1 : 0;
+
         // Ana kaydı güncelle
         $stmt = $pdo->prepare("UPDATE payments SET 
             name = ?, 
@@ -407,7 +411,8 @@ function updatePayment()
             currency = ?, 
             first_date = ?, 
             frequency = ?,
-            exchange_rate = ?
+            exchange_rate = ?,
+            payment_power = ? 
             WHERE id = ? AND user_id = ?");
 
         if (!$stmt->execute([
@@ -417,6 +422,7 @@ function updatePayment()
             $first_date,
             $frequency,
             $exchange_rate,
+            $payment_power,
             $id,
             $user_id
         ])) {
@@ -434,7 +440,8 @@ function updatePayment()
                     name = ?,
                     amount = ?, 
                     currency = ?, 
-                    exchange_rate = ?
+                    exchange_rate = ?,
+                    payment_power = ?
                     WHERE parent_id = ? AND user_id = ?");
 
                 if (!$stmt->execute([
@@ -442,6 +449,7 @@ function updatePayment()
                     $amount,
                     $currency,
                     $exchange_rate,
+                    $payment_power,
                     $id,
                     $user_id
                 ])) {
@@ -457,7 +465,8 @@ function updatePayment()
                     name = ?,
                     amount = ?, 
                     currency = ?, 
-                    exchange_rate = ?
+                    exchange_rate = ?,
+                    payment_power = ?
                     WHERE parent_id = ? AND first_date >= ? AND user_id = ?");
 
                 if (!$stmt->execute([
@@ -465,6 +474,7 @@ function updatePayment()
                     $amount,
                     $currency,
                     $exchange_rate,
+                    $payment_power,
                     $payment['parent_id'],
                     $first_date,
                     $user_id

@@ -6,17 +6,26 @@
 -- Generation Time: Feb 28, 2025 at 10:42 AM
 -- Server version: 10.11.11-MariaDB
 -- PHP Version: 7.4.33
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET
+    SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+
 START TRANSACTION;
-SET time_zone = "+00:00";
+
+SET
+    time_zone = "+00:00";
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */
 ;
+
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */
 ;
+
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */
 ;
+
 /*!40101 SET NAMES utf8mb4 */
 ;
+
 --
 -- Database: `odeme_takip`
 --
@@ -32,10 +41,12 @@ CREATE TABLE `exchange_rates` (
     `date` date NOT NULL,
     `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 --
 -- Dumping data for table `exchange_rates`
 --
-INSERT INTO `exchange_rates` (
+INSERT INTO
+    `exchange_rates` (
         `id`,
         `from_currency`,
         `to_currency`,
@@ -43,7 +54,8 @@ INSERT INTO `exchange_rates` (
         `date`,
         `created_at`
     )
-VALUES (
+VALUES
+    (
         2,
         'usd',
         'try',
@@ -51,6 +63,7 @@ VALUES (
         '2025-02-25',
         '2025-02-25 07:27:59'
     );
+
 -- --------------------------------------------------------
 --
 -- Table structure for table `income`
@@ -68,6 +81,7 @@ CREATE TABLE `income` (
     `exchange_rate` decimal(10, 4) DEFAULT NULL,
     `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 -- --------------------------------------------------------
 --
 -- Table structure for table `logs`
@@ -80,6 +94,7 @@ CREATE TABLE `logs` (
     `user_id` int(11) DEFAULT NULL,
     `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 -- --------------------------------------------------------
 --
 -- Table structure for table `payments`
@@ -95,8 +110,10 @@ CREATE TABLE `payments` (
     `frequency` varchar(20) NOT NULL,
     `status` enum('pending', 'paid') DEFAULT 'pending',
     `exchange_rate` decimal(10, 4) DEFAULT NULL,
+    `payment_power` int(11) DEFAULT 0,
     `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 -- --------------------------------------------------------
 --
 -- Table structure for table `portfolio`
@@ -122,6 +139,7 @@ CREATE TABLE `portfolio` (
     `user_id` int(11) DEFAULT NULL,
     `referans_alis_id` int(11) DEFAULT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 -- --------------------------------------------------------
 --
 -- Table structure for table `savings`
@@ -140,6 +158,7 @@ CREATE TABLE `savings` (
     `target_date` date NOT NULL,
     `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 -- --------------------------------------------------------
 --
 -- Table structure for table `users`
@@ -156,10 +175,12 @@ CREATE TABLE `users` (
     `is_active` int(11) NOT NULL DEFAULT 1,
     `last_login` timestamp NULL DEFAULT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 --
 -- Dumping data for table `users`
 --
-INSERT INTO `users` (
+INSERT INTO
+    `users` (
         `id`,
         `username`,
         `password`,
@@ -171,7 +192,8 @@ INSERT INTO `users` (
         `is_active`,
         `last_login`
     )
-VALUES (
+VALUES
+    (
         1,
         'admin',
         '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi',
@@ -183,10 +205,12 @@ VALUES (
         1,
         '2025-02-28 07:22:42'
     );
+
 --
 -- Table structure for table `telegram_users`
 --
 DROP TABLE IF EXISTS `telegram_users`;
+
 CREATE TABLE `telegram_users` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
     `user_id` int(11) NOT NULL,
@@ -198,6 +222,7 @@ CREATE TABLE `telegram_users` (
     UNIQUE KEY `telegram_id` (`telegram_id`),
     KEY `user_id` (`user_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 --
 -- Table structure for table `ai_analysis_temp`
 --
@@ -215,129 +240,199 @@ CREATE TABLE `ai_analysis_temp` (
     PRIMARY KEY (`id`),
     KEY `user_id` (`user_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+
 --
 -- Indexes for dumped tables
 --
 --
 -- Indexes for table `exchange_rates`
 --
-ALTER TABLE `exchange_rates`
-ADD PRIMARY KEY (`id`),
-    ADD KEY `idx_date` (`date`),
-    ADD KEY `idx_currencies` (`from_currency`, `to_currency`);
+ALTER TABLE
+    `exchange_rates`
+ADD
+    PRIMARY KEY (`id`),
+ADD
+    KEY `idx_date` (`date`),
+ADD
+    KEY `idx_currencies` (`from_currency`, `to_currency`);
+
 --
 -- Indexes for table `income`
 --
-ALTER TABLE `income`
-ADD PRIMARY KEY (`id`),
-    ADD KEY `user_id` (`user_id`),
-    ADD KEY `parent_id` (`parent_id`);
+ALTER TABLE
+    `income`
+ADD
+    PRIMARY KEY (`id`),
+ADD
+    KEY `user_id` (`user_id`),
+ADD
+    KEY `parent_id` (`parent_id`);
+
 --
 -- Indexes for table `logs`
 --
-ALTER TABLE `logs`
-ADD PRIMARY KEY (`id`);
+ALTER TABLE
+    `logs`
+ADD
+    PRIMARY KEY (`id`);
+
 --
 -- Indexes for table `payments`
 --
-ALTER TABLE `payments`
-ADD PRIMARY KEY (`id`),
-    ADD KEY `user_id` (`user_id`),
-    ADD KEY `parent_id` (`parent_id`);
+ALTER TABLE
+    `payments`
+ADD
+    PRIMARY KEY (`id`),
+ADD
+    KEY `user_id` (`user_id`),
+ADD
+    KEY `parent_id` (`parent_id`);
+
 --
 -- Indexes for table `portfolio`
 --
-ALTER TABLE `portfolio`
-ADD PRIMARY KEY (`id`);
+ALTER TABLE
+    `portfolio`
+ADD
+    PRIMARY KEY (`id`);
+
 --
 -- Indexes for table `savings`
 --
-ALTER TABLE `savings`
-ADD PRIMARY KEY (`id`),
-    ADD KEY `user_id` (`user_id`),
-    ADD KEY `parent_id` (`parent_id`);
+ALTER TABLE
+    `savings`
+ADD
+    PRIMARY KEY (`id`),
+ADD
+    KEY `user_id` (`user_id`),
+ADD
+    KEY `parent_id` (`parent_id`);
+
 --
 -- Indexes for table `users`
 --
-ALTER TABLE `users`
-ADD PRIMARY KEY (`id`),
-    ADD UNIQUE KEY `username` (`username`);
+ALTER TABLE
+    `users`
+ADD
+    PRIMARY KEY (`id`),
+ADD
+    UNIQUE KEY `username` (`username`);
+
 --
 -- AUTO_INCREMENT for dumped tables
 --
 --
 -- AUTO_INCREMENT for table `exchange_rates`
 --
-ALTER TABLE `exchange_rates`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+ALTER TABLE
+    `exchange_rates`
+MODIFY
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     AUTO_INCREMENT = 3;
+
 --
 -- AUTO_INCREMENT for table `income`
 --
-ALTER TABLE `income`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+ALTER TABLE
+    `income`
+MODIFY
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     AUTO_INCREMENT = 49;
+
 --
 -- AUTO_INCREMENT for table `logs`
 --
-ALTER TABLE `logs`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+ALTER TABLE
+    `logs`
+MODIFY
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     AUTO_INCREMENT = 2109;
+
 --
 -- AUTO_INCREMENT for table `payments`
 --
-ALTER TABLE `payments`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+ALTER TABLE
+    `payments`
+MODIFY
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     AUTO_INCREMENT = 34;
+
 --
 -- AUTO_INCREMENT for table `portfolio`
 --
-ALTER TABLE `portfolio`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+ALTER TABLE
+    `portfolio`
+MODIFY
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     AUTO_INCREMENT = 61;
+
 --
 -- AUTO_INCREMENT for table `savings`
 --
-ALTER TABLE `savings`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+ALTER TABLE
+    `savings`
+MODIFY
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     AUTO_INCREMENT = 13;
+
 --
 -- AUTO_INCREMENT for table `users`
 --
-ALTER TABLE `users`
-MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,
+ALTER TABLE
+    `users`
+MODIFY
+    `id` int(11) NOT NULL AUTO_INCREMENT,
     AUTO_INCREMENT = 2;
+
 --
 -- Constraints for dumped tables
 --
 --
 -- Constraints for table `income`
 --
-ALTER TABLE `income`
-ADD CONSTRAINT `income_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-    ADD CONSTRAINT `income_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `income` (`id`) ON DELETE CASCADE;
+ALTER TABLE
+    `income`
+ADD
+    CONSTRAINT `income_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+ADD
+    CONSTRAINT `income_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `income` (`id`) ON DELETE CASCADE;
+
 --
 -- Constraints for table `payments`
 --
-ALTER TABLE `payments`
-ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-    ADD CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `payments` (`id`) ON DELETE CASCADE;
+ALTER TABLE
+    `payments`
+ADD
+    CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+ADD
+    CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `payments` (`id`) ON DELETE CASCADE;
+
 --
 -- Constraints for table `savings`
 --
-ALTER TABLE `savings`
-ADD CONSTRAINT `savings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-    ADD CONSTRAINT `savings_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `savings` (`id`) ON DELETE CASCADE;
+ALTER TABLE
+    `savings`
+ADD
+    CONSTRAINT `savings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+ADD
+    CONSTRAINT `savings_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `savings` (`id`) ON DELETE CASCADE;
+
 COMMIT;
+
 --
 -- Constraints for table `telegram_users`
 --
-ALTER TABLE `telegram_users`
-ADD CONSTRAINT `telegram_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+ALTER TABLE
+    `telegram_users`
+ADD
+    CONSTRAINT `telegram_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
 --
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */
 ;
+
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */
 ;
+
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */
 ;

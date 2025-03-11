@@ -91,6 +91,15 @@
                         </div>
                         <small id="current_exchange_rate" class="text-muted d-block mt-1"></small>
                     </div>
+                    <div class="mb-3" id="updatePaymentPower" style="display: none;">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="update_payment_power" name="update_payment_power">
+                            <label class="form-check-label" for="update_payment_power">
+                                Ödeme Gücü Listesine Dahiil Et.
+                            </label>
+                        </div>
+                        <small id="current_payment_power" class="text-muted d-block mt-1"></small>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label"><?php echo t('payment_date'); ?></label>
                         <input type="date" class="form-control" id="update_payment_first_date" name="first_date" required>
