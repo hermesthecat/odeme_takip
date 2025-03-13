@@ -465,7 +465,22 @@ function updatePayment()
                 // eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle
                 if ($payment_power !== $payment['payment_power']) {
 
-                    // ama kaydıda güncelle
+                    // ana (parent) kaydı güncelle
+                    $stmt = $pdo->prepare("UPDATE payments SET 
+                    payment_power = ?
+                    WHERE id = ? AND user_id = ?");
+
+                    if (!$stmt->execute([
+                        $payment_power,
+                        $payment['parent_id'],
+                        $user_id
+                    ])) {
+                        throw new Exception(t('payment.update_children_error'));
+                        saveLog("Parent payment power güncelleme hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
+                    }
+                    saveLog("Parent payment power güncellendi: " . $payment['parent_id'], 'info', 'updatePayment', $_SESSION['user_id']);
+
+                    // kendisini güncelle
                     $stmt = $pdo->prepare("UPDATE payments SET 
                     name = ?,
                     amount = ?, 
@@ -488,14 +503,14 @@ function updatePayment()
                     }
                     saveLog("1 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle: $id", 'info', 'updatePayment', $_SESSION['user_id']);
 
-                    // parent_id ile güncelle
+                    // diğer child kayıtları güncelle
                     $stmt = $pdo->prepare("UPDATE payments SET 
                     name = ?,
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?,
                     payment_power = ?
-                    WHERE parent_id = ? AND user_id = ?");
+                    WHERE parent_id = ? AND id != ? AND user_id = ?");
 
                     if (!$stmt->execute([
                         $name,
@@ -504,6 +519,7 @@ function updatePayment()
                         $exchange_rate,
                         $payment_power,
                         $payment['parent_id'],
+                        $id,
                         $user_id
                     ])) {
                         throw new Exception(t('payment.update_children_error'));
