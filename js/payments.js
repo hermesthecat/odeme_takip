@@ -536,9 +536,10 @@ function openUpdatePaymentModal(id) {
                 $('#update_payment_is_parent').val(isParent ? '1' : '0');
 
                 // if payment power is 1 check the box
-                console.log('Payment Power:', payment.payment_power);
-                if (payment.payment_power === 1) {
+                if (parseInt(payment.payment_power) === 1) {
                     $('#update_payment_power').prop('checked', true);
+                } else {
+                    $('#update_payment_power').prop('checked', false);
                 }
 
                 // Güncelleme seçeneğini göster/gizle
