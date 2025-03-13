@@ -91,7 +91,7 @@
                         </div>
                         <small id="current_exchange_rate" class="text-muted d-block mt-1"></small>
                     </div>
-                    <div class="mb-3" id="updatePaymentPower" style="display: none;">
+                    <div class="mb-3" id="updatePaymentPower">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="update_payment_power" name="update_payment_power">
                             <label class="form-check-label" for="update_payment_power">

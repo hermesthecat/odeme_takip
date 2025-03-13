@@ -535,6 +535,11 @@ function openUpdatePaymentModal(id) {
                 const isParent = payment.parent_id === null;
                 $('#update_payment_is_parent').val(isParent ? '1' : '0');
 
+                // if payment power is 1 check the box
+                if (payment.payment_power === 1) {
+                    $('#update_payment_power').prop('checked', true);
+                }
+
                 // Güncelleme seçeneğini göster/gizle
                 const childrenGroup = document.getElementById('updatePaymentChildrenGroup');
                 if (payment.frequency !== 'none') {
