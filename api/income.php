@@ -187,7 +187,7 @@ function loadIncomes()
             WHERE i.user_id = ? 
             AND MONTH(i.first_date) = ? 
             AND YEAR(i.first_date) = ?
-            ORDER BY i.parent_id, i.first_date ASC";
+            ORDER BY i.name ASC";
 
     $stmt_incomes = $pdo->prepare($sql_incomes);
     $stmt_incomes->execute([$user_id, $month, $year]);

@@ -196,7 +196,7 @@ function loadPayments()
                             WHERE p.user_id = ? 
                             AND MONTH(p.first_date) = ? 
                             AND YEAR(p.first_date) = ?
-                            ORDER BY p.parent_id, p.first_date ASC";
+                            ORDER BY p.name ASC";
 
     $stmt_payments = $pdo->prepare($sql_payments);
     $stmt_payments->execute([$user_id, $month, $year]);
@@ -258,7 +258,7 @@ function loadRecurringPayments()
     AND p1.frequency != 'none'
     AND p1.parent_id IS NULL
     AND p1.payment_power = 1
-    ORDER BY yearly_total DESC";
+    ORDER BY p1.name ASC";
 
     $stmt_recurring_payments = $pdo->prepare($sql_recurring_payments);
     $stmt_recurring_payments->execute([$user_id]);
@@ -461,6 +461,57 @@ function updatePayment()
             }
             // Child ödeme ise, kendisi ve sonraki kayıtları güncelle
             else {
+
+                // eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle
+                if ($payment_power !== $payment['payment_power']) {
+
+                    // ama kaydıda güncelle
+                    $stmt = $pdo->prepare("UPDATE payments SET 
+                    name = ?,
+                    amount = ?, 
+                    currency = ?, 
+                    exchange_rate = ?,
+                    payment_power = ?
+                    WHERE id = ? AND user_id = ?");
+
+                    if (!$stmt->execute([
+                        $name,
+                        $amount,
+                        $currency,
+                        $exchange_rate,
+                        $payment_power,
+                        $id,
+                        $user_id
+                    ])) {
+                        throw new Exception(t('payment.update_children_error'));
+                        saveLog("1 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
+                    }
+                    saveLog("1 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle: $id", 'info', 'updatePayment', $_SESSION['user_id']);
+
+                    // parent_id ile güncelle
+                    $stmt = $pdo->prepare("UPDATE payments SET 
+                    name = ?,
+                    amount = ?, 
+                    currency = ?, 
+                    exchange_rate = ?,
+                    payment_power = ?
+                    WHERE parent_id = ? AND user_id = ?");
+
+                    if (!$stmt->execute([
+                        $name,
+                        $amount,
+                        $currency,
+                        $exchange_rate,
+                        $payment_power,
+                        $payment['parent_id'],
+                        $user_id
+                    ])) {
+                        throw new Exception(t('payment.update_children_error'));
+                        saveLog("2 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
+                    }
+                    saveLog("2 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle: $id", 'info', 'updatePayment', $_SESSION['user_id']);
+                }
+
                 $stmt = $pdo->prepare("UPDATE payments SET 
                     name = ?,
                     amount = ?, 

@@ -81,7 +81,7 @@ function loadSavings()
     global $pdo, $user_id;
 
     // Önce parent kayıtları al
-    $stmt = $pdo->prepare("SELECT * FROM savings WHERE user_id = ? AND parent_id IS NULL");
+    $stmt = $pdo->prepare("SELECT * FROM savings WHERE user_id = ? AND parent_id IS NULL ORDER BY name ASC");
 
     if (!$stmt->execute([$user_id])) {
         throw new Exception(t('saving.load_error'));
