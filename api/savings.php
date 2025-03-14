@@ -184,12 +184,12 @@ function updateSaving()
             target_amount = ? 
             WHERE (parent_id = ? OR id = ?) 
             AND user_id = ?");
-            
+
         if (!$stmt->execute([
-            $exchange_rate, 
-            $post_name, 
-            $post_target_amount, 
-            $saving['id'], 
+            $exchange_rate,
+            $post_name,
+            $post_target_amount,
+            $saving['id'],
             $saving['id'],
             $user_id
         ])) {
@@ -199,7 +199,6 @@ function updateSaving()
         $pdo->commit();
         saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateSaving', $_SESSION['user_id']);
         return true;
-
     } catch (Exception $e) {
         $pdo->rollBack();
         saveLog("Birikim güncelleme hatası: " . $e->getMessage(), 'error', 'updateSaving', $_SESSION['user_id']);
