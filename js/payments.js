@@ -520,6 +520,26 @@ function openUpdatePaymentModal(id) {
         load_type: 'payments'
     }).done(function (response) {
         if (response.status === 'success') {
+
+            // bilgileri yüklemeden önce Modal alanlarını reseetle
+            $('#update_payment_id').val('');
+            $('#update_payment_name').val('');
+            $('#update_payment_amount').val('');
+            $('#update_payment_currency').val('');
+            $('#update_payment_first_date').val('');
+            $('#update_payment_frequency').val('');
+            $('#update_payment_is_parent').val('');
+            $('#update_payment_power').prop('checked', false);
+            $('#update_exchange_rate').prop('checked', false);
+            $('#update_payment_children').prop('checked', false);
+
+            // payment power seçeneğinde bir değişiklik olduğunda update_payment_children alanı otomatik seçilir
+            $('#update_payment_power').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $('#update_payment_children').prop('checked', true);
+                }
+            });
+
             const payment = response.data.payments.find(p => String(p.id) === String(id));
 
             if (payment) {

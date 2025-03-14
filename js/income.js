@@ -100,6 +100,19 @@ function openUpdateIncomeModal(id) {
         load_type: 'income'
     }).done(function (response) {
         if (response.status === 'success') {
+
+            // bilgileri yüklemeden önce Modal alanlarını reseetle
+            $('#update_income_id').val('');
+            $('#update_income_is_parent').val('');
+            $('#update_income_name').val('');
+            $('#update_income_amount').val('');
+            $('#update_income_currency').val('');
+            $('#update_income_first_date').val('');
+            $('#update_income_is_parent').val('');
+            $('#update_income_children').prop('checked', false);
+            $('#update_income_exchange_rate').prop('checked', false);
+            $('#update_income_end_date').val('');
+
             const income = response.data.incomes.find(inc => String(inc.id) === String(id));
 
             if (income) {
@@ -231,7 +244,7 @@ function updateIncome() {
     });
 }
 
-// Frekans değişikliğinde bitiş tarihi alanını göster/gizle
+// gelir sıklığı değişikliğinde bitiş tarihi alanını göster/gizle
 document.getElementById('update_income_frequency').addEventListener('change', function () {
     const endDateGroup = document.getElementById('updateIncomeEndDateGroup');
     const endDateInput = endDateGroup.querySelector('input[name="end_date"]');
