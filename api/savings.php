@@ -158,30 +158,52 @@ function updateSaving()
         }
     }
 
-    // Create new saving record
-    $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $post_name = $_POST['name'] ?? null;
+    $post_target_amount = $_POST['target_amount'] ?? null;
 
-    if ($stmt->execute([$user_id, $saving['id'], $saving['name'], $saving['target_amount'], $current_amount, $saving['currency'], $saving['start_date'], $saving['target_date'], $exchange_rate, 'update'])) {
+    // Create new saving record
+    $pdo->beginTransaction();
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+
+        if (!$stmt->execute([$user_id, $saving['id'], $post_name, $post_target_amount, $current_amount, $saving['currency'], $saving['start_date'], $saving['target_date'], $exchange_rate, 'update'])) {
+            throw new Exception(t('saving.update_error'));
+        }
 
         // Update original saving record
-        $stmt = $pdo->prepare("UPDATE savings SET exchange_rate = ? WHERE id = ? AND user_id = ?");
-        $stmt->execute([$exchange_rate, $saving['id'], $user_id]);
+        $stmt = $pdo->prepare("UPDATE savings SET exchange_rate = ?, name = ?, target_amount = ? WHERE id = ? AND user_id = ?");
+        if (!$stmt->execute([$exchange_rate, $post_name, $post_target_amount, $saving['id'], $user_id])) {
+            throw new Exception(t('saving.update_error'));
+        }
+
+        // update all children (including history records)
+        $stmt = $pdo->prepare("UPDATE savings SET 
+            exchange_rate = ?, 
+            name = ?, 
+            target_amount = ? 
+            WHERE (parent_id = ? OR id = ?) 
+            AND user_id = ?");
+            
+        if (!$stmt->execute([
+            $exchange_rate, 
+            $post_name, 
+            $post_target_amount, 
+            $saving['id'], 
+            $saving['id'],
+            $user_id
+        ])) {
+            throw new Exception(t('saving.update_error'));
+        }
+
+        $pdo->commit();
         saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateSaving', $_SESSION['user_id']);
         return true;
-    } else {
-        throw new Exception(t('saving.update_error'));
+
+    } catch (Exception $e) {
+        $pdo->rollBack();
         saveLog("Birikim güncelleme hatası: " . $e->getMessage(), 'error', 'updateSaving', $_SESSION['user_id']);
-    }
-
-    // Create new saving record
-    $stmt = $pdo->prepare("INSERT INTO savings (user_id, parent_id, name, target_amount, current_amount, currency, start_date, target_date, exchange_rate, update_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-
-    if ($stmt->execute([$user_id, $saving['id'], $saving['name'], $saving['target_amount'], $current_amount, $saving['currency'], $saving['start_date'], $saving['target_date'], $exchange_rate, 'update'])) {
-
-        return true;
-    } else {
-        throw new Exception(t('saving.update_error'));
-        saveLog("Birikim güncelleme hatası: " . $e->getMessage(), 'error', 'updateSaving', $_SESSION['user_id']);
+        throw $e;
     }
 }
 
