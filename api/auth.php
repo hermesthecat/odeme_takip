@@ -109,17 +109,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-        /**
-         * Kullanıcı girişi
-         * User login
-         *
-         * Bu bölüm, kayıtlı kullanıcıların sisteme giriş yapmasını sağlar.
-         * This section allows registered users to log in to the system.
-         *
-         * @param string $_POST['username'] - Kullanıcı adı / Username
-         * @param string $_POST['password'] - Şifre / Password
-         * @param boolean $_POST['remember_me'] - Beni hatırla / Remember me
-         */
+            /**
+             * Kullanıcı girişi
+             * User login
+             *
+             * Bu bölüm, kayıtlı kullanıcıların sisteme giriş yapmasını sağlar.
+             * This section allows registered users to log in to the system.
+             *
+             * @param string $_POST['username'] - Kullanıcı adı / Username
+             * @param string $_POST['password'] - Şifre / Password
+             * @param boolean $_POST['remember_me'] - Beni hatırla / Remember me
+             */
         case 'login':
             $username = sanitizeInput(trim($_POST['username'] ?? ''));
             $password = trim($_POST['password'] ?? '');
@@ -205,13 +205,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-        /**
-         * Kullanıcı çıkışı
-         * User logout
-         *
-         * Bu bölüm, kullanıcının sistemden çıkış yapmasını sağlar.
-         * This section allows the user to log out of the system.
-         */
+            /**
+             * Kullanıcı çıkışı
+             * User logout
+             *
+             * Bu bölüm, kullanıcının sistemden çıkış yapmasını sağlar.
+             * This section allows the user to log out of the system.
+             */
         case 'logout':
             // Session zaten başlatılmış mı kontrol et
             // Check if session is already started

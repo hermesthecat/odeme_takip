@@ -160,21 +160,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-        /**
-         * Kullanıcı bilgilerini güncelleme
-         * Update user information
-         *
-         * Bu fonksiyon, mevcut bir kullanıcının bilgilerini günceller.
-         * This function updates the information of an existing user.
-         *
-         * @param int $_POST['id'] - Kullanıcı ID'si / User ID
-         * @param string $_POST['username'] - Kullanıcı adı / Username
-         * @param string $_POST['password'] - Şifre (opsiyonel) / Password (optional)
-         * @param string $_POST['base_currency'] - Temel para birimi / Base currency
-         * @param string $_POST['theme_preference'] - Tema tercihi / Theme preference
-         * @param bool $_POST['is_admin'] - Yönetici yetkisi / Admin privileges
-         * @param bool $_POST['is_active'] - Aktif durumu / Active status
-         */
+            /**
+             * Kullanıcı bilgilerini güncelleme
+             * Update user information
+             *
+             * Bu fonksiyon, mevcut bir kullanıcının bilgilerini günceller.
+             * This function updates the information of an existing user.
+             *
+             * @param int $_POST['id'] - Kullanıcı ID'si / User ID
+             * @param string $_POST['username'] - Kullanıcı adı / Username
+             * @param string $_POST['password'] - Şifre (opsiyonel) / Password (optional)
+             * @param string $_POST['base_currency'] - Temel para birimi / Base currency
+             * @param string $_POST['theme_preference'] - Tema tercihi / Theme preference
+             * @param bool $_POST['is_admin'] - Yönetici yetkisi / Admin privileges
+             * @param bool $_POST['is_active'] - Aktif durumu / Active status
+             */
         case 'update_user':
             if (empty($_POST['id']) || empty($_POST['username'])) {
                 header('Content-Type: application/json');
@@ -262,16 +262,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-        /**
-         * Kullanıcı silme
-         * Delete user
-         *
-         * Bu fonksiyon, belirtilen ID'ye sahip bir kullanıcıyı siler.
-         * This function deletes a user with the specified ID.
-         *
-         * @param int $_POST['id'] - Silinecek kullanıcı ID'si / User ID to delete
-         * @throws Exception - Kullanıcı kendisini silemez / User cannot delete themselves
-         */
+            /**
+             * Kullanıcı silme
+             * Delete user
+             *
+             * Bu fonksiyon, belirtilen ID'ye sahip bir kullanıcıyı siler.
+             * This function deletes a user with the specified ID.
+             *
+             * @param int $_POST['id'] - Silinecek kullanıcı ID'si / User ID to delete
+             * @throws Exception - Kullanıcı kendisini silemez / User cannot delete themselves
+             */
         case 'delete_user':
             if (empty($_POST['id'])) {
                 header('Content-Type: application/json');
