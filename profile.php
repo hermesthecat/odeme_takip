@@ -47,7 +47,7 @@ function generate_telegram_code()
     }
 
     //$_SESSION['success'] = "Yeni doğrulama kodu oluşturuldu: " . $code;
-    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    echo "<script>window.location.href = '" . $_SERVER['HTTP_REFERER'] . "';</script>";
     exit;
 }
 
@@ -59,7 +59,7 @@ function unlink_telegram()
     $stmt->execute([$_SESSION['user_id']]);
 
     //$_SESSION['success'] = "Telegram bağlantısı kaldırıldı.";
-    header('Location: ' . $_SERVER['HTTP_REFERER']);
+    echo "<script>window.location.href = '" . $_SERVER['HTTP_REFERER'] . "';</script>";
     exit;
 }
 ?>

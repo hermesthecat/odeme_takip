@@ -10,7 +10,7 @@ require_once 'config.php';
 
 // Oturum kontrolü
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    echo "<script>window.location.href = '" . SITE_URL . "/login.php';</script>";
     exit;
 }
 
@@ -68,5 +68,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_arr
 }
 
 // Geri yönlendir
-header('Location: ai_analysis.php');
+echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
 exit;

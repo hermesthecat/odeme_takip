@@ -32,6 +32,7 @@ define('DB_SERVER', getenv('DB_SERVER') ?: 'localhost');
 define('DB_USERNAME', getenv('DB_USERNAME') ?: 'root');
 define('DB_PASSWORD', getenv('DB_PASSWORD') ?: 'root');
 define('DB_NAME', getenv('DB_NAME') ?: 'odeme_takip');
+define('SITE_URL', getenv('SITE_URL') ?: 'http://butce.local');
 
 // API Anahtarları
 define('GEMINI_API_KEY', getenv('GEMINI_API_KEY'));
@@ -86,7 +87,7 @@ function t($key, $params = [])
 function checkLogin()
 {
     if (!isset($_SESSION['user_id'])) {
-        header("Location: login.php");
+        echo "<script>window.location.href = '" . SITE_URL . "/login.php';</script>";
         exit;
     }
 }

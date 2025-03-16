@@ -4,7 +4,7 @@ require_once 'classes/log.php';
 checkLogin();
 
 if ($_SESSION['is_admin'] != 1) {
-    header("Location: app.php");
+    echo "<script>window.location.href = '" . SITE_URL . "/app.php';</script>";
     exit;
 }
 

@@ -12,7 +12,7 @@ require_once 'navbar.php';
 
 // Oturum kontrolü
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    echo "<script>window.location.href = '" . SITE_URL . "/login.php';</script>";
     exit;
 }
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     $maxFileSize = 10 * 1024 * 1024; // 10MB
     if ($fileSize > $maxFileSize) {
         $_SESSION['error'] = "Dosya boyutu çok büyük. Maksimum 10MB yükleyebilirsiniz.";
-        header('Location: ai_analysis.php');
+        echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
         exit;
     }
 
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
 
     if (!in_array($fileMime, $allowedMimes)) {
         $_SESSION['error'] = "Geçersiz dosya türü. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.";
-        header('Location: ai_analysis.php');
+        echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
         exit;
     }
 
@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     $allowedExtensions = ['pdf', 'xlsx', 'xls', 'csv', 'png', 'jpg', 'jpeg'];
     if (!in_array($fileType, $allowedExtensions)) {
         $_SESSION['error'] = "Geçersiz dosya uzantısı. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.";
-        header('Location: ai_analysis.php');
+        echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
         exit;
     }
 
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     foreach ($maliciousPatterns as $pattern) {
         if (stripos($fileContent, $pattern) !== false) {
             $_SESSION['error'] = "Zararlı içerik tespit edildi. Dosya reddedildi.";
-            header('Location: ai_analysis.php');
+            echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
             exit;
         }
     }

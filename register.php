@@ -2,7 +2,7 @@
 require_once __DIR__ . '/header.php';
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: app.php');
+    echo "<script>window.location.href = '" . SITE_URL . "/app.php';</script>";
     exit;
 }
 ?>
