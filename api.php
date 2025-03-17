@@ -90,8 +90,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             break;
 
         case 'get_data':
-            $month = intval($_POST['month']) + 1;
-            $year = intval($_POST['year']);
+            if (isset($_POST['month'])) {
+                $month = intval($_POST['month']) + 1;
+            } else {
+                $month = date('m');
+            }
+            if (isset($_POST['year'])) {
+                $year = intval($_POST['year']);
+            } else {
+                $year = date('Y');
+            }
             $load_type = $_POST['load_type'] ?? 'all';
 
             // Kullanıcı bilgilerini al
@@ -131,6 +139,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 case 'summary':
                     $summary = loadSummary();
                     $response['data']['summary'] = $summary;
+                    break;
+
+                case 'card':
+                    $cards = loadCards();
+                    $response['data']['cards'] = $cards;
                     break;
             }
             break;
@@ -378,6 +391,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;
+
         case 'add_card':
             if (addCard()) {
                 $response = ['status' => 'success', 'message' => t('card.add_success')];
@@ -385,6 +399,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'error', 'message' => t('card.add_error')];
             }
             break;
+
         case 'delete_card':
             if (deleteCard()) {
                 $response = ['status' => 'success', 'message' => t('card.delete_success')];
@@ -392,10 +407,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'error', 'message' => t('card.delete_error')];
             }
             break;
+
         case 'load_cards':
             $cards = loadCards();
             $response = ['status' => 'success', 'data' => $cards];
             break;
+
         case 'update_card':
             if (updateCard()) {
                 $response = ['status' => 'success', 'message' => t('card.update_success')];

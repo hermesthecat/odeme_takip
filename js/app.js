@@ -9,6 +9,7 @@ function loadData() {
     $('#paymentsLoadingSpinner').show();
     $('#recurringPaymentsLoadingSpinner').show();
     $('#summaryLoadingSpinner').show();
+    $('#cardLoadingSpinner').show();
 
     // Tabloları gizle
     $('.table').hide();
@@ -65,6 +66,23 @@ function loadIncomeData() {
             updateIncomeList(response.data.incomes);
             $('#incomeLoadingSpinner').hide();
             $('#incomeList').closest('.table').show();
+        }
+    });
+}
+
+// Ödeme yöntemi verilerini yükle
+function loadCardData() {
+    const month = $('#monthSelect').val();
+    const year = $('#yearSelect').val();
+
+    ajaxRequest({
+        action: 'get_data',
+        load_type: 'card'
+    }).done(function (response) {
+        if (response.status === 'success') {
+            updateCardList(response.data.cards);
+            $('#cardLoadingSpinner').hide();
+            $('#cardList').closest('.table').show();
         }
     });
 }
