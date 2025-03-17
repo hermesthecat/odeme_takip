@@ -82,7 +82,6 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
         </div>
 
-
         <!-- Ödeme Yöntemleri - Ödemeler Listesi Tablosu -->
         <div class="card mb-4">
             <div class="card-header bg-success bg-opacity-25">
@@ -92,21 +91,80 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <div id="cardLoadingSpinner" class="text-center py-4" style="display: none;">
-                        <div class="spinner-border text-success" role="status">
-                            <span class="visually-hidden">Yükleniyor...</span>
+                    <?php
+                    // Kullanıcının kartlarını al
+                    $cards = get_user_cards();
+
+                    // Her kart için ödemeleri listele
+                    foreach ($cards as $card) {
+                        // Karta ait ödemeleri al
+                        $sql = "SELECT p.*, 
+                               CASE 
+                                   WHEN p.parent_id IS NULL THEN (
+                                       SELECT MIN(p2.first_date)
+                                       FROM payments p2
+                                       WHERE p2.parent_id = p.id
+                                       AND p2.user_id = p.user_id
+                                   )
+                                   ELSE (
+                                       SELECT MIN(p2.first_date)
+                                       FROM payments p2
+                                       WHERE p2.parent_id = p.parent_id
+                                       AND p2.first_date > p.first_date
+                                       AND p2.user_id = p.user_id
+                                   )
+                               END as next_payment_date
+                               FROM payments p 
+                               WHERE p.user_id = ? 
+                               AND p.card_id = ?
+                               ORDER BY p.name ASC";
+                        
+                        $stmt = $pdo->prepare($sql);
+                        $stmt->execute([$_SESSION['user_id'], $card['id']]);
+                        $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        // Kart başlığını göster
+                        echo '<div class="card mt-3">
+                                <div class="card-header bg-light">
+                                    <h5 class="mb-0">' . htmlspecialchars($card['name']) . '</h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <table class="table table-striped mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Ödeme Adı</th>
+                                                <th class="text-end">İşlemler</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>';
+
+                        if (count($payments) > 0) {
+                            foreach ($payments as $payment) {
+                                echo '<tr>
+                                        <td class="text-center align-middle">' . htmlspecialchars($payment['name']) . '</td>
+                                        <td class="text-end">
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-danger" onclick="deletePayment(' . $payment['id'] . ')" title="Sil">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>';
+                            }
+                        } else {
+                            echo '<tr>
+                                    <td colspan="6" class="text-center">
+                                        <p class="text-muted mb-0">Bu ödeme yöntemine ait ödeme bulunmamaktadır.</p>
+                                    </td>
+                                </tr>';
+                        }
+
+                        echo '</tbody>
+                            </table>
                         </div>
-                        <div class="mt-2"><?php echo t('loading'); ?></div>
-                    </div>
-                    <table class="table table-striped" style="display: table;">
-                        <thead>
-                            <tr>
-                                <th class="text-center" style="width: 70%">Ödeme Yöntemi</th>
-                                <th class="text-end" style="width: 30%">İşlemler</th>
-                            </tr>
-                        </thead>
-                        <tbody id="cardList"></tbody>
-                    </table>
+                    </div>';
+                    }
+                    ?>
                 </div>
             </div>
         </div>
