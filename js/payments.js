@@ -171,6 +171,38 @@ function markAsPaid(id) {
                                 .attr('aria-valuenow', progress);
 
                             statusText.text(`${paidCount}/${totalCount}`);
+
+                            // Ödeme gücü verilerini güncelle
+                            ajaxRequest({
+                                action: 'get_data',
+                                month: $('#monthSelect').val(),
+                                year: $('#yearSelect').val(),
+                                load_type: 'recurring_payments'
+                            }).done(function (response) {
+                                if (response.status === 'success') {
+                                    // Sadece toplam ve bekleyen ödeme bilgilerini güncelle
+                                    let totalYearlyPayment = 0;
+                                    let totalUnpaidPayment = 0;
+
+                                    response.data.recurring_payments.forEach(function (payment) {
+                                        totalYearlyPayment += parseFloat(payment.yearly_total) || 0;
+                                        totalUnpaidPayment += parseFloat(payment.unpaid_total) || 0;
+                                    });
+
+                                    // Tablo altbilgisini güncelle
+                                    const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
+                                    tfoot.html(`
+                                        <tr class="text-end">
+                                            <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.total_payment}:</td>
+                                            <td class="fw-bold">${formatMyMoney(totalYearlyPayment.toFixed(2))} ${data.user.base_currency}</td>
+                                        </tr>
+                                        <tr class="text-end">
+                                            <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.pending_payment}:</td>
+                                            <td class="fw-bold">${formatMyMoney(totalUnpaidPayment.toFixed(2))} ${data.user.base_currency}</td>
+                                        </tr>
+                                    `);
+                                }
+                            });
                         }
                     });
                 }
