@@ -182,13 +182,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'transfer_unpaid_payments':
             try {
+                $pdo->beginTransaction();
                 if (transferUnpaidPayments()) {
+                    $pdo->commit();
                     $response = ['status' => 'success', 'message' => t('transfer.success')];
                 } else {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
                     $response = ['status' => 'error', 'message' => t('transfer.error')];
                 }
             } catch (Exception $e) {
-                $response = ['status' => 'error', 'message' => t('transfer.error') . ': ' . $e->getMessage()];
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                $response = ['status' => 'error', 'message' => $e->getMessage()];
             }
             break;
 

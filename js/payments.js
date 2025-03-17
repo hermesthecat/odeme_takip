@@ -306,7 +306,7 @@ function deletePayment(id) {
 
 // Ödenmemiş ödemeleri sonraki aya aktar
 function transferUnpaidPayments() {
-    const currentMonth = parseInt($('#monthSelect').val());
+    const currentMonth = parseInt($('#monthSelect').val()) + 1;
     const currentYear = parseInt($('#yearSelect').val());
 
     // Sonraki ayı hesapla
@@ -323,7 +323,7 @@ function transferUnpaidPayments() {
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: translations.transfer.transfer_button || 'Transfer Et',
-        cancelButtonText: translations.transfer.cancel_button || 'İptal',
+        cancelButtonText: translations.transfer.cancel_button || 'İptal'
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
@@ -342,16 +342,16 @@ function transferUnpaidPayments() {
                         timer: 1500
                     }).then(() => {
                         // Sonraki aya geç
-                        $('#monthSelect').val(nextMonth);
+                        $('#monthSelect').val(nextMonth - 1);
                         $('#yearSelect').val(nextYear);
-                        updateUrl(nextMonth, nextYear);
+                        updateUrl(nextMonth - 1, nextYear);
                         loadData();
                     });
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: translations.error || 'Hata',
-                        text: response.message || translations.transfer.error || 'Transfer sırasında bir hata oluştu',
+                        text: response.message || translations.transfer.error || 'Transfer sırasında bir hata oluştu'
                     });
                 }
             });

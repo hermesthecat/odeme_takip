@@ -10,8 +10,6 @@ function transferUnpaidPayments()
     global $pdo, $user_id;
 
     try {
-        $pdo->beginTransaction();
-
         // Kullanıcının ana para birimini al
         $stmt = $pdo->prepare("SELECT base_currency FROM users WHERE id = ?");
         $stmt->execute([$user_id]);
@@ -36,8 +34,8 @@ function transferUnpaidPayments()
         }
 
         // Ay ve yıl hesaplama
-        $next_month = $_POST['current_month'] == 12 ? 1 : $_POST['current_month'] + 1;
-        $next_year = $_POST['current_month'] == 12 ? $_POST['current_year'] + 1 : $_POST['current_year'];
+        $next_month = $_POST['next_month'];
+        $next_year = $_POST['next_year'];
         $current_month_name = date('F', mktime(0, 0, 0, $_POST['current_month'], 1));
 
         foreach ($unpaid_payments as $payment) {
@@ -75,10 +73,8 @@ function transferUnpaidPayments()
             }
         }
 
-        $pdo->commit();
         return true;
     } catch (Exception $e) {
-        $pdo->rollBack();
         throw $e;
     }
 }
