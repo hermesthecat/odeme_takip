@@ -1,12 +1,9 @@
 // Ödeme yöntemi listesini güncelle
 function updateCardList(cards) {
-    console.log('updateCardList çağrıldı, gelen veriler:', cards);
     
     const tbody = $('#cardList');
-    console.log('tbody elementi bulundu:', tbody.length > 0);
     
     tbody.empty();
-    console.log('tbody temizlendi');
 
     if (!cards || cards.length === 0) {
         tbody.append(`

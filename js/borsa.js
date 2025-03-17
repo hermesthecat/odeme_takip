@@ -194,14 +194,11 @@ function maliDurumGrafigiGuncelle(portfoyData) {
             // Türkçe para birimi formatını düzgün şekilde parse et
             let satisKariDeger = satisKariText.replace(/[^0-9,.-]+/g, "").replace('.', '').replace(',', '.');
             satisKariDeger = parseFloat(satisKariDeger);
-            console.log('Satış Karı Değeri (Ana Satır):', satisKariText, satisKariDeger);
             if (!isNaN(satisKariDeger)) {
                 totalSatisKar += satisKariDeger;
             }
         }
     });
-
-    console.log('Toplam Satış Karı (Ana Satırlardan):', totalSatisKar);
 
     // Ayrıca satış kayıtları tablosundaki satış karlarını da kontrol et
     document.querySelectorAll('.detay-satir').forEach(detaySatir => {
@@ -222,7 +219,6 @@ function maliDurumGrafigiGuncelle(portfoyData) {
                         // Sayısal değeri çıkar (₺ ve diğer karakterleri temizle)
                         let karZararDeger = karZararText.replace(/[^0-9,.-]+/g, "").replace('.', '').replace(',', '.');
                         karZararDeger = parseFloat(karZararDeger);
-                        console.log('Satış Karı Değeri (Satış Kaydı):', karZararText, karZararDeger);
                         if (!isNaN(karZararDeger)) {
                             // Bu değerleri ana satırlardan zaten topladığımız için burada toplamıyoruz
                             // totalSatisKar += karZararDeger;
@@ -233,8 +229,6 @@ function maliDurumGrafigiGuncelle(portfoyData) {
         }
     });
 
-    console.log('Toplam Satış Karı (Tüm Kayıtlardan):', totalSatisKar);
-
     // Aktif hisselerin kar/zararını topla
     document.querySelectorAll('.ana-satir').forEach(anaSatir => {
         const karZararHucresi = anaSatir.querySelector('td:nth-child(8)'); // Kar/Zarar sütunu
@@ -243,7 +237,6 @@ function maliDurumGrafigiGuncelle(portfoyData) {
             // Türkçe para birimi formatını düzgün şekilde parse et
             let karZararDeger = karZararText.replace(/[^0-9,.-]+/g, "").replace('.', '').replace(',', '.');
             karZararDeger = parseFloat(karZararDeger);
-            console.log('Kar/Zarar Değeri:', karZararText, karZararDeger);
             if (!isNaN(karZararDeger)) {
                 totalKarZarar += karZararDeger;
             }
@@ -263,10 +256,6 @@ function maliDurumGrafigiGuncelle(portfoyData) {
         style: 'currency',
         currency: 'TRY'
     }).format(totalSatisKar);
-
-    // Debug log
-    console.log('Toplam Kar/Zarar:', totalKarZarar);
-    console.log('Toplam Satış Karı:', totalSatisKar);
 
     // Renk sınıflarını güncelle
     karZararElement.className = totalKarZarar >= 0 ? 'text-success mb-0 mt-2' : 'text-danger mb-0 mt-2';
