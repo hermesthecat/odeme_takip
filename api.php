@@ -12,6 +12,7 @@ require_once __DIR__ . '/api/payments.php';
 require_once __DIR__ . '/api/summary.php';
 require_once __DIR__ . '/api/user.php';
 require_once __DIR__ . '/api/transfer.php';
+require_once __DIR__ . '/api/card.php';
 
 header('Content-Type: application/json');
 
@@ -294,7 +295,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception(t('income.not_found'));
                 }
 
-                require_once __DIR__ . '/api/income.php';
                 $last_date = getLastChildIncomeDate($id);
                 $response = ['status' => 'success', 'last_date' => $last_date];
             } catch (Exception $e) {
@@ -324,7 +324,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new Exception(t('payment.not_found'));
                 }
 
-                require_once __DIR__ . '/api/payments.php';
                 $last_date = getLastChildPaymentDate($id);
                 $response = ['status' => 'success', 'last_date' => $last_date];
             } catch (Exception $e) {
@@ -373,11 +372,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         case 'get_savings_history':
             try {
-                require_once __DIR__ . '/api/savings.php';
                 $savings_history = getSavingsHistory($_POST['id']);
                 $response = ['status' => 'success', 'data' => $savings_history];
             } catch (Exception $e) {
                 $response = ['status' => 'error', 'message' => $e->getMessage()];
+            }
+            break;
+        case 'add_card':
+            if (addCard()) {
+                $response = ['status' => 'success', 'message' => t('card.add_success')];
+            } else {
+                $response = ['status' => 'error', 'message' => t('card.add_error')];
+            }
+            break;
+        case 'delete_card':
+            if (deleteCard()) {
+                $response = ['status' => 'success', 'message' => t('card.delete_success')];
+            } else {
+                $response = ['status' => 'error', 'message' => t('card.delete_error')];
+            }
+            break;
+        case 'load_cards':
+            $cards = loadCards();
+            $response = ['status' => 'success', 'data' => $cards];
+            break;
+        case 'update_card':
+            if (updateCard()) {
+                $response = ['status' => 'success', 'message' => t('card.update_success')];
+            } else {
+                $response = ['status' => 'error', 'message' => t('card.update_error')];
             }
             break;
     }
