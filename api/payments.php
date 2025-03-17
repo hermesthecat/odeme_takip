@@ -501,7 +501,7 @@ function updatePayment()
                         throw new Exception(t('payment.update_children_error'));
                         saveLog("1 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
                     }
-                    saveLog("1 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle: $id", 'info', 'updatePayment', $_SESSION['user_id']);
+                    saveLog("2 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle: $id", 'info', 'updatePayment', $_SESSION['user_id']);
 
                     // diğer child kayıtları güncelle
                     $stmt = $pdo->prepare("UPDATE payments SET 
@@ -523,9 +523,9 @@ function updatePayment()
                         $user_id
                     ])) {
                         throw new Exception(t('payment.update_children_error'));
-                        saveLog("2 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
+                        saveLog("3 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle hatası ($id): " . $e->getMessage(), 'error', 'updatePayment', $_SESSION['user_id']);
                     }
-                    saveLog("2 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle: $id", 'info', 'updatePayment', $_SESSION['user_id']);
+                    saveLog("4 eğer payment power önceki değerden farklı ise, tüm kayıtları güncelle: $id", 'info', 'updatePayment', $_SESSION['user_id']);
                 }
 
                 $stmt = $pdo->prepare("UPDATE payments SET 
