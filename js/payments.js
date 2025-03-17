@@ -238,7 +238,11 @@ function updateChildPayments(parentId, parent, children) {
             <td class="text-center">${parent.first_date}</td>
             <td class="text-center">${parentAmountText}</td>
             <td class="text-center">${parent.currency}</td>
-            <td></td>
+            <td class="text-end">
+                <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${parent.id})" title="${translations.payment.buttons.delete}">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
         </tr>
     `);
 
@@ -264,7 +268,11 @@ function updateChildPayments(parentId, parent, children) {
                 <td class="text-center">${payment.first_date}</td>
                 <td class="text-center">${amountText}</td>
                 <td class="text-center">${payment.currency}</td>
-                <td></td>
+                <td class="text-end">
+                    <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deletePayment(${payment.id})" title="${translations.payment.buttons.delete}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
             </tr>
         `);
     });
