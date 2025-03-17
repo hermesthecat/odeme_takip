@@ -34,6 +34,7 @@ function loadData() {
             loadSavingsData();
             loadPaymentsData();
             loadRecurringPaymentsData();
+            loadCardData();
         } else {
             console.error('Veri yükleme hatası:', response.message);
             hideAllLoadingSpinners();
@@ -72,8 +73,9 @@ function loadIncomeData() {
 
 // Ödeme yöntemi verilerini yükle
 function loadCardData() {
-    const month = $('#monthSelect').val();
-    const year = $('#yearSelect').val();
+    // Loading spinner'ı göster
+    $('#cardLoadingSpinner').show();
+    $('#cardList').closest('.table').hide();
 
     ajaxRequest({
         action: 'get_data',
@@ -81,9 +83,18 @@ function loadCardData() {
     }).done(function (response) {
         if (response.status === 'success') {
             updateCardList(response.data.cards);
-            $('#cardLoadingSpinner').hide();
-            $('#cardList').closest('.table').show();
         }
+    }).fail(function (error) {
+        console.error("Error loading card data:", error);
+        Swal.fire({
+            icon: 'error',
+            title: translations.error || 'Hata',
+            text: translations.card.load_error || 'Ödeme yöntemleri yüklenirken bir hata oluştu'
+        });
+    }).always(function () {
+        // Her durumda loading spinner'ı gizle ve tabloyu göster
+        $('#cardLoadingSpinner').hide();
+        $('#cardList').closest('.table').show();
     });
 }
 
@@ -153,6 +164,7 @@ function hideAllLoadingSpinners() {
     $('#paymentsLoadingSpinner').hide();
     $('#recurringPaymentsLoadingSpinner').hide();
     $('#summaryLoadingSpinner').hide();
+    $('#cardLoadingSpinner').hide();
 }
 
 // Sayfa yüklendiğinde

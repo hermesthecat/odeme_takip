@@ -72,7 +72,6 @@ $user_default_currency = $_SESSION['base_currency'];
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th></th>
                                 <th class="text-center"><?php echo t('card_name'); ?></th>
                                 <th></th>
                             </tr>

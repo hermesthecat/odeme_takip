@@ -6,6 +6,7 @@ require_once __DIR__ . '/modals/income_modal.php';
 require_once __DIR__ . '/modals/savings_modal.php';
 require_once __DIR__ . '/modals/payment_modal.php';
 require_once __DIR__ . '/modals/user_settings_modal.php';
+require_once __DIR__ . '/modals/card_modal.php';
 ?>
 
 <script>

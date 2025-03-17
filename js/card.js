@@ -3,7 +3,7 @@ function updateCardList(cards) {
     const tbody = $('#cardList');
     tbody.empty();
 
-    if (incomes.length === 0) {
+    if (cards.length === 0) {
         tbody.append(`
             <tr>
                 <td colspan="8" class="text-center">

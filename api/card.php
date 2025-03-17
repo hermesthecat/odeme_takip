@@ -20,26 +20,34 @@ function addCard()
 {
     global $pdo, $user_id;
 
-    if (isset($_POST['name'])) {
-        $name = validateRequired($_POST['name'] ?? null, t('income.name'));
-    }
+    try {
+        if (isset($_POST['name'])) {
+            $name = validateRequired($_POST['name'] ?? null, t('card.name'));
+        }
 
-    $pdo->beginTransaction();
+        $pdo->beginTransaction();
 
-    $stmt = $pdo->prepare("INSERT INTO card (user_id, name) 
-                     VALUES (?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO card (user_id, name) 
+                         VALUES (?, ?)");
 
-    if (!$stmt->execute([
-        $user_id,
-        $name
-    ])) {
-        throw new Exception(t('card.add_error'));
+        if (!$stmt->execute([
+            $user_id,
+            $name
+        ])) {
+            throw new Exception(t('card.add_error'));
+        }
+
+        $pdo->commit();
+        saveLog("Ödeme yöntemi eklendi: " . $name, 'info', 'addCard', $_SESSION['user_id']);
+        return true;
+
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         saveLog("Ödeme yöntemi ekleme hatası ($name): " . $e->getMessage(), 'error', 'addCard', $_SESSION['user_id']);
-        // Card addition error
+        throw $e;
     }
-
-    $pdo->commit();
-    return true;
 }
 
 /**
