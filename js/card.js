@@ -6,7 +6,7 @@ function updateCardList(cards) {
     if (cards.length === 0) {
         tbody.append(`
             <tr>
-                <td colspan="8" class="text-center">
+                <td colspan="2" class="text-center">
                     <p class="text-muted">${translations.card.no_data}</p>
                 </td>
             </tr>
@@ -48,7 +48,7 @@ function deleteCard(id) {
                 id: id
             }).done(function (response) {
                 if (response.status === 'success') {
-                    loadData();
+                    loadCardData();
                 }
             });
         }
@@ -103,7 +103,7 @@ function updateCard() {
             modal.hide();
 
             // Tabloyu güncelle
-            loadData();
+            loadCardData();
 
             // Başarı mesajı göster
             Swal.fire({

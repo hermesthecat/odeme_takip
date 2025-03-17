@@ -82,7 +82,6 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
         </div>
 
-
         <!-- Sorumluluk Reddi -->
         <div class="container mt-5 mb-3">
             <div class="card">
@@ -257,6 +256,12 @@ $user_default_currency = $_SESSION['base_currency'];
                     cancel_button: '<?php echo t('transfer.cancel_button'); ?>',
                     error: '<?php echo t('transfer.error'); ?>',
                     success: '<?php echo t('transfer.success'); ?>'
+                },
+                card: {
+                    name: '<?php echo t('card.name'); ?>',
+                    add_error: '<?php echo t('card.add_error'); ?>',
+                    delete_error: '<?php echo t('card.delete_error'); ?>',
+                    load_error: '<?php echo t('card.load_error'); ?>'
                 }
             };
         </script>
