@@ -40,7 +40,6 @@ function addCard()
         $pdo->commit();
         saveLog("Ödeme yöntemi eklendi: " . $name, 'info', 'addCard', $_SESSION['user_id']);
         return true;
-
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {
             $pdo->rollBack();
@@ -135,4 +134,18 @@ function updateCard()
         $pdo->rollBack();
         throw $e;
     }
+}
+
+function getAllCardPayments()
+{
+    global $pdo, $user_id;
+
+    $sql_payments = "SELECT * FROM payments WHERE user_id = ? AND card_id IS NOT NULL AND parent_id IS NULL";
+    $stmt_payments = $pdo->prepare($sql_payments);
+    $stmt_payments->execute([$user_id]);
+    $payments = $stmt_payments->fetchAll(PDO::FETCH_ASSOC);
+
+    saveLog("Kartlara ait tüm ödemeler alındı: " . $user_id, 'info', 'getAllCardPayments', $_SESSION['user_id']);
+
+    return $payments;
 }

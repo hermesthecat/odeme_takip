@@ -26,7 +26,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ödeme Yöntemi</label>
-                        <select class="form-select" id="update_payment_card" name="card" required>
+                        <select class="form-select" id="paymentCard" name="card_id" required>
                             <option value=""><?php echo t('select_card'); ?></option>
                             <?php
                             // get user cards
@@ -96,7 +96,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Ödeme Yöntemi</label>
-                        <select class="form-select" id="update_payment_card" name="card" required>
+                        <select class="form-select" id="updatePaymentCard" name="card_id" required>
                             <option value=""><?php echo t('select_card'); ?></option>
                             <?php
                             // get user cards

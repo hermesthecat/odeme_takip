@@ -46,6 +46,10 @@ function addPayment()
         validateDateRange($first_date, $end_date);
     }
 
+    if (isset($_POST['card_id'])) {
+        $card_id = validateRequired($_POST['card_id'] ?? null, t('payment.card'));
+    }
+
     $pdo->beginTransaction();
 
     try {
@@ -59,8 +63,8 @@ function addPayment()
         }
 
         // Ana kaydı ekle
-        $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate, status) 
-                             VALUES (?, NULL, ?, ?, ?, ?, ?, ?, 'pending')");
+        $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate, status, card_id) 
+                             VALUES (?, NULL, ?, ?, ?, ?, ?, ?, 'pending', ?)");
 
         if (!$stmt->execute([
             $user_id,
@@ -69,7 +73,8 @@ function addPayment()
             $currency,
             $first_date,
             $frequency,
-            $exchange_rate
+            $exchange_rate,
+            $card_id
         ])) {
             throw new Exception(t('payment.add_error'));
         }
@@ -85,8 +90,8 @@ function addPayment()
 
             // Child kayıtları ekle
             if ($repeat_count > 0) {
-                $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate, status) 
-                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')");
+                $stmt = $pdo->prepare("INSERT INTO payments (user_id, parent_id, name, amount, currency, first_date, frequency, exchange_rate, status, card_id) 
+                                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)");
 
                 for ($i = 1; $i <= $repeat_count; $i++) {
                     $payment_date = calculateNextPaymentDate($first_date, $i * $month_interval);
@@ -101,7 +106,8 @@ function addPayment()
                             $currency,
                             $payment_date,
                             $frequency,
-                            $exchange_rate
+                            $exchange_rate,
+                            $card_id
                         ])) {
                             throw new Exception(t('payment.add_recurring_error'));
                         }
@@ -176,7 +182,7 @@ function loadPayments()
     global $pdo, $user_id, $month, $year;
 
     // Ödemeleri al
-    $sql_payments = "SELECT p.*, 
+    $sql_payments = "SELECT p.*, c.name as card_name,
                             CASE 
                                 WHEN p.parent_id IS NULL THEN (
                                     SELECT MIN(p2.first_date)
@@ -193,6 +199,7 @@ function loadPayments()
                                 )
                             END as next_payment_date
                             FROM payments p 
+                            LEFT JOIN card c ON p.card_id = c.id
                             WHERE p.user_id = ? 
                             AND MONTH(p.first_date) = ? 
                             AND YEAR(p.first_date) = ?
@@ -369,6 +376,10 @@ function updatePayment()
         $frequency = validateFrequency($frequency, t('payment.frequency'));
     }
 
+    if (isset($_POST['card_id'])) {
+        $card_id = validateRequired($_POST['card_id'] ?? null, t('payment.card'));
+    }
+
     // Ödemenin mevcut olduğunu kontrol et
     $stmt = $pdo->prepare("SELECT * FROM payments WHERE id = ? AND user_id = ?");
     if (!$stmt->execute([$id, $user_id])) {
@@ -412,7 +423,8 @@ function updatePayment()
             first_date = ?, 
             frequency = ?,
             exchange_rate = ?,
-            payment_power = ? 
+            payment_power = ?,
+            card_id = ?
             WHERE id = ? AND user_id = ?");
 
         if (!$stmt->execute([
@@ -423,6 +435,7 @@ function updatePayment()
             $frequency,
             $exchange_rate,
             $payment_power,
+            $card_id,
             $id,
             $user_id
         ])) {
@@ -441,7 +454,8 @@ function updatePayment()
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?,
-                    payment_power = ?
+                    payment_power = ?,
+                    card_id = ?
                     WHERE parent_id = ? AND user_id = ?");
 
                 if (!$stmt->execute([
@@ -450,6 +464,7 @@ function updatePayment()
                     $currency,
                     $exchange_rate,
                     $payment_power,
+                    $card_id,
                     $id,
                     $user_id
                 ])) {
@@ -486,7 +501,8 @@ function updatePayment()
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?,
-                    payment_power = ?
+                    payment_power = ?,
+                    card_id = ?
                     WHERE id = ? AND user_id = ?");
 
                     if (!$stmt->execute([
@@ -495,6 +511,7 @@ function updatePayment()
                         $currency,
                         $exchange_rate,
                         $payment_power,
+                        $card_id,
                         $id,
                         $user_id
                     ])) {
@@ -509,7 +526,8 @@ function updatePayment()
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?,
-                    payment_power = ?
+                    payment_power = ?,
+                    card_id = ?
                     WHERE parent_id = ? AND id != ? AND user_id = ?");
 
                     if (!$stmt->execute([
@@ -518,6 +536,7 @@ function updatePayment()
                         $currency,
                         $exchange_rate,
                         $payment_power,
+                        $card_id,
                         $payment['parent_id'],
                         $id,
                         $user_id
@@ -533,7 +552,8 @@ function updatePayment()
                     amount = ?, 
                     currency = ?, 
                     exchange_rate = ?,
-                    payment_power = ?
+                    payment_power = ?,
+                    card_id = ?
                     WHERE parent_id = ? AND first_date >= ? AND user_id = ?");
 
                 if (!$stmt->execute([
@@ -542,6 +562,7 @@ function updatePayment()
                     $currency,
                     $exchange_rate,
                     $payment_power,
+                    $card_id,
                     $payment['parent_id'],
                     $first_date,
                     $user_id

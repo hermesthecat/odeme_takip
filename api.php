@@ -420,6 +420,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $response = ['status' => 'error', 'message' => t('card.update_error')];
             }
             break;
+
+        case 'get_all_card_payments':
+            $payments = getAllCardPayments();
+            $response = ['status' => 'success', 'data' => $payments];
+            break;
     }
 
     // Response'u güvenli hale getir

@@ -242,6 +242,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                 <th class="text-center"><?php echo t('payment_date'); ?></th>
                                 <th class="text-center"><?php echo t('payment_frequency'); ?></th>
                                 <th class="text-center"><?php echo t('app.next_payment'); ?></th>
+                                <th class="text-center"><?php echo t('payment.card'); ?></th>
                                 <th></th>
                             </tr>
                         </thead>

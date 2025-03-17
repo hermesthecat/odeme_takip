@@ -82,6 +82,35 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
         </div>
 
+
+        <!-- Ödeme Yöntemleri - Ödemeler Listesi Tablosu -->
+        <div class="card mb-4">
+            <div class="card-header bg-success bg-opacity-25">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Ödemeler Listesi</h2>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <div id="cardLoadingSpinner" class="text-center py-4" style="display: none;">
+                        <div class="spinner-border text-success" role="status">
+                            <span class="visually-hidden">Yükleniyor...</span>
+                        </div>
+                        <div class="mt-2"><?php echo t('loading'); ?></div>
+                    </div>
+                    <table class="table table-striped" style="display: table;">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 70%">Ödeme Yöntemi</th>
+                                <th class="text-end" style="width: 30%">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cardList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- Sorumluluk Reddi -->
         <div class="container mt-5 mb-3">
             <div class="card">

@@ -43,6 +43,7 @@ function updatePaymentsList(payments) {
                 <td class="text-center">${payment.first_date}</td>
                 <td class="text-center">${getFrequencyText(payment.frequency)}</td>
                 <td class="text-center">${payment.next_payment_date || ''}</td>
+                <td class="text-center">${payment.card_name || ''}</td>
                 <td class="text-end">
                     <div class="btn-group">
                         <button class="btn btn-sm btn-primary" onclick="openUpdatePaymentModal(${payment.id})" title="${translations.payment.buttons.edit}">
@@ -532,6 +533,7 @@ function openUpdatePaymentModal(id) {
             $('#update_payment_power').prop('checked', false);
             $('#update_exchange_rate').prop('checked', false);
             $('#update_payment_children').prop('checked', false);
+            $('#updatePaymentCard').val('');
 
             // payment power seçeneğinde bir değişiklik olduğunda update_payment_children alanı otomatik seçilir
             $('#update_payment_power').on('change', function () {
@@ -550,6 +552,7 @@ function openUpdatePaymentModal(id) {
                 $('#update_payment_currency').val(payment.currency);
                 $('#update_payment_first_date').val(payment.first_date);
                 $('#update_payment_frequency').val(payment.frequency);
+                $('#updatePaymentCard').val(payment.card_id);
 
                 // Parent/Child durumunu kontrol et
                 const isParent = payment.parent_id === null;
