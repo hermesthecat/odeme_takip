@@ -25,6 +25,18 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Ödeme Yöntemi</label>
+                        <select class="form-select" id="update_payment_card" name="card" required>
+                            <option value=""><?php echo t('select_card'); ?></option>
+                            <?php
+                            // get user cards
+                            $cards = get_user_cards();
+                            foreach ($cards as $card) : ?>
+                                <option value="<?php echo $card['id']; ?>"><?php echo $card['name']; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label"><?php echo t('payment_date'); ?></label>
                         <input type="date" class="form-control" name="first_date" required>
                     </div>
@@ -79,6 +91,18 @@
                         <select class="form-select" id="update_payment_currency" name="currency" required>
                             <?php foreach ($supported_currencies as $code => $name) : ?>
                                 <option value="<?php echo $code; ?>"><?php echo $name; ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Ödeme Yöntemi</label>
+                        <select class="form-select" id="update_payment_card" name="card" required>
+                            <option value=""><?php echo t('select_card'); ?></option>
+                            <?php
+                            // get user cards
+                            $cards = get_user_cards();
+                            foreach ($cards as $card) : ?>
+                                <option value="<?php echo $card['id']; ?>"><?php echo $card['name']; ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>

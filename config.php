@@ -111,6 +111,19 @@ $supported_currencies = [
     'GBP' => 'GBP - ' . t('currencies.gbp')
 ];
 
+// get user cards
+function get_user_cards()
+{
+    global $pdo;
+    $user_id = $_SESSION['user_id'];
+    $query = "SELECT * FROM card WHERE user_id = :user_id";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['user_id' => $user_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+
 // Site ayarları
 $site_name = getenv('SITE_NAME') ?: "Pecunia";
 $site_description = t('site_description');
