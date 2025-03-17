@@ -188,7 +188,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $response = ['status' => 'error', 'message' => t('transfer.error')];
                 }
             } catch (Exception $e) {
-                $pdo->rollBack();
                 $response = ['status' => 'error', 'message' => t('transfer.error') . ': ' . $e->getMessage()];
             }
             break;
