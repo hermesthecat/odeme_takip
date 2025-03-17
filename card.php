@@ -2,6 +2,50 @@
 require_once 'config.php';
 checkLogin();
 
+// Recursive olarak tüm alt ödemeleri güncelle
+function updateChildPayments($pdo, $payment_id, $user_id) {
+    // Önce bu ödemenin parent'ını bul
+    $find_parent_sql = "SELECT parent_id FROM payments WHERE id = ? AND user_id = ?";
+    $find_parent_stmt = $pdo->prepare($find_parent_sql);
+    $find_parent_stmt->execute([$payment_id, $user_id]);
+    $payment = $find_parent_stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Eğer parent varsa, önce parent'ı güncelle
+    if ($payment && $payment['parent_id']) {
+        $update_sql = "UPDATE payments SET card_id = NULL WHERE id = ? AND user_id = ?";
+        $update_stmt = $pdo->prepare($update_sql);
+        $update_stmt->execute([$payment['parent_id'], $user_id]);
+
+        // Parent'ın tüm child'larını güncelle
+        $find_siblings_sql = "SELECT id FROM payments WHERE parent_id = ? AND user_id = ?";
+        $find_siblings_stmt = $pdo->prepare($find_siblings_sql);
+        $find_siblings_stmt->execute([$payment['parent_id'], $user_id]);
+        
+        while ($sibling = $find_siblings_stmt->fetch(PDO::FETCH_ASSOC)) {
+            $update_sql = "UPDATE payments SET card_id = NULL WHERE id = ? AND user_id = ?";
+            $update_stmt = $pdo->prepare($update_sql);
+            $update_stmt->execute([$sibling['id'], $user_id]);
+        }
+    } else {
+        // Parent yoksa sadece seçilen ödemeyi ve child'larını güncelle
+        // Önce seçilen ödemeyi güncelle
+        $update_sql = "UPDATE payments SET card_id = NULL WHERE id = ? AND user_id = ?";
+        $update_stmt = $pdo->prepare($update_sql);
+        $update_stmt->execute([$payment_id, $user_id]);
+
+        // Sonra child'ları güncelle
+        $find_children_sql = "SELECT id FROM payments WHERE parent_id = ? AND user_id = ?";
+        $find_children_stmt = $pdo->prepare($find_children_sql);
+        $find_children_stmt->execute([$payment_id, $user_id]);
+
+        while ($child = $find_children_stmt->fetch(PDO::FETCH_ASSOC)) {
+            $update_sql = "UPDATE payments SET card_id = NULL WHERE id = ? AND user_id = ?";
+            $update_stmt = $pdo->prepare($update_sql);
+            $update_stmt->execute([$child['id'], $user_id]);
+        }
+    }
+}
+
 // Ödeme karttan çıkarma işlemi
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] == 'delete_payment' && isset($_POST['id'])) {
     $payment_id = (int)$_POST['id'];
@@ -13,13 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $check_stmt->execute([$payment_id, $_SESSION['user_id']]);
 
         if ($check_stmt->rowCount() > 0) {
-            // Ödemenin card_id'sini NULL yap
-            $update_sql = "UPDATE payments SET card_id = NULL WHERE id = ? AND user_id = ?";
-            $update_stmt = $pdo->prepare($update_sql);
-            $update_stmt->execute([$payment_id, $_SESSION['user_id']]);
+            // Recursive fonksiyonu çağır
+            updateChildPayments($pdo, $payment_id, $_SESSION['user_id']);
 
             // Başarılı mesajı
-            $_SESSION['success_message'] = "Ödeme, ödeme yönteminden başarıyla çıkarıldı.";
+            $_SESSION['success_message'] = "Ödeme ve ilişkili tüm ödemeler, ödeme yönteminden başarıyla çıkarıldı.";
         } else {
             $_SESSION['error_message'] = "Sadece kendi ödemelerinizi ödeme yönteminden çıkarabilirsiniz.";
         }
@@ -28,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 
     // Sayfayı yeniden yükle
-    echo "<script>window.location.reload();</script>";
+    header("Location: card.php");
     exit;
 }
 
@@ -142,6 +184,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                FROM payments p 
                                WHERE p.user_id = ? 
                                AND p.card_id = ?
+                               GROUP BY p.name
                                ORDER BY p.name ASC";
 
                         $stmt = $pdo->prepare($sql);
