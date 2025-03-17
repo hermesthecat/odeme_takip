@@ -2,6 +2,36 @@
 require_once 'config.php';
 checkLogin();
 
+// Ödeme karttan çıkarma işlemi
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] == 'delete_payment' && isset($_POST['id'])) {
+    $payment_id = (int)$_POST['id'];
+
+    try {
+        // Ödemenin kullanıcıya ait olup olmadığını kontrol et
+        $check_sql = "SELECT id FROM payments WHERE id = ? AND user_id = ?";
+        $check_stmt = $pdo->prepare($check_sql);
+        $check_stmt->execute([$payment_id, $_SESSION['user_id']]);
+
+        if ($check_stmt->rowCount() > 0) {
+            // Ödemenin card_id'sini NULL yap
+            $update_sql = "UPDATE payments SET card_id = NULL WHERE id = ? AND user_id = ?";
+            $update_stmt = $pdo->prepare($update_sql);
+            $update_stmt->execute([$payment_id, $_SESSION['user_id']]);
+
+            // Başarılı mesajı
+            $_SESSION['success_message'] = "Ödeme, ödeme yönteminden başarıyla çıkarıldı.";
+        } else {
+            $_SESSION['error_message'] = "Sadece kendi ödemelerinizi ödeme yönteminden çıkarabilirsiniz.";
+        }
+    } catch (PDOException $e) {
+        $_SESSION['error_message'] = "Ödeme, ödeme yönteminden çıkarılırken bir hata oluştu.";
+    }
+
+    // Sayfayı yeniden yükle
+    echo "<script>window.location.reload();</script>";
+    exit;
+}
+
 // get user default currency from session
 $user_default_currency = $_SESSION['base_currency'];
 ?>
@@ -22,34 +52,29 @@ $user_default_currency = $_SESSION['base_currency'];
 
 <body>
     <div class="container mt-4">
-        <!-- Başlık ve Kullanıcı Bilgisi -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="mb-0"><?php echo $site_name; ?></h1>
-            <div class="d-flex align-items-center">
-                <?php if ($_SESSION['is_admin'] == 1) : ?>
-                    <a href="admin.php" class="btn btn-outline-secondary me-2">
-                        <i class="bi bi-list-nested me-1"></i>Kullanıcılar
-                    </a>
-                <?php endif; ?>
-                <?php if ($_SESSION['is_admin'] == 1) : ?>
-                    <a href="log.php" class="btn btn-outline-secondary me-2">
-                        <i class="bi bi-list-nested me-1"></i>Log
-                    </a>
-                <?php endif; ?>
-                <a href="borsa.php" class="btn btn-outline-success me-2">
-                    <i class="bi bi-graph-up me-1"></i>Borsa
-                </a>
-                <a href="profile.php" class="btn btn-outline-success me-2">
-                    <i class="bi bi-telegram me-1"></i>Telegram
-                </a>
-                <button class="btn btn-outline-primary me-2" onclick="openUserSettings()">
-                    <i class="bi bi-gear me-1"></i><?php echo t('settings.title'); ?>
-                </button>
-                <button class="btn btn-outline-danger logout-btn">
-                    <?php echo htmlspecialchars($_SESSION['username']); ?> <i class="bi bi-box-arrow-right ms-1"></i>
-                </button>
+
+        <?php include 'navbar_app.php'; ?>
+
+        <!-- Mesajlar -->
+        <?php if (isset($_SESSION['success_message'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <?php
+                echo $_SESSION['success_message'];
+                unset($_SESSION['success_message']);
+                ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
-        </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['error_message'])): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <?php
+                echo $_SESSION['error_message'];
+                unset($_SESSION['error_message']);
+                ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
 
         <!-- Ödeme Yöntemleri Tablosu -->
         <div class="card mb-4">
@@ -118,7 +143,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                WHERE p.user_id = ? 
                                AND p.card_id = ?
                                ORDER BY p.name ASC";
-                        
+
                         $stmt = $pdo->prepare($sql);
                         $stmt->execute([$_SESSION['user_id'], $card['id']]);
                         $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -144,8 +169,8 @@ $user_default_currency = $_SESSION['base_currency'];
                                         <td class="text-center align-middle">' . htmlspecialchars($payment['name']) . '</td>
                                         <td class="text-end">
                                             <div class="btn-group">
-                                                <button class="btn btn-sm btn-danger" onclick="deletePayment(' . $payment['id'] . ')" title="Sil">
-                                                    <i class="bi bi-trash"></i>
+                                                <button class="btn btn-sm btn-warning" onclick="deletePayment(' . $payment['id'] . ')" title="Ödeme Yönteminden Çıkar">
+                                                    <i class="bi bi-x-circle"></i>
                                                 </button>
                                             </div>
                                         </td>
@@ -195,6 +220,46 @@ $user_default_currency = $_SESSION['base_currency'];
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+        <script>
+            function deletePayment(id) {
+                Swal.fire({
+                    title: 'Emin misiniz?',
+                    text: "Bu ödemeyi ödeme yönteminden çıkarmak istediğinize emin misiniz?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Evet, çıkar!',
+                    cancelButtonText: 'İptal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // POST formu oluştur
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = 'card.php';
+
+                        // Action input
+                        const actionInput = document.createElement('input');
+                        actionInput.type = 'hidden';
+                        actionInput.name = 'action';
+                        actionInput.value = 'delete_payment';
+                        form.appendChild(actionInput);
+
+                        // ID input
+                        const idInput = document.createElement('input');
+                        idInput.type = 'hidden';
+                        idInput.name = 'id';
+                        idInput.value = id;
+                        form.appendChild(idInput);
+
+                        // Formu sayfaya ekle ve gönder
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                });
+            }
+        </script>
 
         <!-- JavaScript için dil çevirileri -->
         <script>
