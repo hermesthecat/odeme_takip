@@ -15,9 +15,26 @@
                 <a href="borsa.php" class="btn btn-outline-success me-2">
                     <i class="bi bi-graph-up me-1"></i>Borsa
                 </a>
-                <a href="app.php" class="btn btn-outline-success me-2">
-                    <i class="bi bi-graph-up me-1"></i>Bütçe
-                </a>
+                <div class="btn-group me-2">
+                    <a href="app.php" class="btn btn-outline-success">
+                        <i class="bi bi-wallet2 me-1"></i>Bütçe
+                    </a>
+                    <button type="button" class="btn btn-outline-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="visually-hidden">Menüyü aç</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item" href="card.php">
+                                <i class="bi bi-cash-coin me-1"></i>Ödeme Yöntemleri
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="payment_power.php">
+                                <i class="bi bi-credit-card me-1"></i>Ödeme Gücü
+                            </a>
+                        </li>
+                    </ul>
+                </div>
                 <a href="profile.php" class="btn btn-outline-success me-2">
                     <i class="bi bi-telegram me-1"></i>Telegram
                 </a>
