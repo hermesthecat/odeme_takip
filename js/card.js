@@ -1,8 +1,8 @@
 // Ödeme yöntemi listesini güncelle
 function updateCardList(cards) {
-    
+
     const tbody = $('#cardList');
-    
+
     tbody.empty();
 
     if (!cards || cards.length === 0) {
