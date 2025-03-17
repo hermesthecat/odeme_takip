@@ -3,7 +3,7 @@ function loadData() {
     const month = $('#monthSelect').val();
     const year = $('#yearSelect').val();
 
-    // Yükleme göstergelerini göster
+    // Yükleme göstergelerini göster ve ilgili tabloları gizle
     $('#incomeLoadingSpinner').show();
     $('#savingsLoadingSpinner').show();
     $('#paymentsLoadingSpinner').show();
@@ -11,8 +11,11 @@ function loadData() {
     $('#summaryLoadingSpinner').show();
     $('#cardLoadingSpinner').show();
 
-    // Tabloları gizle
-    $('.table').hide();
+    $('#incomeList').closest('.table').hide();
+    $('#savingList').closest('.table').hide();
+    $('#paymentList').closest('.table').hide();
+    $('#recurringPaymentsList').closest('.table').hide();
+    $('#cardList').closest('.table').hide();
 
     // Ana veriyi yükle
     ajaxRequest({
@@ -75,26 +78,24 @@ function loadIncomeData() {
 function loadCardData() {
     // Loading spinner'ı göster
     $('#cardLoadingSpinner').show();
-    $('#cardList').closest('.table').hide();
 
     ajaxRequest({
         action: 'get_data',
         load_type: 'card'
     }).done(function (response) {
-        if (response.status === 'success') {
+        if (response.status === 'success' && response.data && response.data.cards) {
             updateCardList(response.data.cards);
+        } else {
+            console.error('Kart verisi bulunamadı:', response);
         }
     }).fail(function (error) {
-        console.error("Error loading card data:", error);
         Swal.fire({
             icon: 'error',
             title: translations.error || 'Hata',
             text: translations.card.load_error || 'Ödeme yöntemleri yüklenirken bir hata oluştu'
         });
     }).always(function () {
-        // Her durumda loading spinner'ı gizle ve tabloyu göster
         $('#cardLoadingSpinner').hide();
-        $('#cardList').closest('.table').show();
     });
 }
 

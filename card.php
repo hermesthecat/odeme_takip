@@ -51,7 +51,7 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
         </div>
 
-        <!-- Gelirler Tablosu -->
+        <!-- Ödeme Yöntemleri Tablosu -->
         <div class="card mb-4">
             <div class="card-header bg-success bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
@@ -63,17 +63,17 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <div id="cardLoadingSpinner" class="text-center py-4">
+                    <div id="cardLoadingSpinner" class="text-center py-4" style="display: none;">
                         <div class="spinner-border text-success" role="status">
                             <span class="visually-hidden">Yükleniyor...</span>
                         </div>
                         <div class="mt-2"><?php echo t('loading'); ?></div>
                     </div>
-                    <table class="table table-striped">
+                    <table class="table table-striped" style="display: table;">
                         <thead>
                             <tr>
-                                <th class="text-center"><?php echo t('card_name'); ?></th>
-                                <th></th>
+                                <th class="text-center" style="width: 70%">Ödeme Yöntemi</th>
+                                <th class="text-end" style="width: 30%">İşlemler</th>
                             </tr>
                         </thead>
                         <tbody id="cardList"></tbody>
@@ -177,7 +177,12 @@ $user_default_currency = $_SESSION['base_currency'];
                     name: '<?php echo t('card.name'); ?>',
                     add_error: '<?php echo t('card.add_error'); ?>',
                     delete_error: '<?php echo t('card.delete_error'); ?>',
-                    load_error: '<?php echo t('card.load_error'); ?>'
+                    load_error: '<?php echo t('card.load_error'); ?>',
+                    no_data: '<?php echo t('card.no_data'); ?>',
+                    buttons: {
+                        edit: '<?php echo t('card.buttons.edit'); ?>',
+                        delete: '<?php echo t('card.buttons.delete'); ?>'
+                    }
                 }
             };
         </script>

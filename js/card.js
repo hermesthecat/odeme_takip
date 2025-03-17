@@ -1,29 +1,34 @@
 // Ödeme yöntemi listesini güncelle
 function updateCardList(cards) {
+    console.log('updateCardList çağrıldı, gelen veriler:', cards);
+    
     const tbody = $('#cardList');
+    console.log('tbody elementi bulundu:', tbody.length > 0);
+    
     tbody.empty();
+    console.log('tbody temizlendi');
 
-    if (cards.length === 0) {
+    if (!cards || cards.length === 0) {
         tbody.append(`
             <tr>
                 <td colspan="2" class="text-center">
-                    <p class="text-muted">${translations.card.no_data}</p>
+                    <p class="text-muted mb-0">${translations.card.no_data || 'Henüz ödeme yöntemi eklenmemiş'}</p>
                 </td>
             </tr>
         `);
         return;
     }
 
-    cards.forEach(function (card) {
+    cards.forEach(function (card, index) {
         tbody.append(`
             <tr>
-                <td class="text-center">${card.name}</td>
+                <td class="text-center align-middle">${card.name}</td>
                 <td class="text-end">
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-primary" onclick="openUpdateCardModal(${card.id})" title="${translations.card.buttons.edit}">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateCardModal(${card.id})" title="${translations.card.buttons.edit || 'Düzenle'}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCard(${card.id})" title="${translations.card.buttons.delete}">
+                        <button class="btn btn-sm btn-danger" onclick="deleteCard(${card.id})" title="${translations.card.buttons.delete || 'Sil'}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -31,6 +36,14 @@ function updateCardList(cards) {
             </tr>
         `);
     });
+
+    // Tablo ve container'ı göster
+    const table = tbody.closest('.table');
+    const container = tbody.closest('.table-responsive');
+
+    $('#cardLoadingSpinner').hide();
+    container.show();
+    table.show();
 }
 
 // Ödeme yöntemi sil
