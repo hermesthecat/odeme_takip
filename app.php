@@ -226,44 +226,6 @@ $user_default_currency = $_SESSION['base_currency'];
             </div>
         </div>
 
-        <!-- Ödeme Gücü Tablosu -->
-        <div class="card mb-4">
-            <div class="card-header bg-info bg-opacity-25">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0"><?php echo t('app.payment_power'); ?></h2>
-                    <small class="text-muted"></small>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <div id="recurringPaymentsLoadingSpinner" class="text-center py-4">
-                        <div class="spinner-border text-info" role="status">
-                            <span class="visually-hidden">Yükleniyor...</span>
-                        </div>
-                        <div class="mt-2"><?php echo t('loading'); ?></div>
-                    </div>
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th><?php echo t('payment_name'); ?></th>
-                                <th class="text-center"><?php echo t('payment_amount'); ?></th>
-                                <th class="text-center"><?php echo t('payment.currency'); ?></th>
-                                <th class="text-center"><?php echo t('app.installment_info'); ?></th>
-                                <th class="text-center"><?php echo t('app.total'); ?></th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody id="recurringPaymentsList"></tbody>
-                        <tfoot>
-                            <tr class="table-info">
-                                <td class="text-end fw-bold"><?php echo t('app.total_payment'); ?>:</td>
-                                <td id="totalYearlyPayment" class="fw-bold"></td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Sorumluluk Reddi -->
