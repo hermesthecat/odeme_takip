@@ -29,18 +29,19 @@ SET
 --
 -- Database: `odeme_takip`
 --
+
 -- --------------------------------------------------------
 --
 -- Table structure for table `exchange_rates`
 --
 CREATE TABLE `exchange_rates` (
     `id` int(11) NOT NULL,
-    `from_currency` varchar(3) NOT NULL,
-    `to_currency` varchar(3) NOT NULL,
-    `rate` decimal(10, 4) NOT NULL,
-    `date` date NOT NULL,
-    `created_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+    `from_currency` varchar(3) NOT NULL COMMENT 'Kaynak para birimi kodu',
+    `to_currency` varchar(3) NOT NULL COMMENT 'Hedef para birimi kodu',
+    `rate` decimal(10, 4) NOT NULL COMMENT 'Dönüşüm oranı',
+    `date` date NOT NULL COMMENT 'Kur tarihi',
+    `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Döviz kurları tablosu';
 
 --
 -- Dumping data for table `exchange_rates`
@@ -70,17 +71,17 @@ VALUES
 --
 CREATE TABLE `income` (
     `id` int(11) NOT NULL,
-    `user_id` int(11) NOT NULL,
-    `parent_id` int(11) DEFAULT NULL,
-    `name` varchar(100) NOT NULL,
-    `amount` decimal(10, 2) NOT NULL,
-    `currency` varchar(3) DEFAULT 'TRY',
-    `first_date` date NOT NULL,
-    `frequency` varchar(20) NOT NULL,
-    `status` enum('pending', 'received') DEFAULT 'pending',
-    `exchange_rate` decimal(10, 4) DEFAULT NULL,
-    `created_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+    `user_id` int(11) NOT NULL COMMENT 'Kullanıcı ID referansı',
+    `parent_id` int(11) DEFAULT NULL COMMENT 'Üst gelir kaydı ID referansı',
+    `name` varchar(100) NOT NULL COMMENT 'Gelir adı',
+    `amount` decimal(10, 2) NOT NULL COMMENT 'Gelir miktarı',
+    `currency` varchar(3) DEFAULT 'TRY' COMMENT 'Para birimi',
+    `first_date` date NOT NULL COMMENT 'İlk gelir tarihi',
+    `frequency` varchar(20) NOT NULL COMMENT 'Gelir sıklığı (aylık, yıllık, vb.)',
+    `status` enum('pending', 'received') DEFAULT 'pending' COMMENT 'Gelir durumu',
+    `exchange_rate` decimal(10, 4) DEFAULT NULL COMMENT 'Döviz kuru (varsa)',
+    `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Gelir kayıtları tablosu';
 
 -- --------------------------------------------------------
 --
@@ -88,12 +89,12 @@ CREATE TABLE `income` (
 --
 CREATE TABLE `logs` (
     `id` int(11) NOT NULL,
-    `log_method` text NOT NULL,
-    `log_text` text NOT NULL,
-    `type` text DEFAULT NULL,
-    `user_id` int(11) DEFAULT NULL,
-    `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+    `log_method` text NOT NULL COMMENT 'Log metodu',
+    `log_text` text NOT NULL COMMENT 'Log metni',
+    `type` text DEFAULT NULL COMMENT 'Log tipi',
+    `user_id` int(11) DEFAULT NULL COMMENT 'Kullanıcı ID referansı',
+    `created_at` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Sistem log kayıtları';
 
 -- --------------------------------------------------------
 --
@@ -101,18 +102,18 @@ CREATE TABLE `logs` (
 --
 CREATE TABLE `payments` (
     `id` int(11) NOT NULL,
-    `user_id` int(11) NOT NULL,
-    `parent_id` int(11) DEFAULT NULL,
-    `name` varchar(100) NOT NULL,
-    `amount` decimal(10, 2) NOT NULL,
-    `currency` varchar(3) DEFAULT 'TRY',
-    `first_date` date NOT NULL,
-    `frequency` varchar(20) NOT NULL,
-    `status` enum('pending', 'paid') DEFAULT 'pending',
-    `exchange_rate` decimal(10, 4) DEFAULT NULL,
-    `payment_power` int(11) DEFAULT 0,
-    `created_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+    `user_id` int(11) NOT NULL COMMENT 'Kullanıcı ID referansı',
+    `parent_id` int(11) DEFAULT NULL COMMENT 'Üst ödeme kaydı ID referansı',
+    `name` varchar(100) NOT NULL COMMENT 'Ödeme adı',
+    `amount` decimal(10, 2) NOT NULL COMMENT 'Ödeme miktarı',
+    `currency` varchar(3) DEFAULT 'TRY' COMMENT 'Para birimi',
+    `first_date` date NOT NULL COMMENT 'İlk ödeme tarihi',
+    `frequency` varchar(20) NOT NULL COMMENT 'Ödeme sıklığı (aylık, yıllık, vb.)',
+    `status` enum('pending', 'paid') DEFAULT 'pending' COMMENT 'Ödeme durumu',
+    `exchange_rate` decimal(10, 4) DEFAULT NULL COMMENT 'Döviz kuru (varsa)',
+    `payment_power` int(11) DEFAULT 0 COMMENT 'Ödeme önceliği/gücü',
+    `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Ödeme kayıtları tablosu';
 
 -- --------------------------------------------------------
 --
@@ -120,25 +121,25 @@ CREATE TABLE `payments` (
 --
 CREATE TABLE `portfolio` (
     `id` int(11) NOT NULL,
-    `sembol` varchar(10) NOT NULL,
-    `adet` int(11) NOT NULL,
-    `alis_fiyati` decimal(10, 2) NOT NULL,
-    `alis_tarihi` timestamp NULL DEFAULT current_timestamp(),
-    `anlik_fiyat` decimal(10, 2) DEFAULT 0.00,
-    `son_guncelleme` timestamp NULL DEFAULT current_timestamp(),
-    `hisse_adi` varchar(255) DEFAULT '',
-    `satis_fiyati` decimal(10, 2) DEFAULT NULL,
-    `satis_tarihi` timestamp NULL DEFAULT NULL,
-    `satis_adet` int(11) DEFAULT NULL,
+    `sembol` varchar(10) NOT NULL COMMENT 'Hisse senedi sembolü',
+    `adet` int(11) NOT NULL COMMENT 'Hisse adedi',
+    `alis_fiyati` decimal(10, 2) NOT NULL COMMENT 'Alış fiyatı',
+    `alis_tarihi` timestamp NULL DEFAULT current_timestamp() COMMENT 'Alış tarihi',
+    `anlik_fiyat` decimal(10, 2) DEFAULT 0.00 COMMENT 'Anlık fiyat',
+    `son_guncelleme` timestamp NULL DEFAULT current_timestamp() COMMENT 'Son güncelleme tarihi',
+    `hisse_adi` varchar(255) DEFAULT '' COMMENT 'Hisse senedi adı',
+    `satis_fiyati` decimal(10, 2) DEFAULT NULL COMMENT 'Satış fiyatı',
+    `satis_tarihi` timestamp NULL DEFAULT NULL COMMENT 'Satış tarihi',
+    `satis_adet` int(11) DEFAULT NULL COMMENT 'Satış adedi',
     `durum` enum(
         'aktif',
         'satildi',
         'kismi_satildi',
         'satis_kaydi'
-    ) DEFAULT 'aktif',
-    `user_id` int(11) DEFAULT NULL,
-    `referans_alis_id` int(11) DEFAULT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+    ) DEFAULT 'aktif' COMMENT 'Hisse durumu',
+    `user_id` int(11) DEFAULT NULL COMMENT 'Kullanıcı ID referansı',
+    `referans_alis_id` int(11) DEFAULT NULL COMMENT 'Referans alış kaydı ID'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Portföy kayıtları tablosu';
 
 -- --------------------------------------------------------
 --
@@ -146,18 +147,18 @@ CREATE TABLE `portfolio` (
 --
 CREATE TABLE `savings` (
     `id` int(11) NOT NULL,
-    `user_id` int(11) NOT NULL,
-    `parent_id` int(11) DEFAULT NULL,
-    `update_type` enum('initial', 'update') DEFAULT 'initial',
-    `name` varchar(100) NOT NULL,
-    `target_amount` decimal(10, 2) NOT NULL,
-    `current_amount` decimal(10, 2) DEFAULT 0.00,
-    `currency` varchar(3) DEFAULT 'TRY',
-    `exchange_rate` decimal(10, 4) DEFAULT NULL,
-    `start_date` date NOT NULL,
-    `target_date` date NOT NULL,
-    `created_at` timestamp NULL DEFAULT current_timestamp()
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+    `user_id` int(11) NOT NULL COMMENT 'Kullanıcı ID referansı',
+    `parent_id` int(11) DEFAULT NULL COMMENT 'Üst birikim kaydı ID referansı',
+    `update_type` enum('initial', 'update') DEFAULT 'initial' COMMENT 'Güncelleme tipi',
+    `name` varchar(100) NOT NULL COMMENT 'Birikim adı',
+    `target_amount` decimal(10, 2) NOT NULL COMMENT 'Hedef miktar',
+    `current_amount` decimal(10, 2) DEFAULT 0.00 COMMENT 'Mevcut miktar',
+    `currency` varchar(3) DEFAULT 'TRY' COMMENT 'Para birimi',
+    `exchange_rate` decimal(10, 4) DEFAULT NULL COMMENT 'Döviz kuru (varsa)',
+    `start_date` date NOT NULL COMMENT 'Başlangıç tarihi',
+    `target_date` date NOT NULL COMMENT 'Hedef tarihi',
+    `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Birikim kayıtları tablosu';
 
 -- --------------------------------------------------------
 --
@@ -165,16 +166,16 @@ CREATE TABLE `savings` (
 --
 CREATE TABLE `users` (
     `id` int(11) NOT NULL,
-    `username` varchar(50) NOT NULL,
-    `password` varchar(255) NOT NULL,
-    `base_currency` varchar(3) NOT NULL DEFAULT 'TRY',
-    `theme_preference` varchar(10) NOT NULL DEFAULT 'light',
-    `created_at` timestamp NULL DEFAULT current_timestamp(),
-    `remember_token` varchar(64) DEFAULT NULL,
-    `is_admin` int(11) DEFAULT NULL,
-    `is_active` int(11) NOT NULL DEFAULT 1,
-    `last_login` timestamp NULL DEFAULT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+    `username` varchar(50) NOT NULL COMMENT 'Kullanıcı adı',
+    `password` varchar(255) NOT NULL COMMENT 'Şifre (hash)',
+    `base_currency` varchar(3) NOT NULL DEFAULT 'TRY' COMMENT 'Temel para birimi',
+    `theme_preference` varchar(10) NOT NULL DEFAULT 'light' COMMENT 'Tema tercihi',
+    `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi',
+    `remember_token` varchar(64) DEFAULT NULL COMMENT 'Hatırlama tokeni',
+    `is_admin` tinyint(1) DEFAULT 0 COMMENT 'Yönetici mi? (1=evet, 0=hayır)',
+    `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'Aktif mi? (1=evet, 0=hayır)',
+    `last_login` timestamp NULL DEFAULT NULL COMMENT 'Son giriş tarihi'
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Kullanıcı kayıtları tablosu';
 
 --
 -- Dumping data for table `users`
@@ -213,33 +214,33 @@ DROP TABLE IF EXISTS `telegram_users`;
 
 CREATE TABLE `telegram_users` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `user_id` int(11) NOT NULL,
-    `telegram_id` varchar(50) NOT NULL,
-    `is_verified` tinyint(1) DEFAULT 0,
-    `verification_code` varchar(6) DEFAULT NULL,
-    `created_at` timestamp NULL DEFAULT current_timestamp(),
+    `user_id` int(11) NOT NULL COMMENT 'Kullanıcı ID referansı',
+    `telegram_id` varchar(50) NOT NULL COMMENT 'Telegram kullanıcı ID',
+    `is_verified` tinyint(1) DEFAULT 0 COMMENT 'Doğrulanmış mı? (1=evet, 0=hayır)',
+    `verification_code` varchar(6) DEFAULT NULL COMMENT 'Doğrulama kodu',
+    `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi',
     PRIMARY KEY (`id`),
     UNIQUE KEY `telegram_id` (`telegram_id`),
     KEY `user_id` (`user_id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Telegram kullanıcı bağlantıları';
 
 --
 -- Table structure for table `ai_analysis_temp`
 --
 CREATE TABLE `ai_analysis_temp` (
     `id` int(11) NOT NULL AUTO_INCREMENT,
-    `user_id` int(11) NOT NULL,
-    `file_name` varchar(255) NOT NULL,
-    `file_type` enum('pdf', 'excel') NOT NULL,
-    `amount` decimal(10, 2) NOT NULL,
-    `currency` varchar(3) DEFAULT 'TRY',
-    `category` enum('income', 'expense') NOT NULL,
-    `suggested_name` varchar(100) NOT NULL,
-    `is_approved` tinyint(1) DEFAULT 0,
-    `created_at` timestamp NULL DEFAULT current_timestamp(),
+    `user_id` int(11) NOT NULL COMMENT 'Kullanıcı ID referansı',
+    `file_name` varchar(255) NOT NULL COMMENT 'Dosya adı',
+    `file_type` enum('pdf', 'excel') NOT NULL COMMENT 'Dosya tipi',
+    `amount` decimal(10, 2) NOT NULL COMMENT 'Miktar',
+    `currency` varchar(3) DEFAULT 'TRY' COMMENT 'Para birimi',
+    `category` enum('income', 'expense') NOT NULL COMMENT 'Kategori (gelir/gider)',
+    `suggested_name` varchar(100) NOT NULL COMMENT 'Önerilen isim',
+    `is_approved` tinyint(1) DEFAULT 0 COMMENT 'Onaylandı mı? (1=evet, 0=hayır)',
+    `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi',
     PRIMARY KEY (`id`),
     KEY `user_id` (`user_id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci;
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'AI analiz geçici tablosu';
 
 --
 -- Indexes for dumped tables
@@ -248,191 +249,3 @@ CREATE TABLE `ai_analysis_temp` (
 -- Indexes for table `exchange_rates`
 --
 ALTER TABLE
-    `exchange_rates`
-ADD
-    PRIMARY KEY (`id`),
-ADD
-    KEY `idx_date` (`date`),
-ADD
-    KEY `idx_currencies` (`from_currency`, `to_currency`);
-
---
--- Indexes for table `income`
---
-ALTER TABLE
-    `income`
-ADD
-    PRIMARY KEY (`id`),
-ADD
-    KEY `user_id` (`user_id`),
-ADD
-    KEY `parent_id` (`parent_id`);
-
---
--- Indexes for table `logs`
---
-ALTER TABLE
-    `logs`
-ADD
-    PRIMARY KEY (`id`);
-
---
--- Indexes for table `payments`
---
-ALTER TABLE
-    `payments`
-ADD
-    PRIMARY KEY (`id`),
-ADD
-    KEY `user_id` (`user_id`),
-ADD
-    KEY `parent_id` (`parent_id`);
-
---
--- Indexes for table `portfolio`
---
-ALTER TABLE
-    `portfolio`
-ADD
-    PRIMARY KEY (`id`);
-
---
--- Indexes for table `savings`
---
-ALTER TABLE
-    `savings`
-ADD
-    PRIMARY KEY (`id`),
-ADD
-    KEY `user_id` (`user_id`),
-ADD
-    KEY `parent_id` (`parent_id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE
-    `users`
-ADD
-    PRIMARY KEY (`id`),
-ADD
-    UNIQUE KEY `username` (`username`);
-
---
--- AUTO_INCREMENT for dumped tables
---
---
--- AUTO_INCREMENT for table `exchange_rates`
---
-ALTER TABLE
-    `exchange_rates`
-MODIFY
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 3;
-
---
--- AUTO_INCREMENT for table `income`
---
-ALTER TABLE
-    `income`
-MODIFY
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 49;
-
---
--- AUTO_INCREMENT for table `logs`
---
-ALTER TABLE
-    `logs`
-MODIFY
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 2109;
-
---
--- AUTO_INCREMENT for table `payments`
---
-ALTER TABLE
-    `payments`
-MODIFY
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 34;
-
---
--- AUTO_INCREMENT for table `portfolio`
---
-ALTER TABLE
-    `portfolio`
-MODIFY
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 61;
-
---
--- AUTO_INCREMENT for table `savings`
---
-ALTER TABLE
-    `savings`
-MODIFY
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 13;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE
-    `users`
-MODIFY
-    `id` int(11) NOT NULL AUTO_INCREMENT,
-    AUTO_INCREMENT = 2;
-
---
--- Constraints for dumped tables
---
---
--- Constraints for table `income`
---
-ALTER TABLE
-    `income`
-ADD
-    CONSTRAINT `income_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-ADD
-    CONSTRAINT `income_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `income` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `payments`
---
-ALTER TABLE
-    `payments`
-ADD
-    CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-ADD
-    CONSTRAINT `payments_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `payments` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `savings`
---
-ALTER TABLE
-    `savings`
-ADD
-    CONSTRAINT `savings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-ADD
-    CONSTRAINT `savings_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `savings` (`id`) ON DELETE CASCADE;
-
-COMMIT;
-
---
--- Constraints for table `telegram_users`
---
-ALTER TABLE
-    `telegram_users`
-ADD
-    CONSTRAINT `telegram_users_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */
-;
-
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */
-;
-
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */
-;
