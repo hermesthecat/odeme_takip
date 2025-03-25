@@ -27,12 +27,17 @@ if (file_exists(__DIR__ . '/.env')) {
     exit;
 }
 
+// Create dynamic domain URL with HTTP/HTTPS check
+// Dinamik domain URL'si oluştur (HTTP/HTTPS kontrolü ile)
+$domain = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+
 // Veritabanı bağlantı bilgileri
 define('DB_SERVER', getenv('DB_SERVER') ?: 'localhost');
 define('DB_USERNAME', getenv('DB_USERNAME') ?: 'root');
 define('DB_PASSWORD', getenv('DB_PASSWORD') ?: 'root');
 define('DB_NAME', getenv('DB_NAME') ?: 'odeme_takip');
-define('SITE_URL', getenv('SITE_URL') ?: 'http://butce.local');
+define('SITE_URL', $domain);
+define('WEBHOOK_URL', $domain . '/telegram_webhook.php');
 
 // API Anahtarları
 define('GEMINI_API_KEY', getenv('GEMINI_API_KEY'));
