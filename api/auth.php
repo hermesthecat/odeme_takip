@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-            /**
+        /**
              * Kullanıcı girişi
              * User login
              *
@@ -205,7 +205,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-            /**
+        /**
              * Kullanıcı çıkışı
              * User logout
              *

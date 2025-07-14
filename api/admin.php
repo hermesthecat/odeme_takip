@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-            /**
+        /**
              * Kullanıcı bilgilerini güncelleme
              * Update user information
              *
@@ -262,7 +262,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
-            /**
+        /**
              * Kullanıcı silme
              * Delete user
              *
