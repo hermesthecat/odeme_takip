@@ -113,3 +113,67 @@ function formatNumber($number, $decimals = 2)
     }
     return number_format((float)$number, $decimals, '.', '');
 }
+
+// Exchange rate cache mekanizması - performans optimizasyonu
+function getCachedExchangeRate($from_currency, $to_currency)
+{
+    global $pdo;
+    
+    // Aynı para birimi ise 1 döndür
+    if ($from_currency === $to_currency) {
+        return 1.0;
+    }
+    
+    // Cache'den bugünkü kuru kontrol et (2 saat cache)
+    $stmt = $pdo->prepare("SELECT rate FROM exchange_rates 
+                          WHERE from_currency = ? AND to_currency = ? 
+                          AND created_at >= DATE_SUB(NOW(), INTERVAL 2 HOUR)
+                          ORDER BY created_at DESC LIMIT 1");
+    $stmt->execute([$from_currency, $to_currency]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($result) {
+        return floatval($result['rate']);
+    }
+    
+    // Cache'de yoksa external API'den al ve cache'le
+    $rate = getExchangeRate($from_currency, $to_currency);
+    if ($rate) {
+        // Cache'e kaydet
+        try {
+            $stmt = $pdo->prepare("INSERT INTO exchange_rates (from_currency, to_currency, rate, date) 
+                                  VALUES (?, ?, ?, CURDATE())
+                                  ON DUPLICATE KEY UPDATE 
+                                  rate = VALUES(rate), created_at = CURRENT_TIMESTAMP");
+            $stmt->execute([$from_currency, $to_currency, $rate]);
+        } catch (Exception $e) {
+            // Cache hatası log'la ama rate'i döndür
+            saveLog("Exchange rate cache hatası: " . $e->getMessage(), 'warning', 'getCachedExchangeRate', 0);
+        }
+    }
+    
+    return $rate;
+}
+
+// Session tabanlı summary cache - daha da hızlı işlem için
+function getCachedSummary($user_id, $month, $year)
+{
+    $cache_key = "summary_{$user_id}_{$month}_{$year}";
+    
+    // Session cache kontrol et (5 dakika cache)
+    if (isset($_SESSION[$cache_key]) && 
+        isset($_SESSION[$cache_key . '_time']) && 
+        (time() - $_SESSION[$cache_key . '_time']) < 300) {
+        return $_SESSION[$cache_key];
+    }
+    
+    return null;
+}
+
+// Summary'yi cache'le
+function cacheSummary($user_id, $month, $year, $summary_data)
+{
+    $cache_key = "summary_{$user_id}_{$month}_{$year}";
+    $_SESSION[$cache_key] = $summary_data;
+    $_SESSION[$cache_key . '_time'] = time();
+}

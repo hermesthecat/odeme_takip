@@ -269,7 +269,9 @@ CREATE TABLE `card` (
 --
 ALTER TABLE `exchange_rates`
     ADD PRIMARY KEY (`id`),
-    ADD KEY `idx_currencies_date` (`from_currency`, `to_currency`, `date`);
+    ADD UNIQUE KEY `unique_currency_date` (`from_currency`, `to_currency`, `date`),
+    ADD KEY `idx_currencies_date` (`from_currency`, `to_currency`, `date`),
+    ADD KEY `idx_created_at` (`created_at`);
 
 --
 -- Indexes for table `income`
