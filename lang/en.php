@@ -613,4 +613,17 @@ return [
         'update_success' => 'User information updated successfully',
         'update_error' => 'User information could not be updated'
     ],
+
+    // Rate Limiting
+    'rate_limit' => [
+        'general_error' => 'Too many requests sent. Please wait a moment and try again.',
+        'ai_analysis_error' => 'Too many AI analysis requests sent. Try again in 5 minutes.',
+        'exchange_rate_error' => 'Too many exchange rate requests sent. Try again in 10 minutes.',
+        'file_upload_error' => 'Too many file upload requests sent. Try again in 5 minutes.',
+        'api_limit_exceeded' => 'API limit exceeded. Please try again later.',
+        'too_many_requests' => 'Too many requests. Please slow down.',
+        'retry_after' => 'Try again after %s seconds.',
+        'daily_limit_reached' => 'Daily limit exceeded. Try again tomorrow.',
+        'hourly_limit_reached' => 'Hourly limit exceeded. Try again in an hour.'
+    ]
 ];

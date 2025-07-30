@@ -9,6 +9,7 @@
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../classes/log.php';
+require_once __DIR__ . '/rate_limiter.php';
 checkLogin();
 
 /**
@@ -50,6 +51,12 @@ function getExchangeRate($from_currency, $to_currency)
     }
 
     try {
+        // Exchange rate API rate limiting kontrolü
+        if (!checkExchangeRateLimit($_SESSION['user_id'])) {
+            saveLog("Exchange rate API rate limit aşıldı: " . $from_currency . " to " . $to_currency, 'warning', 'getExchangeRate', $_SESSION['user_id']);
+            throw new Exception(t('rate_limit.exchange_rate_error'));
+        }
+
         // API'den güncel kur bilgisini al
         // Get current exchange rate from API
         $api_url = "https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/{$from_currency}.json";

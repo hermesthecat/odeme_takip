@@ -7,6 +7,7 @@
  */
 
 require_once 'config.php';
+require_once 'api/rate_limiter.php';
 require_once 'header.php';
 require_once 'navbar_app.php';
 
@@ -20,6 +21,12 @@ $user_id = $_SESSION['user_id'];
 
 // Dosya yükleme işlemi
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
+    // Rate limiting kontrolü - file upload
+    if (!checkFileUploadLimit($user_id)) {
+        $_SESSION['error'] = "Çok fazla dosya yükleme denemesi. 5 dakika sonra tekrar deneyin.";
+        echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
+        exit;
+    }
     $file = $_FILES['document'];
     $fileName = $file['name'];
     $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
@@ -123,6 +130,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
                 }
                 $fileContent .= "\n";
             }
+        }
+
+        // Gemini API rate limiting kontrolü
+        if (!checkGeminiApiLimit($user_id)) {
+            $_SESSION['error'] = "AI analizi için çok fazla istek gönderildi. 5 dakika sonra tekrar deneyin.";
+            echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
+            exit;
         }
 
         // Gemini AI'ya istek gönder

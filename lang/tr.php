@@ -610,5 +610,18 @@ return [
         'not_found' => 'Kullanıcı bilgileri bulunamadı',
         'update_success' => 'Kullanıcı bilgileri başarıyla güncellendi',
         'update_error' => 'Kullanıcı bilgileri güncellenemedi'
+    ],
+
+    // Rate Limiting
+    'rate_limit' => [
+        'general_error' => 'Çok fazla istek gönderildi. Lütfen bir süre bekleyip tekrar deneyin.',
+        'ai_analysis_error' => 'AI analizi için çok fazla istek gönderildi. 5 dakika sonra tekrar deneyin.',
+        'exchange_rate_error' => 'Kur bilgisi için çok fazla istek gönderildi. 10 dakika sonra tekrar deneyin.',
+        'file_upload_error' => 'Dosya yükleme için çok fazla istek gönderildi. 5 dakika sonra tekrar deneyin.',
+        'api_limit_exceeded' => 'API limiti aşıldı. Lütfen daha sonra tekrar deneyin.',
+        'too_many_requests' => 'Çok fazla istek. Lütfen yavaşlayın.',
+        'retry_after' => '%s saniye sonra tekrar deneyin.',
+        'daily_limit_reached' => 'Günlük limit aşıldı. Yarın tekrar deneyin.',
+        'hourly_limit_reached' => 'Saatlik limit aşıldı. Bir saat sonra tekrar deneyin.'
     ]
 ];
