@@ -124,10 +124,10 @@ function getCachedExchangeRate($from_currency, $to_currency)
         return 1.0;
     }
     
-    // Cache'den bugünkü kuru kontrol et (2 saat cache)
+    // Cache'den bugünkü kuru kontrol et (30 dakika cache - daha güncel kurlar için)
     $stmt = $pdo->prepare("SELECT rate FROM exchange_rates 
                           WHERE from_currency = ? AND to_currency = ? 
-                          AND created_at >= DATE_SUB(NOW(), INTERVAL 2 HOUR)
+                          AND created_at >= DATE_SUB(NOW(), INTERVAL 30 MINUTE)
                           ORDER BY created_at DESC LIMIT 1");
     $stmt->execute([$from_currency, $to_currency]);
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -219,4 +219,44 @@ function invalidateSummaryCacheForDate($user_id, $date)
     if (function_exists('saveLog')) {
         saveLog("Summary cache cleared for user {$user_id}, date: {$date}", 'info', 'cache_invalidation', $user_id);
     }
+}
+
+// Exchange rate cache invalidation - belirli para birimi çiftinin cache'ini temizle
+function invalidateExchangeRateCache($from_currency, $to_currency)
+{
+    global $pdo;
+    
+    try {
+        // Belirli para birimi çiftinin cache'ini sil
+        $stmt = $pdo->prepare("DELETE FROM exchange_rates 
+                              WHERE (from_currency = ? AND to_currency = ?) 
+                              OR (from_currency = ? AND to_currency = ?)");
+        $stmt->execute([$from_currency, $to_currency, $to_currency, $from_currency]);
+        
+        if (function_exists('saveLog')) {
+            saveLog("Exchange rate cache cleared for {$from_currency}/{$to_currency}", 'info', 'exchange_rate_invalidation', 0);
+        }
+    } catch (Exception $e) {
+        if (function_exists('saveLog')) {
+            saveLog("Exchange rate cache invalidation error: " . $e->getMessage(), 'error', 'exchange_rate_invalidation', 0);
+        }
+    }
+}
+
+// Güncel kur verisi zorla çek - kullanıcı tarafından tetiklenen manuel güncelleme
+function forceUpdateExchangeRate($from_currency, $to_currency)
+{
+    global $pdo;
+    
+    // Önce cache'i temizle
+    invalidateExchangeRateCache($from_currency, $to_currency);
+    
+    // Yeni kuru çek
+    $rate = getExchangeRate($from_currency, $to_currency);
+    
+    if ($rate && function_exists('saveLog')) {
+        saveLog("Exchange rate force updated: {$from_currency} to {$to_currency} = {$rate}", 'info', 'force_exchange_update', 0);
+    }
+    
+    return $rate;
 }
