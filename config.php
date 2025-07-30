@@ -23,7 +23,20 @@ if (file_exists(__DIR__ . '/.env')) {
         $_ENV[$key] = $value;
     }
 } else {
-    echo "HATA: .env dosyası bulunamadı.";
+    // JSON response için check et
+    if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode(['status' => 'error', 'message' => 'Configuration file not found']);
+    } else {
+        // Web page request için redirect
+        http_response_code(500);
+        echo "<!DOCTYPE html><html><head><title>Configuration Error</title></head><body>";
+        echo "<h1>Configuration Error</h1>";
+        echo "<p>Application configuration file (.env) not found.</p>";
+        echo "<p>Please contact the system administrator.</p>";
+        echo "</body></html>";
+    }
     exit;
 }
 
@@ -45,12 +58,37 @@ define('GEMINI_API_KEY', getenv('GEMINI_API_KEY'));
 // Composer autoload
 require_once __DIR__ . '/vendor/autoload.php';
 
+// Global error handling
+require_once __DIR__ . '/api/error_handler.php';
+initializeErrorHandlers();
+
 try {
     $pdo = new PDO("mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME, DB_USERNAME, DB_PASSWORD);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->exec("SET NAMES 'utf8'");
 } catch (PDOException $e) {
-    die("HATA: Veritabanına bağlanılamadı. " . $e->getMessage());
+    // Log hatayı (production'da detay göstermemek için)
+    error_log("Database connection failed: " . $e->getMessage());
+    
+    // JSON response için check et
+    if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+        header('Content-Type: application/json');
+        http_response_code(500);
+        echo json_encode([
+            'status' => 'error', 
+            'message' => 'Database connection failed',
+            'error_code' => 'DB_CONNECTION_ERROR'
+        ]);
+    } else {
+        // Web page request için user-friendly error
+        http_response_code(500);
+        echo "<!DOCTYPE html><html><head><title>Database Error</title></head><body>";
+        echo "<h1>Database Connection Error</h1>";
+        echo "<p>Unable to connect to the database. Please try again later.</p>";
+        echo "<p>If the problem persists, please contact the system administrator.</p>";
+        echo "</body></html>";
+    }
+    exit;
 }
 
 // Autoload sınıfları
