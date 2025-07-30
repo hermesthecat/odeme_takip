@@ -130,6 +130,10 @@ function addIncome()
     }
 
     $pdo->commit();
+    
+    // Cache invalidation - gelir eklenen ay cache'ini temizle
+    invalidateSummaryCacheForDate($user_id, $first_date);
+    
     return true;
 }
 
@@ -144,9 +148,21 @@ function deleteIncome()
     global $pdo, $user_id;
 
     $id = $_POST['id'];
+    
+    // Silmeden önce tarihi al - cache invalidation için
+    $date_stmt = $pdo->prepare("SELECT first_date FROM income WHERE id = ? AND user_id = ?");
+    $date_stmt->execute([$id, $user_id]);
+    $income_record = $date_stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$income_record) {
+        throw new Exception(t('income.not_found'));
+    }
 
     $stmt = $pdo->prepare("DELETE FROM income WHERE id = ? AND user_id = ?");
-    if ($stmt->execute([$_POST['id'], $user_id])) {
+    if ($stmt->execute([$id, $user_id])) {
+        // Cache invalidation - silinen gelirin ayına ait cache'i temizle
+        invalidateSummaryCacheForDate($user_id, $income_record['first_date']);
+        
         return true;
     } else {
         throw new Exception(t('income.delete_error'));

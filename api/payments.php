@@ -118,6 +118,9 @@ function addPayment()
         }
 
         $pdo->commit();
+        
+        // Cache invalidation - ödeme eklenen ay cache'ini temizle
+        invalidateSummaryCacheForDate($user_id, $first_date);
         return true;
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {
@@ -136,6 +139,15 @@ function deletePayment()
     try {
         $id = $_POST['id'];
         $delete_children = isset($_POST['delete_children']) && $_POST['delete_children'] === 'true';
+        
+        // Silmeden önce tarihi al - cache invalidation için
+        $date_stmt = $pdo->prepare("SELECT first_date FROM payments WHERE id = ? AND user_id = ?");
+        $date_stmt->execute([$id, $user_id]);
+        $payment_record = $date_stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if (!$payment_record) {
+            throw new Exception(t('payment.not_found'));
+        }
 
         if ($delete_children) {
             // Önce child kayıtları sil
@@ -172,6 +184,10 @@ function deletePayment()
         }
 
         $pdo->commit();
+        
+        // Cache invalidation - silinen ödemenin ayına ait cache'i temizle
+        invalidateSummaryCacheForDate($user_id, $payment_record['first_date']);
+        
         return true;
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {

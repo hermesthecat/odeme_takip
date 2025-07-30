@@ -177,3 +177,46 @@ function cacheSummary($user_id, $month, $year, $summary_data)
     $_SESSION[$cache_key] = $summary_data;
     $_SESSION[$cache_key . '_time'] = time();
 }
+
+// Cache invalidation - kullanıcının belirli ay cache'ini temizle
+function clearSummaryCache($user_id, $month, $year)
+{
+    $cache_key = "summary_{$user_id}_{$month}_{$year}";
+    if (isset($_SESSION[$cache_key])) {
+        unset($_SESSION[$cache_key]);
+        unset($_SESSION[$cache_key . '_time']);
+    }
+}
+
+// Cache invalidation - kullanıcının tüm summary cache'lerini temizle
+function clearAllUserSummaryCache($user_id)
+{
+    // Session'daki tüm summary cache'lerini bul ve temizle
+    $prefix = "summary_{$user_id}_";
+    $keys_to_remove = [];
+    
+    foreach ($_SESSION as $key => $value) {
+        if (strpos($key, $prefix) === 0) {
+            $keys_to_remove[] = $key;
+        }
+    }
+    
+    foreach ($keys_to_remove as $key) {
+        unset($_SESSION[$key]);
+    }
+}
+
+// Smart cache invalidation - sadece etkilenen ay cache'lerini temizle
+function invalidateSummaryCacheForDate($user_id, $date)
+{
+    $date_obj = new DateTime($date);
+    $month = (int)$date_obj->format('n');
+    $year = (int)$date_obj->format('Y');
+    
+    clearSummaryCache($user_id, $month, $year);
+    
+    // Log cache temizleme işlemini
+    if (function_exists('saveLog')) {
+        saveLog("Summary cache cleared for user {$user_id}, date: {$date}", 'info', 'cache_invalidation', $user_id);
+    }
+}
