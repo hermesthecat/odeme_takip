@@ -243,9 +243,103 @@ CREATE TABLE `ai_analysis_temp` (
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'AI analiz geçici tablosu';
 
 --
+-- Table structure for table `card`
+--
+CREATE TABLE `card` (
+    `id` int(11) NOT NULL AUTO_INCREMENT,
+    `user_id` int(11) NOT NULL COMMENT 'Kullanıcı ID referansı',
+    `name` varchar(100) NOT NULL COMMENT 'Kart adı',
+    `card_number` varchar(20) DEFAULT NULL COMMENT 'Kart numarası (maskelenmiş)',
+    `card_type` enum('credit', 'debit') DEFAULT 'credit' COMMENT 'Kart tipi',
+    `limit_amount` decimal(10, 2) DEFAULT NULL COMMENT 'Kart limiti',
+    `current_balance` decimal(10, 2) DEFAULT 0.00 COMMENT 'Mevcut bakiye',
+    `currency` varchar(3) DEFAULT 'TRY' COMMENT 'Para birimi',
+    `is_active` tinyint(1) DEFAULT 1 COMMENT 'Aktif mi? (1=evet, 0=hayır)',
+    `created_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'Kayıt oluşturma tarihi',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_is_active` (`is_active`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'Kredi/Banka kartları tablosu';
+
+--
 -- Indexes for dumped tables
 --
 --
 -- Indexes for table `exchange_rates`
 --
-ALTER TABLE
+ALTER TABLE `exchange_rates`
+    ADD PRIMARY KEY (`id`),
+    ADD KEY `idx_currencies_date` (`from_currency`, `to_currency`, `date`);
+
+--
+-- Indexes for table `income`
+--
+ALTER TABLE `income`
+    ADD PRIMARY KEY (`id`),
+    ADD KEY `idx_user_id` (`user_id`),
+    ADD KEY `idx_user_date` (`user_id`, `first_date`),
+    ADD KEY `idx_parent_id` (`parent_id`),
+    ADD KEY `idx_status` (`status`);
+
+--
+-- Indexes for table `logs`
+--
+ALTER TABLE `logs`
+    ADD PRIMARY KEY (`id`),
+    ADD KEY `idx_user_id` (`user_id`),
+    ADD KEY `idx_created_at` (`created_at`),
+    ADD KEY `idx_type` (`type`(255));
+
+--
+-- Indexes for table `payments`
+--
+ALTER TABLE `payments`
+    ADD PRIMARY KEY (`id`),
+    ADD KEY `idx_user_id` (`user_id`),
+    ADD KEY `idx_user_date` (`user_id`, `first_date`),
+    ADD KEY `idx_parent_id` (`parent_id`),
+    ADD KEY `idx_status` (`status`),
+    ADD KEY `idx_payment_power` (`payment_power`);
+
+--
+-- Indexes for table `portfolio`
+--
+ALTER TABLE `portfolio`
+    ADD PRIMARY KEY (`id`),
+    ADD KEY `idx_user_id` (`user_id`),
+    ADD KEY `idx_sembol` (`sembol`),
+    ADD KEY `idx_durum` (`durum`),
+    ADD KEY `idx_referans_alis_id` (`referans_alis_id`);
+
+--
+-- Indexes for table `savings`
+--
+ALTER TABLE `savings`
+    ADD PRIMARY KEY (`id`),
+    ADD KEY `idx_user_id` (`user_id`),
+    ADD KEY `idx_user_date` (`user_id`, `start_date`),
+    ADD KEY `idx_parent_id` (`parent_id`),
+    ADD KEY `idx_target_date` (`target_date`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+    ADD PRIMARY KEY (`id`),
+    ADD UNIQUE KEY `username` (`username`),
+    ADD KEY `idx_remember_token` (`remember_token`),
+    ADD KEY `idx_is_active` (`is_active`);
+
+--
+-- Auto Increment for dumped tables
+--
+ALTER TABLE `exchange_rates` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+ALTER TABLE `income` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `logs` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `payments` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `portfolio` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `savings` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `users` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+ALTER TABLE `card` MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+COMMIT;
