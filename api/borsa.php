@@ -36,7 +36,7 @@ function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi = '')
     $sql = "INSERT INTO portfolio (sembol, adet, alis_fiyati, anlik_fiyat, hisse_adi, user_id) 
                 VALUES (:sembol, :adet, :alis_fiyati, :anlik_fiyat, :hisse_adi, :user_id)";
     $stmt = $pdo->prepare($sql);
-    return $stmt->execute([
+    $result = $stmt->execute([
         'sembol' => $sembol,
         'adet' => $adet,
         'alis_fiyati' => $alis_fiyati,
@@ -44,6 +44,14 @@ function hisseEkle($sembol, $adet, $alis_fiyati, $alis_tarihi, $hisse_adi = '')
         'hisse_adi' => $hisse_adi,
         'user_id' => $user_id
     ]);
+    
+    // Cache invalidation - hisse eklenen ay cache'ini temizle
+    if ($result && function_exists('invalidateSummaryCacheForDate')) {
+        $current_date = date('Y-m-d');
+        invalidateSummaryCacheForDate($user_id, $current_date);
+    }
+    
+    return $result;
 }
 
 /**
@@ -98,6 +106,13 @@ function hisseSil($id)
 
         // İşlemi tamamla
         $pdo->commit();
+        
+        // Cache invalidation - hisse silindiğinde cache'i temizle
+        if (function_exists('invalidateSummaryCacheForDate')) {
+            $current_date = date('Y-m-d');
+            invalidateSummaryCacheForDate($user_id, $current_date);
+        }
+        
         return true;
     } catch (Exception $e) {
         // Hata durumunda işlemi geri al
@@ -908,6 +923,12 @@ function hisseSat($id, $adet, $fiyat)
 
         // İşlemi tamamla
         $pdo->commit();
+        
+        // Cache invalidation - hisse satışı sonrası cache'i temizle
+        if (function_exists('invalidateSummaryCacheForDate')) {
+            $current_date = date('Y-m-d');
+            invalidateSummaryCacheForDate($user_id, $current_date);
+        }
 
         // Log
         saveLog(

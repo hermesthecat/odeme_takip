@@ -286,6 +286,10 @@ function markIncomeReceived()
         }
 
         $pdo->commit();
+        
+        // Cache invalidation - gelir durumu değişen ayın cache'ini temizle
+        invalidateSummaryCacheForDate($user_id, $income['first_date']);
+        
         return true;
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {
@@ -453,6 +457,10 @@ function updateIncome()
         }
 
         $pdo->commit();
+        
+        // Cache invalidation - güncellenen gelirin ayına ait cache'i temizle
+        invalidateSummaryCacheForDate($user_id, $first_date);
+        
         return true;
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {

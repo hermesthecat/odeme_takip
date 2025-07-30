@@ -55,6 +55,10 @@ function addSaving()
 
     if ($stmt->execute([$user_id, $name, $target_amount, $currency, $start_date, $target_date, $exchange_rate])) {
         saveLog("Birikim eklendi: " . $name, 'info', 'addSaving', $_SESSION['user_id']);
+        
+        // Cache invalidation - birikim eklenen ay cache'ini temizle
+        invalidateSummaryCacheForDate($user_id, $start_date);
+        
         return true;
     } else {
         throw new Exception(t('saving.add_error'));
@@ -66,9 +70,22 @@ function deleteSaving()
 {
     global $pdo, $user_id;
 
+    // Silmeden önce tarihi al - cache invalidation için
+    $date_stmt = $pdo->prepare("SELECT start_date FROM savings WHERE id = ? AND user_id = ?");
+    $date_stmt->execute([$_POST['id'], $user_id]);
+    $saving_record = $date_stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$saving_record) {
+        throw new Exception(t('saving.not_found'));
+    }
+
     $stmt = $pdo->prepare("DELETE FROM savings WHERE id = ? AND user_id = ?");
     if ($stmt->execute([$_POST['id'], $user_id])) {
         saveLog("Birikim silindi: " . $_POST['id'], 'info', 'deleteSaving', $_SESSION['user_id']);
+        
+        // Cache invalidation - silinen birikimin ayına ait cache'i temizle
+        invalidateSummaryCacheForDate($user_id, $saving_record['start_date']);
+        
         return true;
     } else {
         throw new Exception(t('saving.delete_error'));
@@ -198,6 +215,10 @@ function updateSaving()
 
         $pdo->commit();
         saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateSaving', $_SESSION['user_id']);
+        
+        // Cache invalidation - güncellenen birikimin ayına ait cache'i temizle
+        invalidateSummaryCacheForDate($user_id, $saving['start_date']);
+        
         return true;
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {
@@ -265,6 +286,10 @@ function updateFullSaving()
         $stmt = $pdo->prepare("UPDATE savings SET  exchange_rate = ? WHERE id = ? AND user_id = ?");
         $stmt->execute([$exchange_rate, $saving['id'], $user_id]);
         saveLog("Birikim güncellendi: " . $saving['id'], 'info', 'updateFullSaving', $_SESSION['user_id']);
+        
+        // Cache invalidation - güncellenen birikimin ayına ait cache'i temizle
+        invalidateSummaryCacheForDate($user_id, $start_date);
+        
         return true;
     } else {
         throw new Exception(t('saving.update_error'));

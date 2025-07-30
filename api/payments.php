@@ -349,6 +349,10 @@ function markPaymentPaid()
 
         $pdo->commit();
         saveLog("Ödeme güncellendi: " . $_POST['id'], 'info', 'markPaymentPaid', $_SESSION['user_id']);
+        
+        // Cache invalidation - ödeme durumu değişen ayın cache'ini temizle
+        invalidateSummaryCacheForDate($user_id, $payment['first_date']);
+        
         return true;
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {
@@ -598,6 +602,10 @@ function updatePayment()
         }
 
         $pdo->commit();
+        
+        // Cache invalidation - güncellenen ödemenin ayına ait cache'i temizle
+        invalidateSummaryCacheForDate($user_id, $first_date);
+        
         return true;
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {

@@ -58,6 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_arr
         }
 
         $pdo->commit();
+        
+        // Cache invalidation - AI analiz onayından sonra bu ay cache'ini temizle
+        $current_date = date('Y-m-d');
+        invalidateSummaryCacheForDate($user_id, $current_date);
+        
+        // Log AI analysis approval
+        if (function_exists('saveLog')) {
+            saveLog("AI analysis approved: " . count($items) . " items added", 'info', 'ai_analysis_approve', $user_id);
+        }
+        
         $_SESSION['success'] = "Seçilen kayıtlar başarıyla eklendi.";
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {

@@ -71,6 +71,15 @@ function transferUnpaidPayments()
             ])) {
                 throw new Exception(t('transfer.update_error'));
             }
+            
+            // Cache invalidation - transfer edilen ödemenin hem eski hem yeni ayının cache'ini temizle
+            invalidateSummaryCacheForDate($user_id, $payment['first_date']); // Eski ay
+            invalidateSummaryCacheForDate($user_id, $new_date); // Yeni ay
+        }
+        
+        // Genel cache temizleme - transfer işlemi sonrası log
+        if (function_exists('saveLog')) {
+            saveLog("Payment transfer completed: " . count($unpaid_payments) . " payments transferred", 'info', 'transferUnpaidPayments', $user_id);
         }
 
         return true;
