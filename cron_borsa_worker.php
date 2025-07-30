@@ -188,9 +188,11 @@ function topluVeritabaniGuncelle($fiyatlar, $hisse_isimleri)
         $pdo->commit();
 
         saveLog("Toplu veritabanı güncellemesi tamamlandı. Güncellenen: $guncellenen", 'info', 'topluVeritabaniGuncelle', 0);
-    } catch (PDOException $e) {
+    } catch (Exception $e) {
         // Hata durumunda geri al
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         $basarisiz = count($fiyatlar);
         $guncellenen = 0;
         saveLog("Toplu veritabanı güncellemesi hatası: " . $e->getMessage(), 'error', 'topluVeritabaniGuncelle', 0);

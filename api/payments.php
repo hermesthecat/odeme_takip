@@ -120,7 +120,9 @@ function addPayment()
         $pdo->commit();
         return true;
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         throw $e;
     }
 }
@@ -172,7 +174,9 @@ function deletePayment()
         $pdo->commit();
         return true;
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         throw $e;
     }
 }
@@ -331,7 +335,9 @@ function markPaymentPaid()
         saveLog("Ödeme güncellendi: " . $_POST['id'], 'info', 'markPaymentPaid', $_SESSION['user_id']);
         return true;
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         throw $e;
     }
 }
@@ -578,7 +584,9 @@ function updatePayment()
         $pdo->commit();
         return true;
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         throw $e;
     }
 }

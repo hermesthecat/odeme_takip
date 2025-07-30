@@ -60,7 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approved']) && is_arr
         $pdo->commit();
         $_SESSION['success'] = "Seçilen kayıtlar başarıyla eklendi.";
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         $_SESSION['error'] = "Kayıt sırasında bir hata oluştu: " . $e->getMessage();
     }
 } else {

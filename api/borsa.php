@@ -101,7 +101,9 @@ function hisseSil($id)
         return true;
     } catch (Exception $e) {
         // Hata durumunda işlemi geri al
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         saveLog("Hisse silme hatası: " . $e->getMessage(), 'error', 'hisseSil', $user_id);
         return false;
     }
@@ -920,7 +922,9 @@ function hisseSat($id, $adet, $fiyat)
         return true;
     } catch (Exception $e) {
         // Hata durumunda işlemi geri al
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         saveLog("Satış hatası: " . $e->getMessage(), 'error', 'hisseSat', $user_id);
         return false;
     }

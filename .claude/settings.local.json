@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(gemini:*)"
+      "Bash(gemini:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": []
   }

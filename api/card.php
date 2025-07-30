@@ -42,7 +42,9 @@ function addCard()
         return true;
     } catch (Exception $e) {
         if ($pdo->inTransaction()) {
+            if ($pdo->inTransaction()) {
             $pdo->rollBack();
+        }
         }
         saveLog("Ödeme yöntemi ekleme hatası ($name): " . $e->getMessage(), 'error', 'addCard', $_SESSION['user_id']);
         throw $e;
@@ -131,7 +133,9 @@ function updateCard()
         $pdo->commit();
         return true;
     } catch (Exception $e) {
-        $pdo->rollBack();
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
         throw $e;
     }
 }
