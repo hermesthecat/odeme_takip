@@ -26,7 +26,7 @@ mkdir uploads
 chmod 777 uploads
 
 # Set up Telegram bot webhook (requires HTTPS)
-php telegram_bot.php
+php telegram/telegram_bot.php
 ```
 
 ### Testing

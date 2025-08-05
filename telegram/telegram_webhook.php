@@ -6,9 +6,9 @@
  * @date 2024-02-28
  */
 
-require_once 'config.php';
-require_once 'api/rate_limiter.php';
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../api/rate_limiter.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\Request;
