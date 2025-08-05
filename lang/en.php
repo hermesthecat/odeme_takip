@@ -806,6 +806,21 @@ return [
         'upload_and_analyze' => 'Upload and Analyze',
         'analysis_results' => 'Analysis Results',
         'save_selected' => 'Save Selected',
+        'file_select_label' => 'Select PDF, Excel, CSV, PNG, JPG and JPEG Files',
+        'errors' => [
+            'rate_limit_upload' => 'Too many file upload attempts. Try again at :time.',
+            'rate_limit_ai' => 'AI analysis limit exceeded. Try again at :time.',
+            'file_too_large' => 'File size too large. Maximum 10MB allowed.',
+            'invalid_file_type' => 'Invalid file type. Only PDF, Excel, CSV, PNG and JPEG files are allowed.',
+            'invalid_file_extension' => 'Invalid file extension. Only PDF, Excel, CSV, PNG and JPEG files are allowed.',
+            'malicious_content' => 'Malicious content detected. File rejected.',
+            'gemini_rate_limit' => 'Too many AI analysis requests. Try again in 5 minutes.',
+            'analysis_failed' => 'An error occurred during AI analysis.',
+            'upload_failed' => 'An error occurred during file upload.'
+        ],
+        'success' => [
+            'upload_and_analysis' => 'File successfully uploaded and analyzed.'
+        ],
         'table' => [
             'select' => 'Select',
             'type' => 'Type',

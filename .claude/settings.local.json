@@ -25,7 +25,8 @@
       "Bash(php:*)",
       "Bash(rm:*)",
       "Bash(rmdir:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

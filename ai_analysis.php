@@ -28,8 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     // File upload rate limit check
     $uploadLimit = $rateLimiter->checkLimit('file_upload', $userIdentifier, 'user');
     if (!$uploadLimit['allowed']) {
-        $_SESSION['error'] = "Çok fazla dosya yükleme denemesi. " . 
-                           date('H:i:s', $uploadLimit['reset_time']) . " saatinde tekrar deneyin.";
+        $_SESSION['error'] = t('ai.errors.rate_limit_upload', ['time' => date('H:i:s', $uploadLimit['reset_time'])]);
         header("Location: " . SITE_URL . "/ai_analysis.php");
         exit;
     }
@@ -37,8 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     // AI analysis rate limit check
     $aiLimit = $rateLimiter->checkLimit('ai_analysis', $userIdentifier, 'user');
     if (!$aiLimit['allowed']) {
-        $_SESSION['error'] = "AI analiz limiti aşıldı. " . 
-                           date('H:i:s', $aiLimit['reset_time']) . " saatinde tekrar deneyin.";
+        $_SESSION['error'] = t('ai.errors.rate_limit_ai', ['time' => date('H:i:s', $aiLimit['reset_time'])]);
         header("Location: " . SITE_URL . "/ai_analysis.php");
         exit;
     }
@@ -56,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     // Dosya boyutu kontrolü (max 10MB)
     $maxFileSize = 10 * 1024 * 1024; // 10MB
     if ($fileSize > $maxFileSize) {
-        $_SESSION['error'] = "Dosya boyutu çok büyük. Maksimum 10MB yükleyebilirsiniz.";
+        $_SESSION['error'] = t('ai.errors.file_too_large');
         echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
         exit;
     }
@@ -74,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
 
     // İki farklı MIME type kontrolü de geçmeli
     if (!in_array($fileMime, $allowedMimes) || !in_array($backupMime, $allowedMimes)) {
-        $_SESSION['error'] = "Geçersiz dosya türü. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.";
+        $_SESSION['error'] = t('ai.errors.invalid_file_type');
         echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
         exit;
     }
@@ -82,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     // Dosya uzantısı kontrolü
     $allowedExtensions = ['pdf', 'xlsx', 'xls', 'csv', 'png', 'jpg', 'jpeg'];
     if (!in_array($fileType, $allowedExtensions)) {
-        $_SESSION['error'] = "Geçersiz dosya uzantısı. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.";
+        $_SESSION['error'] = t('ai.errors.invalid_file_extension');
         echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
         exit;
     }
@@ -108,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     $fileContent = file_get_contents($file['tmp_name']);
     foreach ($maliciousPatterns as $pattern) {
         if (stripos($fileContent, $pattern) !== false) {
-            $_SESSION['error'] = "Zararlı içerik tespit edildi. Dosya reddedildi.";
+            $_SESSION['error'] = t('ai.errors.malicious_content');
             echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
             exit;
         }
@@ -158,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
 
         // Gemini API rate limiting kontrolü
         if (!checkGeminiApiLimit($user_id)) {
-            $_SESSION['error'] = "AI analizi için çok fazla istek gönderildi. 5 dakika sonra tekrar deneyin.";
+            $_SESSION['error'] = t('ai.errors.gemini_rate_limit');
             echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
             exit;
         }
@@ -227,12 +225,12 @@ EOD;
                 ]);
             }
 
-            $_SESSION['success'] = "Dosya başarıyla yüklendi ve analiz edildi.";
+            $_SESSION['success'] = t('ai.success.upload_and_analysis');
         } else {
-            $_SESSION['error'] = "AI analizi sırasında bir hata oluştu.";
+            $_SESSION['error'] = t('ai.errors.analysis_failed');
         }
     } else {
-        $_SESSION['error'] = "Dosya yükleme sırasında bir hata oluştu.";
+        $_SESSION['error'] = t('ai.errors.upload_failed');
     }
 }
 
@@ -246,7 +244,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-5">
     <div class="row">
         <div class="col-12">
-            <h1 class="mb-4"><?php echo t('ai.analysis_title'); ?></h1>
+            <h1 class="mb-4" data-translate="ai.analysis_title"><?php echo t('ai.analysis_title'); ?></h1>
 
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="alert alert-danger">
@@ -269,14 +267,14 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <!-- Dosya Yükleme Formu -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title"><?php echo t('ai.upload_file'); ?></h5>
+                    <h5 class="card-title" data-translate="ai.upload_file"><?php echo t('ai.upload_file'); ?></h5>
                     <form action="" method="post" enctype="multipart/form-data">
                         <?php echo getCSRFTokenInput(); ?>
                         <div class="mb-3">
-                            <label for="document" class="form-label">PDF, Excel, CSV, PNG, JPG ve JPEG Dosyası Seçin</label>
+                            <label for="document" class="form-label" data-translate="ai.file_select_label"><?php echo t('ai.file_select_label'); ?></label>
                             <input type="file" class="form-control" id="document" name="document" accept=".pdf,.xlsx,.xls,.csv,.png,.jpg,.jpeg" required>
                         </div>
-                        <button type="submit" class="btn btn-primary"><?php echo t('ai.upload_and_analyze'); ?></button>
+                        <button type="submit" class="btn btn-primary" data-translate="ai.upload_and_analyze"><?php echo t('ai.upload_and_analyze'); ?></button>
                     </form>
                 </div>
             </div>
@@ -285,18 +283,18 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php if (!empty($results)): ?>
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title"><?php echo t('ai.analysis_results'); ?></h5>
+                        <h5 class="card-title" data-translate="ai.analysis_results"><?php echo t('ai.analysis_results'); ?></h5>
                         <form action="save_analysis.php" method="post">
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th><?php echo t('ai.table.select'); ?></th>
-                                            <th><?php echo t('ai.table.type'); ?></th>
-                                            <th><?php echo t('ai.table.description'); ?></th>
-                                            <th><?php echo t('ai.table.amount'); ?></th>
-                                            <th><?php echo t('ai.table.suggested_name'); ?></th>
-                                            <th><?php echo t('ai.table.file'); ?></th>
+                                            <th data-translate="ai.table.select"><?php echo t('ai.table.select'); ?></th>
+                                            <th data-translate="ai.table.type"><?php echo t('ai.table.type'); ?></th>
+                                            <th data-translate="ai.table.description"><?php echo t('ai.table.description'); ?></th>
+                                            <th data-translate="ai.table.amount"><?php echo t('ai.table.amount'); ?></th>
+                                            <th data-translate="ai.table.suggested_name"><?php echo t('ai.table.suggested_name'); ?></th>
+                                            <th data-translate="ai.table.file"><?php echo t('ai.table.file'); ?></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -315,7 +313,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </tbody>
                                 </table>
                             </div>
-                            <button type="submit" class="btn btn-success"><?php echo t('ai.save_selected'); ?></button>
+                            <button type="submit" class="btn btn-success" data-translate="ai.save_selected"><?php echo t('ai.save_selected'); ?></button>
                         </form>
                     </div>
                 </div>
@@ -324,5 +322,56 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 </div>
+
+<!-- JavaScript için dil çevirileri -->
+<script>
+const translations = {
+    ai: {
+        analysis_title: '<?php echo t('ai.analysis_title'); ?>',
+        upload_file: '<?php echo t('ai.upload_file'); ?>',
+        upload_and_analyze: '<?php echo t('ai.upload_and_analyze'); ?>',
+        analysis_results: '<?php echo t('ai.analysis_results'); ?>',
+        save_selected: '<?php echo t('ai.save_selected'); ?>',
+        file_select_label: '<?php echo t('ai.file_select_label'); ?>',
+        errors: {
+            rate_limit_upload: '<?php echo t('ai.errors.rate_limit_upload'); ?>',
+            rate_limit_ai: '<?php echo t('ai.errors.rate_limit_ai'); ?>',
+            file_too_large: '<?php echo t('ai.errors.file_too_large'); ?>',
+            invalid_file_type: '<?php echo t('ai.errors.invalid_file_type'); ?>',
+            invalid_file_extension: '<?php echo t('ai.errors.invalid_file_extension'); ?>',
+            malicious_content: '<?php echo t('ai.errors.malicious_content'); ?>',
+            gemini_rate_limit: '<?php echo t('ai.errors.gemini_rate_limit'); ?>',
+            analysis_failed: '<?php echo t('ai.errors.analysis_failed'); ?>',
+            upload_failed: '<?php echo t('ai.errors.upload_failed'); ?>'
+        },
+        success: {
+            upload_and_analysis: '<?php echo t('ai.success.upload_and_analysis'); ?>'
+        },
+        table: {
+            select: '<?php echo t('ai.table.select'); ?>',
+            type: '<?php echo t('ai.table.type'); ?>',
+            description: '<?php echo t('ai.table.description'); ?>',
+            amount: '<?php echo t('ai.table.amount'); ?>',
+            suggested_name: '<?php echo t('ai.table.suggested_name'); ?>',
+            file: '<?php echo t('ai.table.file'); ?>'
+        }
+    },
+    income: {
+        title: '<?php echo t('income.title'); ?>'
+    },
+    payment: {
+        title: '<?php echo t('payment.title'); ?>'
+    },
+    common: {
+        loading: '<?php echo t('loading'); ?>',
+        error: '<?php echo t('error'); ?>',
+        success: '<?php echo t('success'); ?>'
+    }
+};
+</script>
+
+<!-- Modern Language System -->
+<script src="js/language.js"></script>
+<script src="js/language-compatibility.js"></script>
 
 <?php require_once 'footer.php'; ?>

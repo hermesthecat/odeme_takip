@@ -804,6 +804,21 @@ return [
         'upload_and_analyze' => 'Yükle ve Analiz Et',
         'analysis_results' => 'Analiz Sonuçları',
         'save_selected' => 'Seçilenleri Kaydet',
+        'file_select_label' => 'PDF, Excel, CSV, PNG, JPG ve JPEG Dosyası Seçin',
+        'errors' => [
+            'rate_limit_upload' => 'Çok fazla dosya yükleme denemesi. :time saatinde tekrar deneyin.',
+            'rate_limit_ai' => 'AI analiz limiti aşıldı. :time saatinde tekrar deneyin.',
+            'file_too_large' => 'Dosya boyutu çok büyük. Maksimum 10MB yükleyebilirsiniz.',
+            'invalid_file_type' => 'Geçersiz dosya türü. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.',
+            'invalid_file_extension' => 'Geçersiz dosya uzantısı. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.',
+            'malicious_content' => 'Zararlı içerik tespit edildi. Dosya reddedildi.',
+            'gemini_rate_limit' => 'AI analizi için çok fazla istek gönderildi. 5 dakika sonra tekrar deneyin.',
+            'analysis_failed' => 'AI analizi sırasında bir hata oluştu.',
+            'upload_failed' => 'Dosya yükleme sırasında bir hata oluştu.'
+        ],
+        'success' => [
+            'upload_and_analysis' => 'Dosya başarıyla yüklendi ve analiz edildi.'
+        ],
         'table' => [
             'select' => 'Seç',
             'type' => 'Tür',
