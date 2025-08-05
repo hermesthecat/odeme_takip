@@ -15,6 +15,20 @@ return [
     'no' => 'Hayır',
     'confirm' => 'Onayla',
     'go_to_app' => 'Uygulamaya Git',
+    'error' => 'Hata',
+    'success' => 'Başarılı',
+    'add' => 'Ekle',
+    'clear' => 'Temizle',
+    'close' => 'Kapat',
+    'reset' => 'Sıfırla',
+    'filter' => 'Filtrele',
+    'actions' => 'İşlemler',
+    'status' => 'Durum',
+    'all' => 'Tümü',
+    'active' => 'Aktif',
+    'inactive' => 'Pasif',
+    'system' => 'Sistem',
+    'disclaimer' => 'Sorumluluk Reddi',
 
     // Giriş/Kayıt
     'username' => 'Kullanıcı Adı',
@@ -694,5 +708,129 @@ return [
         'rate_updated' => 'Kur bilgisi güncellendi',
         'update_error' => 'Kur bilgisi güncellenirken bir hata oluştu.',
         'refresh_tooltip' => 'Kur bilgisini yenile'
+    ],
+
+    // Admin Panel
+    'admin' => [
+        'user_filtering' => 'Kullanıcı Filtreleme',
+        'new_user' => 'Yeni Kullanıcı',
+        'administrator' => 'Yönetici',
+        'user_list' => 'Kullanıcı Listesi',
+        'user_count' => 'kullanıcı',
+        'add_user' => 'Kullanıcı Ekle',
+        'edit_user' => 'Kullanıcı Düzenle',
+        'password_edit_note' => 'Düzenleme sırasında boş bırakılırsa şifre değişmez',
+        'no_users_found' => 'Kullanıcı bulunamadı',
+        'table' => [
+            'id' => 'ID',
+            'username' => 'Kullanıcı Adı',
+            'base_currency' => 'Ana Para Birimi',
+            'theme' => 'Tema',
+            'is_admin' => 'Yönetici',
+            'status' => 'Durum',
+            'last_login' => 'Son Giriş',
+            'actions' => 'İşlemler'
+        ]
+    ],
+
+    // Log System
+    'log' => [
+        'system_logs' => 'Sistem Logları',
+        'filtering' => 'Log Filtreleme',
+        'type' => 'Log Tipi',
+        'method' => 'Metod',
+        'date_range' => 'Tarih Aralığı',
+        'records_found' => 'kayıt bulundu',
+        'no_records' => 'Kayıt bulunamadı',
+        'message_title' => 'Log Mesajı',
+        'info' => 'Bilgi',
+        'error' => 'Hata',
+        'warning' => 'Uyarı',
+        'success' => 'Başarılı',
+        'debug' => 'Debug',
+        'table' => [
+            'id' => 'ID',
+            'date' => 'Tarih',
+            'type' => 'Tür',
+            'method' => 'Metod',
+            'user' => 'Kullanıcı',
+            'message' => 'Mesaj'
+        ]
+    ],
+
+    // Stock Portfolio
+    'stock' => [
+        'add_stock' => 'Hisse Ekle',
+        'symbol_or_name' => 'Hisse Sembolü veya Adı',
+        'lot' => 'Lot',
+        'purchase_price' => 'Alış Fiyatı (₺)',
+        'estimated_cost' => 'Tahmini Maliyet:',
+        'financial_summary' => 'Mali Durum Özeti',
+        'portfolio_value' => 'Portföy Değeri',
+        'current_market_value' => 'Güncel piyasa değeri',
+        'profit_loss' => 'Kar/Zarar',
+        'based_on_current_value' => 'Güncel değere göre',
+        'realized_profit_loss' => 'Gerçekleşen K/Z',
+        'from_sales' => 'Satış işlemlerinden',
+        'my_portfolio' => 'Portföyüm',
+        'table' => [
+            'stock' => 'Hisse',
+            'lot' => 'Lot',
+            'purchase' => 'Alış',
+            'current' => 'Güncel',
+            'avg_purchase' => 'Ort. Alış',
+            'cost' => 'Maliyet',
+            'current_value' => 'Güncel Değer',
+            'profit_loss' => 'Kar/Zarar',
+            'sales_profit' => 'Satış Karı',
+            'actions' => 'İşlemler'
+        ]
+    ],
+
+    // Payment Card
+    'card' => [
+        'payment_method' => 'Ödeme Yöntemi',
+        'payments_list' => 'Ödemeler Listesi',
+        'remove_from_method' => 'Ödeme Yönteminden Çıkar',
+        'payment_removed_success' => 'Ödeme ve ilişkili tüm ödemeler, ödeme yönteminden başarıyla çıkarıldı.',
+        'unauthorized_removal' => 'Sadece kendi ödemelerinizi ödeme yönteminden çıkarabilirsiniz.',
+        'removal_error' => 'Ödeme, ödeme yönteminden çıkarılırken bir hata oluştu.'
+    ],
+
+    // AI Analysis
+    'ai' => [
+        'analysis_title' => 'AI Destekli Gelir/Gider Analizi',
+        'upload_file' => 'Dosya Yükle',
+        'upload_and_analyze' => 'Yükle ve Analiz Et',
+        'analysis_results' => 'Analiz Sonuçları',
+        'save_selected' => 'Seçilenleri Kaydet',
+        'table' => [
+            'select' => 'Seç',
+            'type' => 'Tür',
+            'description' => 'Açıklama',
+            'amount' => 'Tutar',
+            'suggested_name' => 'Önerilen İsim',
+            'file' => 'Dosya'
+        ]
+    ],
+
+    // Currency
+    'currency' => [
+        'try' => 'Türk Lirası',
+        'usd' => 'ABD Doları',
+        'eur' => 'Euro',
+        'gbp' => 'İngiliz Sterlini'
+    ],
+
+    // Settings
+    'settings' => [
+        'theme_light' => 'Açık Tema',
+        'theme_dark' => 'Koyu Tema'
+    ],
+
+    // Common Messages
+    'logout_confirm' => 'Çıkış yapmak istediğinize emin misiniz?',
+    'logout' => [
+        'yes' => 'Evet, çıkış yap'
     ]
 ];

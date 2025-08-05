@@ -114,7 +114,7 @@ $log_type_bg_classes = [
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title><?php echo $site_name; ?> - Sistem Logları</title>
+    <title><?php echo $site_name; ?> - <?php echo t('log.system_logs'); ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
@@ -287,7 +287,7 @@ $log_type_bg_classes = [
     <div class="container mt-4">
         <!-- Başlık ve Kullanıcı Bilgisi -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="mb-0">Sistem Logları</h1>
+            <h1 class="mb-0"><?php echo t('log.system_logs'); ?></h1>
             <div class="d-flex align-items-center">
                 <?php if ($_SESSION['is_admin'] == 1) : ?>
                     <a href="admin.php" class="btn btn-outline-secondary me-2">
@@ -321,37 +321,37 @@ $log_type_bg_classes = [
         <div class="card mb-4">
             <div class="card-header bg-primary bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Log Filtreleme</h2>
+                    <h2 class="mb-0"><?php echo t('log.filtering'); ?></h2>
                 </div>
             </div>
             <div class="card-body">
                 <form method="GET" action="log.php" class="row g-3">
                     <div class="col-md-3">
-                        <label for="log_type" class="form-label">Log Tipi</label>
+                        <label for="log_type" class="form-label"><?php echo t('log.type'); ?></label>
                         <select name="log_type" id="log_type" class="form-select">
-                            <option value="">Tümü</option>
-                            <option value="info" <?php echo $log_type == 'info' ? 'selected' : ''; ?>>Bilgi</option>
-                            <option value="error" <?php echo $log_type == 'error' ? 'selected' : ''; ?>>Hata</option>
-                            <option value="warning" <?php echo $log_type == 'warning' ? 'selected' : ''; ?>>Uyarı</option>
-                            <option value="success" <?php echo $log_type == 'success' ? 'selected' : ''; ?>>Başarılı</option>
-                            <option value="debug" <?php echo $log_type == 'debug' ? 'selected' : ''; ?>>Debug</option>
+                            <option value=""><?php echo t('all'); ?></option>
+                            <option value="info" <?php echo $log_type == 'info' ? 'selected' : ''; ?>><?php echo t('log.info'); ?></option>
+                            <option value="error" <?php echo $log_type == 'error' ? 'selected' : ''; ?>><?php echo t('log.error'); ?></option>
+                            <option value="warning" <?php echo $log_type == 'warning' ? 'selected' : ''; ?>><?php echo t('log.warning'); ?></option>
+                            <option value="success" <?php echo $log_type == 'success' ? 'selected' : ''; ?>><?php echo t('log.success'); ?></option>
+                            <option value="debug" <?php echo $log_type == 'debug' ? 'selected' : ''; ?>><?php echo t('log.debug'); ?></option>
                         </select>
                     </div>
                     <div class="col-md-3">
-                        <label for="log_method" class="form-label">Metod</label>
+                        <label for="log_method" class="form-label"><?php echo t('log.method'); ?></label>
                         <input type="text" name="log_method" id="log_method" class="form-control" placeholder="Metod adı" value="<?php echo htmlspecialchars($log_method); ?>">
                     </div>
                     <div class="col-md-3">
-                        <label for="username" class="form-label">Kullanıcı</label>
+                        <label for="username" class="form-label"><?php echo t('username'); ?></label>
                         <input type="text" name="username" id="username" class="form-control" placeholder="Kullanıcı adı" value="<?php echo htmlspecialchars($username); ?>">
                     </div>
                     <div class="col-md-3">
-                        <label for="date_range" class="form-label">Tarih Aralığı</label>
+                        <label for="date_range" class="form-label"><?php echo t('log.date_range'); ?></label>
                         <input type="text" name="date_range" id="date_range" class="form-control" placeholder="Tarih aralığı" value="<?php echo htmlspecialchars($date_range); ?>">
                     </div>
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Filtrele</button>
-                        <a href="log.php" class="btn btn-secondary">Sıfırla</a>
+                        <button type="submit" class="btn btn-primary"><?php echo t('filter'); ?></button>
+                        <a href="log.php" class="btn btn-secondary"><?php echo t('reset'); ?></a>
                     </div>
                 </form>
             </div>
@@ -361,8 +361,8 @@ $log_type_bg_classes = [
         <div class="card mb-4">
             <div class="card-header bg-info bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Sistem Logları</h2>
-                    <span class="badge bg-primary"><?php echo $total_logs; ?> kayıt bulundu</span>
+                    <h2 class="mb-0"><?php echo t('log.system_logs'); ?></h2>
+                    <span class="badge bg-primary"><?php echo $total_logs; ?> <?php echo t('log.records_found'); ?></span>
                 </div>
             </div>
             <div class="card-body">
@@ -370,12 +370,12 @@ $log_type_bg_classes = [
                     <table class="table table-responsive">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Tarih</th>
-                                <th>Tür</th>
-                                <th>Metod</th>
-                                <th>Kullanıcı</th>
-                                <th>Mesaj</th>
+                                <th><?php echo t('log.table.id'); ?></th>
+                                <th><?php echo t('log.table.date'); ?></th>
+                                <th><?php echo t('log.table.type'); ?></th>
+                                <th><?php echo t('log.table.method'); ?></th>
+                                <th><?php echo t('log.table.user'); ?></th>
+                                <th><?php echo t('log.table.message'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -412,13 +412,13 @@ $log_type_bg_classes = [
                                             </span>
                                         </td>
                                         <td style="background-color: <?php echo $bg_color; ?> !important;"><?php echo "<pre>" . htmlspecialchars($log['log_method']) . "</pre>"; ?></td>
-                                        <td style="background-color: <?php echo $bg_color; ?> !important;"><?php echo htmlspecialchars($log['username'] ?? 'Sistem'); ?></td>
+                                        <td style="background-color: <?php echo $bg_color; ?> !important;"><?php echo htmlspecialchars($log['username'] ?? t('system')); ?></td>
                                         <td style="background-color: <?php echo $bg_color; ?> !important; max-width: 300px; cursor: pointer;" class="text-truncate message-cell" data-message="<?php echo htmlspecialchars($log['log_text']); ?>"><?php echo htmlspecialchars(mb_substr($log['log_text'], 0, 50) . (mb_strlen($log['log_text']) > 50 ? '...' : '')); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" class="text-center">Kayıt bulunamadı</td>
+                                    <td colspan="6" class="text-center"><?php echo t('log.no_records'); ?></td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -586,10 +586,10 @@ $log_type_bg_classes = [
             $('.message-cell').on('click', function() {
                 const message = $(this).data('message');
                 Swal.fire({
-                    title: 'Log Mesajı',
+                    title: '<?php echo t('log.message_title'); ?>',
                     html: `<div class="text-start">${message}</div>`,
                     width: '80%',
-                    confirmButtonText: 'Kapat'
+                    confirmButtonText: '<?php echo t('close'); ?>'
                 });
             });
         });
@@ -597,11 +597,11 @@ $log_type_bg_classes = [
         // Çıkış işlemi
         document.querySelector('.logout-btn').addEventListener('click', function() {
             Swal.fire({
-                title: 'Çıkış yapmak istediğinize emin misiniz?',
+                title: '<?php echo t('logout_confirm'); ?>',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Evet, çıkış yap',
-                cancelButtonText: 'İptal'
+                confirmButtonText: '<?php echo t('logout.yes'); ?>',
+                cancelButtonText: '<?php echo t('cancel'); ?>'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({

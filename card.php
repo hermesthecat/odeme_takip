@@ -61,12 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             updateChildPayments($pdo, $payment_id, $_SESSION['user_id']);
 
             // Başarılı mesajı
-            $_SESSION['success_message'] = "Ödeme ve ilişkili tüm ödemeler, ödeme yönteminden başarıyla çıkarıldı.";
+            $_SESSION['success_message'] = t('card.payment_removed_success');
         } else {
-            $_SESSION['error_message'] = "Sadece kendi ödemelerinizi ödeme yönteminden çıkarabilirsiniz.";
+            $_SESSION['error_message'] = t('card.unauthorized_removal');
         }
     } catch (PDOException $e) {
-        $_SESSION['error_message'] = "Ödeme, ödeme yönteminden çıkarılırken bir hata oluştu.";
+        $_SESSION['error_message'] = t('card.removal_error');
     }
 
     // Sayfayı yeniden yükle
@@ -139,8 +139,8 @@ $user_default_currency = $_SESSION['base_currency'];
                     <table class="table table-striped" style="display: table;">
                         <thead>
                             <tr>
-                                <th class="text-center" style="width: 70%">Ödeme Yöntemi</th>
-                                <th class="text-end" style="width: 30%">İşlemler</th>
+                                <th class="text-center" style="width: 70%"><?php echo t('card.payment_method'); ?></th>
+                                <th class="text-end" style="width: 30%"><?php echo t('actions'); ?></th>
                             </tr>
                         </thead>
                         <tbody id="cardList"></tbody>
@@ -153,7 +153,7 @@ $user_default_currency = $_SESSION['base_currency'];
         <div class="card mb-4">
             <div class="card-header bg-success bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Ödemeler Listesi</h2>
+                    <h2 class="mb-0"><?php echo t('card.payments_list'); ?></h2>
                 </div>
             </div>
             <div class="card-body">
@@ -200,8 +200,8 @@ $user_default_currency = $_SESSION['base_currency'];
                                     <table class="table table-striped mb-0">
                                         <thead>
                                             <tr>
-                                                <th class="text-center">Ödeme Adı</th>
-                                                <th class="text-end">İşlemler</th>
+                                                <th class="text-center"><?php echo t('payment.name'); ?></th>
+                                                <th class="text-end"><?php echo t('actions'); ?></th>
                                             </tr>
                                         </thead>
                                         <tbody>';
@@ -212,7 +212,7 @@ $user_default_currency = $_SESSION['base_currency'];
                                         <td class="text-center align-middle">' . htmlspecialchars($payment['name']) . '</td>
                                         <td class="text-end">
                                             <div class="btn-group">
-                                                <button class="btn btn-sm btn-warning" onclick="deletePayment(' . $payment['id'] . ')" title="Ödeme Yönteminden Çıkar">
+                                                <button class="btn btn-sm btn-warning" onclick="deletePayment(' . $payment['id'] . ')" title="<?php echo t('card.remove_from_method'); ?>">
                                                     <i class="bi bi-x-circle"></i>
                                                 </button>
                                             </div>
@@ -241,7 +241,7 @@ $user_default_currency = $_SESSION['base_currency'];
         <div class="container mt-5 mb-3">
             <div class="card">
                 <div class="card-header bg-warning text-dark">
-                    <i class="bi bi-exclamation-triangle me-2"></i>Sorumluluk Reddi
+                    <i class="bi bi-exclamation-triangle me-2"></i><?php echo t('disclaimer'); ?>
                 </div>
                 <div class="card-body">
                     <p class="card-text small text-muted">

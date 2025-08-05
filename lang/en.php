@@ -15,6 +15,20 @@ return [
     'no' => 'No',
     'confirm' => 'Confirm',
     'go_to_app' => 'Go to App',
+    'error' => 'Error',
+    'success' => 'Success',
+    'add' => 'Add',
+    'clear' => 'Clear',
+    'close' => 'Close',
+    'reset' => 'Reset',
+    'filter' => 'Filter',
+    'actions' => 'Actions',
+    'status' => 'Status',
+    'all' => 'All',
+    'active' => 'Active',
+    'inactive' => 'Inactive',
+    'system' => 'System',
+    'disclaimer' => 'Disclaimer',
 
     // Giriş/Kayıt
     'username' => 'Username',
@@ -696,5 +710,129 @@ return [
         'rate_updated' => 'Exchange rate updated',
         'update_error' => 'An error occurred while updating exchange rate.',
         'refresh_tooltip' => 'Refresh exchange rate'
+    ],
+
+    // Admin Panel
+    'admin' => [
+        'user_filtering' => 'User Filtering',
+        'new_user' => 'New User',
+        'administrator' => 'Administrator',
+        'user_list' => 'User List',
+        'user_count' => 'users',
+        'add_user' => 'Add User',
+        'edit_user' => 'Edit User',
+        'password_edit_note' => 'Leave blank to keep current password',
+        'no_users_found' => 'No users found',
+        'table' => [
+            'id' => 'ID',
+            'username' => 'Username',
+            'base_currency' => 'Base Currency',
+            'theme' => 'Theme',
+            'is_admin' => 'Administrator',
+            'status' => 'Status',
+            'last_login' => 'Last Login',
+            'actions' => 'Actions'
+        ]
+    ],
+
+    // Log System
+    'log' => [
+        'system_logs' => 'System Logs',
+        'filtering' => 'Log Filtering',
+        'type' => 'Log Type',
+        'method' => 'Method',
+        'date_range' => 'Date Range',
+        'records_found' => 'records found',
+        'no_records' => 'No records found',
+        'message_title' => 'Log Message',
+        'info' => 'Info',
+        'error' => 'Error',
+        'warning' => 'Warning',
+        'success' => 'Success',
+        'debug' => 'Debug',
+        'table' => [
+            'id' => 'ID',
+            'date' => 'Date',
+            'type' => 'Type',
+            'method' => 'Method',
+            'user' => 'User',
+            'message' => 'Message'
+        ]
+    ],
+
+    // Stock Portfolio
+    'stock' => [
+        'add_stock' => 'Add Stock',
+        'symbol_or_name' => 'Stock Symbol or Name',
+        'lot' => 'Lot',
+        'purchase_price' => 'Purchase Price (₺)',
+        'estimated_cost' => 'Estimated Cost:',
+        'financial_summary' => 'Financial Summary',
+        'portfolio_value' => 'Portfolio Value',
+        'current_market_value' => 'Current market value',
+        'profit_loss' => 'Profit/Loss',
+        'based_on_current_value' => 'Based on current value',
+        'realized_profit_loss' => 'Realized P/L',
+        'from_sales' => 'From sales',
+        'my_portfolio' => 'My Portfolio',
+        'table' => [
+            'stock' => 'Stock',
+            'lot' => 'Lot',
+            'purchase' => 'Purchase',
+            'current' => 'Current',
+            'avg_purchase' => 'Avg. Purchase',
+            'cost' => 'Cost',
+            'current_value' => 'Current Value',
+            'profit_loss' => 'Profit/Loss',
+            'sales_profit' => 'Sales Profit',
+            'actions' => 'Actions'
+        ]
+    ],
+
+    // Payment Card
+    'card' => [
+        'payment_method' => 'Payment Method',
+        'payments_list' => 'Payments List',
+        'remove_from_method' => 'Remove from Payment Method',
+        'payment_removed_success' => 'Payment and all related payments have been successfully removed from the payment method.',
+        'unauthorized_removal' => 'You can only remove your own payments from the payment method.',
+        'removal_error' => 'An error occurred while removing the payment from the payment method.'
+    ],
+
+    // AI Analysis
+    'ai' => [
+        'analysis_title' => 'AI-Powered Income/Expense Analysis',
+        'upload_file' => 'Upload File',
+        'upload_and_analyze' => 'Upload and Analyze',
+        'analysis_results' => 'Analysis Results',
+        'save_selected' => 'Save Selected',
+        'table' => [
+            'select' => 'Select',
+            'type' => 'Type',
+            'description' => 'Description',
+            'amount' => 'Amount',
+            'suggested_name' => 'Suggested Name',
+            'file' => 'File'
+        ]
+    ],
+
+    // Currency
+    'currency' => [
+        'try' => 'Turkish Lira',
+        'usd' => 'US Dollar',
+        'eur' => 'Euro',
+        'gbp' => 'British Pound'
+    ],
+
+    // Settings
+    'settings' => [
+        'theme_light' => 'Light Theme',
+        'theme_dark' => 'Dark Theme'
+    ],
+
+    // Common Messages
+    'logout_confirm' => 'Are you sure you want to logout?',
+    'logout' => [
+        'yes' => 'Yes, logout'
     ]
 ];

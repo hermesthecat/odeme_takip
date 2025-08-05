@@ -31,9 +31,9 @@ $user_default_currency = $_SESSION['base_currency'];
             <!-- Yeni Hisse Ekleme Formu -->
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Hisse Ekle</span>
+                    <span><?php echo t('stock.add_stock'); ?></span>
                     <button class="btn btn-sm btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#yeniHisseForm">
-                        <i class="fa-solid fa-plus me-1"></i> Ekle
+                        <i class="fa-solid fa-plus me-1"></i> <?php echo t('add'); ?>
                     </button>
                 </div>
                 <div class="collapse" id="yeniHisseForm">
@@ -43,8 +43,8 @@ $user_default_currency = $_SESSION['base_currency'];
                                 <div class="col-md-6">
                                     <div class="form-floating sembol-input-container">
                                         <input type="text" name="sembol" id="sembolInput" class="form-control"
-                                            placeholder="Hisse Sembolü veya Adı" required autocomplete="off">
-                                        <label for="sembolInput">Hisse Sembolü veya Adı</label>
+                                            placeholder="<?php echo t('stock.symbol_or_name'); ?>" required autocomplete="off">
+                                        <label for="sembolInput"><?php echo t('stock.symbol_or_name'); ?></label>
                                         <div id="sembolOnerileri" class="autocomplete-items shadow-sm"></div>
                                     </div>
                                 </div>
@@ -52,14 +52,14 @@ $user_default_currency = $_SESSION['base_currency'];
                                     <div class="form-floating">
                                         <input type="number" name="adet" id="adetInput" class="form-control"
                                             placeholder="Adet" required min="1">
-                                        <label for="adetInput">Lot</label>
+                                        <label for="adetInput"><?php echo t('stock.lot'); ?></label>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-floating">
                                         <input type="number" step="0.01" name="alis_fiyati" id="alisFiyatiInput"
                                             class="form-control" placeholder="Alış Fiyatı" required min="0.01">
-                                        <label for="alisFiyatiInput">Alış Fiyatı (₺)</label>
+                                        <label for="alisFiyatiInput"><?php echo t('stock.purchase_price'); ?></label>
                                     </div>
                                 </div>
                             </div>
@@ -69,17 +69,17 @@ $user_default_currency = $_SESSION['base_currency'];
                                     <div class="alert alert-info mb-0 d-flex align-items-center">
                                         <i class="fa-solid fa-circle-info me-2"></i>
                                         <div>
-                                            <strong>Tahmini Maliyet:</strong>
+                                            <strong><?php echo t('stock.estimated_cost'); ?></strong>
                                             <span id="tahminiMaliyet">0.00 ₺</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6 text-end">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fa-solid fa-check me-1"></i> Ekle
+                                        <i class="fa-solid fa-check me-1"></i> <?php echo t('add'); ?>
                                     </button>
                                     <button type="reset" class="btn btn-secondary ms-2">
-                                        <i class="fa-solid fa-rotate me-1"></i> Temizle
+                                        <i class="fa-solid fa-rotate me-1"></i> <?php echo t('clear'); ?>
                                     </button>
                                 </div>
                             </div>
@@ -91,7 +91,7 @@ $user_default_currency = $_SESSION['base_currency'];
             <!-- Mali Durum Grafiği -->
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span>Mali Durum Özeti</span>
+                    <span><?php echo t('stock.financial_summary'); ?></span>
                 </div>
                 <div class="collapse show" id="maliDurumDetay">
                     <div class="card-body py-3">
@@ -107,10 +107,10 @@ $user_default_currency = $_SESSION['base_currency'];
                                                 <div class="mali-ozet-ikon bg-primary bg-opacity-10 rounded-circle p-2 me-2">
                                                     <i class="fas fa-wallet text-primary"></i>
                                                 </div>
-                                                <h6 class="mb-0">Portföy Değeri</h6>
+                                                <h6 class="mb-0"><?php echo t('stock.portfolio_value'); ?></h6>
                                             </div>
                                             <h4 id="toplamPortfoyDeger" class="mb-0 mt-2">0.00</h4>
-                                            <small class="text-muted">Güncel piyasa değeri</small>
+                                            <small class="text-muted"><?php echo t('stock.current_market_value'); ?></small>
                                         </div>
                                     </div>
                                     <div class="col">
@@ -119,10 +119,10 @@ $user_default_currency = $_SESSION['base_currency'];
                                                 <div class="mali-ozet-ikon bg-info bg-opacity-10 rounded-circle p-2 me-2">
                                                     <i class="fas fa-chart-line text-info"></i>
                                                 </div>
-                                                <h6 class="mb-0">Kar/Zarar</h6>
+                                                <h6 class="mb-0"><?php echo t('stock.profit_loss'); ?></h6>
                                             </div>
                                             <h4 id="toplamKarZarar" class="mb-0 mt-2">0.00</h4>
-                                            <small class="text-muted">Güncel değere göre</small>
+                                            <small class="text-muted"><?php echo t('stock.based_on_current_value'); ?></small>
                                         </div>
                                     </div>
                                     <div class="col">
@@ -131,10 +131,10 @@ $user_default_currency = $_SESSION['base_currency'];
                                                 <div class="mali-ozet-ikon bg-success bg-opacity-10 rounded-circle p-2 me-2">
                                                     <i class="fas fa-money-bill-wave text-success"></i>
                                                 </div>
-                                                <h6 class="mb-0">Gerçekleşen K/Z</h6>
+                                                <h6 class="mb-0"><?php echo t('stock.realized_profit_loss'); ?></h6>
                                             </div>
                                             <h4 id="toplamSatisKar" class="mb-0 mt-2">0.00</h4>
-                                            <small class="text-muted">Satış işlemlerinden</small>
+                                            <small class="text-muted"><?php echo t('stock.from_sales'); ?></small>
                                         </div>
                                     </div>
                                 </div>
@@ -146,21 +146,21 @@ $user_default_currency = $_SESSION['base_currency'];
 
             <!-- Portföy Listesi -->
             <div class="card">
-                <div class="card-header">Portföyüm</div>
+                <div class="card-header"><?php echo t('stock.my_portfolio'); ?></div>
                 <div class="card-body">
                     <table class="table table-striped table-responsive">
                         <thead>
                             <tr>
-                                <th>Hisse</th>
-                                <th>Lot</th>
-                                <th>Alış</th>
-                                <th class="text-center">Güncel</th>
-                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Ortalama Alış Fiyatı = Toplam Alış Maliyeti / Toplam Alış Lot Sayısı">Ort. Alış</th>
-                                <th class="text-center" data-bs-toggle="tooltip" data-bs-placement="top" title="Maliyet = Kalan Adetlerin Toplam Maliyeti / Toplam Alış Maliyeti">Maliyet</th>
-                                <th>Güncel Değer</th>
-                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Kar/Zarar = (Güncel Fiyat - Ortalama Alış Fiyatı) × Lot Sayısı">Kar/Zarar</th>
-                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Satış Karı = (Satış Fiyatı - Alış Fiyatı) x Satılan Lot Sayısı">Satış Karı</th>
-                                <th>İşlemler</th>
+                                <th><?php echo t('stock.table.stock'); ?></th>
+                                <th><?php echo t('stock.table.lot'); ?></th>
+                                <th><?php echo t('stock.table.purchase'); ?></th>
+                                <th class="text-center"><?php echo t('stock.table.current'); ?></th>
+                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Ortalama Alış Fiyatı = Toplam Alış Maliyeti / Toplam Alış Lot Sayısı"><?php echo t('stock.table.avg_purchase'); ?></th>
+                                <th class="text-center" data-bs-toggle="tooltip" data-bs-placement="top" title="Maliyet = Kalan Adetlerin Toplam Maliyeti / Toplam Alış Maliyeti"><?php echo t('stock.table.cost'); ?></th>
+                                <th><?php echo t('stock.table.current_value'); ?></th>
+                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Kar/Zarar = (Güncel Fiyat - Ortalama Alış Fiyatı) × Lot Sayısı"><?php echo t('stock.table.profit_loss'); ?></th>
+                                <th data-bs-toggle="tooltip" data-bs-placement="top" title="Satış Karı = (Satış Fiyatı - Alış Fiyatı) x Satılan Lot Sayısı"><?php echo t('stock.table.sales_profit'); ?></th>
+                                <th><?php echo t('stock.table.actions'); ?></th>
                             </tr>
                         </thead>
                         <tbody id="portfoyListesi">
@@ -175,7 +175,7 @@ $user_default_currency = $_SESSION['base_currency'];
         <div class="container mt-5 mb-4">
             <div class="card">
                 <div class="card-header bg-warning text-dark">
-                    <i class="bi bi-exclamation-triangle me-2"></i>Sorumluluk Reddi
+                    <i class="bi bi-exclamation-triangle me-2"></i><?php echo t('disclaimer'); ?>
                 </div>
                 <div class="card-body">
                     <p class="small text-muted mb-0">
@@ -215,11 +215,11 @@ $user_default_currency = $_SESSION['base_currency'];
             // Çıkış işlemi
             document.querySelector('.logout-btn').addEventListener('click', function() {
                 Swal.fire({
-                    title: 'Çıkış yapmak istediğinize emin misiniz?',
+                    title: '<?php echo t('logout_confirm'); ?>',
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonText: 'Evet, çıkış yap',
-                    cancelButtonText: 'İptal'
+                    confirmButtonText: '<?php echo t('logout.yes'); ?>',
+                    cancelButtonText: '<?php echo t('cancel'); ?>'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({

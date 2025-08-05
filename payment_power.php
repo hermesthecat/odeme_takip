@@ -66,7 +66,7 @@ $user_default_currency = $_SESSION['base_currency'];
         <div class="container mt-5 mb-3">
             <div class="card">
                 <div class="card-header bg-warning text-dark">
-                    <i class="bi bi-exclamation-triangle me-2"></i>Sorumluluk Reddi
+                    <i class="bi bi-exclamation-triangle me-2"></i><?php echo t('disclaimer'); ?>
                 </div>
                 <div class="card-body">
                     <p class="card-text small text-muted">

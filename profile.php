@@ -153,11 +153,11 @@ function unlink_telegram()
         // Çıkış işlemi
         document.querySelector('.logout-btn').addEventListener('click', function() {
             Swal.fire({
-                title: 'Çıkış yapmak istediğinize emin misiniz?',
+                title: '<?php echo t('logout_confirm'); ?>',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Evet, çıkış yap',
-                cancelButtonText: 'İptal'
+                confirmButtonText: '<?php echo t('logout.yes'); ?>',
+                cancelButtonText: '<?php echo t('cancel'); ?>'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({

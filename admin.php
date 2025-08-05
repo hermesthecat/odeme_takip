@@ -145,37 +145,37 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="card mb-4">
             <div class="card-header bg-primary bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Kullanıcı Filtreleme</h2>
+                    <h2 class="mb-0"><?php echo t('admin.user_filtering'); ?></h2>
                     <button class="btn btn-primary" onclick="showAddUserModal()">
-                        <i class="bi bi-person-plus me-1"></i>Yeni Kullanıcı
+                        <i class="bi bi-person-plus me-1"></i><?php echo t('admin.new_user'); ?>
                     </button>
                 </div>
             </div>
             <div class="card-body">
                 <form method="GET" action="admin.php" class="row g-3">
                     <div class="col-md-4">
-                        <label for="username" class="form-label">Kullanıcı Adı</label>
+                        <label for="username" class="form-label"><?php echo t('username'); ?></label>
                         <input type="text" name="username" id="username" class="form-control" placeholder="Kullanıcı adı" value="<?php echo htmlspecialchars($username_filter); ?>">
                     </div>
                     <div class="col-md-4">
-                        <label for="is_admin" class="form-label">Yönetici</label>
+                        <label for="is_admin" class="form-label"><?php echo t('admin.administrator'); ?></label>
                         <select name="is_admin" id="is_admin" class="form-select">
-                            <option value="">Tümü</option>
-                            <option value="1" <?php echo $is_admin_filter === '1' ? 'selected' : ''; ?>>Evet</option>
-                            <option value="0" <?php echo $is_admin_filter === '0' ? 'selected' : ''; ?>>Hayır</option>
+                            <option value=""><?php echo t('all'); ?></option>
+                            <option value="1" <?php echo $is_admin_filter === '1' ? 'selected' : ''; ?>><?php echo t('yes'); ?></option>
+                            <option value="0" <?php echo $is_admin_filter === '0' ? 'selected' : ''; ?>><?php echo t('no'); ?></option>
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label for="is_active" class="form-label">Durum</label>
+                        <label for="is_active" class="form-label"><?php echo t('status'); ?></label>
                         <select name="is_active" id="is_active" class="form-select">
-                            <option value="">Tümü</option>
-                            <option value="1" <?php echo $is_active_filter === '1' ? 'selected' : ''; ?>>Aktif</option>
-                            <option value="0" <?php echo $is_active_filter === '0' ? 'selected' : ''; ?>>Pasif</option>
+                            <option value=""><?php echo t('all'); ?></option>
+                            <option value="1" <?php echo $is_active_filter === '1' ? 'selected' : ''; ?>><?php echo t('active'); ?></option>
+                            <option value="0" <?php echo $is_active_filter === '0' ? 'selected' : ''; ?>><?php echo t('inactive'); ?></option>
                         </select>
                     </div>
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Filtrele</button>
-                        <a href="admin.php" class="btn btn-secondary">Sıfırla</a>
+                        <button type="submit" class="btn btn-primary"><?php echo t('filter'); ?></button>
+                        <a href="admin.php" class="btn btn-secondary"><?php echo t('reset'); ?></a>
                     </div>
                 </form>
             </div>
@@ -185,8 +185,8 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="card mb-4">
             <div class="card-header bg-info bg-opacity-25">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">Kullanıcı Listesi</h2>
-                    <span class="badge bg-primary"><?php echo $total_users; ?> kullanıcı</span>
+                    <h2 class="mb-0"><?php echo t('admin.user_list'); ?></h2>
+                    <span class="badge bg-primary"><?php echo $total_users; ?> <?php echo t('admin.user_count'); ?></span>
                 </div>
             </div>
             <div class="card-body">
@@ -194,14 +194,14 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Kullanıcı Adı</th>
-                                <th>Ana Para Birimi</th>
-                                <th>Tema</th>
-                                <th>Yönetici</th>
-                                <th>Durum</th>
-                                <th>Son Giriş</th>
-                                <th>İşlemler</th>
+                                <th><?php echo t('admin.table.id'); ?></th>
+                                <th><?php echo t('admin.table.username'); ?></th>
+                                <th><?php echo t('admin.table.base_currency'); ?></th>
+                                <th><?php echo t('admin.table.theme'); ?></th>
+                                <th><?php echo t('admin.table.is_admin'); ?></th>
+                                <th><?php echo t('admin.table.status'); ?></th>
+                                <th><?php echo t('admin.table.last_login'); ?></th>
+                                <th><?php echo t('admin.table.actions'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -214,7 +214,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                                         <td><?php echo htmlspecialchars($user['theme_preference']); ?></td>
                                         <td>
                                             <span class="badge <?php echo $user['is_admin'] ? 'bg-success' : 'bg-secondary'; ?>">
-                                                <?php echo $user['is_admin'] ? 'Evet' : 'Hayır'; ?>
+                                                <?php echo $user['is_admin'] ? t('yes') : t('no'); ?>
                                             </span>
                                         </td>
                                         <td>
@@ -239,7 +239,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="8" class="text-center">Kullanıcı bulunamadı</td>
+                                    <td colspan="8" class="text-center"><?php echo t('admin.no_users_found'); ?></td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -296,7 +296,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="userModalTitle" data-translate="admin.add_user">Kullanıcı Ekle</h5>
+                    <h5 class="modal-title" id="userModalTitle"><?php echo t('admin.add_user'); ?></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -309,22 +309,22 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="mb-3">
                             <label for="modalPassword" class="form-label" data-translate="password">Şifre</label>
                             <input type="password" class="form-control" id="modalPassword" name="password">
-                            <small class="text-muted" data-translate="admin.password_edit_note">Düzenleme sırasında boş bırakılırsa şifre değişmez</small>
+                            <small class="text-muted"><?php echo t('admin.password_edit_note'); ?></small>
                         </div>
                         <div class="mb-3">
                             <label for="modalBaseCurrency" class="form-label" data-translate="base_currency">Ana Para Birimi</label>
                             <select class="form-select" id="modalBaseCurrency" name="base_currency" required>
-                                <option value="TRY">Türk Lirası (TRY)</option>
-                                <option value="USD">Amerikan Doları (USD)</option>
-                                <option value="EUR">Euro (EUR)</option>
-                                <option value="GBP">İngiliz Sterlini (GBP)</option>
+                                <option value="TRY"><?php echo t('currency.try'); ?> (TRY)</option>
+                                <option value="USD"><?php echo t('currency.usd'); ?> (USD)</option>
+                                <option value="EUR"><?php echo t('currency.eur'); ?> (EUR)</option>
+                                <option value="GBP"><?php echo t('currency.gbp'); ?> (GBP)</option>
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="modalTheme" class="form-label" data-translate="theme">Tema</label>
                             <select class="form-select" id="modalTheme" name="theme_preference" required>
-                                <option value="light">Açık Tema</option>
-                                <option value="dark">Koyu Tema</option>
+                                <option value="light"><?php echo t('settings.theme_light'); ?></option>
+                                <option value="dark"><?php echo t('settings.theme_dark'); ?></option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -415,7 +415,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                     }
                 })
                 .catch(error => {
-                    console.error('Hata:', error);
+                    console.error('<?php echo t('error'); ?>:', error);
                     Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', '<?php echo htmlspecialchars(t('admin.user_info_error')); ?>', 'error');
                 });
         }
@@ -438,7 +438,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                     if (data.status === 'success') {
                         Swal.fire({
                             icon: 'success',
-                            title: 'Başarılı',
+                            title: '<?php echo t('success'); ?>',
                             text: data.message,
                             showConfirmButton: false,
                             timer: 1500
@@ -450,7 +450,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                     }
                 })
                 .catch(error => {
-                    console.error('Hata:', error);
+                    console.error('<?php echo t('error'); ?>:', error);
                     Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', '<?php echo htmlspecialchars(t('app.operation_error')); ?>', 'error');
                 });
         }
@@ -483,7 +483,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                             if (data.status === 'success') {
                                 Swal.fire({
                                     icon: 'success',
-                                    title: 'Başarılı',
+                                    title: '<?php echo t('success'); ?>',
                                     text: data.message,
                                     showConfirmButton: false,
                                     timer: 1500
@@ -495,7 +495,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                             }
                         })
                         .catch(error => {
-                            console.error('Hata:', error);
+                            console.error('<?php echo t('error'); ?>:', error);
                             Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', '<?php echo htmlspecialchars(t('admin.delete_error')); ?>', 'error');
                         });
                 }
@@ -512,11 +512,11 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
         // Çıkış işlemi
         document.querySelector('.logout-btn').addEventListener('click', function() {
             Swal.fire({
-                title: 'Çıkış yapmak istediğinize emin misiniz?',
+                title: '<?php echo t('logout_confirm'); ?>',
                 icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'Evet, çıkış yap',
-                cancelButtonText: 'İptal'
+                confirmButtonText: '<?php echo t('logout.yes'); ?>',
+                cancelButtonText: '<?php echo t('cancel'); ?>'
             }).then((result) => {
                 if (result.isConfirmed) {
                     $.ajax({

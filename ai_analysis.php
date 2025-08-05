@@ -246,7 +246,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-5">
     <div class="row">
         <div class="col-12">
-            <h1 class="mb-4">AI Destekli Gelir/Gider Analizi</h1>
+            <h1 class="mb-4"><?php echo t('ai.analysis_title'); ?></h1>
 
             <?php if (isset($_SESSION['error'])): ?>
                 <div class="alert alert-danger">
@@ -269,14 +269,14 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <!-- Dosya Yükleme Formu -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title">Dosya Yükle</h5>
+                    <h5 class="card-title"><?php echo t('ai.upload_file'); ?></h5>
                     <form action="" method="post" enctype="multipart/form-data">
                         <?php echo getCSRFTokenInput(); ?>
                         <div class="mb-3">
                             <label for="document" class="form-label">PDF, Excel, CSV, PNG, JPG ve JPEG Dosyası Seçin</label>
                             <input type="file" class="form-control" id="document" name="document" accept=".pdf,.xlsx,.xls,.csv,.png,.jpg,.jpeg" required>
                         </div>
-                        <button type="submit" class="btn btn-primary">Yükle ve Analiz Et</button>
+                        <button type="submit" class="btn btn-primary"><?php echo t('ai.upload_and_analyze'); ?></button>
                     </form>
                 </div>
             </div>
@@ -285,18 +285,18 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php if (!empty($results)): ?>
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Analiz Sonuçları</h5>
+                        <h5 class="card-title"><?php echo t('ai.analysis_results'); ?></h5>
                         <form action="save_analysis.php" method="post">
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>Seç</th>
-                                            <th>Tür</th>
-                                            <th>Açıklama</th>
-                                            <th>Tutar</th>
-                                            <th>Önerilen İsim</th>
-                                            <th>Dosya</th>
+                                            <th><?php echo t('ai.table.select'); ?></th>
+                                            <th><?php echo t('ai.table.type'); ?></th>
+                                            <th><?php echo t('ai.table.description'); ?></th>
+                                            <th><?php echo t('ai.table.amount'); ?></th>
+                                            <th><?php echo t('ai.table.suggested_name'); ?></th>
+                                            <th><?php echo t('ai.table.file'); ?></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -305,7 +305,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                 <td>
                                                     <input type="checkbox" name="approved[]" value="<?php echo $result['id']; ?>">
                                                 </td>
-                                                <td><?php echo $result['category'] == 'income' ? 'Gelir' : 'Gider'; ?></td>
+                                                <td><?php echo $result['category'] == 'income' ? t('income.title') : t('payment.title'); ?></td>
                                                 <td><?php echo htmlspecialchars($result['description']); ?></td>
                                                 <td><?php echo number_format($result['amount'], 2) . ' ' . $result['currency']; ?></td>
                                                 <td><?php echo htmlspecialchars($result['suggested_name']); ?></td>
@@ -315,7 +315,7 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                     </tbody>
                                 </table>
                             </div>
-                            <button type="submit" class="btn btn-success">Seçilenleri Kaydet</button>
+                            <button type="submit" class="btn btn-success"><?php echo t('ai.save_selected'); ?></button>
                         </form>
                     </div>
                 </div>
