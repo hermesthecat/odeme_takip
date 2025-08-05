@@ -256,6 +256,11 @@ $user_default_currency = $_SESSION['base_currency'];
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Modern Language System - translations loaded via /api/translations.php -->
+    
+    <!-- CSRF Token for AJAX requests -->
+    <script>
+        window.csrfToken = '<?php echo generateCSRFToken(); ?>';
+    </script>
 
     <script src="js/utils.js"></script>
     <script src="js/income.js"></script>

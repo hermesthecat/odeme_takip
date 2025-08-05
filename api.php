@@ -19,8 +19,13 @@ header('Content-Type: application/json');
 $response = ['status' => 'error', 'message' => 'Invalid request'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    checkLogin(); // Ensure user is authenticated
+    
+    // CSRF Protection for state-changing operations
+    requireCSRFToken();
+    
     $action = $_POST['action'] ?? '';
-    $user_id = $_SESSION['user_id'];
+    $user_id = validateUserId($_SESSION['user_id']);
 
     switch ($action) {
         case 'add_income':

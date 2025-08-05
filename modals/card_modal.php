@@ -7,6 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form data-type="card">
+                <?php echo getCSRFTokenInput(); ?>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Ödeme Yönetimi Adı</label>

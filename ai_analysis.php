@@ -11,16 +11,15 @@ require_once 'api/rate_limiter.php';
 require_once 'header.php';
 require_once 'navbar_app.php';
 
-// Oturum kontrolü
-if (!isset($_SESSION['user_id'])) {
-    echo "<script>window.location.href = '" . SITE_URL . "/login.php';</script>";
-    exit;
-}
+// Oturum kontrolü - güvenli authentication
+checkLogin();
 
-$user_id = $_SESSION['user_id'];
+$user_id = validateUserId($_SESSION['user_id']);
 
 // Dosya yükleme işlemi
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
+    // CSRF koruması
+    requireCSRFToken();
     // Rate limiting kontrolü - file upload
     if (!checkFileUploadLimit($user_id)) {
         $_SESSION['error'] = "Çok fazla dosya yükleme denemesi. 5 dakika sonra tekrar deneyin.";
@@ -31,7 +30,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     $fileName = $file['name'];
     $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
     $fileSize = $file['size'];
-    $fileMime = mime_content_type($file['tmp_name']);
+    // Güçlü MIME type validasyonu
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $fileMime = $finfo->file($file['tmp_name']);
+    
+    // Backup olarak mime_content_type de kontrol et
+    $backupMime = mime_content_type($file['tmp_name']);
 
     // Dosya boyutu kontrolü (max 10MB)
     $maxFileSize = 10 * 1024 * 1024; // 10MB
@@ -41,17 +45,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
         exit;
     }
 
-    // İzin verilen MIME tipleri
+    // İzin verilen MIME tipleri - sıkı kontrol
     $allowedMimes = [
         'application/pdf',
         'application/vnd.ms-excel',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'text/csv',
+        'text/plain',
         'image/jpeg',
         'image/png'
     ];
 
-    if (!in_array($fileMime, $allowedMimes)) {
+    // İki farklı MIME type kontrolü de geçmeli
+    if (!in_array($fileMime, $allowedMimes) || !in_array($backupMime, $allowedMimes)) {
         $_SESSION['error'] = "Geçersiz dosya türü. Sadece PDF, Excel, CSV, PNG ve JPEG dosyaları yüklenebilir.";
         echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
         exit;
@@ -92,12 +98,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
         }
     }
 
-    // Dosya adı güvenliği
-    $safeFileName = preg_replace("/[^a-zA-Z0-9.-]/", "_", $fileName);
+    // Güvenli dosya adı oluştur - hash ile
+    $fileExtension = pathinfo($fileName, PATHINFO_EXTENSION);
+    $safeFileName = hash('sha256', $fileName . time() . $user_id) . '.' . $fileExtension;
 
-    $uploadDir = 'uploads/';
+    // Güvenli depolama dizini - web root dışında
+    $uploadDir = __DIR__ . '/../secure_uploads/' . $user_id . '/';
     if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+        mkdir($uploadDir, 0755, true); // Daha güvenli permissions
     }
 
     $uniqueFileName = uniqid() . '_' . $safeFileName;
@@ -247,9 +255,10 @@ $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <div class="card-body">
                     <h5 class="card-title">Dosya Yükle</h5>
                     <form action="" method="post" enctype="multipart/form-data">
+                        <?php echo getCSRFTokenInput(); ?>
                         <div class="mb-3">
                             <label for="document" class="form-label">PDF, Excel, CSV, PNG, JPG ve JPEG Dosyası Seçin</label>
-                            <input type="file" class="form-control" id="document" name="document" accept=".pdf,.xlsx,.xls" required>
+                            <input type="file" class="form-control" id="document" name="document" accept=".pdf,.xlsx,.xls,.csv,.png,.jpg,.jpeg" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Yükle ve Analiz Et</button>
                     </form>

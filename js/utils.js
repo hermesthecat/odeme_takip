@@ -229,6 +229,11 @@ function ajaxRequest(data) {
         }
     }
 
+    // CSRF token ekle (eğer mevcut değilse)
+    if (!data.csrf_token && typeof window.csrfToken !== 'undefined') {
+        data.csrf_token = window.csrfToken;
+    }
+
     // AJAX isteği
     return $.ajax({
         url: 'api.php',

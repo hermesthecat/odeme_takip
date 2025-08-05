@@ -7,6 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form data-type="saving">
+                <?php echo getCSRFTokenInput(); ?>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label"><?php echo t('saving_name'); ?></label>

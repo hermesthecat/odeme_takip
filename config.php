@@ -130,9 +130,54 @@ function t($key, $params = [])
 function checkLogin()
 {
     if (!isset($_SESSION['user_id'])) {
-        echo "<script>window.location.href = '" . SITE_URL . "/login.php';</script>";
+        // JSON request için farklı response
+        if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+            header('Content-Type: application/json');
+            http_response_code(401);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Unauthorized access',
+                'redirect' => SITE_URL . '/login.php'
+            ]);
+        } else {
+            // Normal web request için PHP redirect
+            header("Location: " . SITE_URL . "/login.php");
+            http_response_code(302);
+        }
         exit;
     }
+    
+    // Session timeout kontrolü ekle
+    validateSessionTimeout();
+}
+
+// Session timeout validation
+function validateSessionTimeout()
+{
+    $timeout = 30 * 60; // 30 dakika
+    
+    if (isset($_SESSION['last_activity_time'])) {
+        if (time() - $_SESSION['last_activity_time'] > $timeout) {
+            session_destroy();
+            
+            // JSON request için farklı response
+            if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+                header('Content-Type: application/json');
+                http_response_code(401);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Session expired',
+                    'redirect' => SITE_URL . '/login.php?timeout=1'
+                ]);
+            } else {
+                header("Location: " . SITE_URL . "/login.php?timeout=1");
+                http_response_code(302);
+            }
+            exit;
+        }
+    }
+    
+    $_SESSION['last_activity_time'] = time();
 }
 
 // convert date from english to turkish
@@ -154,11 +199,69 @@ $supported_currencies = [
     'GBP' => 'GBP - ' . t('currencies.gbp')
 ];
 
+// User ID validation function
+function validateUserId($userId)
+{
+    if (!is_numeric($userId) || $userId <= 0) {
+        throw new Exception('Invalid user ID');
+    }
+    return (int)$userId;
+}
+
+// CSRF Protection Functions
+function generateCSRFToken()
+{
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function validateCSRFToken($token)
+{
+    if (empty($_SESSION['csrf_token']) || empty($token)) {
+        return false;
+    }
+    return hash_equals($_SESSION['csrf_token'], $token);
+}
+
+function getCSRFTokenInput()
+{
+    $token = generateCSRFToken();
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token) . '">';
+}
+
+function requireCSRFToken()
+{
+    $token = $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
+    if (!validateCSRFToken($token)) {
+        // JSON request için
+        if (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false) {
+            header('Content-Type: application/json');
+            http_response_code(403);
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'CSRF token validation failed',
+                'error_code' => 'CSRF_TOKEN_INVALID'
+            ]);
+        } else {
+            // Web request için
+            http_response_code(403);
+            echo "<!DOCTYPE html><html><head><title>Security Error</title></head><body>";
+            echo "<h1>Security Error</h1>";
+            echo "<p>CSRF token validation failed. Please refresh the page and try again.</p>";
+            echo "<a href='javascript:history.back()'>Go Back</a>";
+            echo "</body></html>";
+        }
+        exit;
+    }
+}
+
 // get user cards
 function get_user_cards()
 {
     global $pdo;
-    $user_id = $_SESSION['user_id'];
+    $user_id = validateUserId($_SESSION['user_id']);
     $query = "SELECT * FROM card WHERE user_id = :user_id";
     $stmt = $pdo->prepare($query);
     $stmt->execute(['user_id' => $user_id]);
