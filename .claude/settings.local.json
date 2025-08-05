@@ -4,7 +4,20 @@
       "Bash(gemini:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(npx claude-flow:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npx --yes create-next-app@latest butce-js --typescript --tailwind --app --src-dir --import-alias \"@/*\" --eslint)",
+      "Bash(npx --yes create-next-app@latest butce-js --ts --tailwind --app --src-dir --import-alias \"@/*\" --eslint --turbopack)",
+      "Bash(ls:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx shadcn@latest init:*)",
+      "Bash(git init:*)",
+      "Bash(npx husky init:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": []
   }

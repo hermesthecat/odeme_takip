@@ -29,6 +29,10 @@ chmod 777 uploads
 php telegram_bot.php
 ```
 
+### Testing
+
+No automated test suite is configured. Testing is done manually through the web interface.
+
 ### Background Tasks
 
 ```bash
@@ -67,6 +71,11 @@ curl -X POST http://localhost/api.php \
   -H "Cookie: PHPSESSID=your_session_id" \
   -d "action=get_summary&month=1&year=2025"
 
+# Test exchange rate refresh API
+curl -X POST http://localhost/api/exchange_rate_refresh.php \
+  -H "Cookie: PHPSESSID=your_session_id" \
+  -d "from_currency=USD&to_currency=TRY"
+
 # Check database performance (user_id queries)
 SELECT table_name, index_name 
 FROM information_schema.statistics 
@@ -86,6 +95,30 @@ php telegram_bot.php && curl -s "https://api.telegram.org/bot$TOKEN/getWebhookIn
 
 # Check session storage usage
 ls -la /tmp/sess_* | wc -l  # or configured session path
+
+# Test rate limiting behavior (should return 429 after limit)
+for i in {1..15}; do 
+  curl -X POST http://localhost/api/exchange_rate_refresh.php \
+    -H "Cookie: PHPSESSID=your_session_id" \
+    -d "from_currency=USD&to_currency=TRY"
+done
+
+# Clear cache manually (when debugging cache issues)
+# Access via: http://localhost/api.php with action=clear_cache
+
+# Test AI document processing pipeline
+curl -X POST http://localhost/upload_handler.php \
+  -F "file=@test_receipt.jpg" \
+  -F "type=ai_analysis" \
+  -H "Cookie: PHPSESSID=your_session_id"
+
+# Monitor database transaction locks
+SELECT * FROM information_schema.INNODB_TRX;
+
+# Check exchange rate cache status
+SELECT currency_from, currency_to, rate, updated_at 
+FROM exchange_rates 
+WHERE updated_at > DATE_SUB(NOW(), INTERVAL 1 HOUR);
 ```
 
 ## Architecture
@@ -134,6 +167,9 @@ API Modules:
 - `api/validate.php` - Input validation utilities
 - `api/utils.php` - Common utility functions
 - `api/xss.php` - Security utilities
+- `api/error_handler.php` - Global error handling with dev/prod modes
+- `api/rate_limiter.php` - API rate limiting for external services
+- `api/exchange_rate_refresh.php` - Manual exchange rate updates
 
 #### Internationalization
 
@@ -221,6 +257,12 @@ Commands:
 - **Database Security**: Prepared statements, transaction isolation
 - **XSS Protection**: HTML escaping, content type headers
 - **Authentication**: Strong password policy, brute force protection
+- **Error Handling**: Global error handlers with environment-aware responses
+- **Rate Limiting**: Built-in rate limiting for:
+  - Gemini API: 10 requests per 5 minutes per user
+  - Exchange Rate API: 20 requests per 10 minutes per user
+  - File uploads: 5 files per 5 minutes per user
+  - Telegram webhooks: 30 requests per minute per bot
 
 ## Critical Architectural Insights
 
@@ -408,6 +450,7 @@ Session management → User context → Feature modules
 - **APIs**: `GEMINI_API_KEY` (Google AI for document analysis)
 - **Telegram**: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_BOT_USERNAME`
 - **Site**: `SITE_NAME`, `SITE_AUTHOR`
+- **Environment**: `APP_ENV` (development/production - affects error display)
 
 ## Performance Considerations
 
@@ -468,6 +511,8 @@ No automated test suite is currently configured. Testing is done manually throug
 - **Security Testing**: Verify file upload security, XSS protection, session handling
 - **Telegram Integration**: Test bot commands and photo processing
 - **AI Workflow**: Test document upload → analysis → approval flow
+- **Rate Limiting**: Verify API rate limits work correctly
+- **Error Handling**: Test both development and production error modes
 
 ## Architectural Decision Guidelines
 
@@ -499,7 +544,9 @@ No automated test suite is currently configured. Testing is done manually throug
 
 - **DON'T**: Direct database access without user_id filtering
 - **DON'T**: File operations without proper cleanup
-- **DON'T**: API endpoints without authentication
+- **DON'T**: API endpoints without authentication (except `api/auth.php`)
 - **DON'T**: Frontend state changes without backend validation
 - **DON'T**: Hardcoded currency or language assumptions
 - **DON'T**: Database operations without proper error handling
+- **DON'T**: External API calls without rate limiting checks
+- **DON'T**: Missing rollback() on database transaction exceptions
