@@ -13,6 +13,7 @@ Pecunia is a comprehensive personal finance management system that helps you tra
 ### Key Features
 
 #### Financial Management
+
 - **Income & Expense Tracking**: Complete CRUD operations with recurring payment support
 - **Multi-Currency Support**: Real-time exchange rates with automatic conversion and caching
 - **Savings Goals**: Track progress toward financial targets with visual indicators
@@ -20,12 +21,14 @@ Pecunia is a comprehensive personal finance management system that helps you tra
 - **Transfer Management**: Move funds between accounts with full audit trail
 
 #### AI & Automation
+
 - **Document Analysis**: AI-powered processing of receipts, invoices, and financial documents
 - **Telegram Bot Integration**: Upload receipts via Telegram for instant AI analysis
 - **Smart Categorization**: Automatic expense categorization based on AI analysis
 - **Approval Workflow**: Review and approve AI suggestions before adding to your records
 
 #### User Experience
+
 - **Multi-Language Support**: Full Turkish and English localization
 - **Dark/Light Themes**: User preference-based theme switching
 - **Responsive Design**: Optimized for desktop and mobile devices
@@ -33,6 +36,7 @@ Pecunia is a comprehensive personal finance management system that helps you tra
 - **Advanced Filtering**: Filter transactions by date, category, currency, and more
 
 #### Security & Performance
+
 - **Session Management**: 30-minute timeout with secure remember-me tokens
 - **Brute Force Protection**: 5 failed attempts trigger 15-minute lockout
 - **Rate Limiting**: Built-in API rate limiting for external services
@@ -51,22 +55,26 @@ Pecunia is a comprehensive personal finance management system that helps you tra
 ### Installation
 
 #### 1. Get the Code
+
 ```bash
 git clone https://github.com/hermesthecat/odeme_takip.git
 cd pecunia
 ```
 
 #### 2. Install Dependencies
+
 ```bash
 composer install
 ```
 
 #### 3. Environment Configuration
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` file with your configuration:
+
 ```env
 # Database Configuration
 DB_SERVER=localhost
@@ -88,6 +96,7 @@ APP_ENV=production
 ```
 
 #### 4. Database Setup
+
 ```bash
 # Create database and import structure
 mysql -u your_user -p -e "CREATE DATABASE your_database CHARACTER SET utf8mb4 COLLATE utf8mb4_turkish_ci;"
@@ -95,6 +104,7 @@ mysql -u your_user -p your_database < database.sql
 ```
 
 #### 5. File Permissions
+
 ```bash
 mkdir uploads
 chmod 755 uploads
@@ -102,6 +112,7 @@ chmod 755 uploads
 ```
 
 #### 6. Telegram Bot Setup (Optional)
+
 ```bash
 # 1. Create bot via @BotFather on Telegram
 # 2. Add bot token to .env file
@@ -110,7 +121,9 @@ php telegram_bot.php
 ```
 
 #### 7. Background Tasks (Optional)
+
 Set up cron job for stock price updates:
+
 ```bash
 # Add to crontab: run every hour
 0 * * * * /usr/bin/php /path/to/project/cron_borsa.php
@@ -119,6 +132,7 @@ Set up cron job for stock price updates:
 ### Usage
 
 #### Getting Started
+
 1. **Access the Application**: Navigate to your domain in a web browser
 2. **Create Account**: Register with email/username and secure password
 3. **Configure Profile**: Set your preferred currency, language, and theme
@@ -127,39 +141,46 @@ Set up cron job for stock price updates:
 #### Core Workflows
 
 **Adding Transactions**:
+
 - Use the "+" button to add income, payments, or savings
 - Set up recurring transactions for regular income/expenses
 - Enable multi-currency support for international transactions
 
 **AI Document Analysis**:
+
 - Upload receipts, invoices, or bank statements (PDF, Excel, images)
 - Review AI-generated transaction suggestions
 - Bulk approve or edit suggestions before adding to your records
 
 **Telegram Integration**:
+
 - Go to Profile → Get Verification Code
 - Start chat with your bot on Telegram
 - Send `/verify your_code` to link accounts
 - Send receipt photos directly to bot for instant analysis
 
 **Portfolio Management**:
+
 - Add stock purchases with automatic price tracking
 - Monitor real-time portfolio performance
 - Track partial sales and dividend income
 
 #### Key Features Usage
 
-**Multi-Currency**: 
+**Multi-Currency**:
+
 - Set different currencies per transaction
 - Automatic exchange rate fetching and conversion
 - Historical rate preservation for accurate reporting
 
 **Savings Goals**:
+
 - Set target amounts and deadlines
 - Track progress with visual indicators
 - Link transactions to specific goals
 
 **Reporting & Analytics**:
+
 - Monthly/yearly financial summaries
 - Category-based expense analysis
 - Multi-currency consolidated reports
@@ -176,6 +197,7 @@ Pecunia, gelirlerinizi, giderlerinizi ve yatırımlarınızı takip etmenize yar
 ### Temel Özellikler
 
 #### Finansal Yönetim
+
 - **Gelir & Gider Takibi**: Tekrarlayan ödeme desteği ile tam CRUD işlemleri
 - **Çoklu Para Birimi Desteği**: Gerçek zamanlı döviz kurları, otomatik çevrim ve önbellekleme
 - **Birikim Hedefleri**: Görsel göstergelerle finansal hedeflere doğru ilerleme takibi
@@ -183,12 +205,14 @@ Pecunia, gelirlerinizi, giderlerinizi ve yatırımlarınızı takip etmenize yar
 - **Transfer Yönetimi**: Tam denetim izi ile hesaplar arası para transferi
 
 #### Yapay Zeka & Otomasyon
+
 - **Döküman Analizi**: Fişler, faturalar ve finansal dökümanların yapay zeka ile işlenmesi
 - **Telegram Bot Entegrasyonu**: Anında yapay zeka analizi için Telegram üzerinden fiş yükleme
 - **Akıllı Kategorilendirme**: Yapay zeka analizine dayalı otomatik gider kategorilendirmesi
 - **Onay İş Akışı**: Kayıtlarınıza eklemeden önce yapay zeka önerilerini gözden geçirme ve onaylama
 
 #### Kullanıcı Deneyimi
+
 - **Çoklu Dil Desteği**: Tam Türkçe ve İngilizce lokalizasyonu
 - **Koyu/Açık Temalar**: Kullanıcı tercihine dayalı tema değiştirme
 - **Duyarlı Tasarım**: Masaüstü ve mobil cihazlar için optimize edilmiş
@@ -196,6 +220,7 @@ Pecunia, gelirlerinizi, giderlerinizi ve yatırımlarınızı takip etmenize yar
 - **Gelişmiş Filtreleme**: Tarih, kategori, para birimi ve daha fazlasına göre işlem filtreleme
 
 #### Güvenlik & Performans
+
 - **Oturum Yönetimi**: Güvenli "beni hatırla" tokenleri ile 30 dakika zaman aşımı
 - **Kaba Kuvvet Koruması**: 5 başarısız girişim 15 dakika kilitleme tetikler
 - **Hız Sınırlama**: Dış servisler için yerleşik API hız sınırlama
@@ -214,22 +239,26 @@ Pecunia, gelirlerinizi, giderlerinizi ve yatırımlarınızı takip etmenize yar
 ### Kurulum
 
 #### 1. Kodu İndirin
+
 ```bash
 git clone https://github.com/hermesthecat/odeme_takip.git
 cd pecunia
 ```
 
 #### 2. Bağımlılıkları Yükleyin
+
 ```bash
 composer install
 ```
 
 #### 3. Ortam Yapılandırması
+
 ```bash
 cp .env.example .env
 ```
 
 `.env` dosyasını yapılandırmanıza göre düzenleyin:
+
 ```env
 # Veritabanı Yapılandırması
 DB_SERVER=localhost
@@ -251,6 +280,7 @@ APP_ENV=production
 ```
 
 #### 4. Veritabanı Kurulumu
+
 ```bash
 # Veritabanı oluşturun ve yapıyı içe aktarın
 mysql -u kullanici -p -e "CREATE DATABASE veritabani_adi CHARACTER SET utf8mb4 COLLATE utf8mb4_turkish_ci;"
@@ -258,6 +288,7 @@ mysql -u kullanici -p veritabani_adi < database.sql
 ```
 
 #### 5. Dosya İzinleri
+
 ```bash
 mkdir uploads
 chmod 755 uploads
@@ -265,6 +296,7 @@ chmod 755 uploads
 ```
 
 #### 6. Telegram Bot Kurulumu (Opsiyonel)
+
 ```bash
 # 1. Telegram'da @BotFather üzerinden bot oluşturun
 # 2. Bot token'ını .env dosyasına ekleyin
@@ -273,7 +305,9 @@ php telegram_bot.php
 ```
 
 #### 7. Arka Plan Görevleri (Opsiyonel)
+
 Hisse fiyat güncellemeleri için cron job kurulumu:
+
 ```bash
 # Crontab'a ekleyin: her saat çalıştır
 0 * * * * /usr/bin/php /proje/yolu/cron_borsa.php
@@ -282,6 +316,7 @@ Hisse fiyat güncellemeleri için cron job kurulumu:
 ### Kullanım
 
 #### Başlangıç
+
 1. **Uygulamaya Erişim**: Web tarayıcınızda domain adresinize gidin
 2. **Hesap Oluşturun**: E-posta/kullanıcı adı ve güvenli parola ile kayıt olun
 3. **Profil Yapılandırması**: Tercih ettiğiniz para birimi, dil ve temayı ayarlayın
@@ -290,22 +325,26 @@ Hisse fiyat güncellemeleri için cron job kurulumu:
 #### Temel İş Akışları
 
 **İşlem Ekleme**:
+
 - Gelir, ödeme veya birikim eklemek için "+" butonunu kullanın
 - Düzenli gelir/gider için tekrarlayan işlemler ayarlayın
 - Uluslararası işlemler için çoklu para birimi desteğini etkinleştirin
 
 **Yapay Zeka Döküman Analizi**:
+
 - Fiş, fatura veya banka ekstreleri yükleyin (PDF, Excel, resim)
 - Yapay zeka tarafından üretilen işlem önerilerini gözden geçirin
 - Kayıtlarınıza eklemeden önce önerileri toplu olarak onaylayın veya düzenleyin
 
 **Telegram Entegrasyonu**:
+
 - Profil → Doğrulama Kodu Al'a gidin
 - Telegram'da botunuzla sohbet başlatın
 - Hesapları bağlamak için `/verify kodunuz` gönderin
 - Anında analiz için fiş fotoğraflarını doğrudan bota gönderin
 
 **Portföy Yönetimi**:
+
 - Otomatik fiyat takibi ile hisse alımları ekleyin
 - Gerçek zamanlı portföy performansını izleyin
 - Kısmi satışları ve temettü gelirlerini takip edin
@@ -313,6 +352,7 @@ Hisse fiyat güncellemeleri için cron job kurulumu:
 ### Architecture & Development
 
 Pecunia is built with a modern, secure architecture:
+
 - **MVC Pattern**: Clean separation of concerns with centralized API routing
 - **Security First**: XSS protection, rate limiting, secure session management
 - **Multi-Language**: Full internationalization support with dynamic language switching
@@ -327,6 +367,7 @@ For detailed technical documentation, see [CLAUDE.md](CLAUDE.md).
 ### Mimari & Geliştirme
 
 Pecunia modern ve güvenli bir mimari ile geliştirilmiştir:
+
 - **MVC Modeli**: Merkezi API yönlendirmesi ile temiz endişe ayrımı
 - **Güvenlik Öncelikli**: XSS koruması, hız sınırlama, güvenli oturum yönetimi
 - **Çoklu Dil**: Dinamik dil değiştirme ile tam uluslararasılaştırma desteği
