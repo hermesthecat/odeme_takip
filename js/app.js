@@ -46,8 +46,8 @@ function loadData() {
         console.error('AJAX hatası:', textStatus, errorThrown);
         Swal.fire({
             icon: 'error',
-            title: 'Hata',
-            text: 'Veri yükleme hatası',
+            title: t('error'),
+            text: t('app.operation_error'),
             showConfirmButton: false,
             timer: 1500
         });
@@ -91,8 +91,8 @@ function loadCardData() {
     }).fail(function (error) {
         Swal.fire({
             icon: 'error',
-            title: translations.error || 'Hata',
-            text: translations.card.load_error || 'Ödeme yöntemleri yüklenirken bir hata oluştu'
+            title: t('error'),
+            text: t('app.operation_error')
         });
     }).always(function () {
         $('#cardLoadingSpinner').hide();

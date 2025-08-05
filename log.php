@@ -479,6 +479,7 @@ $log_type_bg_classes = [
     <script src="https://cdn.jsdelivr.net/npm/moment/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/language.js"></script>
     <script src="js/theme.js"></script>
     <script>
         // Kullanıcı temasını yükle

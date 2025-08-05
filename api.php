@@ -226,6 +226,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             break;
 
+        case 'change_language':
+            try {
+                $language = trim($_POST['language'] ?? '');
+                
+                if (empty($language)) {
+                    throw new Exception(t('validation.field_required', ['field' => 'Language']));
+                }
+                
+                $lang = Language::getInstance();
+                
+                if (!in_array($language, $lang->getAvailableLanguages())) {
+                    throw new Exception(t('currency.invalid_currency'));
+                }
+                
+                if ($lang->setLanguage($language)) {
+                    // Update user language preference in database
+                    $stmt = $pdo->prepare("UPDATE users SET language = ? WHERE id = ?");
+                    $stmt->execute([$language, $user_id]);
+                    
+                    $response = [
+                        'status' => 'success',
+                        'message' => t('settings.save_success'),
+                        'data' => [
+                            'language' => $language,
+                            'language_name' => $lang->getLanguageName($language)
+                        ]
+                    ];
+                } else {
+                    throw new Exception(t('settings.save_error'));
+                }
+            } catch (Exception $e) {
+                $response = [
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ];
+            }
+            break;
+
         case 'get_child_payments':
             // Önce ana kaydı al
             $stmt = $pdo->prepare("SELECT id, name, amount, currency, first_date, status, exchange_rate 

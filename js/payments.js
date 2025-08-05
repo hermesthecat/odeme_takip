@@ -7,7 +7,7 @@ function updatePaymentsList(payments) {
         tbody.append(`
             <tr>
                 <td colspan="8" class="text-center">
-                    <p class="text-muted">${translations.payment.no_data}</p>
+                    <p class="text-muted">${t('app.no_data')}</p>
                 </td>
             </tr>
         `);
@@ -32,7 +32,7 @@ function updatePaymentsList(payments) {
                     <button
                         class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
                         onclick="markAsPaid(${payment.id})"
-                        title="${payment.status === 'paid' ? translations.payment.mark_paid.mark_as_not_paid : translations.payment.mark_paid.mark_as_paid}"
+                        title="${payment.status === 'paid' ? t('payment.mark_not_paid') : t('payment.mark_paid')}"
                     >
                         <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                     </button>
@@ -46,10 +46,10 @@ function updatePaymentsList(payments) {
                 <td class="text-center">${payment.card_name || ''}</td>
                 <td class="text-end">
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-primary" onclick="openUpdatePaymentModal(${payment.id})" title="${translations.payment.buttons.edit}">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdatePaymentModal(${payment.id})" title="${t('edit')}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})" title="${translations.payment.buttons.delete}">
+                        <button class="btn btn-sm btn-danger" onclick="deletePayment(${payment.id})" title="${t('delete')}"
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -65,7 +65,7 @@ function updatePaymentsList(payments) {
                 <td colspan="8" class="text-end">
                     <button class="btn btn-warning" onclick="transferUnpaidPayments()">
                         <i class="bi bi-arrow-right-circle me-1"></i>
-                        ${translations.payment.buttons.transfer || 'Sonraki Aya Transfer Et'}
+                        ${t('transfer.transfer_button')}
                     </button>
                 </td>
             </tr>
@@ -89,11 +89,11 @@ function markAsPaid(id) {
             if (currentStatus) {
                 button.removeClass('btn-success').addClass('btn-outline-success');
                 icon.removeClass('bi-check-circle-fill').addClass('bi-check-circle');
-                button.attr('title', translations.payment.mark_paid.mark_as_paid);
+                button.attr('title', t('payment.mark_paid'));
             } else {
                 button.removeClass('btn-outline-success').addClass('btn-success');
                 icon.removeClass('bi-check-circle').addClass('bi-check-circle-fill');
-                button.attr('title', translations.payment.mark_paid.mark_as_not_paid);
+                button.attr('title', t('payment.mark_not_paid'));
             }
 
             // Tüm ödemelerin durumunu kontrol et
@@ -112,7 +112,7 @@ function markAsPaid(id) {
                         <td colspan="8" class="text-end">
                             <button class="btn btn-warning" onclick="transferUnpaidPayments()">
                                 <i class="bi bi-arrow-right-circle me-1"></i>
-                                ${translations.payment.buttons.transfer || 'Sonraki Aya Transfer Et'}
+                                ${t('transfer.transfer_button')}
                             </button>
                         </td>
                     </tr>
@@ -193,11 +193,11 @@ function markAsPaid(id) {
                                     const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
                                     tfoot.html(`
                                         <tr class="text-end">
-                                            <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.total_payment}:</td>
+                                            <td colspan="5" class="text-end fw-bold">${t('payment.total_amount')}:</td>
                                             <td class="fw-bold">${formatMyMoney(totalYearlyPayment.toFixed(2))} ${data.user.base_currency}</td>
                                         </tr>
                                         <tr class="text-end">
-                                            <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.pending_payment}:</td>
+                                            <td colspan="5" class="text-end fw-bold">${t('payment.pending_amount')}:</td>
                                             <td class="fw-bold">${formatMyMoney(totalUnpaidPayment.toFixed(2))} ${data.user.base_currency}</td>
                                         </tr>
                                     `);
@@ -230,7 +230,7 @@ function updateChildPayments(parentId, parent, children) {
                 <button
                     class="btn btn-sm ${parent.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
                     onclick="event.stopPropagation(); markAsPaid(${parent.id}); return false;"
-                    title="${parent.status === 'paid' ? translations.payment.mark_paid.mark_as_not_paid : translations.payment.mark_paid.mark_as_paid}"
+                    title="${parent.status === 'paid' ? t('payment.mark_not_paid') : t('payment.mark_paid')}"
                 >
                     <i class="bi ${parent.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                 </button>
@@ -239,7 +239,7 @@ function updateChildPayments(parentId, parent, children) {
             <td class="text-center">${parentAmountText}</td>
             <td class="text-center">${parent.currency}</td>
             <td class="text-end">
-                <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${parent.id})" title="${translations.payment.buttons.delete}">
+                <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${parent.id})" title="${t('delete')}">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
@@ -260,7 +260,7 @@ function updateChildPayments(parentId, parent, children) {
                     <button
                         class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
                         onclick="event.stopPropagation(); markAsPaid(${payment.id}); return false;"
-                        title="${payment.status === 'paid' ? translations.payment.mark_paid.mark_as_not_paid : translations.payment.mark_paid.mark_as_paid}"
+                        title="${payment.status === 'paid' ? t('payment.mark_not_paid') : t('payment.mark_paid')}"
                     >
                         <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                     </button>
@@ -269,7 +269,7 @@ function updateChildPayments(parentId, parent, children) {
                 <td class="text-center">${amountText}</td>
                 <td class="text-center">${payment.currency}</td>
                 <td class="text-end">
-                    <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deletePayment(${payment.id})" title="${translations.payment.buttons.delete}">
+                    <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deletePayment(${payment.id})" title="${t('delete')}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
@@ -282,10 +282,10 @@ function updateChildPayments(parentId, parent, children) {
 function deletePayment(id) {
     Swal.fire({
         icon: 'warning',
-        title: translations.payment.delete.title,
+        title: t('ui.confirm'),
         showCancelButton: true,
-        confirmButtonText: translations.payment.delete.confirm,
-        cancelButtonText: translations.payment.delete.cancel
+        confirmButtonText: t('ui.yes_delete'),
+        cancelButtonText: t('ui.cancel')
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
@@ -295,7 +295,11 @@ function deletePayment(id) {
                 if (response.status === 'success') {
                     loadData();
                 } else {
-                    alert(response.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: t('error'),
+                        text: response.message
+                    });
                 }
             }).fail(function (response) {
                 alert(response.message);
@@ -318,12 +322,12 @@ function transferUnpaidPayments() {
     }
 
     Swal.fire({
-        title: translations.transfer.title || 'Ödemeleri Transfer Et',
-        text: translations.transfer.confirm || 'Ödenmemiş ödemeler sonraki aya transfer edilecek. Bu işlem geri alınamaz!',
+        title: t('transfer.title'),
+        text: t('transfer.confirm'),
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: translations.transfer.transfer_button || 'Transfer Et',
-        cancelButtonText: translations.transfer.cancel_button || 'İptal'
+        confirmButtonText: t('transfer.transfer_button'),
+        cancelButtonText: t('ui.cancel')
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
@@ -336,8 +340,8 @@ function transferUnpaidPayments() {
                 if (response.status === 'success') {
                     Swal.fire({
                         icon: 'success',
-                        title: translations.transfer.success || 'Başarılı',
-                        text: translations.transfer.success_message || 'Ödemeler başarıyla transfer edildi',
+                        title: t('success'),
+                        text: t('transfer.success'),
                         showConfirmButton: false,
                         timer: 1500
                     }).then(() => {
@@ -350,8 +354,8 @@ function transferUnpaidPayments() {
                 } else {
                     Swal.fire({
                         icon: 'error',
-                        title: translations.error || 'Hata',
-                        text: response.message || translations.transfer.error || 'Transfer sırasında bir hata oluştu'
+                        title: t('error'),
+                        text: response.message || t('transfer.error')
                     });
                 }
             });
@@ -408,7 +412,7 @@ function updateRecurringPaymentsList(recurring_payments) {
                     ${formatMyMoney(parseFloat(payment.yearly_total).toFixed(2))}
                 </td>
                 <td class="text-end">
-                    <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${payment.id})" title="${translations.payment.buttons.delete}">
+                    <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${payment.id})" title="${t('delete')}">
                         <i class="bi bi-trash"></i>
                     </button>
                 </td>
@@ -421,9 +425,9 @@ function updateRecurringPaymentsList(recurring_payments) {
                                 <thead>
                                     <tr>
                                         <th style="width: 50px;"></th>
-                                        <th class="text-center">${translations.payment.date}</th>
-                                        <th class="text-center">${translations.payment.amount}</th>
-                                        <th class="text-center">${translations.payment.currency}</th>
+                                        <th class="text-center">${t('payment_date')}</th>
+                                        <th class="text-center">${t('payment_amount')}</th>
+                                        <th class="text-center">${t('payment.currency')}</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -453,11 +457,11 @@ function updateRecurringPaymentsList(recurring_payments) {
     const tfoot = $('#recurringPaymentsList').closest('table').find('tfoot');
     tfoot.html(`
         <tr class="text-end">
-            <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.total_payment}:</td>
+            <td colspan="5" class="text-end fw-bold">${t('payment.total_amount')}:</td>
             <td class="fw-bold">${formatMyMoney(totalYearlyPayment.toFixed(2))} ${data.user.base_currency}</td>
         </tr>
         <tr class="text-end">
-            <td colspan="5" class="text-end fw-bold">${translations.payment.recurring.pending_payment}:</td>
+            <td colspan="5" class="text-end fw-bold">${t('payment.pending_amount')}:</td>
             <td class="fw-bold">${formatMyMoney(totalUnpaidPayment.toFixed(2))} ${data.user.base_currency}</td>
         </tr>
     `);
@@ -501,7 +505,7 @@ function loadChildPayments(parentId) {
                         <button
                             class="btn btn-sm ${parent.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
                             onclick="event.stopPropagation(); markAsPaid(${parent.id}); return false;"
-                            title="${parent.status === 'paid' ? translations.payment.mark_paid.mark_as_not_paid : translations.payment.mark_paid.mark_as_paid}"
+                            title="${parent.status === 'paid' ? t('payment.mark_not_paid') : t('payment.mark_paid')}"
                         >
                             <i class="bi ${parent.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                         </button>
@@ -510,7 +514,7 @@ function loadChildPayments(parentId) {
                     <td class="text-center">${parentAmountText}</td>
                     <td class="text-center">${parent.currency}</td>
                     <td class="text-end">
-                        <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${parent.id})" title="${translations.payment.buttons.delete}">
+                        <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deleteRecurringPayment(${parent.id})" title="${t('delete')}">
                             <i class="bi bi-trash"></i>
                         </button>
                     </td>
@@ -531,7 +535,7 @@ function loadChildPayments(parentId) {
                             <button
                                 class="btn btn-sm ${payment.status === 'paid' ? 'btn-success' : 'btn-outline-success'}"
                                 onclick="event.stopPropagation(); markAsPaid(${payment.id}); return false;"
-                                title="${payment.status === 'paid' ? translations.payment.mark_paid.mark_as_not_paid : translations.payment.mark_paid.mark_as_paid}"
+                                title="${payment.status === 'paid' ? t('payment.mark_not_paid') : t('payment.mark_paid')}"
                             >
                                 <i class="bi ${payment.status === 'paid' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                             </button>
@@ -540,7 +544,7 @@ function loadChildPayments(parentId) {
                         <td class="text-center">${amountText}</td>
                         <td class="text-center">${payment.currency}</td>
                         <td class="text-end">
-                            <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deletePayment(${payment.id})" title="${translations.payment.buttons.delete}">
+                            <button class="btn btn-sm btn-danger ms-2" onclick="event.stopPropagation(); deletePayment(${payment.id})" title="${t('delete')}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -613,9 +617,9 @@ function openUpdatePaymentModal(id) {
                     // Bilgi metnini güncelle
                     let infoText = '';
                     if (isParent) {
-                        infoText = translations.payment.update_children_info_parent || 'Bu seçenek işaretlendiğinde, bu ödemeye bağlı tüm ödemeler güncellenecektir.';
+                        infoText = t('payment.update_children_info_parent');
                     } else {
-                        infoText = translations.payment.update_children_info_child || 'Bu seçenek işaretlendiğinde, bu ödeme ve sonraki ödemeler güncellenecektir.';
+                        infoText = t('payment.update_children_info_child');
                     }
                     $('#update_payment_children_info').text(infoText);
                 } else {
@@ -627,7 +631,7 @@ function openUpdatePaymentModal(id) {
                 if (payment.currency !== data.user.base_currency) {
                     exchangeRateGroup.style.display = 'block';
                     if (payment.exchange_rate) {
-                        $('#current_exchange_rate').text(`${translations.payment.modal.current_rate}: ${payment.exchange_rate}`);
+                        $('#current_exchange_rate').text(`${t('currency.current_rate')}: ${payment.exchange_rate}`);
                     }
                 } else {
                     exchangeRateGroup.style.display = 'none';
@@ -670,8 +674,8 @@ function openUpdatePaymentModal(id) {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: translations.payment.modal.error_title,
-                    text: translations.payment.modal.error_not_found
+                    title: t('error'),
+                    text: t('app.operation_error')
                 });
             }
         }
@@ -701,14 +705,14 @@ function updatePayment() {
             // Başarı mesajı göster
             Swal.fire({
                 icon: 'success',
-                title: translations.payment.modal.success_title,
-                text: translations.payment.modal.success_message
+                title: t('success'),
+                text: t('app.operation_success')
             });
         } else {
             Swal.fire({
                 icon: 'error',
-                title: translations.payment.modal.error_title,
-                text: response.message || translations.payment.modal.error_message
+                title: t('error'),
+                text: response.message || t('app.operation_error')
             });
         }
     });
@@ -718,11 +722,11 @@ function updatePayment() {
 function deleteRecurringPayment(parentId) {
     Swal.fire({
         icon: 'warning',
-        title: translations.payment.delete.title,
-        text: translations.payment.delete.confirm_all,
+        title: t('ui.confirm'),
+        text: t('payment.delete_confirm'),
         showCancelButton: true,
-        confirmButtonText: translations.payment.delete.confirm,
-        cancelButtonText: translations.payment.delete.cancel,
+        confirmButtonText: t('ui.yes_delete'),
+        cancelButtonText: t('ui.cancel'),
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
@@ -734,8 +738,8 @@ function deleteRecurringPayment(parentId) {
                     loadData();
                     Swal.fire({
                         icon: 'success',
-                        title: translations.app.delete_success,
-                        text: translations.payment.delete_success,
+                        title: t('success'),
+                        text: t('payment.delete_success'),
                         timer: 1500
                     });
                 }

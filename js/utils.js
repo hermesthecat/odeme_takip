@@ -93,7 +93,7 @@ function validateForm(formData, rules) {
     for (const field in rules) {
         const fieldRules = rules[field];
         const value = formData[field];
-        const fieldTranslation = translations.utils.form[field] || field;
+        const fieldTranslation = t(`utils.form.${field}`) || field;
 
         for (const rule of fieldRules) {
             let isValid = true;
@@ -102,35 +102,31 @@ function validateForm(formData, rules) {
             switch (rule.type) {
                 case 'required':
                     isValid = validationRules.required(value);
-                    errorMessage = rule.message || translations.utils.validation.required.replace(':field', fieldTranslation);
+                    errorMessage = rule.message || t('utils.validation.required', {field: fieldTranslation});
                     break;
                 case 'numeric':
                     isValid = validationRules.numeric(value);
-                    errorMessage = rule.message || translations.utils.validation.numeric.replace(':field', fieldTranslation);
+                    errorMessage = rule.message || t('utils.validation.numeric', {field: fieldTranslation});
                     break;
                 case 'date':
                     isValid = validationRules.date(value);
-                    errorMessage = rule.message || translations.utils.validation.date.replace(':field', fieldTranslation);
+                    errorMessage = rule.message || t('utils.validation.date', {field: fieldTranslation});
                     break;
                 case 'currency':
                     isValid = validationRules.currency(value);
-                    errorMessage = rule.message || translations.utils.validation.currency.replace(':field', fieldTranslation);
+                    errorMessage = rule.message || t('utils.validation.currency', {field: fieldTranslation});
                     break;
                 case 'frequency':
                     isValid = validationRules.frequency(value);
-                    errorMessage = rule.message || translations.utils.validation.frequency.replace(':field', fieldTranslation);
+                    errorMessage = rule.message || t('utils.validation.frequency', {field: fieldTranslation});
                     break;
                 case 'minValue':
                     isValid = validationRules.minValue(value, rule.value);
-                    errorMessage = rule.message || translations.utils.validation.min_value
-                        .replace(':field', fieldTranslation)
-                        .replace(':min', rule.value);
+                    errorMessage = rule.message || t('utils.validation.min_value', {field: fieldTranslation, min: rule.value});
                     break;
                 case 'maxValue':
                     isValid = validationRules.maxValue(value, rule.value);
-                    errorMessage = rule.message || translations.utils.validation.max_value
-                        .replace(':field', fieldTranslation)
-                        .replace(':max', rule.value);
+                    errorMessage = rule.message || t('utils.validation.max_value', {field: fieldTranslation, max: rule.value});
                     break;
             }
 
@@ -225,9 +221,9 @@ function ajaxRequest(data) {
             return $.Deferred().reject(new Error('Validasyon hatası')).always(() => {
                 Swal.fire({
                     icon: 'error',
-                    title: translations.utils.validation.error_title,
+                    title: t('utils.validation.error_title'),
                     html: errors.join('<br>'),
-                    confirmButtonText: translations.utils.validation.confirm_button
+                    confirmButtonText: t('utils.validation.confirm_button')
                 });
             });
         }
@@ -245,9 +241,9 @@ function ajaxRequest(data) {
             if (response.message) {
                 Swal.fire({
                     icon: 'error',
-                    title: translations.utils.session.error_title,
+                    title: t('error'),
                     text: escapeHtml(response.message),
-                    confirmButtonText: translations.utils.validation.confirm_button
+                    confirmButtonText: t('utils.validation.confirm_button')
                 }).then(() => {
                     window.location.href = 'login.php';
                 });
@@ -260,7 +256,7 @@ function ajaxRequest(data) {
 
 // Tekrarlama sıklığı metni
 function getFrequencyText(frequency) {
-    return translations.utils.frequency[frequency] || frequency;
+    return t(`utils.frequency.${frequency}`) || frequency;
 }
 
 // URL'den tarih parametrelerini al

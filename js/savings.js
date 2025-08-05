@@ -7,7 +7,7 @@ function updateSavingsList(savings) {
         tbody.append(`
             <tr>
                 <td colspan="8" class="text-center">
-                    <p class="text-muted">${translations.savings.no_data}</p>
+                    <p class="text-muted">${t('app.no_data')}</p>
                 </td>
             </tr>
         `);
@@ -69,13 +69,13 @@ function updateSavingsList(savings) {
                 </td>
                 <td class="text-end">
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-primary" onclick="openUpdateSavingModal(${saving.id})" title="${translations.savings.buttons.edit}">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateSavingModal(${saving.id})" title="${t('edit')}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteSaving(${saving.id})" title="${translations.savings.buttons.delete}">
+                        <button class="btn btn-sm btn-danger" onclick="deleteSaving(${saving.id})" title="${t('delete')}">
                             <i class="bi bi-trash"></i>
                         </button>
-                        <button class="btn btn-sm btn-info" onclick="showSavingsHistory(${saving.id})" title="History">
+                        <button class="btn btn-sm btn-info" onclick="showSavingsHistory(${saving.id})" title="${t('saving.history')}">
                            <i class="bi bi-clock-history"></i>
                         </button>
                     </div>
@@ -119,8 +119,8 @@ function openUpdateSavingModal(savingId) {
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'Failed to load saving details',
+                title: t('error'),
+                text: t('saving.load_error'),
             });
         }
     });
@@ -130,10 +130,10 @@ function openUpdateSavingModal(savingId) {
 function deleteSaving(id) {
     Swal.fire({
         icon: 'warning',
-        title: translations.savings.delete.title,
+        title: t('ui.confirm'),
         showCancelButton: true,
-        confirmButtonText: translations.savings.delete.confirm,
-        cancelButtonText: translations.savings.delete.cancel,
+        confirmButtonText: t('ui.yes_delete'),
+        cancelButtonText: t('ui.cancel'),
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
@@ -201,15 +201,15 @@ function showSavingsHistory(savingId) {
             historyHtml += '</tbody></table>';
 
             Swal.fire({
-                title: 'Saving History',
+                title: t('saving.history_title'),
                 html: historyHtml,
                 confirmButtonText: 'Close'
             });
         } else {
             Swal.fire({
                 icon: 'error',
-                title: 'Error',
-                text: 'Failed to load savings history',
+                title: t('error'),
+                text: t('saving.history_load_error'),
             });
         }
     });

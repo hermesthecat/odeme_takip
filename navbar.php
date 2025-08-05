@@ -32,8 +32,8 @@ $is_logged_in = isset($_SESSION['user_id']);
                     <ul class="dropdown-menu dropdown-menu-end">
                         <?php foreach ($lang->getAvailableLanguages() as $code): ?>
                             <li>
-                                <a class="dropdown-item <?php echo $lang->getCurrentLanguage() === $code ? 'active' : ''; ?>"
-                                    href="?lang=<?php echo $code; ?>">
+                                <a class="dropdown-item language-option <?php echo $lang->getCurrentLanguage() === $code ? 'active' : ''; ?>"
+                                    href="?lang=<?php echo $code; ?>" data-lang="<?php echo $code; ?>">
                                     <?php echo $lang->getLanguageName($code); ?>
                                 </a>
                             </li>

@@ -122,7 +122,12 @@ return [
         'forgot_password' => 'Şifremi Unuttum',
         'reset_password' => 'Şifre Sıfırlama',
         'reset_password_success' => 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi',
-        'reset_password_error' => 'Şifre sıfırlama işlemi sırasında bir hata oluştu'
+        'reset_password_error' => 'Şifre sıfırlama işlemi sırasında bir hata oluştu',
+        'password_min_8' => 'En az 8 karakter',
+        'password_uppercase' => 'En az 1 büyük harf', 
+        'password_lowercase' => 'En az 1 küçük harf',
+        'password_number' => 'En az 1 rakam',
+        'password_special' => 'En az 1 özel karakter'
     ],
 
     // Gelirler
@@ -182,7 +187,11 @@ return [
         'recurring_next' => 'Sonraki Tekrar',
         'recurring_last' => 'Son Tekrar',
         'status' => 'Durum',
-        'next_date' => 'Sonraki Tarih'
+        'next_date' => 'Sonraki Tarih',
+        'mark_paid' => 'Ödendi olarak işaretle',
+        'mark_not_paid' => 'Ödenmedi olarak işaretle',
+        'update_children_info_parent' => 'Bu seçenek işaretlendiğinde, bu ödemeye bağlı tüm ödemeler güncellenecektir.',
+        'update_children_info_child' => 'Bu seçenek işaretlendiğinde, bu ödeme ve sonraki ödemeler güncellenecektir.'
     ],
 
     // Ödemeler
@@ -295,7 +304,11 @@ return [
         'actual_progress' => 'Gerçek İlerleme',
         'progress_difference' => 'İlerleme Farkı',
         'update_amount' => 'Tutar Güncelle',
-        'update_details' => 'Detayları Güncelle'
+        'update_details' => 'Detayları Güncelle',
+        'history' => 'Geçmiş',
+        'history_title' => 'Birikim Geçmişi',
+        'load_error' => 'Birikim detayları yüklenemedi',
+        'history_load_error' => 'Birikim geçmişi yüklenemedi'
     ],
 
     // Para Birimleri
@@ -623,5 +636,63 @@ return [
         'retry_after' => '%s saniye sonra tekrar deneyin.',
         'daily_limit_reached' => 'Günlük limit aşıldı. Yarın tekrar deneyin.',
         'hourly_limit_reached' => 'Saatlik limit aşıldı. Bir saat sonra tekrar deneyin.'
+    ],
+    
+    // Admin Panel
+    'admin' => [
+        'user_management' => 'Kullanıcı Yönetimi',
+        'add_user' => 'Kullanıcı Ekle',
+        'edit_user' => 'Kullanıcı Düzenle',
+        'delete_user_confirm' => 'Bu kullanıcı kalıcı olarak silinecek!',
+        'user_info_error' => 'Kullanıcı bilgileri alınamadı',
+        'delete_error' => 'Silme işlemi sırasında bir hata oluştu',
+        'password_edit_note' => 'Düzenleme sırasında boş bırakılırsa şifre değişmez',
+        'admin_role' => 'Yönetici',
+        'active_status' => 'Aktif'
+    ],
+
+    // Stock Portfolio (Borsa)
+    'stock' => [
+        'error' => 'Hata!',
+        'success' => 'Başarılı!',
+        'fill_all_fields' => 'Lütfen tüm alanları doldurun.',
+        'stock_added' => 'Hisse başarıyla eklendi.',
+        'add_error' => 'Hisse eklenirken bir hata oluştu.',
+        'general_error' => 'Bir hata oluştu. Lütfen tekrar deneyin.',
+        'sale_success' => 'Satış işlemi başarıyla gerçekleştirildi.',
+        'sale_error' => 'Satış işlemi başarısız oldu!',
+        'sale_general_error' => 'Satış işlemi sırasında bir hata oluştu!',
+        'delete_confirm' => 'Emin misiniz?',
+        'delete_success' => 'Silindi!',
+        'stock_deleted' => 'Hisse başarıyla silindi.',
+        'delete_error' => 'Hisse silinirken bir hata oluştu!',
+        'enter_quantity' => 'Lütfen satılacak adet giriniz!',
+        'enter_valid_price' => 'Lütfen geçerli bir satış fiyatı girin!',
+        'searching' => 'Aranıyor...',
+        'ok_button' => 'Tamam',
+        'portfolio_distribution' => 'Portföy Dağılımı',
+        'sales_records' => 'Satış Kayıtları',
+        'sold_status' => 'Satıldı'
+    ],
+
+    // General UI
+    'ui' => [
+        'confirm' => 'Emin misiniz?',
+        'yes_delete' => 'Evet, sil!',
+        'yes_remove' => 'Evet, çıkar!',
+        'cancel' => 'İptal',
+        'close' => 'Kapat',
+        'loading' => 'Yükleniyor...',
+        'searching' => 'Aranıyor...',
+        'remove_payment_confirm' => 'Bu ödemeyi ödeme yönteminden çıkarmak istediğinize emin misiniz?'
+    ],
+
+    // Exchange Rate
+    'exchange' => [
+        'success' => 'Başarılı!',
+        'error' => 'Hata!',
+        'rate_updated' => 'Kur bilgisi güncellendi',
+        'update_error' => 'Kur bilgisi güncellenirken bir hata oluştu.',
+        'refresh_tooltip' => 'Kur bilgisini yenile'
     ]
 ];

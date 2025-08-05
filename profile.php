@@ -128,6 +128,7 @@ function unlink_telegram()
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/language.js"></script>
     <script src="js/theme.js"></script>
 
     <script>

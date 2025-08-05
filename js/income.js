@@ -7,7 +7,7 @@ function updateIncomeList(incomes) {
         tbody.append(`
             <tr>
                 <td colspan="8" class="text-center">
-                    <p class="text-muted">${translations.income.no_data}</p>
+                    <p class="text-muted">${t('app.no_data')}</p>
                 </td>
             </tr>
         `);
@@ -30,7 +30,7 @@ function updateIncomeList(incomes) {
                     <button
                         class="btn btn-sm ${income.status === 'received' ? 'btn-success' : 'btn-outline-success'}"
                         onclick="markAsReceived(${income.id})"
-                        title="${income.status === 'received' ? translations.income.mark_received.mark_as_not_received : translations.income.mark_received.mark_as_received}"
+                        title="${income.status === 'received' ? t('income.mark_not_received') : t('income.mark_as_received')}"
                     >
                         <i class="bi ${income.status === 'received' ? 'bi-check-circle-fill' : 'bi-check-circle'}"></i>
                     </button>
@@ -43,10 +43,10 @@ function updateIncomeList(incomes) {
                 <td class="text-center">${income.next_income_date || ''}</td>
                 <td class="text-end">
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-primary" onclick="openUpdateIncomeModal(${income.id})" title="${translations.income.buttons.edit}">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateIncomeModal(${income.id})" title="${t('edit')}">
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})" title="${translations.income.buttons.delete}">
+                        <button class="btn btn-sm btn-danger" onclick="deleteIncome(${income.id})" title="${t('delete')}"
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -72,10 +72,10 @@ function markAsReceived(id) {
 function deleteIncome(id) {
     Swal.fire({
         icon: 'warning',
-        title: translations.income.delete.title,
+        title: t('income.delete_confirm'),
         showCancelButton: true,
-        confirmButtonText: translations.income.delete.confirm,
-        cancelButtonText: translations.income.delete.cancel,
+        confirmButtonText: t('ui.yes_delete'),
+        cancelButtonText: t('ui.cancel'),
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
@@ -136,9 +136,9 @@ function openUpdateIncomeModal(id) {
                     // Bilgi metnini güncelle
                     let infoText = '';
                     if (isParent) {
-                        infoText = translations.income.update_children_info_parent || 'Bu seçenek işaretlendiğinde, bu gelire bağlı tüm gelirler güncellenecektir.';
+                        infoText = t('income.update_children_info_parent');
                     } else {
-                        infoText = translations.income.update_children_info_child || 'Bu seçenek işaretlendiğinde, bu gelir ve sonraki gelirler güncellenecektir.';
+                        infoText = t('income.update_children_info_child');
                     }
                     $('#update_income_children_info').text(infoText);
                 } else {
@@ -150,7 +150,7 @@ function openUpdateIncomeModal(id) {
                 if (income.currency !== data.user.base_currency) {
                     exchangeRateGroup.style.display = 'block';
                     if (income.exchange_rate) {
-                        $('#current_income_exchange_rate').text(`${translations.income.modal.current_rate}: ${income.exchange_rate}`);
+                        $('#current_income_exchange_rate').text(`${t('currency.current_rate')}: ${income.exchange_rate}`);
                     }
                 } else {
                     exchangeRateGroup.style.display = 'none';
@@ -193,8 +193,8 @@ function openUpdateIncomeModal(id) {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: translations.income.modal.error_title,
-                    text: translations.income.modal.error_not_found.replace(':id', id)
+                    title: t('error'),
+                    text: t('app.operation_error')
                 });
             }
         }
@@ -231,14 +231,14 @@ function updateIncome() {
             // Başarı mesajı göster
             Swal.fire({
                 icon: 'success',
-                title: translations.income.modal.success_title,
-                text: translations.income.modal.success_message
+                title: t('success'),
+                text: t('app.operation_success')
             });
         } else {
             Swal.fire({
                 icon: 'error',
-                title: translations.income.modal.error_title,
-                text: response.message || translations.income.modal.error_message
+                title: t('error'),
+                text: response.message || t('app.operation_error')
             });
         }
     });

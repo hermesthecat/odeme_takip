@@ -35,7 +35,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 <div class="table-responsive">
                     <div id="recurringPaymentsLoadingSpinner" class="text-center py-4">
                         <div class="spinner-border text-info" role="status">
-                            <span class="visually-hidden">Yükleniyor...</span>
+                            <span class="visually-hidden"><?php echo t('app.loading'); ?></span>
                         </div>
                         <div class="mt-2"><?php echo t('loading'); ?></div>
                     </div>
@@ -241,6 +241,7 @@ $user_default_currency = $_SESSION['base_currency'];
     </script>
 
     <script src="js/utils.js"></script>
+    <script src="js/language.js"></script>
     <script src="js/payments.js"></script>
     <script src="js/summary.js"></script>
     <script src="js/theme.js"></script>

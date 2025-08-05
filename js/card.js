@@ -9,7 +9,7 @@ function updateCardList(cards) {
         tbody.append(`
             <tr>
                 <td colspan="2" class="text-center">
-                    <p class="text-muted mb-0">${translations.card.no_data || 'Henüz ödeme yöntemi eklenmemiş'}</p>
+                    <p class="text-muted mb-0">${t('app.no_data')}</p>
                 </td>
             </tr>
         `);
@@ -22,10 +22,10 @@ function updateCardList(cards) {
                 <td class="text-center align-middle">${card.name}</td>
                 <td class="text-end">
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-primary" onclick="openUpdateCardModal(${card.id})" title="${translations.card.buttons.edit || 'Düzenle'}">
+                        <button class="btn btn-sm btn-primary" onclick="openUpdateCardModal(${card.id})" title="${t('edit')}"
                             <i class="bi bi-pencil"></i>
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="deleteCard(${card.id})" title="${translations.card.buttons.delete || 'Sil'}">
+                        <button class="btn btn-sm btn-danger" onclick="deleteCard(${card.id})" title="${t('delete')}"
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -47,10 +47,10 @@ function updateCardList(cards) {
 function deleteCard(id) {
     Swal.fire({
         icon: 'warning',
-        title: translations.card.delete.title,
+        title: t('ui.confirm'),
         showCancelButton: true,
-        confirmButtonText: translations.card.delete.confirm,
-        cancelButtonText: translations.card.delete.cancel,
+        confirmButtonText: t('ui.yes_delete'),
+        cancelButtonText: t('ui.cancel'),
     }).then((result) => {
         if (result.isConfirmed) {
             ajaxRequest({
@@ -91,8 +91,8 @@ function openUpdateCardModal(id) {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: translations.card.modal.error_title,
-                    text: translations.card.modal.error_not_found.replace(':id', id)
+                    title: t('error'),
+                    text: t('app.operation_error')
                 });
             }
         }
@@ -118,14 +118,14 @@ function updateCard() {
             // Başarı mesajı göster
             Swal.fire({
                 icon: 'success',
-                title: translations.card.modal.success_title,
-                text: translations.card.modal.success_message
+                title: t('success'),
+                text: t('app.operation_success')
             });
         } else {
             Swal.fire({
                 icon: 'error',
-                title: translations.card.modal.error_title,
-                text: response.message || translations.card.modal.error_message
+                title: t('error'),
+                text: response.message || t('app.operation_error')
             });
         }
     });

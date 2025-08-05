@@ -15,7 +15,7 @@ if (isset($_SESSION['user_id'])) {
         <div class="logo">
             <i class="bi bi-piggy-bank"></i>
             <h2 class="mt-3"><?php echo $site_name; ?></h2>
-            <p class="text-muted"><?php echo t('register.title'); ?></p>
+            <p class="text-muted" data-translate="register.title"><?php echo t('register.title'); ?></p>
         </div>
 
         <div class="card shadow">
@@ -23,7 +23,7 @@ if (isset($_SESSION['user_id'])) {
                 <form id="registerForm" autocomplete="off" novalidate>
 
                     <div class="mb-3">
-                        <label class="form-label"><?php echo htmlspecialchars(t('username')); ?></label>
+                        <label class="form-label" data-translate="username"><?php echo htmlspecialchars(t('username')); ?></label>
                         <input type="text" class="form-control" name="username" required
                             minlength="3" pattern="[a-zA-Z0-9_]{3,}"
                             title="<?php echo htmlspecialchars(t('auth.username_requirements')); ?>"
@@ -32,7 +32,7 @@ if (isset($_SESSION['user_id'])) {
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label"><?php echo htmlspecialchars(t('password')); ?></label>
+                        <label class="form-label" data-translate="password"><?php echo htmlspecialchars(t('password')); ?></label>
                         <div class="input-group">
                             <input type="password" class="form-control" name="password" required
                                 minlength="8"
@@ -45,11 +45,11 @@ if (isset($_SESSION['user_id'])) {
                         </div>
                         <div class="form-text password-requirements">
                             <ul class="mb-0">
-                                <li class="length-check">En az 8 karakter</li>
-                                <li class="uppercase-check">En az 1 büyük harf</li>
-                                <li class="lowercase-check">En az 1 küçük harf</li>
-                                <li class="number-check">En az 1 rakam</li>
-                                <li class="special-check">En az 1 özel karakter (@$!%*?&)</li>
+                                <li class="length-check" data-translate="auth.password_min_8">En az 8 karakter</li>
+                                <li class="uppercase-check" data-translate="auth.password_uppercase">En az 1 büyük harf</li>
+                                <li class="lowercase-check" data-translate="auth.password_lowercase">En az 1 küçük harf</li>
+                                <li class="number-check" data-translate="auth.password_number"><?php echo htmlspecialchars(t('auth.password_number')); ?></li>
+                                <li class="special-check" data-translate="auth.password_special"><?php echo htmlspecialchars(t('auth.password_special')); ?></li>
                             </ul>
                         </div>
                     </div>

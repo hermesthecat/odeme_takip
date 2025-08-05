@@ -27,7 +27,7 @@ function addExchangeRateRefreshButton(fromCurrency, toCurrency, containerId) {
                     </div>
                     <button type="button" class="btn btn-sm btn-outline-secondary" 
                             onclick="refreshExchangeRate('${fromCurrency}', '${toCurrency}', '${containerId}')"
-                            title="Kur bilgisini yenile">
+                            title="${t('exchange.refresh_tooltip')}">
                         <i class="fa-solid fa-refresh"></i>
                     </button>
                 `;
@@ -61,7 +61,7 @@ function refreshExchangeRate(fromCurrency, toCurrency, containerId) {
     .then(data => {
         if (data.status === 'success') {
             Swal.fire({
-                title: 'Başarılı!',
+                title: t('exchange.success'),
                 text: `Kur bilgisi güncellendi: 1 ${fromCurrency} = ${data.data.rate} ${toCurrency}`,
                 icon: 'success',
                 timer: 3000,
@@ -72,7 +72,7 @@ function refreshExchangeRate(fromCurrency, toCurrency, containerId) {
             location.reload();
         } else {
             Swal.fire({
-                title: 'Hata!',
+                title: t('exchange.error'),
                 text: data.message,
                 icon: 'error'
             });
@@ -81,8 +81,8 @@ function refreshExchangeRate(fromCurrency, toCurrency, containerId) {
     .catch(error => {
         console.error('Exchange rate refresh error:', error);
         Swal.fire({
-            title: 'Hata!',
-            text: 'Kur bilgisi güncellenirken bir hata oluştu.',
+            title: t('exchange.error'),
+            text: t('exchange.update_error'),
             icon: 'error'
         });
     })

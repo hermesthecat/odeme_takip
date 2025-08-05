@@ -132,7 +132,7 @@ $user_default_currency = $_SESSION['base_currency'];
                 <div class="table-responsive">
                     <div id="cardLoadingSpinner" class="text-center py-4" style="display: none;">
                         <div class="spinner-border text-success" role="status">
-                            <span class="visually-hidden">Yükleniyor...</span>
+                            <span class="visually-hidden"><?php echo t('app.loading'); ?></span>
                         </div>
                         <div class="mt-2"><?php echo t('loading'); ?></div>
                     </div>
@@ -267,14 +267,14 @@ $user_default_currency = $_SESSION['base_currency'];
         <script>
             function deletePayment(id) {
                 Swal.fire({
-                    title: 'Emin misiniz?',
-                    text: "Bu ödemeyi ödeme yönteminden çıkarmak istediğinize emin misiniz?",
+                    title: '<?php echo htmlspecialchars(t('ui.confirm')); ?>',
+                    text: "<?php echo htmlspecialchars(t('ui.remove_payment_confirm')); ?>",
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d33',
                     cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Evet, çıkar!',
-                    cancelButtonText: 'İptal'
+                    confirmButtonText: '<?php echo htmlspecialchars(t('ui.yes_remove')); ?>',
+                    cancelButtonText: '<?php echo htmlspecialchars(t('ui.cancel')); ?>'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         // POST formu oluştur
@@ -383,6 +383,7 @@ $user_default_currency = $_SESSION['base_currency'];
         </script>
 
         <script src="js/utils.js"></script>
+        <script src="js/language.js"></script>
         <script src="js/card.js"></script>
         <script src="js/summary.js"></script>
         <script src="js/theme.js"></script>

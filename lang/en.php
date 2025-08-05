@@ -122,7 +122,12 @@ return [
         'forgot_password' => 'Forgot My Password',
         'reset_password' => 'Reset Password',
         'reset_password_success' => 'Password reset link sent to your email address',
-        'reset_password_error' => 'An error occurred while resetting the password'
+        'reset_password_error' => 'An error occurred while resetting the password',
+        'password_min_8' => 'At least 8 characters',
+        'password_uppercase' => 'At least 1 uppercase letter',
+        'password_lowercase' => 'At least 1 lowercase letter', 
+        'password_number' => 'At least 1 number',
+        'password_special' => 'At least 1 special character'
     ],
 
     // Gelirler
@@ -182,7 +187,11 @@ return [
         'recurring_next' => 'Next Repetition',
         'recurring_last' => 'Last Repetition',
         'status' => 'Status',
-        'next_date' => 'Next Date'
+        'next_date' => 'Next Date',
+        'mark_paid' => 'Mark as paid',
+        'mark_not_paid' => 'Mark as not paid',
+        'update_children_info_parent' => 'When this option is checked, all payments related to this payment will be updated.',
+        'update_children_info_child' => 'When this option is checked, this payment and subsequent payments will be updated.'
     ],
 
     // Ödemeler
@@ -296,7 +305,11 @@ return [
         'actual_progress' => 'Actual Progress',
         'progress_difference' => 'Progress Difference',
         'update_amount' => 'Update Amount',
-        'update_details' => 'Update Details'
+        'update_details' => 'Update Details',
+        'history' => 'History',
+        'history_title' => 'Saving History',
+        'load_error' => 'Failed to load saving details',
+        'history_load_error' => 'Failed to load savings history'
     ],
 
     // Para Birimleri
@@ -625,5 +638,63 @@ return [
         'retry_after' => 'Try again after %s seconds.',
         'daily_limit_reached' => 'Daily limit exceeded. Try again tomorrow.',
         'hourly_limit_reached' => 'Hourly limit exceeded. Try again in an hour.'
+    ],
+    
+    // Admin Panel
+    'admin' => [
+        'user_management' => 'User Management',
+        'add_user' => 'Add User',
+        'edit_user' => 'Edit User',
+        'delete_user_confirm' => 'This user will be permanently deleted!',
+        'user_info_error' => 'Could not retrieve user information',
+        'delete_error' => 'An error occurred during deletion',
+        'password_edit_note' => 'Leave blank during editing to keep current password',
+        'admin_role' => 'Administrator',
+        'active_status' => 'Active'
+    ],
+
+    // Stock Portfolio (Borsa)
+    'stock' => [
+        'error' => 'Error!',
+        'success' => 'Success!',
+        'fill_all_fields' => 'Please fill in all fields.',
+        'stock_added' => 'Stock added successfully.',
+        'add_error' => 'An error occurred while adding stock.',
+        'general_error' => 'An error occurred. Please try again.',
+        'sale_success' => 'Sale transaction completed successfully.',
+        'sale_error' => 'Sale transaction failed!',
+        'sale_general_error' => 'An error occurred during the sale transaction!',
+        'delete_confirm' => 'Are you sure?',
+        'delete_success' => 'Deleted!',
+        'stock_deleted' => 'Stock deleted successfully.',
+        'delete_error' => 'An error occurred while deleting stock!',
+        'enter_quantity' => 'Please enter the quantity to sell!',
+        'enter_valid_price' => 'Please enter a valid sale price!',
+        'searching' => 'Searching...',
+        'ok_button' => 'OK',
+        'portfolio_distribution' => 'Portfolio Distribution',
+        'sales_records' => 'Sales Records',
+        'sold_status' => 'Sold'
+    ],
+
+    // General UI
+    'ui' => [
+        'confirm' => 'Are you sure?',
+        'yes_delete' => 'Yes, delete!',
+        'yes_remove' => 'Yes, remove!',
+        'cancel' => 'Cancel',
+        'close' => 'Close',
+        'loading' => 'Loading...',
+        'searching' => 'Searching...',
+        'remove_payment_confirm' => 'Are you sure you want to remove this payment from the payment method?'
+    ],
+
+    // Exchange Rate
+    'exchange' => [
+        'success' => 'Success!',
+        'error' => 'Error!',
+        'rate_updated' => 'Exchange rate updated',
+        'update_error' => 'An error occurred while updating exchange rate.',
+        'refresh_tooltip' => 'Refresh exchange rate'
     ]
 ];

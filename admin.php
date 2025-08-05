@@ -77,7 +77,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title><?php echo t('site_name'); ?> - Kullanıcı Yönetimi</title>
+    <title><?php echo t('site_name'); ?> - <?php echo t('admin.user_management'); ?></title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
@@ -296,23 +296,23 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="userModalTitle">Kullanıcı Ekle</h5>
+                    <h5 class="modal-title" id="userModalTitle" data-translate="admin.add_user">Kullanıcı Ekle</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <form id="userForm">
                         <input type="hidden" id="userId" name="id">
                         <div class="mb-3">
-                            <label for="modalUsername" class="form-label">Kullanıcı Adı</label>
+                            <label for="modalUsername" class="form-label" data-translate="username">Kullanıcı Adı</label>
                             <input type="text" class="form-control" id="modalUsername" name="username" required>
                         </div>
                         <div class="mb-3">
-                            <label for="modalPassword" class="form-label">Şifre</label>
+                            <label for="modalPassword" class="form-label" data-translate="password">Şifre</label>
                             <input type="password" class="form-control" id="modalPassword" name="password">
-                            <small class="text-muted">Düzenleme sırasında boş bırakılırsa şifre değişmez</small>
+                            <small class="text-muted" data-translate="admin.password_edit_note">Düzenleme sırasında boş bırakılırsa şifre değişmez</small>
                         </div>
                         <div class="mb-3">
-                            <label for="modalBaseCurrency" class="form-label">Ana Para Birimi</label>
+                            <label for="modalBaseCurrency" class="form-label" data-translate="base_currency">Ana Para Birimi</label>
                             <select class="form-select" id="modalBaseCurrency" name="base_currency" required>
                                 <option value="TRY">Türk Lirası (TRY)</option>
                                 <option value="USD">Amerikan Doları (USD)</option>
@@ -321,7 +321,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="modalTheme" class="form-label">Tema</label>
+                            <label for="modalTheme" class="form-label" data-translate="theme">Tema</label>
                             <select class="form-select" id="modalTheme" name="theme_preference" required>
                                 <option value="light">Açık Tema</option>
                                 <option value="dark">Koyu Tema</option>
@@ -330,20 +330,20 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                         <div class="mb-3">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="modalIsAdmin" name="is_admin">
-                                <label class="form-check-label" for="modalIsAdmin">Yönetici</label>
+                                <label class="form-check-label" for="modalIsAdmin" data-translate="admin.admin_role">Yönetici</label>
                             </div>
                         </div>
                         <div class="mb-3">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="modalIsActive" name="is_active" checked>
-                                <label class="form-check-label" for="modalIsActive">Aktif</label>
+                                <label class="form-check-label" for="modalIsActive" data-translate="admin.active_status">Aktif</label>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
-                    <button type="button" class="btn btn-primary" onclick="saveUser()">Kaydet</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-translate="cancel">İptal</button>
+                    <button type="button" class="btn btn-primary" onclick="saveUser()" data-translate="save">Kaydet</button>
                 </div>
             </div>
         </div>
@@ -356,6 +356,7 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="js/utils.js"></script>
+    <script src="js/language.js"></script>
     <script src="js/theme.js"></script>
     <script>
         // Kullanıcı temasını yükle
@@ -406,16 +407,16 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                         document.getElementById('modalTheme').value = user.theme_preference;
                         document.getElementById('modalIsAdmin').checked = user.is_admin == 1;
                         document.getElementById('modalIsActive').checked = user.is_active == 1;
-                        document.getElementById('userModalTitle').textContent = 'Kullanıcı Düzenle';
+                        document.getElementById('userModalTitle').textContent = t('admin.edit_user');
                         const modal = new bootstrap.Modal(document.getElementById('userModal'));
                         modal.show();
                     } else {
-                        Swal.fire('Hata', data.message, 'error');
+                        Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', data.message, 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Hata:', error);
-                    Swal.fire('Hata', 'Kullanıcı bilgileri alınamadı', 'error');
+                    Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', '<?php echo htmlspecialchars(t('admin.user_info_error')); ?>', 'error');
                 });
         }
 
@@ -445,26 +446,26 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                             window.location.reload();
                         });
                     } else {
-                        Swal.fire('Hata', data.message, 'error');
+                        Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', data.message, 'error');
                     }
                 })
                 .catch(error => {
                     console.error('Hata:', error);
-                    Swal.fire('Hata', 'İşlem sırasında bir hata oluştu', 'error');
+                    Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', '<?php echo htmlspecialchars(t('app.operation_error')); ?>', 'error');
                 });
         }
 
         // Kullanıcı sil
         function deleteUser(id) {
             Swal.fire({
-                title: 'Emin misiniz?',
-                text: "Bu kullanıcı kalıcı olarak silinecek!",
+                title: '<?php echo htmlspecialchars(t('ui.confirm')); ?>',
+                text: "<?php echo htmlspecialchars(t('admin.delete_user_confirm')); ?>",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'İptal'
+                confirmButtonText: '<?php echo htmlspecialchars(t('ui.yes_delete')); ?>',
+                cancelButtonText: '<?php echo htmlspecialchars(t('ui.cancel')); ?>'
             }).then((result) => {
                 if (result.isConfirmed) {
                     fetch('api/admin.php', {
@@ -490,12 +491,12 @@ $users = $users_stmt->fetchAll(PDO::FETCH_ASSOC);
                                     window.location.reload();
                                 });
                             } else {
-                                Swal.fire('Hata', data.message, 'error');
+                                Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', data.message, 'error');
                             }
                         })
                         .catch(error => {
                             console.error('Hata:', error);
-                            Swal.fire('Hata', 'Silme işlemi sırasında bir hata oluştu', 'error');
+                            Swal.fire('<?php echo htmlspecialchars(t('error')); ?>', '<?php echo htmlspecialchars(t('admin.delete_error')); ?>', 'error');
                         });
                 }
             });

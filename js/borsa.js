@@ -33,9 +33,9 @@ document.getElementById('hisseForm').addEventListener('submit', function (event)
     if (!sembol || !adet || !alisFiyati) {
         Swal.fire({
             icon: 'error',
-            title: 'Hata!',
-            text: 'Lütfen tüm alanları doldurun.',
-            confirmButtonText: 'Tamam'
+            title: t('stock.error'),
+            text: t('stock.fill_all_fields'),
+            confirmButtonText: t('stock.ok_button')
         });
         return;
     }
@@ -61,9 +61,9 @@ document.getElementById('hisseForm').addEventListener('submit', function (event)
                 // Başarılı mesajı göster
                 Swal.fire({
                     icon: 'success',
-                    title: 'Başarılı!',
-                    text: 'Hisse başarıyla eklendi.',
-                    confirmButtonText: 'Tamam'
+                    title: t('stock.success'),
+                    text: t('stock.stock_added'),
+                    confirmButtonText: t('stock.ok_button')
                 });
 
                 // Formu temizle
@@ -80,9 +80,9 @@ document.getElementById('hisseForm').addEventListener('submit', function (event)
                 // Hata mesajı göster
                 Swal.fire({
                     icon: 'error',
-                    title: 'Hata!',
-                    text: data.message || 'Hisse eklenirken bir hata oluştu.',
-                    confirmButtonText: 'Tamam'
+                    title: t('stock.error'),
+                    text: data.message || t('stock.add_error'),
+                    confirmButtonText: t('stock.ok_button')
                 });
             }
         })
@@ -90,9 +90,9 @@ document.getElementById('hisseForm').addEventListener('submit', function (event)
             console.error('Hata:', error);
             Swal.fire({
                 icon: 'error',
-                title: 'Hata!',
-                text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
-                confirmButtonText: 'Tamam'
+                title: t('stock.error'),
+                text: t('stock.general_error'),
+                confirmButtonText: t('stock.ok_button')
             });
         });
 });
@@ -167,7 +167,7 @@ function maliDurumGrafigiGuncelle(portfoyData) {
                 },
                 title: {
                     display: true,
-                    text: 'Portföy Dağılımı',
+                    text: t('stock.portfolio_distribution'),
                     color: isDarkMode ? '#e9ecef' : '#212529'
                 }
             }
@@ -204,14 +204,14 @@ function maliDurumGrafigiGuncelle(portfoyData) {
     document.querySelectorAll('.detay-satir').forEach(detaySatir => {
         // Satış kayıtları tablosunu bul
         const satisKayitlariBaslik = detaySatir.querySelector('h6.mb-2');
-        if (satisKayitlariBaslik && satisKayitlariBaslik.textContent.includes('Satış Kayıtları')) {
+        if (satisKayitlariBaslik && satisKayitlariBaslik.textContent.includes(t('stock.sales_records'))) {
             // Satış kayıtları tablosundaki tüm satırları bul
             const satisKayitlari = detaySatir.querySelectorAll('table tbody tr');
 
             satisKayitlari.forEach(satisKaydi => {
                 // Satış durumu "Satıldı" olan kayıtları kontrol et
                 const satisDurumu = satisKaydi.querySelector('td:nth-child(6)');
-                if (satisDurumu && satisDurumu.textContent.includes('Satıldı')) {
+                if (satisDurumu && satisDurumu.textContent.includes(t('stock.sold_status'))) {
                     // Kar/zarar hücresini bul (5. sütun)
                     const karZararHucresi = satisKaydi.querySelector('td:nth-child(5)');
                     if (karZararHucresi) {
@@ -476,9 +476,9 @@ function topluSatisKaydet(sembol) {
     if (toplamAdet <= 0) {
         Swal.fire({
             icon: 'error',
-            title: 'Hata!',
-            text: 'Lütfen satılacak adet giriniz!',
-            confirmButtonText: 'Tamam'
+            title: t('stock.error'),
+            text: t('stock.enter_quantity'),
+            confirmButtonText: t('stock.ok_button')
         });
         return;
     }
@@ -486,9 +486,9 @@ function topluSatisKaydet(sembol) {
     if (!satisFiyati || satisFiyati <= 0) {
         Swal.fire({
             icon: 'error',
-            title: 'Hata!',
-            text: 'Lütfen geçerli bir satış fiyatı girin!',
-            confirmButtonText: 'Tamam'
+            title: t('stock.error'),
+            text: t('stock.enter_valid_price'),
+            confirmButtonText: t('stock.ok_button')
         });
         return;
     }
@@ -518,18 +518,18 @@ function topluSatisKaydet(sembol) {
             if (result === 'success') {
                 Swal.fire({
                     icon: 'success',
-                    title: 'Başarılı!',
-                    text: 'Satış işlemi başarıyla gerçekleştirildi.',
-                    confirmButtonText: 'Tamam'
+                    title: t('stock.success'),
+                    text: t('stock.sale_success'),
+                    confirmButtonText: t('stock.ok_button')
                 });
                 topluSatisFormunuGizle(sembol);
                 portfoyGuncelle();
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Hata!',
-                    text: 'Satış işlemi başarısız oldu!',
-                    confirmButtonText: 'Tamam'
+                    title: t('stock.error'),
+                    text: t('stock.sale_error'),
+                    confirmButtonText: t('stock.ok_button')
                 });
             }
         })
@@ -537,9 +537,9 @@ function topluSatisKaydet(sembol) {
             console.error('Hata:', error);
             Swal.fire({
                 icon: 'error',
-                title: 'Hata!',
-                text: 'Satış işlemi sırasında bir hata oluştu!',
-                confirmButtonText: 'Tamam'
+                title: t('stock.error'),
+                text: t('stock.sale_general_error'),
+                confirmButtonText: t('stock.ok_button')
             });
         });
 }
@@ -580,14 +580,14 @@ function hisseSil(ids, event) {
         'Bu hisse kaydını silmek istediğinizden emin misiniz?';
 
     Swal.fire({
-        title: 'Emin misiniz?',
+        title: t('stock.delete_confirm'),
         text: message,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Evet, sil!',
-        cancelButtonText: 'İptal'
+        confirmButtonText: t('ui.yes_delete'),
+        cancelButtonText: t('ui.cancel')
     }).then((result) => {
         if (result.isConfirmed) {
             fetch('api/borsa.php?sil=' + encodeURIComponent(ids.replace(/,/g, '-')))
@@ -595,28 +595,28 @@ function hisseSil(ids, event) {
                 .then(data => {
                     if (data === 'success') {
                         Swal.fire({
-                            title: 'Silindi!',
-                            text: 'Hisse başarıyla silindi.',
+                            title: t('stock.delete_success'),
+                            text: t('stock.stock_deleted'),
                             icon: 'success',
-                            confirmButtonText: 'Tamam'
+                            confirmButtonText: t('stock.ok_button')
                         });
                         portfoyGuncelle();
                     } else {
                         Swal.fire({
-                            title: 'Hata!',
-                            text: 'Hisse silinirken bir hata oluştu!',
+                            title: t('stock.error'),
+                            text: t('stock.delete_error'),
                             icon: 'error',
-                            confirmButtonText: 'Tamam'
+                            confirmButtonText: t('stock.ok_button')
                         });
                     }
                 })
                 .catch(error => {
                     console.error('Hata:', error);
                     Swal.fire({
-                        title: 'Hata!',
-                        text: 'Bir hata oluştu. Lütfen tekrar deneyin.',
+                        title: t('stock.error'),
+                        text: t('stock.general_error'),
                         icon: 'error',
-                        confirmButtonText: 'Tamam'
+                        confirmButtonText: t('stock.ok_button')
                     });
                 });
         }
@@ -668,7 +668,7 @@ function hisseAra() {
     }
 
     // Arama yapılıyor göstergesi
-    sembolOnerileri.innerHTML = '<div class="text-muted"><small>Aranıyor...</small></div>';
+    sembolOnerileri.innerHTML = `<div class="text-muted"><small>${t('stock.searching')}</small></div>`;
 
     fetch('api/borsa.php?ara=' + encodeURIComponent(aranan))
         .then(response => response.json())
