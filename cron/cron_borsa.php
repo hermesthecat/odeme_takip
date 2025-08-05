@@ -6,8 +6,8 @@
  * @version 1.0
  */
 
-require_once 'config.php';
-require_once 'classes/log.php'; // Log fonksiyonları
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/log.php'; // Log fonksiyonları
 global $pdo;
 
 /**

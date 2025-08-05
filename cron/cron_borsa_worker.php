@@ -8,8 +8,8 @@
 
 // Bu script cron_borsa.php tarafından çağrılır ve belirli bir hisse grubunu işler
 
-require_once 'config.php';
-require_once 'classes/log.php'; // Log fonksiyonları
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/log.php'; // Log fonksiyonları
 global $pdo;
 
 // Komut satırı argümanlarını kontrol et

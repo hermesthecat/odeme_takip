@@ -37,13 +37,13 @@ No automated test suite is configured. Testing is done manually through the web 
 
 ```bash
 # Stock portfolio update cron job (run every hour)
-php cron_borsa.php
+php cron/cron_borsa.php
 
 # Stock portfolio worker process (for real-time updates)
-php cron_borsa_worker.php
+php cron/cron_borsa_worker.php
 
 # Example crontab entry for stock updates:
-# 0 * * * * /usr/bin/php /path/to/project/cron_borsa.php
+# 0 * * * * /usr/bin/php /path/to/project/cron/cron_borsa.php
 ```
 
 ### Development Server
