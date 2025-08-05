@@ -19,7 +19,7 @@ cp .env.example .env
 # Edit .env with your database and API credentials
 
 # Import database structure
-mysql -u your_user -p your_database < database.sql
+mysql -u your_user -p your_database < database/database.sql
 
 # Create uploads directory with proper permissions
 mkdir uploads

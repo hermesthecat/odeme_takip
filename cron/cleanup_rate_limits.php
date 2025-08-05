@@ -9,8 +9,8 @@
  * - Manual execution: php cleanup_rate_limits.php
  */
 
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/classes/RateLimiter.php';
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/RateLimiter.php';
 
 // CLI-only script
 if (php_sapi_name() !== 'cli') {

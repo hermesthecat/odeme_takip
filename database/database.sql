@@ -1,14 +1,5 @@
--- ============================================================================
 -- PECUNIA - COMPLETE DATABASE SCHEMA
 -- Personal Finance Management System
--- ============================================================================
--- Author: A. Kerem Gök
--- Created: 2025-02-28
--- Last Updated: 2025-08-05
--- Version: 2.0
--- Description: Complete database schema with all tables, indexes, foreign keys, 
---              and rate limiting system
--- ============================================================================
 
 -- MySQL Configuration
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -20,9 +11,6 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
--- ============================================================================
--- CORE TABLES
--- ============================================================================
 
 -- --------------------------------------------------------
 -- Table structure for table `users`
@@ -254,9 +242,6 @@ CREATE TABLE `ai_analysis_temp` (
     CONSTRAINT `fk_ai_analysis_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_turkish_ci COMMENT = 'AI analiz geçici tablosu';
 
--- ============================================================================
--- RATE LIMITING SYSTEM
--- ============================================================================
 
 -- --------------------------------------------------------
 -- Table structure for table `rate_limits`
@@ -316,9 +301,6 @@ CREATE TABLE `rate_limit_violations` (
     CONSTRAINT `fk_rate_limit_violations_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci COMMENT='Rate limit violation logs';
 
--- ============================================================================
--- INITIAL DATA
--- ============================================================================
 
 -- Default admin user
 INSERT INTO `users` (
@@ -396,9 +378,6 @@ ON DUPLICATE KEY UPDATE
   `window_minutes` = VALUES(`window_minutes`),
   `updated_at` = CURRENT_TIMESTAMP;
 
--- ============================================================================
--- AUTO INCREMENT SETTINGS
--- ============================================================================
 ALTER TABLE `users` AUTO_INCREMENT = 2;
 ALTER TABLE `exchange_rates` AUTO_INCREMENT = 3;
 ALTER TABLE `income` AUTO_INCREMENT = 1;
@@ -413,9 +392,6 @@ ALTER TABLE `rate_limits` AUTO_INCREMENT = 1;
 ALTER TABLE `rate_limit_rules` AUTO_INCREMENT = 13;
 ALTER TABLE `rate_limit_violations` AUTO_INCREMENT = 1;
 
--- ============================================================================
--- STORED PROCEDURES
--- ============================================================================
 
 -- Rate limit cleanup procedure
 DELIMITER //
@@ -434,50 +410,8 @@ BEGIN
 END //
 DELIMITER ;
 
--- ============================================================================
--- PERFORMANCE MONITORING QUERIES
--- ============================================================================
 
--- Performance test queries (run these after setup):
--- EXPLAIN SELECT * FROM payments WHERE user_id = 1 ORDER BY first_date DESC;
--- EXPLAIN SELECT * FROM income WHERE user_id = 1 AND status = 'pending';
--- EXPLAIN SELECT * FROM savings WHERE user_id = 1 AND start_date >= '2025-01-01';
 
--- Index monitoring:
--- SHOW INDEX FROM payments;
--- SHOW TABLE STATUS LIKE 'payments';
--- ANALYZE TABLE payments;
-
--- Rate limit monitoring:
--- SELECT * FROM rate_limit_rules WHERE is_active = 1;
--- SELECT endpoint, SUM(request_count) as total_requests FROM rate_limits GROUP BY endpoint;
--- CALL CleanExpiredRateLimits();
-
--- ============================================================================
--- SECURITY NOTES
--- ============================================================================
-
--- 1. All tables use utf8mb4_turkish_ci collation for proper Turkish character support
--- 2. Foreign key constraints ensure referential integrity
--- 3. CASCADE DELETE prevents orphaned records
--- 4. Strategic indexing improves query performance 10-100x
--- 5. Rate limiting system prevents abuse
--- 6. Admin user password: 'password' (change immediately!)
--- 7. All sensitive data properly escaped and validated
-
--- ============================================================================
--- MAINTENANCE
--- ============================================================================
-
--- Regular maintenance tasks:
--- 1. Run CALL CleanExpiredRateLimits(); daily
--- 2. Monitor rate_limit_violations for abuse patterns
--- 3. Update exchange rates regularly via API
--- 4. Archive old logs periodically
--- 5. Monitor disk space usage
 
 COMMIT;
 
--- ============================================================================
--- END OF SCHEMA
--- ============================================================================

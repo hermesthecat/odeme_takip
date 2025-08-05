@@ -5,6 +5,7 @@ Bu klasör projenin cron job dosyalarını içerir.
 ## Dosyalar
 
 ### `cron_borsa.php`
+
 - **Açıklama**: Ana borsa portföy güncelleme script'i
 - **İşlev**: Portföydeki hisse senetlerinin güncel fiyatlarını BigPara API'den çeker
 - **Çalışma Sıklığı**: Saatlik (önerilen)
@@ -15,6 +16,7 @@ Bu klasör projenin cron job dosyalarını içerir.
   - Detaylı loglama
 
 ### `cron_borsa_worker.php`
+
 - **Açıklama**: Worker script (yardımcı işlem)
 - **İşlev**: `cron_borsa.php` tarafından çağrılır, belirli hisse gruplarını işler
 - **Kullanım**: Otomatik olarak ana script tarafından çalıştırılır
@@ -57,6 +59,7 @@ php cron_borsa.php
 ## Loglama
 
 Tüm cron işlemleri `logs` tablosuna kaydedilir:
+
 - Başarılı güncellemeler
 - API hataları
 - Veritabanı işlem sonuçları
