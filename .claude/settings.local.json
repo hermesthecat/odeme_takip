@@ -22,7 +22,9 @@
       "Bash(mv:*)",
       "Bash(cp:*)",
       "Bash(find:*)",
-      "Bash(php:*)"
+      "Bash(php:*)",
+      "Bash(rm:*)",
+      "Bash(rmdir:*)"
     ],
     "deny": []
   }
