@@ -20,7 +20,9 @@
       "Bash(npm run dev:*)",
       "Bash(mysql:*)",
       "Bash(mv:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(find:*)",
+      "Bash(php:*)"
     ],
     "deny": []
   }

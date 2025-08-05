@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/classes/RateLimiter.php';
 require_once __DIR__ . '/api/utils.php';
 require_once __DIR__ . '/api/validate.php';
 require_once __DIR__ . '/api/currency.php';
@@ -20,6 +21,26 @@ $response = ['status' => 'error', 'message' => 'Invalid request'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     checkLogin(); // Ensure user is authenticated
+    
+    // Rate limiting check
+    $rateLimiter = RateLimiter::getInstance();
+    $clientIP = $rateLimiter->getClientIP();
+    $userIdentifier = $rateLimiter->getCombinedIdentifier();
+    
+    // Check general API rate limit (IP-based)
+    $ipLimit = $rateLimiter->checkLimit('api.php', $clientIP, 'ip');
+    if (!$ipLimit['allowed']) {
+        $rateLimiter->sendRateLimitResponse($ipLimit);
+    }
+    
+    // Check user-based rate limit
+    $userLimit = $rateLimiter->checkLimit('api.php', $userIdentifier, 'user');
+    if (!$userLimit['allowed']) {
+        $rateLimiter->sendRateLimitResponse($userLimit);
+    }
+    
+    // Add rate limit headers to response
+    $rateLimiter->addRateLimitHeaders($userLimit);
     
     // CSRF Protection for state-changing operations
     requireCSRFToken();

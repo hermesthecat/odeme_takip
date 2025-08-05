@@ -165,6 +165,36 @@ function portfoyListele()
     $stmt->execute(['user_id' => $user_id]);
     $hisseler = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // PERFORMANCE OPTIMIZATION: Tüm alış kayıtlarını tek sorguda çek
+    $sql_all_purchases = "SELECT id, sembol, adet, alis_fiyati, alis_tarihi, anlik_fiyat, durum, satis_fiyati, satis_tarihi, satis_adet
+                         FROM portfolio 
+                         WHERE user_id = :user_id AND durum != 'satis_kaydi'
+                         ORDER BY sembol ASC, alis_tarihi ASC";
+    $stmt_all = $pdo->prepare($sql_all_purchases);
+    $stmt_all->execute(['user_id' => $user_id]);
+    $all_purchases = $stmt_all->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Alış kayıtlarını sembol bazında grupla (memory'de organize et)
+    $purchases_by_symbol = [];
+    foreach ($all_purchases as $purchase) {
+        $purchases_by_symbol[$purchase['sembol']][] = $purchase;
+    }
+    
+    // PERFORMANCE OPTIMIZATION: Tüm satış kayıtlarını tek sorguda çek
+    $sql_all_sales = "SELECT referans_alis_id, SUM(adet) as toplam_satilan
+                      FROM portfolio 
+                      WHERE user_id = :user_id AND durum = 'satis_kaydi'
+                      GROUP BY referans_alis_id";
+    $stmt_sales = $pdo->prepare($sql_all_sales);
+    $stmt_sales->execute(['user_id' => $user_id]);
+    $sales_data = $stmt_sales->fetchAll(PDO::FETCH_ASSOC);
+    
+    // Satış kayıtlarını referans ID bazında organize et
+    $sales_by_reference = [];
+    foreach ($sales_data as $sale) {
+        $sales_by_reference[$sale['referans_alis_id']] = $sale['toplam_satilan'];
+    }
+
     $output = '';
     foreach ($hisseler as $hisse) {
         $sembol = $hisse['sembol'];
@@ -176,14 +206,8 @@ function portfoyListele()
         $hisse_adi = $hisse['hisse_adi'] ?: $sembol;
         $son_guncelleme = $hisse['son_guncelleme'];
 
-        // Hissenin tüm alış kayıtlarını getir
-        $sql = "SELECT id, adet, alis_fiyati, alis_tarihi, anlik_fiyat, durum, satis_fiyati, satis_tarihi, satis_adet
-                FROM portfolio 
-                WHERE user_id = :user_id AND sembol = :sembol AND durum != 'satis_kaydi'
-                ORDER BY alis_tarihi ASC";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute(['user_id' => $user_id, 'sembol' => $sembol]);
-        $alislar = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        // Memory'den alış kayıtlarını al (database query yok!)
+        $alislar = $purchases_by_symbol[$sembol] ?? [];
 
         // Ortalama alış fiyatını hesapla
         $toplam_maliyet = 0;
@@ -194,15 +218,8 @@ function portfoyListele()
         foreach ($alislar as $alis) {
             // Aktif veya kısmen satılmış hisseler için mevcut değerleri hesapla
             if ($alis['durum'] == 'aktif' || $alis['durum'] == 'kismi_satildi') {
-                // Satış kayıtlarından satılan adet miktarını hesapla
-                $sql = "SELECT IFNULL(SUM(adet), 0) as toplam_satilan
-                        FROM portfolio 
-                        WHERE durum = 'satis_kaydi' 
-                        AND referans_alis_id = :referans_id";
-                $stmt = $pdo->prepare($sql);
-                $stmt->execute(['referans_id' => $alis['id']]);
-                $satilan = $stmt->fetch(PDO::FETCH_ASSOC);
-                $satilan_adet = $satilan['toplam_satilan'];
+                // Memory'den satış kayıtlarını al (database query yok!)
+                $satilan_adet = $sales_by_reference[$alis['id']] ?? 0;
 
                 $kalan_adet = $alis['adet'] - $satilan_adet;
                 $toplam_maliyet += $alis['alis_fiyati'] * $kalan_adet;

@@ -1,0 +1,148 @@
+{
+  "validation_rules": {
+    "income": {
+      "name": {
+        "required": true,
+        "type": "string",
+        "min_length": 1,
+        "max_length": 100
+      },
+      "amount": {
+        "required": true,
+        "type": "numeric",
+        "min_value": 0.01,
+        "max_value": 999999999.99
+      },
+      "currency": {
+        "required": true,
+        "type": "enum",
+        "values": ["TRY", "USD", "EUR", "GBP"]
+      },
+      "first_date": {
+        "required": true,
+        "type": "date",
+        "format": "Y-m-d"
+      },
+      "frequency": {
+        "required": true,
+        "type": "enum",
+        "values": ["none", "monthly", "bimonthly", "quarterly", "fourmonthly", "fivemonthly", "sixmonthly", "yearly"]
+      },
+      "end_date": {
+        "required": false,
+        "type": "date",
+        "format": "Y-m-d",
+        "dependency": "frequency != 'none'"
+      }
+    },
+    "payment": {
+      "name": {
+        "required": true,
+        "type": "string",
+        "min_length": 1,
+        "max_length": 100
+      },
+      "amount": {
+        "required": true,
+        "type": "numeric",
+        "min_value": 0.01,
+        "max_value": 999999999.99
+      },
+      "currency": {
+        "required": true,
+        "type": "enum",
+        "values": ["TRY", "USD", "EUR", "GBP"]
+      },
+      "first_date": {
+        "required": true,
+        "type": "date",
+        "format": "Y-m-d"
+      },
+      "frequency": {
+        "required": true,
+        "type": "enum",
+        "values": ["none", "monthly", "bimonthly", "quarterly", "fourmonthly", "fivemonthly", "sixmonthly", "yearly"]
+      },
+      "end_date": {
+        "required": false,
+        "type": "date",
+        "format": "Y-m-d",
+        "dependency": "frequency != 'none'"
+      },
+      "card_id": {
+        "required": false,
+        "type": "integer",
+        "min_value": 1
+      }
+    },
+    "saving": {
+      "name": {
+        "required": true,
+        "type": "string",
+        "min_length": 1,
+        "max_length": 100
+      },
+      "target_amount": {
+        "required": true,
+        "type": "numeric",
+        "min_value": 0.01,
+        "max_value": 999999999.99
+      },
+      "current_amount": {
+        "required": false,
+        "type": "numeric",
+        "min_value": 0,
+        "max_value": 999999999.99
+      },
+      "currency": {
+        "required": true,
+        "type": "enum",
+        "values": ["TRY", "USD", "EUR", "GBP"]
+      },
+      "start_date": {
+        "required": true,
+        "type": "date",
+        "format": "Y-m-d"
+      },
+      "target_date": {
+        "required": true,
+        "type": "date",
+        "format": "Y-m-d"
+      }
+    },
+    "card": {
+      "name": {
+        "required": true,
+        "type": "string",
+        "min_length": 1,
+        "max_length": 100
+      }
+    },
+    "user_settings": {
+      "base_currency": {
+        "required": true,
+        "type": "enum",
+        "values": ["TRY", "USD", "EUR", "GBP"]
+      },
+      "theme_preference": {
+        "required": true,
+        "type": "enum",
+        "values": ["light", "dark"]
+      }
+    }
+  },
+  "error_messages": {
+    "required": "Bu alan zorunludur",
+    "numeric": "Bu alan sayısal değer olmalıdır",
+    "string": "Bu alan metin olmalıdır",
+    "date": "Geçerli bir tarih giriniz (YYYY-MM-DD)",
+    "enum": "Geçersiz seçenek",
+    "min_value": "Minimum değer {min} olmalıdır",
+    "max_value": "Maksimum değer {max} olmalıdır",
+    "min_length": "Minimum {min} karakter olmalıdır",
+    "max_length": "Maksimum {max} karakter olmalıdır"
+  },
+  "supported_currencies": ["TRY", "USD", "EUR", "GBP"],
+  "supported_frequencies": ["none", "monthly", "bimonthly", "quarterly", "fourmonthly", "fivemonthly", "sixmonthly", "yearly"],
+  "supported_themes": ["light", "dark"]
+}

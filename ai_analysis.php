@@ -7,7 +7,7 @@
  */
 
 require_once 'config.php';
-require_once 'api/rate_limiter.php';
+require_once 'classes/RateLimiter.php';
 require_once 'header.php';
 require_once 'navbar_app.php';
 
@@ -20,10 +20,26 @@ $user_id = validateUserId($_SESSION['user_id']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['document'])) {
     // CSRF koruması
     requireCSRFToken();
-    // Rate limiting kontrolü - file upload
-    if (!checkFileUploadLimit($user_id)) {
-        $_SESSION['error'] = "Çok fazla dosya yükleme denemesi. 5 dakika sonra tekrar deneyin.";
-        echo "<script>window.location.href = '" . SITE_URL . "/ai_analysis.php';</script>";
+    
+    // Rate limiting kontrolü - MySQL based
+    $rateLimiter = RateLimiter::getInstance();
+    $userIdentifier = $rateLimiter->getCombinedIdentifier($user_id);
+    
+    // File upload rate limit check
+    $uploadLimit = $rateLimiter->checkLimit('file_upload', $userIdentifier, 'user');
+    if (!$uploadLimit['allowed']) {
+        $_SESSION['error'] = "Çok fazla dosya yükleme denemesi. " . 
+                           date('H:i:s', $uploadLimit['reset_time']) . " saatinde tekrar deneyin.";
+        header("Location: " . SITE_URL . "/ai_analysis.php");
+        exit;
+    }
+    
+    // AI analysis rate limit check
+    $aiLimit = $rateLimiter->checkLimit('ai_analysis', $userIdentifier, 'user');
+    if (!$aiLimit['allowed']) {
+        $_SESSION['error'] = "AI analiz limiti aşıldı. " . 
+                           date('H:i:s', $aiLimit['reset_time']) . " saatinde tekrar deneyin.";
+        header("Location: " . SITE_URL . "/ai_analysis.php");
         exit;
     }
     $file = $_FILES['document'];

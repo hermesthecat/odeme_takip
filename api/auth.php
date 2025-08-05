@@ -10,6 +10,7 @@
 
 require_once '../config.php';
 require_once '../classes/log.php';
+require_once '../classes/RateLimiter.php';
 
 /**
  * XSS koruma fonksiyonu
@@ -38,6 +39,10 @@ $response = ['status' => 'error', 'message' => t('auth.invalid_request')];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $action = sanitizeInput($_POST['action'] ?? '');
+    
+    // Rate limiting setup
+    $rateLimiter = RateLimiter::getInstance();
+    $clientIP = $rateLimiter->getClientIP();
 
     switch ($action) {
         /**
@@ -53,6 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * @param string $_POST['base_currency'] - Temel para birimi / Base currency
          */
         case 'register':
+            // Register rate limit check
+            $registerLimit = $rateLimiter->checkLimit('register', $clientIP, 'ip');
+            if (!$registerLimit['allowed']) {
+                $rateLimiter->sendRateLimitResponse($registerLimit);
+            }
             $username = sanitizeInput(trim($_POST['username'] ?? ''));
             $password = trim($_POST['password'] ?? '');
             $password_confirm = trim($_POST['password_confirm'] ?? '');
@@ -121,12 +131,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
              * @param boolean $_POST['remember_me'] - Beni hatırla / Remember me
              */
         case 'login':
+            // Login rate limit check
+            $loginLimit = $rateLimiter->checkLimit('login', $clientIP, 'ip');
+            if (!$loginLimit['allowed']) {
+                $rateLimiter->sendRateLimitResponse($loginLimit);
+            }
+            
             $username = sanitizeInput(trim($_POST['username'] ?? ''));
             $password = trim($_POST['password'] ?? '');
             $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'true';
 
-            // Brute force koruması
-            // Brute force protection
+            // Brute force koruması - MySQL rate limiting ile enhance edildi
+            // Brute force protection - Enhanced with MySQL rate limiting
+            $bruteForceLimit = $rateLimiter->checkLimit('login', $clientIP . ':' . $username, 'combined');
+            if (!$bruteForceLimit['allowed']) {
+                $response = [
+                    'status' => 'error', 
+                    'message' => t('auth.brute_force_protection') . ' ' . 
+                               date('H:i:s', $bruteForceLimit['reset_time']) . ' saatinde tekrar deneyin.'
+                ];
+                break;
+            }
+            
+            // Legacy session-based brute force protection (backward compatibility)
             if (
                 isset($_SESSION['login_attempts'][$username]) &&
                 $_SESSION['login_attempts'][$username]['count'] >= 5 &&

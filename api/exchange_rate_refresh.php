@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../classes/RateLimiter.php';
 require_once __DIR__ . '/utils.php';
 checkLogin();
 
@@ -15,31 +16,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $from_currency = $_POST['from_currency'] ?? null;
         $to_currency = $_POST['to_currency'] ?? null;
-        $user_id = $_SESSION['user_id'];
+        $user_id = validateUserId($_SESSION['user_id']);
         
         if (!$from_currency || !$to_currency) {
             throw new Exception('Para birimi bilgileri eksik');
         }
         
-        // Rate limiting - aynı kullanıcı 1 dakikada en fazla 5 kur güncellemesi yapabilir
-        $cache_key = "rate_refresh_{$user_id}";
-        $current_time = time();
+        // MySQL-based rate limiting
+        $rateLimiter = RateLimiter::getInstance();
+        $userIdentifier = $rateLimiter->getCombinedIdentifier($user_id);
         
-        if (!isset($_SESSION[$cache_key])) {
-            $_SESSION[$cache_key] = [];
+        $exchangeLimit = $rateLimiter->checkLimit('exchange_rate_refresh', $userIdentifier, 'user');
+        if (!$exchangeLimit['allowed']) {
+            $rateLimiter->addRateLimitHeaders($exchangeLimit);
+            throw new Exception('Çok fazla kur güncelleme isteği. ' . 
+                              date('H:i:s', $exchangeLimit['reset_time']) . ' saatinde tekrar deneyin.');
         }
         
-        // Son 1 dakikadaki istekleri filtrele
-        $_SESSION[$cache_key] = array_filter($_SESSION[$cache_key], function($timestamp) use ($current_time) {
-            return ($current_time - $timestamp) < 60;
-        });
-        
-        if (count($_SESSION[$cache_key]) >= 5) {
-            throw new Exception('Çok fazla kur güncelleme isteği. 1 dakika sonra tekrar deneyin.');
-        }
-        
-        // İsteği kaydet
-        $_SESSION[$cache_key][] = $current_time;
+        // Add rate limit headers
+        $rateLimiter->addRateLimitHeaders($exchangeLimit);
         
         // Kuru zorla güncelle
         $new_rate = forceUpdateExchangeRate($from_currency, $to_currency);

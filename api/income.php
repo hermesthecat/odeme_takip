@@ -61,15 +61,16 @@ function addIncome()
 
     $pdo->beginTransaction();
 
-    // Kur bilgisini al
-    // Get exchange rate
-    $exchange_rate = null;
-    if ($currency !== $base_currency) {
-        $exchange_rate = getExchangeRate($currency, $base_currency);
-        if (!$exchange_rate) {
-            throw new Exception(t('income.rate_error'));
+    try {
+        // Kur bilgisini al
+        // Get exchange rate
+        $exchange_rate = null;
+        if ($currency !== $base_currency) {
+            $exchange_rate = getExchangeRate($currency, $base_currency);
+            if (!$exchange_rate) {
+                throw new Exception(t('income.rate_error'));
+            }
         }
-    }
 
     // Ana kaydı ekle
     // Add main record
@@ -129,12 +130,19 @@ function addIncome()
         }
     }
 
-    $pdo->commit();
-    
-    // Cache invalidation - gelir eklenen ay cache'ini temizle
-    invalidateSummaryCacheForDate($user_id, $first_date);
-    
-    return true;
+        $pdo->commit();
+        
+        // Cache invalidation - gelir eklenen ay cache'ini temizle
+        invalidateSummaryCacheForDate($user_id, $first_date);
+        
+        return true;
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        saveLog('Transaction failed in addIncome: ' . $e->getMessage(), 'error', 'addIncome', $_SESSION['user_id']);
+        throw $e;
+    }
 }
 
 /**
